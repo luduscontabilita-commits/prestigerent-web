@@ -106,6 +106,36 @@ export function Footer({ locale }: { locale: string }) {
         </div>
       </div>
 
+      {/* IL PROMEMORIA. Sta in fondo, e' rosso e ha un link che porta dritto
+          dove si spegne. Deve dare fastidio: e' l'unica difesa contro i due
+          errori che non danno nessun sintomo -- andare online col noindex
+          acceso, e lasciare pubblico il repo del cliente. Ogni riga sparisce
+          da sola quando la sua variabile viene spenta. */}
+      {(process.env.SITE_NOINDEX !== 'false' || process.env.REPO_PUBLIC === 'true') && (
+        <div className="ft-warn">
+          {process.env.SITE_NOINDEX !== 'false' && (
+            <a
+              href="https://vercel.com/traliccioelettrico-wqs-projects/prestigerent-web/settings/environment-variables"
+              target="_blank"
+              rel="noopener"
+            >
+              ⚠️ QUESTO SITO È INVISIBILE A GOOGLE — il giorno del passaggio metti
+              SITE_NOINDEX=false su Vercel e ripubblica. Clicca qui per farlo.
+            </a>
+          )}
+          {process.env.REPO_PUBLIC === 'true' && (
+            <a
+              href="https://github.com/luduscontabilita-commits/prestigerent-web/settings"
+              target="_blank"
+              rel="noopener"
+            >
+              ⚠️ IL REPO È PUBBLICO — reso pubblico solo per collegare Vercel.
+              Rimettilo privato, poi REPO_PUBLIC=false. Clicca qui.
+            </a>
+          )}
+        </div>
+      )}
+
       <div className="ft-bottom">
         <span>&copy; {new Date().getFullYear()} Prestige Rent S.R.L. &mdash; Florence, Italy</span>
         <span className="ft-social">

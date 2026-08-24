@@ -384,3 +384,15 @@
 @media (max-width:760px){
   .pr-sticky.pr-sticky-tour{ display:flex; transform:none; }
 }
+
+/* Il promemoria in fondo al footer. Deve dare fastidio: rosso pieno, in
+   maiuscolo, cliccabile. E' l'unica difesa contro due errori che non danno
+   nessun sintomo -- il sito online col noindex acceso e il repo del cliente
+   lasciato pubblico. Sparisce da solo quando le variabili vengono spente. */
+.ft-warn{ background:#C8102E; padding:2px 0; }
+.ft-warn a{
+  display:block; padding:11px 20px; text-align:center; text-decoration:none;
+  color:#fff; font-size:.78rem; font-weight:800; letter-spacing:.02em; line-height:1.45;
+}
+.ft-warn a:hover{ background:rgba(0,0,0,.18); text-decoration:underline; }
+.ft-warn a + a{ border-top:1px solid rgba(255,255,255,.28); }
