@@ -7,9 +7,23 @@ import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
+import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import '@/styles/home.css';
 
-const SITE = 'https://prestigerent.com';
+const SITE = SITE_URL;
+
+/* Le 87 pagine (x 3 lingue) si generano in anticipo e si rigenerano ogni ora.
+   Prima erano dinamiche: ogni visita interrogava Supabase e Regiondo, con un
+   TTFB intorno al secondo. Il masterplan chiede LCP sotto i 2 secondi
+   misurato da mobile negli Stati Uniti, e con la generazione a richiesta non
+   ci si arriva. */
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const { data } = await supabase.from('tours').select('slug').eq('status', 'published');
+  const slugs = (data ?? []) as { slug: string }[];
+  return LOCALES.flatMap((l) => slugs.map((s) => ({ locale: l.code, slug: s.slug })));
+}
 
 /* Da dove viene cosa, e perche':
  *
@@ -64,9 +78,7 @@ export async function generateMetadata({
   const res = await getTour(slug, locale);
   if (!res) return {};
 
-  const languages: Record<string, string> = {};
-  for (const l of LOCALES) languages[l.htmlLang] = SITE + pathFor(l.code, slug);
-  languages['x-default'] = SITE + pathFor(DEFAULT_LOCALE, slug);
+  const { languages } = { languages: hreflangDi((l) => pathFor(l, slug)) };
 
   return {
     title: res.contenuto.name ?? slug,
@@ -242,6 +254,31 @@ export default async function TourPage({
           )}
         </div>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            grafo([
+              organization(),
+              breadcrumb(locale, [
+                { nome: 'Home', path: '/' },
+                { nome: nome, path: `/tour/${slug}/` },
+              ]),
+              touristTrip({
+                nome,
+                descrizione: contenuto.description,
+                url: SITE + pathFor(locale, slug),
+                locale,
+                immagini: foto,
+                prezzo: product?.price ?? null,
+                ore: product?.durationHours ?? null,
+                tappe: punti.slice(0, 8),
+              }),
+            ])
+          ),
+        }}
+      />
 
       <ContactSection />
     </main>

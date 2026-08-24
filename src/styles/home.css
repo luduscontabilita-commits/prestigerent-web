@@ -188,7 +188,11 @@
   max-width:1180px; margin:0 auto; padding:11px 20px;
   display:flex; align-items:center; gap:20px;
 }
-.hd-logo{ text-decoration:none; color:inherit; line-height:1.1; margin-inline-end:auto; }
+.hd-logo{
+  text-decoration:none; color:inherit; line-height:1.1; margin-inline-end:auto;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.hd-logo img{ width:40px; height:40px; flex:0 0 auto; }
 .hd-logo strong{ display:block; font-size:1.06rem; font-weight:800; color:var(--ink); letter-spacing:-.01em; }
 .hd-logo small{ display:block; font-size:.62rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
 .hd-top{

@@ -58,8 +58,20 @@ export function Header({ locale }: { locale: string }) {
     <header className="hd">
       <div className="hd-in">
         <a className="hd-logo" href={p('/')}>
-          <strong>Prestige Rent</strong>
-          <small>Tours &amp; Transfers in Italy</small>
+          {/* Il marchio tondo e' quello delle landing, il logotipo e' quello
+              del sito: si usano insieme come sulla landing, cosi' chi arriva
+              dagli annunci riconosce lo stesso segno. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://prestigerent.com/lp/img/logo-prestige.png"
+            alt="Prestige Rent"
+            width={40}
+            height={40}
+          />
+          <span>
+            <strong>Prestige Rent</strong>
+            <small>Tours &amp; Transfers in Italy</small>
+          </span>
         </a>
 
         <nav className="hd-nav">
