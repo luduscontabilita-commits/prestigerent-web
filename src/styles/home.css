@@ -375,3 +375,12 @@
 .ft-social{ display:flex; gap:16px; }
 .ft-social a{ color:rgba(255,255,255,.75); text-decoration:none; font-weight:700; }
 .ft-social a:hover{ color:#fff; }
+
+/* Sotto i 760px la barra si vede SUBITO, senza aspettare che si scorra.
+   Su telefono il pulsante di prenotazione a portata di pollice fin dal primo
+   istante e' la differenza fra una scheda letta e una prenotata: far
+   comparire la barra solo dopo l'hero significa perdere chi decide in fretta.
+   Sopra i 760px resta legata allo scorrimento, per non coprire il contenuto. */
+@media (max-width:760px){
+  .pr-sticky.pr-sticky-tour{ display:flex; transform:none; }
+}
