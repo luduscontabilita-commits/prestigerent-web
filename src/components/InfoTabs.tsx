@@ -40,10 +40,11 @@ export function InfoTabs({ tabs }: { tabs: Record<string, string> }) {
 
       {keys.map((k) => (
         <div key={k} className="pr-tabp" role="tabpanel" hidden={k !== attiva}>
-          {/* Le FAQ diventano accordion; tutto il resto e' testo normale,
-              SENZA ritaglio: la scheda dei prezzi tagliata a meta' da una
-              sfumatura era la cosa peggiore della pagina. Chi apre "Prezzi"
-              vuole vedere i prezzi, non un bottone. */}
+          {/* Nella scheda FAQ le domande sono accordion apribili; tutto il
+              resto e' testo normale, SENZA ritaglio: la scheda dei prezzi
+              tagliata a meta' da una sfumatura era la cosa peggiore della
+              pagina. Chi apre "Prezzi" vuole vedere i prezzi, non un
+              bottone. */}
           {/^faq/i.test(k) ? (
             <Faq html={tabs[k]} />
           ) : (

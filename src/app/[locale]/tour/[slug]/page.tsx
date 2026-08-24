@@ -8,7 +8,6 @@ import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
 import { pulisci } from '@/lib/prosa';
-import { Faq } from '@/components/Faq';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
@@ -114,13 +113,18 @@ export default async function TourPage({
   const punti = (contenuto.highlights ?? []).filter(
     (p) => !/^(read more|leggi (tutto|di piu))/i.test(p.trim())
   );
-  /* Sulla landing le FAQ sono una SEZIONE a se', dopo l'itinerario, non
-     una delle schede informative. Qui si separano. */
+  /* L'ordine delle schede lo decide la pagina, non l'ordine in cui sono
+     state estratte da WordPress -- che metteva le FAQ per prime, cioe' la
+     cosa piu' secondaria nel posto piu' importante. Si comincia da cosa e'
+     incluso e quanto costa; le FAQ chiudono, a destra. */
+  const ORDINE = ['INCLUDED', 'PRICES', 'IMPORTANT INFO', 'TIME / LOCATION', 'TOUR SCHEDULE'];
   const tutteLeSchede = contenuto.tabs ?? {};
-  const chiaveFaq = Object.keys(tutteLeSchede).find((k) => /^faq/i.test(k));
-  const faqHtml = chiaveFaq ? tutteLeSchede[chiaveFaq] : '';
   const schede = Object.fromEntries(
-    Object.entries(tutteLeSchede).filter(([k]) => !/^faq/i.test(k))
+    Object.entries(tutteLeSchede).sort(([a], [b]) => {
+      const pa = /^faq/i.test(a) ? 99 : ORDINE.indexOf(a.toUpperCase());
+      const pb = /^faq/i.test(b) ? 99 : ORDINE.indexOf(b.toUpperCase());
+      return (pa < 0 ? 50 : pa) - (pb < 0 ? 50 : pb);
+    })
   );
   /* Il mosaico .hero-gallery e' nascosto sopra i 760px (sulla landing, li'
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
@@ -297,14 +301,6 @@ export default async function TourPage({
               className="pr-prose"
               dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
             />
-          </div>
-        </section>
-      )}
-
-      {faqHtml && (
-        <section className="pr-sec" id="faq">
-          <div className="pr-wrap">
-            <Faq html={faqHtml} />
           </div>
         </section>
       )}
