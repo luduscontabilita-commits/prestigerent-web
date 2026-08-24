@@ -9,6 +9,12 @@ import type { NextConfig } from 'next';
 const noindex = process.env.SITE_NOINDEX !== 'false';
 
 const nextConfig: NextConfig = {
+  /* WordPress serve le pagine CON la barra finale: /tour/nome-tour/
+     Next per default la toglie, e ogni indirizzo indicizzato risponderebbe
+     308 invece di 200. Su 124 URL con anni di posizionamento non e' un
+     dettaglio estetico: e' la regola numero uno della migrazione. */
+  trailingSlash: true,
+
   images: {
     remotePatterns: [
       // le foto dei tour oggi stanno ancora su WordPress: si leggono da li'

@@ -36,7 +36,8 @@ export default function proxy(req: NextRequest) {
      due indirizzi e Google dovrebbe scegliere quale ignorare. */
   if (first === DEFAULT_LOCALE) {
     const url = req.nextUrl.clone();
-    url.pathname = pathname.slice(DEFAULT_LOCALE.length + 1) || '/';
+    const rest = pathname.slice(DEFAULT_LOCALE.length + 1);
+    url.pathname = rest && rest !== '/' ? rest : '/';
     return NextResponse.redirect(url, 308);
   }
 

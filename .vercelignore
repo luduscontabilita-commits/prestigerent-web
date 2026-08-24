@@ -1,0 +1,5 @@
+# Vercel ricompila da solo: mandargli anche il build locale e le dipendenze
+# significa caricare centinaia di MB e far scadere l'upload.
+.next
+node_modules
+.git
