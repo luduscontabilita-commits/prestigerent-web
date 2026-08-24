@@ -3,6 +3,7 @@ import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import { ContactSection } from '@/components/ContactSection';
 import '@/styles/home.css';
 
 /* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
@@ -94,7 +95,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {foto && <img src={foto} alt="Tuscany" fetchPriority="high" />}
         </div>
         <div className="hm-hero-in">
-          <span className="hm-kicker">★ Florence, since 2007 · our own fleet</span>
+          <span className="hm-kicker">★ Florence, since 2002 · our own fleet</span>
           <h1 className="hm-title">
             Tours and transfers across Italy,<br />with your own driver
           </h1>
@@ -185,24 +186,16 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </section>
 
-      <section className="pr-sec tight" id="contact">
-        <div className="pr-wrap">
-          <div className="pr-head"><h2 className="pr-title">Talk to a real person</h2></div>
-          <div className="pr-help">
-            <a href="https://wa.me/393338424047" target="_blank" rel="noopener">
-              <div><b>WhatsApp</b><span>Chat with us</span></div>
-            </a>
-            <a href="tel:+39055286059"><div><b>+39 055 286059</b><span>Call us</span></div></a>
-            <a href="mailto:usa@prestigerent.com"><div><b>usa@prestigerent.com</b><span>Email us</span></div></a>
-          </div>
-          <p className="pr-lead" style={{ textAlign: 'center', fontSize: '.85rem', marginTop: 20 }}>
-            {LOCALES.map((l) => (
-              <span key={l.code} style={{ marginInlineEnd: 12 }}>
-                <a href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>{l.label}</a>
-              </span>
-            ))}
-          </p>
-        </div>
+      <ContactSection />
+
+      <section className="pr-sec tight" style={{ textAlign: 'center' }}>
+        <p className="pr-lead" style={{ fontSize: '.85rem' }}>
+          {LOCALES.map((l) => (
+            <span key={l.code} style={{ marginInlineEnd: 12 }}>
+              <a href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>{l.label}</a>
+            </span>
+          ))}
+        </p>
       </section>
     </main>
   );

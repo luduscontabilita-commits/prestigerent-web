@@ -148,3 +148,36 @@
 .hm-fleet-count div{ text-align:center; }
 .hm-fleet-count b{ display:block; font-size:1.9rem; font-weight:800; color:var(--orange); line-height:1; }
 .hm-fleet-count span{ font-size:.8rem; font-weight:700; color:var(--ink-soft); }
+
+/* ---------- striscia foto della pagina tour ---------- */
+.tr-strip-wrap{ position:relative; }
+.tr-strip{
+  display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding-bottom:10px; scrollbar-width:thin;
+}
+.tr-strip::-webkit-scrollbar{ height:6px; }
+.tr-strip::-webkit-scrollbar-thumb{ background:var(--line); border-radius:99px; }
+.tr-strip figure{
+  position:relative; flex:0 0 min(78vw,420px); scroll-snap-align:center;
+  margin:0; border-radius:16px; overflow:hidden; background:#E9E5DF;
+}
+.tr-strip img{ width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+.tr-strip figcaption{
+  position:absolute; inset:auto 0 0 0; padding:26px 18px 14px; color:#fff;
+  background:linear-gradient(180deg,transparent,rgba(15,20,26,.82));
+}
+.tr-strip figcaption span{
+  display:block; font-size:.68rem; font-weight:800; letter-spacing:.13em;
+  text-transform:uppercase; color:#FFC79E;
+}
+.tr-strip figcaption b{ display:block; margin-top:3px; font-size:1rem; font-weight:800; }
+.tr-arrow{
+  position:absolute; top:calc(50% - 26px); width:42px; height:42px; border-radius:50%;
+  border:1px solid var(--line); background:rgba(255,255,255,.95); color:var(--ink);
+  display:grid; place-items:center; cursor:pointer; box-shadow:0 4px 14px rgba(36,51,63,.16);
+}
+.tr-arrow svg{ width:20px; height:20px; }
+.tr-arrow.prev{ inset-inline-start:-10px; }
+.tr-arrow.next{ inset-inline-end:-10px; }
+/* col dito le frecce non servono e rubano spazio alla foto */
+@media (max-width:760px){ .tr-arrow{ display:none; } }

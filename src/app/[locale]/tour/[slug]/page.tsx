@@ -5,6 +5,9 @@ import { fetchProduct } from '@/lib/regiondo';
 import { getLocale, isLocale, LOCALES, DEFAULT_LOCALE, regiondoLocale } from '@/lib/locales';
 import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
+import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
+import { ContactSection } from '@/components/ContactSection';
+import '@/styles/home.css';
 
 const SITE = 'https://prestigerent.com';
 
@@ -26,6 +29,9 @@ type Contenuto = {
   highlights?: string[];
   itinerary?: string;
   tabs?: Record<string, string>;
+  /* Solo dove le foto sono state scelte a mano, con etichetta e
+     sottotitolo: una didascalia scritta vende, un nome di file no. */
+  gallery?: Foto[];
 };
 
 function pathFor(locale: string, slug: string) {
@@ -89,6 +95,7 @@ export default async function TourPage({
   const foto = contenuto.images ?? [];
   const punti = contenuto.highlights ?? [];
   const schede = contenuto.tabs ?? {};
+  const striscia = contenuto.gallery ?? [];
 
   return (
     <main>
@@ -138,7 +145,7 @@ export default async function TourPage({
           </div>
         )}
 
-        {foto.length > 0 && (
+        {striscia.length === 0 && foto.length > 0 && (
           <div className="hero-gallery" aria-label="Tour photos">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="g-hero" src={foto[0]} alt={nome} loading="eager" decoding="async" />
@@ -157,6 +164,14 @@ export default async function TourPage({
           </div>
         )}
       </section>
+
+      {striscia.length > 0 && (
+        <section className="pr-sec tight" id="photos">
+          <div className="pr-wrap wide">
+            <PhotoStrip foto={striscia} />
+          </div>
+        </section>
+      )}
 
       {punti.length > 0 && (
         <section className="pr-sec tight" id="highlights">
@@ -228,24 +243,7 @@ export default async function TourPage({
         </div>
       </section>
 
-      <section className="pr-sec tight" id="contact">
-        <div className="pr-wrap">
-          <div className="pr-head">
-            <h2 className="pr-title">Talk to a real person</h2>
-          </div>
-          <div className="pr-help">
-            <a href="https://wa.me/393338424047" target="_blank" rel="noopener">
-              <div><b>WhatsApp</b><span>Chat with us</span></div>
-            </a>
-            <a href="tel:+39055286059">
-              <div><b>+39 055 286059</b><span>Call us</span></div>
-            </a>
-            <a href="mailto:usa@prestigerent.com">
-              <div><b>usa@prestigerent.com</b><span>Email us</span></div>
-            </a>
-          </div>
-        </div>
-      </section>
+      <ContactSection />
     </main>
   );
 }
