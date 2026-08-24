@@ -7,7 +7,7 @@ import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
-import { Prosa } from '@/components/Prosa';
+import { pulisci } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
@@ -277,7 +277,13 @@ export default async function TourPage({
             <div className="pr-head">
               <h2 className="pr-title">Itinerary</h2>
             </div>
-            <Prosa html={contenuto.itinerary} />
+            {/* L'itinerario si legge tutto, come sul sito attuale: e' gia'
+                spezzato in titoletti, e il ritaglio a 320px lo troncava a
+                meta' di una frase. */}
+            <div
+              className="pr-prose"
+              dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
+            />
           </div>
         </section>
       )}

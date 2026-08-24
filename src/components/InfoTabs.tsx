@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Prosa } from './Prosa';
+import { Faq } from './Faq';
+import { pulisci } from '@/lib/prosa';
 
 /* Le schede informative, con la grafica della landing (.pr-tabs / .pr-tabp).
  * Sulla landing erano gestite da uno script che accendeva e spegneva
@@ -38,16 +40,18 @@ export function InfoTabs({ tabs }: { tabs: Record<string, string> }) {
 
       {keys.map((k) => (
         <div key={k} className="pr-tabp" role="tabpanel" hidden={k !== attiva}>
-          <div className="pr-acc-body">
-            {/* Le schede lunghe -- prezzi, informazioni importanti -- sono
-                muri di testo come l'itinerario: stesso ritaglio, stessa
-                formattazione. Sotto le 900 battute non serve. */}
-            <Prosa
-              html={tabs[k]}
-              ritaglia={tabs[k].length > 900}
-              etichetta="Read everything"
+          {/* Le FAQ diventano accordion; tutto il resto e' testo normale,
+              SENZA ritaglio: la scheda dei prezzi tagliata a meta' da una
+              sfumatura era la cosa peggiore della pagina. Chi apre "Prezzi"
+              vuole vedere i prezzi, non un bottone. */}
+          {/^faq/i.test(k) ? (
+            <Faq html={tabs[k]} />
+          ) : (
+            <div
+              className="pr-acc-body pr-prose"
+              dangerouslySetInnerHTML={{ __html: pulisci(tabs[k]) }}
             />
-          </div>
+          )}
         </div>
       ))}
     </>
