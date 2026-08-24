@@ -1,4 +1,13 @@
-/* Le lingue del sito.
+/* Le lingue del sito: inglese (alla radice), tedesco, italiano.
+ *
+ * Erano otto. Il masterplan §5.5 le vieta: "10 lingue mediocri battute da 3
+ * lingue eccellenti, sempre", e l'anti-pattern #10 e' letteralmente "aprire
+ * 8 lingue insieme". La sequenza del documento e' EN -> DE -> IT, e un
+ * mercato nuovo si apre solo quando il precedente ha almeno 20 pagine
+ * indicizzate con impression stabili.
+ *
+ * L'inglese resta senza prefisso: le 124 URL esistenti hanno anni di
+ * posizionamento e devono restare identiche.
  *
  * `regiondo` non e' sempre la traduzione ovvia della lingua: il widget di
  * prenotazione accetta solo alcuni locale. Provati uno per uno il 24/08/2026
@@ -9,7 +18,7 @@
  * la pagina invece di far finta di niente.
  */
 
-export type Locale = 'en' | 'es' | 'pt' | 'de' | 'ja' | 'zh' | 'ru' | 'ar';
+export type Locale = 'en' | 'de' | 'it';
 
 export const DEFAULT_LOCALE: Locale = 'en';
 
@@ -28,13 +37,8 @@ export type LocaleInfo = {
 
 export const LOCALES: LocaleInfo[] = [
   { code: 'en', htmlLang: 'en-US', label: 'English',  regiondo: 'en_US', dir: 'ltr' },
-  { code: 'es', htmlLang: 'es-ES', label: 'Español',  regiondo: 'es_ES', dir: 'ltr' },
-  { code: 'pt', htmlLang: 'pt-PT', label: 'Português', regiondo: 'pt_PT', dir: 'ltr' },
   { code: 'de', htmlLang: 'de-DE', label: 'Deutsch',  regiondo: 'de_DE', dir: 'ltr' },
-  { code: 'ja', htmlLang: 'ja-JP', label: '日本語',    regiondo: 'ja_JP', dir: 'ltr' },
-  { code: 'zh', htmlLang: 'zh-CN', label: '中文',      regiondo: 'zh_CN', dir: 'ltr' },
-  { code: 'ru', htmlLang: 'ru-RU', label: 'Русский',  regiondo: null,    dir: 'ltr' },
-  { code: 'ar', htmlLang: 'ar',    label: 'العربية',   regiondo: null,    dir: 'rtl' },
+  { code: 'it', htmlLang: 'it-IT', label: 'Italiano', regiondo: 'it_IT', dir: 'ltr' },
 ];
 
 export const LOCALE_CODES = LOCALES.map((l) => l.code);

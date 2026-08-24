@@ -85,7 +85,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     };
   });
 
-  const foto = tours.find((t) => t.foto)?.foto ?? null;
+  /* La foto dell'hero e' quella della home attuale di prestigerent.com,
+     non la prima immagine che capita fra gli 87 tour: e' scelta, ed e'
+     gia' quella che il cliente riconosce. */
+  const foto =
+    'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-scaled.jpg';
 
   return (
     <main>
