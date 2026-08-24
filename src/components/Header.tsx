@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DEFAULT_LOCALE, LOCALES, getLocale } from '@/lib/locales';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 /* L'intestazione.
  *
@@ -87,6 +88,7 @@ export function Header({ locale }: { locale: string }) {
         </nav>
 
         <div className="hd-right">
+          <ThemeToggle />
           <div className="hd-lang">
             <button type="button" onClick={() => { setLingue(!lingue); setAperto(false); }} aria-expanded={lingue}>
               🌐 {info.label}

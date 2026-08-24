@@ -1,0 +1,108 @@
+/* IL TEMA SCURO.
+ *
+ * Non e' una seconda foglia di stile: e' la stessa pagina con altri valori
+ * nelle stesse variabili. Per questo prima sono stati convertiti i 37 sfondi
+ * bianchi scritti a mano -- finche' restavano #FFF nel CSS, nessun tema li
+ * poteva toccare.
+ *
+ * Le tre variabili nuove, e perche' servono:
+ *
+ *   --card   le superfici (schede, riquadri, calendario). Erano #FFF.
+ *   --ph     il grigio dei segnaposto sotto le foto mentre caricano.
+ *   --deep   gli sfondi VOLUTAMENTE scuri: footer e fascia dei privati.
+ *            Prima usavano --ink, che pero' e' il colore del TESTO: al
+ *            primo scambio di tema il footer sarebbe diventato bianco.
+ *            Sono l'unica cosa che resta scura in entrambi i temi, ed e'
+ *            giusto cosi'.
+ *
+ * NON si tocca: `color:#fff` (44 volte). Sta sopra arancione o blu scuro,
+ * cioe' sopra colori che non cambiano. Invertirlo renderebbe illeggibili
+ * proprio i pulsanti di prenotazione.
+ */
+
+:root{
+  --card:  #FFFFFF;
+  --ph:    #E9E5DF;
+  --deep:  #24333F;
+  --ombra: rgba(20,32,42,.10);
+}
+
+html[data-theme="dark"]{
+  --paper:    #11161B;   /* il fondo pagina */
+  --card:     #1A2128;   /* le superfici, un gradino sopra il fondo */
+  --deep:     #0B0F13;   /* footer e fascia: piu' scuri delle schede */
+  --ph:       #222B33;
+
+  --ink:      #E8EEF4;
+  --ink-soft: #A6B4C0;
+  --line:     #2E3A45;
+
+  /* L'arancione del marchio era stato SCURITO per leggerlo sul bianco
+     (#C25A02 -> #ED6707). Su fondo scuro il problema si ribalta: serve
+     piu' chiaro, non piu' scuro. */
+  --orange:   #FF7D1F;
+  --orange-d: #E86A0D;
+  --link:     #FFA65C;
+  --teal:     #FF7D1F;
+  --sienna-1: #FF7D1F;
+  --sienna-2: #FF7D1F;
+  --sienna-hi:#FF7D1F;
+  --wine:     #E8EEF4;
+  --ombra:    rgba(0,0,0,.45);
+}
+
+/* Il colore del fondo lo dichiara <html>, non solo <body>: se si scorre
+   oltre la fine della pagina, la striscia che si vede sotto e' quella di
+   <html>. Senza questa riga, in tema scuro, lampeggia bianca. */
+html[data-theme="dark"]{ background:var(--paper); }
+html[data-theme="dark"] body{ background:var(--paper); color:var(--ink); }
+
+/* Le poche cose che non passano dalle variabili e sono scritte per il
+   bianco. Si correggono una per una, non con un filtro globale. */
+html[data-theme="dark"] .hero,
+html[data-theme="dark"] .pr-tabp,
+html[data-theme="dark"] .pr-acc,
+html[data-theme="dark"] .pg-rail{ background:var(--card); }
+
+html[data-theme="dark"] .pr-faqbar{ border-color:var(--line); }
+
+/* I bordi tenui erano rgba(0,0,0,.06): su fondo scuro spariscono. */
+html[data-theme="dark"] [style*="rgba(0,0,0"],
+html[data-theme="dark"] .hm-card,
+html[data-theme="dark"] .film .slide{ border-color:var(--line); }
+
+/* Le foto in tema scuro accecano se restano a piena luminosita' accanto a
+   un fondo quasi nero. Un velo minimo, che sparisce al passaggio del mouse
+   perche' chi guarda una foto la vuole vedere per intero. */
+html[data-theme="dark"] .film img,
+html[data-theme="dark"] .hm-card img{ filter:brightness(.9); transition:filter .2s; }
+html[data-theme="dark"] .film .slide:hover img,
+html[data-theme="dark"] .hm-card:hover img{ filter:none; }
+
+/* Il calendario di Regiondo e' dentro un iframe: il suo CSS non lo
+   raggiungiamo. Resta chiaro, e va bene -- e' il modulo di pagamento, il
+   posto dove NON si sperimenta. Gli si mette solo una cornice perche' non
+   sembri un buco di luce nella pagina. */
+html[data-theme="dark"] .rgd-widget,
+html[data-theme="dark"] #bookform iframe{
+  border-radius:14px; overflow:hidden;
+  box-shadow:0 0 0 1px var(--line);
+}
+
+/* IL PULSANTE. Sta nell'intestazione, accanto alle lingue. */
+.th-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; padding:0;
+  border:1px solid var(--line); border-radius:10px;
+  background:var(--card); color:var(--ink);
+  cursor:pointer; flex:none;
+  transition:border-color .15s, transform .1s;
+}
+.th-btn:hover{ border-color:var(--orange); }
+.th-btn:active{ transform:scale(.94); }
+.th-btn svg{ width:18px; height:18px; display:block; }
+/* Una sola icona nel markup, due disegni: si scambiano col tema. Cosi' il
+   pulsante non "salta" mentre il browser decide quale mostrare. */
+.th-btn .th-sun{ display:none; }
+html[data-theme="dark"] .th-btn .th-sun{ display:block; }
+html[data-theme="dark"] .th-btn .th-moon{ display:none; }
