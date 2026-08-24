@@ -8,6 +8,7 @@ import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
 import { pulisci } from '@/lib/prosa';
+import { Faq } from '@/components/Faq';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
@@ -113,7 +114,14 @@ export default async function TourPage({
   const punti = (contenuto.highlights ?? []).filter(
     (p) => !/^(read more|leggi (tutto|di piu))/i.test(p.trim())
   );
-  const schede = contenuto.tabs ?? {};
+  /* Sulla landing le FAQ sono una SEZIONE a se', dopo l'itinerario, non
+     una delle schede informative. Qui si separano. */
+  const tutteLeSchede = contenuto.tabs ?? {};
+  const chiaveFaq = Object.keys(tutteLeSchede).find((k) => /^faq/i.test(k));
+  const faqHtml = chiaveFaq ? tutteLeSchede[chiaveFaq] : '';
+  const schede = Object.fromEntries(
+    Object.entries(tutteLeSchede).filter(([k]) => !/^faq/i.test(k))
+  );
   /* Il mosaico .hero-gallery e' nascosto sopra i 760px (sulla landing, li'
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
      La striscia si costruisce sempre -- con le didascalie dove sono state
@@ -236,7 +244,7 @@ export default async function TourPage({
         <section className="pr-sec tight" id="highlights">
           <div className="pr-wrap wide">
             <div className="pr-head">
-              <h2 className="pr-title">Highlights</h2>
+              <h2 className="pr-title">Why you will <em className="hl place">remember it</em></h2>
             </div>
             <ul className="hl2-grid">
               {punti.map((p) => (
@@ -264,7 +272,12 @@ export default async function TourPage({
         <section className="pr-sec alt" id="info">
           <div className="pr-wrap wide">
             <div className="pr-head">
-              <h2 className="pr-title">Everything you need to know</h2>
+              <h2 className="pr-title">
+                <em className="hl place">
+                  {tour.kind === 'private' ? 'Private tour' : tour.kind === 'small_group' ? 'Small group tour' : 'This tour'}
+                </em>{' '}
+                &mdash; everything you need to know
+              </h2>
             </div>
             <InfoTabs tabs={schede} />
           </div>
@@ -275,7 +288,7 @@ export default async function TourPage({
         <section className="pr-sec" id="itinerary">
           <div className="pr-wrap">
             <div className="pr-head">
-              <h2 className="pr-title">Itinerary</h2>
+              <h2 className="pr-title">The <em className="hl place">itinerary</em></h2>
             </div>
             {/* L'itinerario si legge tutto, come sul sito attuale: e' gia'
                 spezzato in titoletti, e il ritaglio a 320px lo troncava a
