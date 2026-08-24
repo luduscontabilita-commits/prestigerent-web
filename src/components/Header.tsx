@@ -98,9 +98,11 @@ export function Header({ locale }: { locale: string }) {
         </div>
       </div>
 
-      {aperto && (
-        <>
-          <div className="hd-mega">
+      {/* Il menu sta SEMPRE nell'HTML e si nasconde con il CSS: montarlo solo
+          all'apertura significava che i suoi link non esistevano per i
+          crawler, e i collegamenti interni sono meta' del posizionamento.
+          Test: curl -A "OAI-SearchBot" e cerca hd-col-t nel sorgente. */}
+      <div className={'hd-mega' + (aperto ? ' is-open' : '')} hidden={!aperto}>
             <div className="hd-mega-in">
               <div>
                 <p className="hd-col-t">Departing from</p>
@@ -126,10 +128,10 @@ export function Header({ locale }: { locale: string }) {
                   </a>
                 ))}
               </div>
-            </div>
-          </div>
-          <button className="hd-veil" aria-label="Close menu" onClick={() => setAperto(false)} />
-        </>
+        </div>
+      </div>
+      {aperto && (
+        <button className="hd-veil" aria-label="Close menu" onClick={() => setAperto(false)} />
       )}
     </header>
   );

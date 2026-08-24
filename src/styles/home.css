@@ -249,3 +249,7 @@
 }
 /* il velo chiude il menu con un clic fuori, senza ascoltatori globali */
 .hd-veil{ position:fixed; inset:0; z-index:55; border:0; background:rgba(15,20,26,.18); cursor:default; }
+
+/* Il menu resta nel sorgente anche da chiuso (serve ai crawler per i link
+   interni): a nasconderlo e' [hidden], non il fatto di non esistere. */
+.hd-mega[hidden]{ display:none; }
