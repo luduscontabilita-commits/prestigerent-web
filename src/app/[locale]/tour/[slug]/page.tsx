@@ -106,7 +106,12 @@ export default async function TourPage({
 
   const nome = contenuto.name ?? slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
-  const punti = contenuto.highlights ?? [];
+  /* "Read more" e' il link di WordPress finito nell'estrazione: compariva
+     fra i punti forti come se fosse uno di essi. Si filtra qui e non nel
+     database, cosi' vale anche per i contenuti che arriveranno domani. */
+  const punti = (contenuto.highlights ?? []).filter(
+    (p) => !/^(read more|leggi (tutto|di piu))/i.test(p.trim())
+  );
   const schede = contenuto.tabs ?? {};
   /* Il mosaico .hero-gallery e' nascosto sopra i 760px (sulla landing, li'
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
@@ -143,7 +148,12 @@ export default async function TourPage({
           torna una colonna sola e il calendario scende al suo posto. */}
       <div className="pg-cols">
       <div className="pg-main">
-      <section className="hero" id="top">
+      <section className="tr-hero" id="top">
+        <div className="tr-hero-bg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {striscia[0] && <img src={striscia[0].src} alt={nome} fetchPriority="high" />}
+        </div>
+        <div className="tr-hero-in">
         <span className="hero-loc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1"
                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -153,13 +163,19 @@ export default async function TourPage({
           {tour.kind === 'private' ? 'Private tour' : tour.kind === 'small_group' ? 'Small group' : 'Prestige Rent'}
         </span>
 
-        <h1 className="hero-title">{nome}</h1>
+        {/* L'ultima parola del titolo va in Fraunces corsivo: e' la firma
+            delle landing, ed e' cio' che distingue il marchio da un titolo
+            qualunque in grassetto. */}
+        <h1>
+          {nome.split(' ').slice(0, -1).join(' ')}{' '}
+          <em>{nome.split(' ').slice(-1)}</em>
+        </h1>
 
-        {contenuto.description && <p className="hero-sub">{contenuto.description}</p>}
+        {contenuto.description && <p>{contenuto.description}</p>}
 
         {prezzo != null && (
-          <p className="hero-dep">
-            <b>from &euro;{prezzo.valore.toFixed(0)}</b>
+          <p className="tr-facts">
+            <span><b>from &euro;{prezzo.valore.toFixed(0)}</b></span>
             {product?.durationHours ? ` · ${product.durationHours} hours` : null}
             {product?.participants ? ` · ${product.participants}` : null}
             {/* Quando il prezzo viene dal listino WordPress e non dal
@@ -168,6 +184,7 @@ export default async function TourPage({
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
         )}
+        </div>
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
             solo dove sono davvero sue. Attribuire a un prodotto le recensioni
