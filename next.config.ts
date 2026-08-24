@@ -24,6 +24,22 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'oeipsfnbpaqkmwrxtcrn.supabase.co' },
     ],
   },
+  /* I doppioni: due URL diverse per lo STESSO prodotto Regiondo.
+     Non si cancellano -- esistono su WordPress da anni e sparire vorrebbe
+     dire un 404 il giorno del passaggio -- si reindirizzano a quella buona
+     con un 301, che e' anche il modo in cui si dice a Google quale delle due
+     tenere. */
+  async redirects() {
+    return [
+      {
+        source: '/tour/siena-san-gimignano-the-tuscan-countryside-landing/',
+        destination:
+          '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     if (!noindex) return [];
     return [
