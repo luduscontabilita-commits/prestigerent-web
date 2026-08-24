@@ -3,6 +3,7 @@ import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
 import '@/styles/home.css';
 
@@ -68,9 +69,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const tours: SchedaTour[] = righe.map((r) => {
     const c = (r.tour_content?.find((x) => x.locale === locale) ??
       r.tour_content?.find((x) => x.locale === 'en'))?.blocks as
-      | { name?: string; images?: string[]; highlights?: string[] }
+      | { name?: string; images?: string[]; highlights?: string[]; tabs?: Record<string, string> }
       | undefined;
     const p = prezzi.get(r.slug);
+    /* Se Regiondo non ha il prodotto, il prezzo si legge dalla scheda PRICES
+       di WordPress: c'e' su tutte e 87 le pagine. Senza questo, un terzo del
+       catalogo diceva "Price on request" pur avendo il listino scritto. */
+    const prezzo = prezzoDi(p?.prezzo, c?.tabs);
     return {
       slug: r.slug,
       href: locale === DEFAULT_LOCALE ? `/tour/${r.slug}/` : `/${locale}/tour/${r.slug}/`,
@@ -78,7 +83,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       kind: r.kind,
       foto: c?.images?.[0] ?? null,
       punti: c?.highlights ?? [],
-      prezzo: p?.prezzo ?? null,
+      prezzo: prezzo?.valore ?? null,
       ore: p?.ore ?? null,
       partenza: partenzaDa(r.slug),
       maxOspiti: maxOspiti(r.kind),

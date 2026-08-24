@@ -8,6 +8,7 @@ import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
+import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
 
 const SITE = SITE_URL;
@@ -108,6 +109,7 @@ export default async function TourPage({
   const punti = contenuto.highlights ?? [];
   const schede = contenuto.tabs ?? {};
   const striscia = contenuto.gallery ?? [];
+  const prezzo = prezzoDi(product?.price, schede);
 
   return (
     <main>
@@ -132,11 +134,15 @@ export default async function TourPage({
 
         {contenuto.description && <p className="hero-sub">{contenuto.description}</p>}
 
-        {product?.price != null && (
+        {prezzo != null && (
           <p className="hero-dep">
-            <b>from &euro;{product.price.toFixed(0)}</b>
-            {product.durationHours ? ` · ${product.durationHours} hours` : null}
-            {product.participants ? ` · ${product.participants}` : null}
+            <b>from &euro;{prezzo.valore.toFixed(0)}</b>
+            {product?.durationHours ? ` · ${product.durationHours} hours` : null}
+            {product?.participants ? ` · ${product.participants}` : null}
+            {/* Quando il prezzo viene dal listino WordPress e non dal
+                calendario, si dice: e' un listino, non una disponibilita'
+                in tempo reale, e chi legge deve saperlo. */}
+            {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
         )}
 
@@ -271,7 +277,7 @@ export default async function TourPage({
                 url: SITE + pathFor(locale, slug),
                 locale,
                 immagini: foto,
-                prezzo: product?.price ?? null,
+                prezzo: prezzo?.valore ?? null,
                 ore: product?.durationHours ?? null,
                 tappe: punti.slice(0, 8),
               }),
