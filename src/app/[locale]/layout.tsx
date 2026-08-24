@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { NoindexBadge } from '@/components/NoindexBadge';
+import { Header } from '@/components/Header';
 import '@/styles/landing.css';
+import '@/styles/home.css';
 
 export const metadata: Metadata = {
   title: 'Prestige Rent — Tours & Transfers in Italy',
@@ -44,6 +46,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
+        <Header locale={locale} />
         {children}
         <NoindexBadge />
       </body>
