@@ -253,3 +253,15 @@
 /* Il menu resta nel sorgente anche da chiuso (serve ai crawler per i link
    interni): a nasconderlo e' [hidden], non il fatto di non esistere. */
 .hd-mega[hidden]{ display:none; }
+
+/* ---------- fascia di prova sociale ---------- */
+.hm-proof{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:18px;
+  background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 18px;
+}
+@media (max-width:760px){ .hm-proof{ grid-template-columns:repeat(2,1fr); gap:14px; } }
+.hm-proof div{ text-align:center; }
+.hm-proof b{ display:block; font-size:clamp(1.6rem,3.4vw,2.2rem); font-weight:800; color:var(--orange); line-height:1; }
+.hm-proof span{ display:block; margin-top:5px; font-size:.8rem; font-weight:700; color:var(--ink-soft); line-height:1.35; }
+.hm-proof-src{ margin:11px 0 0; text-align:center; font-size:.78rem; font-weight:600; color:var(--ink-soft); }
+.hm-proof-src a{ color:var(--orange); font-weight:800; }

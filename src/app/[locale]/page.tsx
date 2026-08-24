@@ -109,10 +109,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             wherever you are staying, at the hour you choose.
           </p>
           <div className="hm-badges">
+            <span><i>⭐</i> <b>4.9</b> · 7,139 reviews on Tripadvisor</span>
+            <span><i>🏆</i> Travellers&rsquo; Choice 2026</span>
             <span><i>🚐</i> 11 minibuses &amp; 10 Mercedes</span>
             <span><i>🛡️</i> Free cancellation up to 24h</span>
-            <span><i>⚡</i> Instant confirmation</span>
-            <span><i>📞</i> A real person, not a call centre</span>
           </div>
         </div>
       </section>
@@ -120,6 +120,30 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <div className="pr-wrap wide" style={{ position: 'relative', zIndex: 3 }}>
         <HomeTours tours={tours} partenze={PARTENZE} />
       </div>
+
+      {/* La prova sociale con la FONTE linkata. Un numero senza fonte e' una
+          affermazione; con la fonte e' una prova, e le AI citano i numeri
+          attribuiti. Verificati sulla scheda Tripadvisor il 24/08/2026:
+          non e' il "#1 su 967" che girava nei riassunti, e' un #2 su 248 --
+          che pero' e' vero, e un secondo posto vero vale piu' di un primo
+          posto falso. */}
+      <section className="pr-sec tight" id="proof">
+        <div className="pr-wrap wide">
+          <div className="hm-proof">
+            <div><b>4.9</b><span>out of 5 on Tripadvisor</span></div>
+            <div><b>7,139</b><span>traveller reviews</span></div>
+            <div><b>#2</b><span>of 248 transport companies in Florence</span></div>
+            <div><b>2002</b><span>the year we started</span></div>
+          </div>
+          <p className="hm-proof-src">
+            Travellers&rsquo; Choice 2026 ·{' '}
+            <a href="https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html"
+               target="_blank" rel="noopener">
+              verified on Tripadvisor
+            </a>, August 2026
+          </p>
+        </div>
+      </section>
 
       <section className="pr-sec">
         <div className="pr-wrap wide">
