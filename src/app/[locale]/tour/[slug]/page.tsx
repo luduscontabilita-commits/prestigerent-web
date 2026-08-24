@@ -6,6 +6,7 @@ import { getLocale, isLocale, LOCALES, DEFAULT_LOCALE, regiondoLocale } from '@/
 import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
+import { Videos, type Video } from '@/components/Videos';
 import { ContactSection } from '@/components/ContactSection';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
@@ -45,6 +46,13 @@ type Contenuto = {
   highlights?: string[];
   itinerary?: string;
   tabs?: Record<string, string>;
+  /* Titolo scritto a mano per la vendita, con i suoi accenti in Fraunces e
+     il tratto sotto la parola chiave. Quando c'e' vince sul nome del
+     prodotto WordPress, che dice cos'e' ma non perche' sceglierlo. */
+  titolo_html?: string;
+  /* I filmati girati su quel tour. Non si mettono dove non appartengono:
+     un video di Siena su un transfer per Milano e' una promessa sbagliata. */
+  videos?: Video[];
   /* Solo dove le foto sono state scelte a mano, con etichetta e
      sottotitolo: una didascalia scritta vende, un nome di file no. */
   gallery?: Foto[];
@@ -130,6 +138,7 @@ export default async function TourPage({
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
      La striscia si costruisce sempre -- con le didascalie dove sono state
      scritte a mano, con le sole foto altrimenti. */
+  const video = contenuto.videos ?? [];
   const striscia: Foto[] =
     contenuto.gallery?.length
       ? contenuto.gallery
@@ -174,11 +183,18 @@ export default async function TourPage({
         {/* L'accento in Fraunces va sul LUOGO, non sull'ultima parola: quasi
             ogni titolo finisce con "from Florence", e accentare la partenza
             invece della meta non dice niente. */}
-        <h1 className="hero-title">
-          {spezzaTitolo(nome).prima}
-          <em className="hl place">{spezzaTitolo(nome).accento}</em>
-          {spezzaTitolo(nome).dopo}
-        </h1>
+        {contenuto.titolo_html ? (
+          <h1
+            className="hero-title"
+            dangerouslySetInnerHTML={{ __html: contenuto.titolo_html }}
+          />
+        ) : (
+          <h1 className="hero-title">
+            {spezzaTitolo(nome).prima}
+            <em className="hl place">{spezzaTitolo(nome).accento}</em>
+            {spezzaTitolo(nome).dopo}
+          </h1>
+        )}
 
         {contenuto.description && <p className="hero-sub">{testo(contenuto.description)}</p>}
 
@@ -212,6 +228,8 @@ export default async function TourPage({
         <PhotoStrip foto={striscia} />
       </section>
 
+
+      {video.length > 0 && <Videos video={video} />}
 
       {punti.length > 0 && (
         <section className="pr-sec tight" id="highlights">
