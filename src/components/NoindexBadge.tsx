@@ -29,8 +29,12 @@ export function NoindexBadge() {
       dir="ltr"
       style={{
         position: 'fixed',
-        insetInlineEnd: 12,
-        bottom: 12,
+        /* In alto a SINISTRA, non in basso a destra: li' copriva la barra
+           di prenotazione -- cioe' esattamente i due pulsanti che devono
+           convertire. Un promemoria per noi non puo' nascondere il pulsante
+           che fa incassare. */
+        insetInlineStart: 12,
+        top: 74,
         zIndex: 2147483647,
         background: '#C8102E',
         color: '#fff',
@@ -38,7 +42,8 @@ export function NoindexBadge() {
         letterSpacing: '.02em',
         padding: '9px 11px',
         borderRadius: 8,
-        maxWidth: 280,
+        maxWidth: 250,
+        opacity: 0.94,
         boxShadow: '0 4px 14px rgba(0,0,0,.28)',
         pointerEvents: 'none',
       }}
