@@ -7,6 +7,7 @@ import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
+import { Prosa } from '@/components/Prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
@@ -276,7 +277,7 @@ export default async function TourPage({
             <div className="pr-head">
               <h2 className="pr-title">Itinerary</h2>
             </div>
-            <div className="pr-prose" dangerouslySetInnerHTML={{ __html: contenuto.itinerary }} />
+            <Prosa html={contenuto.itinerary} />
           </div>
         </section>
       )}

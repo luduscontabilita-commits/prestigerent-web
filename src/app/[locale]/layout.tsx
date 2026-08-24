@@ -8,6 +8,12 @@ import '@/styles/home.css';
 
 export const metadata: Metadata = {
   title: 'Prestige Rent — Tours & Transfers in Italy',
+  /* Il marchio tondo, lo stesso delle landing e dell'intestazione: e' il
+     segno con cui si riconosce la scheda fra venti aperte. */
+  icons: {
+    icon: 'https://prestigerent.com/lp/img/logo-prestige.png',
+    apple: 'https://prestigerent.com/lp/img/logo-prestige.png',
+  },
 };
 
 /* Le otto lingue si generano tutte in anticipo: sono poche e fisse. */

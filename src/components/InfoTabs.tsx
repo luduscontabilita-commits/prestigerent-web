@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Prosa } from './Prosa';
 
 /* Le schede informative, con la grafica della landing (.pr-tabs / .pr-tabp).
  * Sulla landing erano gestite da uno script che accendeva e spegneva
@@ -37,10 +38,16 @@ export function InfoTabs({ tabs }: { tabs: Record<string, string> }) {
 
       {keys.map((k) => (
         <div key={k} className="pr-tabp" role="tabpanel" hidden={k !== attiva}>
-          <div
-            className="pr-acc-body pr-prose"
-            dangerouslySetInnerHTML={{ __html: tabs[k] }}
-          />
+          <div className="pr-acc-body">
+            {/* Le schede lunghe -- prezzi, informazioni importanti -- sono
+                muri di testo come l'itinerario: stesso ritaglio, stessa
+                formattazione. Sotto le 900 battute non serve. */}
+            <Prosa
+              html={tabs[k]}
+              ritaglia={tabs[k].length > 900}
+              etichetta="Read everything"
+            />
+          </div>
         </div>
       ))}
     </>
