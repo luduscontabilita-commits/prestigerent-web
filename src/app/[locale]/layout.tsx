@@ -30,6 +30,19 @@ export default async function LocaleLayout({
      perche' il browser lo propaghi a tutto. */
   return (
     <html lang={info.htmlLang} dir={info.dir}>
+      <head>
+        {/* Il CSS ereditato dalla landing chiama Fraunces e Manrope per nome.
+            Senza questo collegamento nessuno li scarica e tutta la pagina
+            ripiega sul font di sistema: il testo resta leggibile ma la
+            grafica sembra "spoglia". Sono gli stessi identici pesi della
+            landing, non un'approssimazione. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560;1,9..144,640&family=Manrope:wght@500;600;800&display=swap"
+        />
+      </head>
       <body>
         {children}
         <NoindexBadge />
