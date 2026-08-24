@@ -1,79 +1,209 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
-import { DEFAULT_LOCALE, isLocale, LOCALES } from '@/lib/locales';
+import { fetchProduct } from '@/lib/regiondo';
+import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
+import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import '@/styles/home.css';
 
-/* Indice provvisorio: serve a navigare le 87 pagine mentre si costruisce.
- * La home vera arrivera' dopo, quando i template saranno definiti. */
-
+/* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
+   possono essere congelati alla compilazione, ma nemmeno richiesti a ogni
+   visita (49 chiamate per visitatore). */
 export const revalidate = 3600;
 
-function pathFor(locale: string, slug: string) {
-  return locale === DEFAULT_LOCALE ? `/tour/${slug}/` : `/${locale}/tour/${slug}/`;
+const PARTENZE = [
+  { valore: 'florence', etichetta: 'Florence' },
+  { valore: 'livorno', etichetta: 'Livorno (cruise port)' },
+  { valore: 'la-spezia', etichetta: 'La Spezia (cruise port)' },
+  { valore: 'civitavecchia', etichetta: 'Civitavecchia (Rome port)' },
+  { valore: 'naples', etichetta: 'Naples (cruise port)' },
+];
+
+/* Da dove parte un tour si capisce dallo slug: e' l'unica fonte che abbiamo
+   oggi, ed e' affidabile perche' gli slug nominano sempre il porto. */
+function partenzaDa(slug: string): string {
+  const s = slug.toLowerCase();
+  if (s.includes('livorno')) return 'livorno';
+  if (s.includes('la-spezia')) return 'la-spezia';
+  if (s.includes('civitavecchia')) return 'civitavecchia';
+  if (s.includes('naples') || s.includes('pompeii') || s.includes('sorrento') || s.includes('amalfi'))
+    return 'naples';
+  return 'florence';
 }
 
-const KIND_LABEL: Record<string, string> = {
-  small_group: 'Small group',
-  private: 'Private tours',
-  cruise: 'Cruise port tours',
-  transfer: 'Transfers',
-  other: 'Other',
-};
+/* Quante persone ci stanno. Non e' un dato di Regiondo: si ricava dal tipo,
+   ed e' quello che permette di non mostrare un privato da 8 a chi e' in
+   dodici. Va sostituito con il dato vero quando ci sara'. */
+function maxOspiti(kind: string): number | null {
+  if (kind === 'small_group') return 25;
+  if (kind === 'private') return 8;
+  return null;
+}
 
-export default async function Index({ params }: { params: Promise<{ locale: string }> }) {
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
   const { data } = await supabase
     .from('tours')
-    .select('id, slug, kind, regiondo_sku, status')
-    .order('kind')
-    .order('slug');
+    .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, blocks)')
+    .eq('status', 'published')
+    .order('kind');
 
-  const tours = (data ?? []) as TourRow[];
-  const byKind = new Map<string, TourRow[]>();
-  for (const t of tours) {
-    if (!byKind.has(t.kind)) byKind.set(t.kind, []);
-    byKind.get(t.kind)!.push(t);
-  }
+  type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
+  const righe = (data ?? []) as unknown as Riga[];
+
+  /* I prezzi si chiedono a Regiondo tutti insieme, non uno dopo l'altro:
+     in fila sarebbero 49 attese sommate. */
+  const prezzi = new Map<string, { prezzo: number | null; ore: number | null }>();
+  await Promise.all(
+    righe
+      .filter((r) => r.regiondo_sku)
+      .map(async (r) => {
+        const p = await fetchProduct(r.regiondo_sku!, regiondoLocale(locale));
+        if (p) prezzi.set(r.slug, { prezzo: p.price, ore: p.durationHours });
+      })
+  );
+
+  const tours: SchedaTour[] = righe.map((r) => {
+    const c = (r.tour_content?.find((x) => x.locale === locale) ??
+      r.tour_content?.find((x) => x.locale === 'en'))?.blocks as
+      | { name?: string; images?: string[]; highlights?: string[] }
+      | undefined;
+    const p = prezzi.get(r.slug);
+    return {
+      slug: r.slug,
+      href: locale === DEFAULT_LOCALE ? `/tour/${r.slug}/` : `/${locale}/tour/${r.slug}/`,
+      nome: c?.name ?? r.slug.replace(/-/g, ' '),
+      kind: r.kind,
+      foto: c?.images?.[0] ?? null,
+      punti: c?.highlights ?? [],
+      prezzo: p?.prezzo ?? null,
+      ore: p?.ore ?? null,
+      partenza: partenzaDa(r.slug),
+      maxOspiti: maxOspiti(r.kind),
+    };
+  });
+
+  const foto = tours.find((t) => t.foto)?.foto ?? null;
 
   return (
-    <main className="pr-sec">
-      <div className="pr-wrap wide">
-        <div className="pr-head">
-          <h1 className="pr-title">Prestige Rent — {tours.length} tour</h1>
-          <p className="pr-lead">
-            Indice di lavorazione. {tours.filter((t) => t.regiondo_sku).length} tour
-            leggono prezzo e contenuti da Regiondo, {tours.filter((t) => !t.regiondo_sku).length}{' '}
-            sono a preventivo.
+    <main>
+      <section className="hm-hero">
+        <div className="hm-hero-bg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {foto && <img src={foto} alt="Tuscany" fetchPriority="high" />}
+        </div>
+        <div className="hm-hero-in">
+          <span className="hm-kicker">★ Florence, since 2007 · our own fleet</span>
+          <h1 className="hm-title">
+            Tours and transfers across Italy,<br />with your own driver
+          </h1>
+          <p className="hm-sub">
+            Private days and small-group departures from Florence and the cruise ports.
+            We own the vehicles and employ the drivers &mdash; so we come and get you
+            wherever you are staying, at the hour you choose.
           </p>
-          <p className="pr-lead" style={{ fontSize: '.85rem' }}>
+          <div className="hm-badges">
+            <span><i>🚐</i> 11 minibuses &amp; 10 Mercedes</span>
+            <span><i>🛡️</i> Free cancellation up to 24h</span>
+            <span><i>⚡</i> Instant confirmation</span>
+            <span><i>📞</i> A real person, not a call centre</span>
+          </div>
+        </div>
+      </section>
+
+      <div className="pr-wrap wide" style={{ position: 'relative', zIndex: 3 }}>
+        <HomeTours tours={tours} partenze={PARTENZE} />
+      </div>
+
+      <section className="pr-sec">
+        <div className="pr-wrap wide">
+          <div className="hm-band">
+            <div>
+              <h2>Would you rather have the day to yourselves?</h2>
+              <p>
+                On a private tour nobody else is in the vehicle. You choose the hour you
+                leave, we collect you at your hotel, apartment or villa &mdash; and if you
+                are staying somewhere else in Italy, we come and get you there too.
+              </p>
+              <a className="cta" href={locale === DEFAULT_LOCALE ? '/tour/private-tour-siena-and-san-gimignano/' : `/${locale}/tour/private-tour-siena-and-san-gimignano/`}>
+                See the private tours
+              </a>
+            </div>
+            <ul>
+              <li>Your party only &mdash; up to 8 per car</li>
+              <li>A driver who speaks fluent English</li>
+              <li>Pick-up wherever you are staying</li>
+              <li>Change the plan on the day</li>
+              <li>One price for the whole party</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="pr-sec alt" id="fleet">
+        <div className="pr-wrap wide">
+          <div className="pr-head" style={{ marginBottom: 16 }}>
+            <p className="pr-kicker">Our fleet</p>
+            <h2 className="pr-title">We own the vehicles</h2>
+            <p className="pr-lead">
+              Not a marketplace reselling someone else&rsquo;s coach: the cars are ours and
+              the drivers are our employees. That is why we can send the right vehicle for
+              your party, and why we can enter the restricted historic centres.
+            </p>
+          </div>
+
+          <div className="hm-fleet-count">
+            <div><b>11</b><span>25-seat minibuses</span></div>
+            <div><b>10</b><span>Mercedes cars &amp; vans</span></div>
+            <div><b>25</b><span>guests in one vehicle</span></div>
+          </div>
+
+          <div className="hm-fleet">
+            {[
+              ['Mercedes-Benz-Classe-E-black.png', 'Mercedes E-Class', 'Up to 4 guests', 'Sedan'],
+              ['Mercedes-Benz-Classe-S-black.png', 'Mercedes S-Class', 'Up to 4 guests', 'Luxury sedan'],
+              ['Mercedes-Benz-Classe-V-black.png', 'Mercedes V-Class', 'Up to 6 guests', 'MPV'],
+              ['Mercedes-Benz-sprinter-minivan-black.png', 'Mercedes Sprinter', 'Up to 8 guests', 'Minivan'],
+            ].map(([file, nome, pax, tipo]) => (
+              <figure key={file}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={`https://prestigerent.com/wp-content/uploads/2021/09/${file}`} alt={nome} loading="lazy" />
+                <em>{tipo}</em>
+                <b>{nome}</b>
+                <span>{pax}</span>
+              </figure>
+            ))}
+            <figure>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="photo" src="https://prestigerent.com/lp/img/Piazzale-Montelungo-minibuses-2022.webp" alt="Prestige Rent 25-seat minibuses in Florence" loading="lazy" />
+              <em>Minibus</em>
+              <b>25-seat coach</b>
+              <span>Eleven in our fleet</span>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section className="pr-sec tight" id="contact">
+        <div className="pr-wrap">
+          <div className="pr-head"><h2 className="pr-title">Talk to a real person</h2></div>
+          <div className="pr-help">
+            <a href="https://wa.me/393338424047" target="_blank" rel="noopener">
+              <div><b>WhatsApp</b><span>Chat with us</span></div>
+            </a>
+            <a href="tel:+39055286059"><div><b>+39 055 286059</b><span>Call us</span></div></a>
+            <a href="mailto:usa@prestigerent.com"><div><b>usa@prestigerent.com</b><span>Email us</span></div></a>
+          </div>
+          <p className="pr-lead" style={{ textAlign: 'center', fontSize: '.85rem', marginTop: 20 }}>
             {LOCALES.map((l) => (
-              <span key={l.code} style={{ marginInlineEnd: 10 }}>
-                <Link href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}`}>{l.label}</Link>
+              <span key={l.code} style={{ marginInlineEnd: 12 }}>
+                <a href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>{l.label}</a>
               </span>
             ))}
           </p>
         </div>
-
-        {[...byKind.entries()].map(([kind, list]) => (
-          <section key={kind} style={{ marginTop: 26 }}>
-            <h2 className="pr-title" style={{ fontSize: '1.3rem' }}>
-              {KIND_LABEL[kind] ?? kind} <small style={{ opacity: 0.5 }}>({list.length})</small>
-            </h2>
-            <ul className="pr-prose">
-              {list.map((t) => (
-                <li key={t.id}>
-                  <Link href={pathFor(locale, t.slug)}>{t.slug.replace(/-/g, ' ')}</Link>
-                  {t.regiondo_sku ? null : (
-                    <span style={{ color: '#C8102E', fontSize: '.78rem' }}> — a preventivo</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
+      </section>
     </main>
   );
 }

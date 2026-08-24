@@ -1,0 +1,150 @@
+/* ============================================================
+   Home. Sta in un file suo e non dentro landing.css: quello e' la grafica
+   ereditata dalla landing, gia' collaudata su traffico a pagamento, e
+   mescolarci roba nuova renderebbe impossibile capire cosa si puo' toccare.
+   Le variabili di colore sono quelle: --orange, --ink, --line, --wine.
+   ============================================================ */
+
+/* ---------- hero con il modulo di ricerca ---------- */
+.hm-hero{
+  position:relative; min-height:clamp(420px,52vw,560px);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:40px 20px 0; color:#fff; overflow:hidden;
+}
+.hm-hero-bg{ position:absolute; inset:0; z-index:0; }
+.hm-hero-bg img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* la velatura non e' decorazione: sopra una foto di Firenze in pieno sole il
+   testo bianco sparisce, e il titolo e' la prima cosa che deve leggersi */
+.hm-hero-bg::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(15,20,26,.55) 0%,rgba(15,20,26,.28) 45%,rgba(15,20,26,.72) 100%);
+}
+.hm-hero-in{ position:relative; z-index:1; max-width:1120px; margin:0 auto; width:100%; }
+.hm-kicker{
+  display:inline-flex; align-items:center; gap:7px; margin-bottom:12px;
+  font-size:.74rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  color:#FFC79E;
+}
+.hm-title{
+  font-size:clamp(2rem,5.2vw,3.4rem); font-weight:800; line-height:1.08;
+  letter-spacing:-.02em; margin:0; text-shadow:0 2px 18px rgba(0,0,0,.35);
+}
+.hm-sub{
+  margin:14px 0 0; max-width:640px; font-size:clamp(.98rem,1.6vw,1.1rem);
+  font-weight:600; line-height:1.55; color:rgba(255,255,255,.92);
+}
+.hm-badges{ display:flex; flex-wrap:wrap; gap:10px 22px; margin:18px 0 0; }
+.hm-badges span{ font-size:.84rem; font-weight:700; color:#fff; display:inline-flex; gap:7px; align-items:center; }
+.hm-badges i{ font-style:normal; }
+
+/* ---------- il modulo di ricerca: l'elemento che converte di piu' ---------- */
+.hm-search{
+  position:relative; z-index:2; max-width:1120px; margin:22px auto -34px;
+  background:#fff; border-radius:16px; box-shadow:0 12px 40px rgba(15,23,42,.18);
+  display:grid; grid-template-columns:1.4fr 1fr 1fr auto; gap:0; overflow:hidden;
+}
+.hm-f{ padding:14px 18px; border-inline-end:1px solid var(--line); min-width:0; }
+.hm-f:last-of-type{ border-inline-end:0; }
+.hm-f label{
+  display:block; font-size:.66rem; font-weight:800; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px;
+}
+.hm-f select, .hm-f input{
+  width:100%; border:0; outline:0; background:transparent; font:inherit;
+  font-size:.98rem; font-weight:700; color:var(--ink); padding:0;
+}
+.hm-go{
+  border:0; cursor:pointer; background:var(--orange); color:#fff;
+  font:inherit; font-size:.92rem; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; padding:0 30px;
+}
+.hm-go:hover{ background:var(--orange-d); }
+@media (max-width:860px){
+  .hm-search{ grid-template-columns:1fr 1fr; margin-bottom:-20px; }
+  .hm-f{ border-block-end:1px solid var(--line); }
+  .hm-go{ grid-column:1 / -1; padding:15px; }
+}
+
+/* ---------- categorie ---------- */
+.hm-cats{ display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:0 auto 26px; }
+.hm-cat{
+  display:inline-flex; align-items:center; gap:8px; padding:9px 16px;
+  border:1px solid var(--line); border-radius:999px; background:#fff;
+  font-size:.86rem; font-weight:800; color:var(--ink); text-decoration:none;
+}
+.hm-cat:hover{ border-color:var(--orange); color:var(--orange); }
+.hm-cat b{ color:var(--orange); font-weight:800; }
+
+/* ---------- schede tour ---------- */
+.hm-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+@media (max-width:980px){ .hm-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:620px){ .hm-grid{ grid-template-columns:1fr; } }
+
+.hm-card{
+  display:flex; flex-direction:column; background:#fff; border:1px solid var(--line);
+  border-radius:16px; overflow:hidden; text-decoration:none; color:inherit;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.hm-card:hover{ transform:translateY(-3px); box-shadow:0 14px 34px rgba(36,51,63,.14); }
+.hm-card-img{ position:relative; aspect-ratio:4/3; background:#E9E5DF; }
+.hm-card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.hm-card-img::after{
+  content:""; position:absolute; inset:auto 0 0 0; height:62%;
+  background:linear-gradient(180deg,transparent,rgba(15,20,26,.78));
+}
+.hm-card-tag{
+  position:absolute; top:12px; inset-inline-start:12px; z-index:2;
+  background:var(--orange); color:#fff; font-size:.64rem; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase; padding:5px 10px; border-radius:999px;
+}
+.hm-card-name{
+  position:absolute; z-index:2; inset-inline:14px; bottom:12px; margin:0;
+  color:#fff; font-size:1.02rem; font-weight:800; line-height:1.25;
+  text-shadow:0 1px 10px rgba(0,0,0,.5);
+}
+.hm-card-body{ padding:13px 15px 15px; display:flex; flex-direction:column; flex:1; }
+.hm-meta{ display:flex; gap:14px; font-size:.8rem; font-weight:700; color:var(--ink-soft); }
+.hm-hl{ list-style:none; margin:11px 0 0; padding:0; display:grid; gap:6px; }
+.hm-hl li{ font-size:.84rem; font-weight:600; color:var(--ink-soft); padding-inline-start:19px; position:relative; line-height:1.4; }
+.hm-hl li::before{
+  content:""; position:absolute; inset-inline-start:0; top:.42em;
+  width:9px; height:9px; border-radius:50%; background:var(--orange);
+}
+.hm-price{ margin-top:auto; padding-top:13px; display:flex; align-items:baseline; gap:7px; }
+.hm-price small{ font-size:.7rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); }
+.hm-price b{ font-size:1.32rem; font-weight:800; color:var(--ink); }
+.hm-price .ask{ font-size:.88rem; font-weight:800; color:var(--wine); }
+
+/* ---------- fascia scura del privato ---------- */
+.hm-band{
+  background:var(--ink); color:#fff; border-radius:18px; padding:34px;
+  display:grid; grid-template-columns:1.15fr 1fr; gap:28px; align-items:center;
+}
+@media (max-width:860px){ .hm-band{ grid-template-columns:1fr; padding:26px; } }
+.hm-band h2{ font-size:clamp(1.5rem,3vw,2.1rem); font-weight:800; line-height:1.15; margin:0 0 12px; }
+.hm-band p{ font-size:.98rem; font-weight:600; line-height:1.6; color:rgba(255,255,255,.82); margin:0 0 18px; }
+.hm-band ul{ list-style:none; margin:0; padding:0; display:grid; gap:11px; }
+.hm-band li{ font-size:.92rem; font-weight:700; padding-inline-start:26px; position:relative; }
+.hm-band li::before{ content:"✓"; position:absolute; inset-inline-start:0; color:var(--orange); font-weight:800; }
+.hm-band .cta{ margin-top:6px; }
+
+/* ---------- flotta a scorrimento ---------- */
+.hm-fleet{ display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; scroll-snap-type:x mandatory; }
+.hm-fleet::-webkit-scrollbar{ height:6px; }
+.hm-fleet::-webkit-scrollbar-thumb{ background:var(--line); border-radius:99px; }
+.hm-fleet figure{
+  flex:0 0 210px; scroll-snap-align:start; background:#fff;
+  border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center;
+}
+.hm-fleet img{ width:100%; height:96px; object-fit:contain; display:block; margin-bottom:6px; }
+.hm-fleet img.photo{ object-fit:cover; border-radius:8px; }
+.hm-fleet b{ display:block; font-size:.94rem; font-weight:800; color:var(--ink); }
+.hm-fleet span{ display:block; font-size:.79rem; font-weight:600; color:var(--ink-soft); margin-top:2px; }
+.hm-fleet em{
+  display:block; font-style:normal; margin-top:5px; font-size:.68rem; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--orange);
+}
+.hm-fleet-count{ display:flex; gap:26px; justify-content:center; margin-bottom:18px; flex-wrap:wrap; }
+.hm-fleet-count div{ text-align:center; }
+.hm-fleet-count b{ display:block; font-size:1.9rem; font-weight:800; color:var(--orange); line-height:1; }
+.hm-fleet-count span{ font-size:.8rem; font-weight:700; color:var(--ink-soft); }

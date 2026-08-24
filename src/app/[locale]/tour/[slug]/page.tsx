@@ -35,7 +35,7 @@ function pathFor(locale: string, slug: string) {
 async function getTour(slug: string, locale: string) {
   const { data } = await supabase
     .from('tours')
-    .select('id, slug, kind, regiondo_sku, status, tour_content(locale, blocks, title, meta_description)')
+    .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, blocks, title, meta_description)')
     .eq('slug', slug)
     .maybeSingle();
   if (!data) return null;
@@ -121,14 +121,22 @@ export default async function TourPage({
           </p>
         )}
 
-        <div className="trust">
-          <span className="t-item">
-            <span className="stars-img" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((i) => <i className="star" key={i} />)}
+        {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
+            solo dove sono davvero sue. Attribuire a un prodotto le recensioni
+            di un altro e', per Google, un segnale ingannevole. */}
+        {tour.rating != null && tour.reviews_count != null && (
+          <div className="trust">
+            <span className="t-item">
+              <span className="stars-img" aria-hidden="true">
+                {[0, 1, 2, 3, 4].map((i) => <i className="star" key={i} />)}
+              </span>
+              <span>
+                <b>{tour.rating}</b> · {tour.reviews_count.toLocaleString('en-US')} reviews
+                {tour.reviews_source ? ` on ${tour.reviews_source}` : ''}
+              </span>
             </span>
-            <span><b>4.9</b> · 1,794 reviews</span>
-          </span>
-        </div>
+          </div>
+        )}
 
         {foto.length > 0 && (
           <div className="hero-gallery" aria-label="Tour photos">

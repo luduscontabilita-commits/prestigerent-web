@@ -20,4 +20,9 @@ export type TourRow = {
   kind: 'small_group' | 'private' | 'transfer' | 'cruise' | 'other';
   regiondo_sku: string | null;
   status: 'draft' | 'review' | 'published';
+  /* Nulli quasi ovunque: il 4,9 su 1.794 e' del tour Siena in piccolo gruppo,
+     non dell'azienda. Vedi la migrazione `recensioni_per_tour`. */
+  rating: number | null;
+  reviews_count: number | null;
+  reviews_source: string | null;
 };
