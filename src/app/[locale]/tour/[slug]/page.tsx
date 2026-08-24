@@ -161,12 +161,7 @@ export default async function TourPage({
           torna una colonna sola e il calendario scende al suo posto. */}
       <div className="pg-cols">
       <div className="pg-main">
-      <section className="tr-hero" id="top">
-        <div className="tr-hero-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {striscia[0] && <img src={striscia[0].src} alt={nome} fetchPriority="high" />}
-        </div>
-        <div className="tr-hero-in">
+      <section className="hero" id="top">
         <span className="hero-loc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1"
                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -176,39 +171,28 @@ export default async function TourPage({
           {tour.kind === 'private' ? 'Private tour' : tour.kind === 'small_group' ? 'Small group' : 'Prestige Rent'}
         </span>
 
-        {/* L'ultima parola del titolo va in Fraunces corsivo: e' la firma
-            delle landing, ed e' cio' che distingue il marchio da un titolo
-            qualunque in grassetto. */}
-        {/* L'accento in Fraunces va sul LUOGO, non sull'ultima parola:
-            quasi ogni titolo finisce con "from Florence", e accentare la
-            partenza invece della meta non dice niente. */}
-        <h1>
+        {/* L'accento in Fraunces va sul LUOGO, non sull'ultima parola: quasi
+            ogni titolo finisce con "from Florence", e accentare la partenza
+            invece della meta non dice niente. */}
+        <h1 className="hero-title">
           {spezzaTitolo(nome).prima}
-          <em>{spezzaTitolo(nome).accento}</em>
+          <em className="hl place">{spezzaTitolo(nome).accento}</em>
           {spezzaTitolo(nome).dopo}
         </h1>
 
-        {contenuto.description && <p>{testo(contenuto.description)}</p>}
+        {contenuto.description && <p className="hero-sub">{testo(contenuto.description)}</p>}
 
         {prezzo != null && (
-          <p className="tr-facts">
-            <span><b>from &euro;{prezzo.valore.toFixed(0)}</b></span>
+          <p className="hero-dep">
+            <b>from &euro;{prezzo.valore.toFixed(0)}</b>
             {product?.durationHours ? ` · ${product.durationHours} hours` : null}
-            {/* alcuni campi di Regiondo contengono righe di punti usate
-                come separatori nel loro pannello: in pagina sembrano un
-                errore, quindi si scartano */}
             {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
-            {/* Quando il prezzo viene dal listino WordPress e non dal
-                calendario, si dice: e' un listino, non una disponibilita'
-                in tempo reale, e chi legge deve saperlo. */}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
         )}
-        </div>
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
-            solo dove sono davvero sue. Attribuire a un prodotto le recensioni
-            di un altro e', per Google, un segnale ingannevole. */}
+            solo dove sono davvero sue. */}
         {tour.rating != null && tour.reviews_count != null && (
           <div className="trust">
             <span className="t-item">
@@ -223,33 +207,11 @@ export default async function TourPage({
           </div>
         )}
 
-        {false && foto.length > 0 && (
-          <div className="hero-gallery" aria-label="Tour photos">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="g-hero" src={foto[0]} alt={nome} loading="eager" decoding="async" />
-            {foto.slice(1, 13).reduce<string[][]>((cols, f, i) => {
-              if (i % 2 === 0) cols.push([]);
-              cols[cols.length - 1].push(f);
-              return cols;
-            }, []).map((col, i) => (
-              <div className="g-col" key={i}>
-                {col.map((f) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={f} src={f} alt={nome} loading="lazy" decoding="async" />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* La striscia sta DENTRO l'hero, subito sotto il titolo, come sulla
+            landing: non e' una sezione a se'. */}
+        <PhotoStrip foto={striscia} />
       </section>
 
-      {striscia.length > 0 && (
-        <section className="pr-sec tight" id="photos">
-          <div className="pr-wrap wide">
-            <PhotoStrip foto={striscia} />
-          </div>
-        </section>
-      )}
 
       {punti.length > 0 && (
         <section className="pr-sec tight" id="highlights">
