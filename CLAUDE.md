@@ -24,6 +24,19 @@ Ci si accorge del perche' settimane dopo, guardando il traffico a zero.
 
 ---
 
+## 🔴 NIENTE IN LOCALE — SI COMPILA E SI PUBBLICA SOLO SU VERCEL
+
+Niente `next build`, niente `next dev`, niente localhost, niente `vercel` da
+riga di comando. **Si fa `git push` e compila Vercel.**
+
+Non e' una preferenza: il CLI di Vercel su questa macchina si pianta senza
+stampare una riga e lascia deploy in stato UNKNOWN, e un `next build` locale
+crea `.next` che poi il CLI prova a caricare. Con la pubblicazione da GitHub
+il problema non esiste: da qui esce solo codice.
+
+Se serve verificare qualcosa, si verifica **sull'indirizzo pubblicato**, con
+`curl`, non su localhost.
+
 ## Le regole che non si discutono
 
 **1. Le URL non cambiano.** `/tour/nome-tour/` deve restare identico a quello di
