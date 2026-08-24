@@ -37,9 +37,22 @@ export function faqDa(html: string): Domanda[] {
     if (!m) continue;
     const q = (m[1] + (m[2] || '')).replace(/<[^>]+>/g, '').trim();
     const a = m[3].trim();
+
     /* Senza risposta non e' una domanda: e' un titoletto in grassetto, e
        trasformarlo in accordion produrrebbe una riga che si apre sul vuoto. */
     if (!q || !a || a.replace(/<[^>]+>/g, '').trim().length < 12) continue;
+
+    /* DEVE finire con un punto interrogativo. Senza questo controllo
+       finivano fra le domande i NOMI DEGLI AUTORI delle recensioni --
+       "CK_C", "Jana_A", "Timothy_H" -- perche' sulla pagina WordPress
+       sono scritti nello stesso identico modo: nome in grassetto, a capo,
+       testo. Il punto interrogativo e' l'unica cosa che distingue davvero
+       una domanda da un nome. */
+    if (!/[?？]\s*$/.test(q)) continue;
+
+    /* E una domanda vera ha almeno tre parole: "Price?" non lo e'. */
+    if (q.split(/\s+/).length < 3) continue;
+
     out.push({ q, a });
   }
 
