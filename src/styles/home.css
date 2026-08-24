@@ -327,3 +327,51 @@
 .tr-facts b{ font-size:1.24rem; font-weight:800; }
 /* le intestazioni interne allineate a sinistra come l'hero */
 .pr-sec .pr-head{ text-align:start; }
+
+/* ---------- barra fissa di prenotazione ----------
+   Il CSS della landing la mostra solo sotto i 760px. Qui la soglia arriva a
+   1179px: fra 760 e 1180 il calendario non e' piu' nella colonna appiccicata
+   ma in fondo alla pagina, e senza barra bisogna cercarlo. Sopra i 1180 la
+   colonna destra e' sempre sotto gli occhi e la barra sarebbe un doppione. */
+@media (min-width:761px) and (max-width:1179px){
+  .pr-sticky.pr-sticky-tour{ display:flex; }
+}
+@media (min-width:1180px){
+  .pr-sticky.pr-sticky-tour{ display:none !important; }
+}
+
+/* ---------- footer ---------- */
+.ft{ background:var(--ink); color:rgba(255,255,255,.82); margin-top:40px; }
+.ft-band{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:10px 30px;
+  padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.13);
+  font-size:.83rem; font-weight:700; color:#fff;
+}
+.ft-in{
+  max-width:1180px; margin:0 auto; padding:38px 20px 30px;
+  display:grid; grid-template-columns:1.6fr 1fr 1fr 1.2fr; gap:32px;
+}
+@media (max-width:900px){ .ft-in{ grid-template-columns:1fr 1fr; gap:26px; } }
+@media (max-width:560px){ .ft-in{ grid-template-columns:1fr; } }
+.ft-col{ display:flex; flex-direction:column; gap:9px; min-width:0; }
+.ft-t{
+  margin:0 0 3px; font-size:.68rem; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--orange);
+}
+.ft-col a{ color:rgba(255,255,255,.82); text-decoration:none; font-size:.9rem; font-weight:600; }
+.ft-col a:hover{ color:#fff; }
+.ft-about strong{ color:#fff; font-size:1.1rem; font-weight:800; }
+.ft-about p{ margin:0; font-size:.88rem; line-height:1.6; }
+.ft-nap a{ color:var(--orange); font-weight:700; }
+.ft-wa{
+  align-self:flex-start; margin-top:4px; background:#25D366; color:#fff !important;
+  padding:9px 15px; border-radius:999px; font-size:.84rem; font-weight:800;
+}
+.ft-bottom{
+  border-top:1px solid rgba(255,255,255,.13); padding:15px 20px;
+  display:flex; flex-wrap:wrap; justify-content:center; gap:8px 22px;
+  font-size:.8rem; color:rgba(255,255,255,.6);
+}
+.ft-social{ display:flex; gap:16px; }
+.ft-social a{ color:rgba(255,255,255,.75); text-decoration:none; font-weight:700; }
+.ft-social a:hover{ color:#fff; }

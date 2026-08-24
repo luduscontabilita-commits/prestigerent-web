@@ -7,6 +7,7 @@ import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { Videos, type Video } from '@/components/Videos';
+import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
@@ -327,6 +328,12 @@ export default async function TourPage({
 
       <ContactSection />
       </div>{/* /.pg-main-b */}
+
+      <StickyBook
+        titolo={nome}
+        prezzo={prezzo?.valore ?? null}
+        unita={tour.kind === 'private' ? 'per party' : 'per person'}
+      />
       </div>{/* /.pg-cols */}
     </main>
   );

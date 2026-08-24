@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { NoindexBadge } from '@/components/NoindexBadge';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import '@/styles/landing.css';
 import '@/styles/home.css';
 
@@ -54,6 +55,7 @@ export default async function LocaleLayout({
       <body>
         <Header locale={locale} />
         {children}
+        <Footer locale={locale} />
         <NoindexBadge />
       </body>
     </html>
