@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { SearchBar, type Partenza } from './SearchBar';
+import { testo } from '@/lib/prosa';
 
 export type SchedaTour = {
   slug: string;
@@ -109,7 +110,7 @@ export function HomeTours({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t.foto} alt={t.nome} loading="lazy" decoding="async" />
                     )}
-                    <h3 className="hm-card-name">{t.nome}</h3>
+                    <h3 className="hm-card-name">{testo(t.nome)}</h3>
                   </div>
                   <div className="hm-card-body">
                     <div className="hm-meta">
@@ -119,7 +120,7 @@ export function HomeTours({
                     {t.punti.length > 0 && (
                       <ul className="hm-hl">
                         {t.punti.slice(0, 3).map((p) => (
-                          <li key={p}>{p}</li>
+                          <li key={p}>{testo(p)}</li>
                         ))}
                       </ul>
                     )}

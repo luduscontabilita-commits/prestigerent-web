@@ -7,7 +7,7 @@ import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { ContactSection } from '@/components/ContactSection';
-import { pulisci } from '@/lib/prosa';
+import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import '@/styles/home.css';
@@ -83,8 +83,8 @@ export async function generateMetadata({
   const { languages } = { languages: hreflangDi((l) => pathFor(l, slug)) };
 
   return {
-    title: res.contenuto.name ?? slug,
-    description: res.contenuto.description?.slice(0, 160),
+    title: testo(res.contenuto.name) || slug,
+    description: testo(res.contenuto.description).slice(0, 160),
     alternates: { canonical: SITE + pathFor(locale, slug), languages },
   };
 }
@@ -105,7 +105,7 @@ export default async function TourPage({
     ? await fetchProduct(tour.regiondo_sku, regiondoLocale(locale))
     : null;
 
-  const nome = contenuto.name ?? slug.replace(/-/g, ' ');
+  const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
   /* "Read more" e' il link di WordPress finito nell'estrazione: compariva
      fra i punti forti come se fosse uno di essi. Si filtra qui e non nel
@@ -179,18 +179,25 @@ export default async function TourPage({
         {/* L'ultima parola del titolo va in Fraunces corsivo: e' la firma
             delle landing, ed e' cio' che distingue il marchio da un titolo
             qualunque in grassetto. */}
+        {/* L'accento in Fraunces va sul LUOGO, non sull'ultima parola:
+            quasi ogni titolo finisce con "from Florence", e accentare la
+            partenza invece della meta non dice niente. */}
         <h1>
-          {nome.split(' ').slice(0, -1).join(' ')}{' '}
-          <em>{nome.split(' ').slice(-1)}</em>
+          {spezzaTitolo(nome).prima}
+          <em>{spezzaTitolo(nome).accento}</em>
+          {spezzaTitolo(nome).dopo}
         </h1>
 
-        {contenuto.description && <p>{contenuto.description}</p>}
+        {contenuto.description && <p>{testo(contenuto.description)}</p>}
 
         {prezzo != null && (
           <p className="tr-facts">
             <span><b>from &euro;{prezzo.valore.toFixed(0)}</b></span>
             {product?.durationHours ? ` · ${product.durationHours} hours` : null}
-            {product?.participants ? ` · ${product.participants}` : null}
+            {/* alcuni campi di Regiondo contengono righe di punti usate
+                come separatori nel loro pannello: in pagina sembrano un
+                errore, quindi si scartano */}
+            {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
             {/* Quando il prezzo viene dal listino WordPress e non dal
                 calendario, si dice: e' un listino, non una disponibilita'
                 in tempo reale, e chi legge deve saperlo. */}
@@ -258,7 +265,7 @@ export default async function TourPage({
                     <path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff"
                           strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <span>{p}</span>
+                  <span>{testo(p)}</span>
                 </li>
               ))}
             </ul>
