@@ -288,6 +288,14 @@ export default async function TourPage({
         </section>
       )}
 
+      {faqHtml && (
+        <section className="pr-sec" id="faq">
+          <div className="pr-wrap">
+            <Faq html={faqHtml} />
+          </div>
+        </section>
+      )}
+
       </div>{/* /.pg-main */}
 
       <aside className="pg-rail" id="prRail" aria-label="Book this tour">

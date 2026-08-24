@@ -22,10 +22,18 @@ export function Faq({ html }: { html: string }) {
     );
   }
 
+  /* Sulla landing tutte le domande stanno dentro UNA barra chiusa, non
+     sparse in pagina: dodici accordion aperti in fila occupavano mezza
+     schermata anche da chiusi. Qui si replica quella struttura. */
   return (
-    <div className="pr-faqbar-body">
+    <details className="pr-faqbar">
+      <summary>
+        <span>FAQ&rsquo;s</span>
+        <i aria-hidden="true" />
+      </summary>
+      <div className="pr-faqbar-body">
       {domande.map((d, i) => (
-        <details className="pr-acc" key={d.q} open={i === 0}>
+        <details className="pr-acc" key={d.q} >
           <summary>
             <span>{d.q}</span>
             <svg
@@ -46,7 +54,8 @@ export function Faq({ html }: { html: string }) {
             dangerouslySetInnerHTML={{ __html: d.a }}
           />
         </details>
-      ))}
-    </div>
+        ))}
+      </div>
+    </details>
   );
 }
