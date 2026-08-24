@@ -269,3 +269,23 @@
 .hm-proof span{ display:block; margin-top:5px; font-size:.8rem; font-weight:700; color:var(--ink-soft); line-height:1.35; }
 .hm-proof-src{ margin:11px 0 0; text-align:center; font-size:.78rem; font-weight:600; color:var(--ink-soft); }
 .hm-proof-src a{ color:var(--orange); font-weight:800; }
+
+/* Le due colonne della scheda tour partivano da 1400px (soglia ereditata
+   dalla landing): su un portatile da 1280-1366 non scattavano mai e il
+   calendario restava in fondo. Da 1180px in su la colonna destra c'e'. */
+@media (min-width:1180px) and (max-width:1399px){
+  .pg-cols{ display:grid; grid-template-columns:minmax(0,1fr) 400px; }
+  .pg-main{ grid-column:1; grid-row:1; }
+  .pg-main-b{ grid-column:1; grid-row:2; }
+  .pg-rail{
+    grid-column:2; grid-row:1 / span 2; background:#FFF;
+    border-inline-start:1px solid var(--line);
+  }
+  .pg-rail-in{ position:sticky; top:74px; padding:20px 16px; }
+  .cta-mobile{ display:none; }
+}
+/* sotto la soglia il calendario torna in linea, non appiccicato */
+@media (max-width:1179px){
+  .pg-rail-in{ padding:26px 20px 34px; }
+  .pg-rail{ border-top:1px solid var(--line); }
+}

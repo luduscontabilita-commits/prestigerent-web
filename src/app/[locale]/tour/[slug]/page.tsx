@@ -108,19 +108,42 @@ export default async function TourPage({
   const foto = contenuto.images ?? [];
   const punti = contenuto.highlights ?? [];
   const schede = contenuto.tabs ?? {};
-  const striscia = contenuto.gallery ?? [];
+  /* Il mosaico .hero-gallery e' nascosto sopra i 760px (sulla landing, li'
+     c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
+     La striscia si costruisce sempre -- con le didascalie dove sono state
+     scritte a mano, con le sole foto altrimenti. */
+  const striscia: Foto[] =
+    contenuto.gallery?.length
+      ? contenuto.gallery
+      : (contenuto.images ?? []).map((src) => ({ src, alt: contenuto.name ?? '' }));
   const prezzo = prezzoDi(product?.price, schede);
+
+  const calendario = (
+    <>
+      <div className="bk-head">
+        <h2 className="bk-title">Book this tour</h2>
+        <p className="bk-sub">Pick your date and the number of guests.</p>
+      </div>
+      <div className="pr-tguar">
+        <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h</span>
+        <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
+      </div>
+      {tour.regiondo_sku && (
+        <RegiondoWidget sku={tour.regiondo_sku} title={product?.name || nome} locale={locale} />
+      )}
+    </>
+  );
 
   return (
     <main>
+      {/* Due colonne: il contenuto a sinistra, il calendario appiccicato a
+          destra. E' la disposizione della scheda tour del sito attuale, ed e'
+          quella giusta -- il modulo resta sotto gli occhi mentre si legge,
+          invece di stare in fondo dove bisogna cercarlo. Sotto la soglia
+          torna una colonna sola e il calendario scende al suo posto. */}
+      <div className="pg-cols">
+      <div className="pg-main">
       <section className="hero" id="top">
-        <a className="logo" href="/">
-          <span className="logo-name">
-            <strong>Prestige Rent</strong>
-            <small>Tours &amp; Transfers in Italy</small>
-          </span>
-        </a>
-
         <span className="hero-loc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1"
                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -163,7 +186,7 @@ export default async function TourPage({
           </div>
         )}
 
-        {striscia.length === 0 && foto.length > 0 && (
+        {false && foto.length > 0 && (
           <div className="hero-gallery" aria-label="Tour photos">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="g-hero" src={foto[0]} alt={nome} loading="eager" decoding="async" />
@@ -241,25 +264,13 @@ export default async function TourPage({
         </section>
       )}
 
-      <section className="pr-sec alt" id="bookform">
-        <div className="pr-wrap">
-          <div className="bk-head">
-            <h2 className="bk-title">Book this tour</h2>
-            <p className="bk-sub">Pick your date and the number of guests.</p>
-          </div>
-          {tour.regiondo_sku && product ? (
-            <RegiondoWidget sku={tour.regiondo_sku} title={product.name || nome} locale={locale} />
-          ) : (
-            <p className="pr-lead">
-              This tour is arranged on request.{' '}
-              <a href="https://wa.me/393338424047" target="_blank" rel="noopener">
-                Message us on WhatsApp
-              </a>{' '}
-              with your date and the number of guests, and we will send you the price.
-            </p>
-          )}
-        </div>
-      </section>
+      </div>{/* /.pg-main */}
+
+      <aside className="pg-rail" id="prRail" aria-label="Book this tour">
+        <div className="pg-rail-in" id="bookform">{calendario}</div>
+      </aside>
+
+      <div className="pg-main-b">
 
       <script
         type="application/ld+json"
@@ -287,6 +298,8 @@ export default async function TourPage({
       />
 
       <ContactSection />
+      </div>{/* /.pg-main-b */}
+      </div>{/* /.pg-cols */}
     </main>
   );
 }
