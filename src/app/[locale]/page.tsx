@@ -5,6 +5,8 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
+import { Recensioni } from '@/components/Recensioni';
+import { fonti, inEvidenza } from '@/lib/recensioni';
 import '@/styles/home.css';
 
 /* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
@@ -53,6 +55,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
   const righe = (data ?? []) as unknown as Riga[];
+
+  const [leFonti, leRecensioni] = await Promise.all([fonti(), inEvidenza(6)]);
 
   /* I prezzi si chiedono a Regiondo tutti insieme, non uno dopo l'altro:
      in fila sarebbero 49 attese sommate. */
@@ -219,6 +223,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
         </div>
       </section>
+
+      <Recensioni
+        fonti={leFonti}
+        recensioni={leRecensioni}
+        titolo="Twenty-four years, one reputation"
+      />
 
       <ContactSection />
 

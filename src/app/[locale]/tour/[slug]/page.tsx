@@ -9,6 +9,8 @@ import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { Videos, type Video } from '@/components/Videos';
 import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
+import { Recensioni } from '@/components/Recensioni';
+import { fonti, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
@@ -110,9 +112,16 @@ export default async function TourPage({
   if (!res) notFound();
 
   const { tour, contenuto } = res;
-  const product = tour.regiondo_sku
-    ? await fetchProduct(tour.regiondo_sku, regiondoLocale(locale))
-    : null;
+  /* Regiondo e le recensioni si leggono INSIEME, non una dopo l'altra:
+     sono due richieste indipendenti e in fila costerebbero il doppio del
+     tempo su ogni pagina. */
+  const [product, leFonti, leRecensioni] = await Promise.all([
+    tour.regiondo_sku
+      ? fetchProduct(tour.regiondo_sku, regiondoLocale(locale))
+      : Promise.resolve(null),
+    fonti(),
+    recensioniDi(slug),
+  ]);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
@@ -231,6 +240,12 @@ export default async function TourPage({
 
 
       {video.length > 0 && <Videos video={video} />}
+
+      {/* Le recensioni PRIMA del calendario, non dopo: chi ha ancora
+          un dubbio lo risolve qui, un attimo prima di scegliere la
+          data. Metterle in fondo vuol dire mostrarle a chi ha gia'
+          deciso, cioe' a chi non ne aveva bisogno. */}
+      <Recensioni fonti={leFonti} recensioni={leRecensioni} />
 
       {punti.length > 0 && (
         <section className="pr-sec tight" id="highlights">

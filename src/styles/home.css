@@ -396,3 +396,57 @@
 }
 .ft-warn a:hover{ background:rgba(0,0,0,.18); text-decoration:underline; }
 .ft-warn a + a{ border-top:1px solid rgba(255,255,255,.28); }
+
+/* ─── RECENSIONI ────────────────────────────────────────────────────────
+   Tutti i colori passano dalle variabili, quindi il blocco funziona anche
+   in tema scuro senza una sola regola in piu'. */
+.rv{ max-width:1180px; margin:56px auto; padding:0 20px; }
+.rv-head{ text-align:center; margin-bottom:26px; }
+.rv-title{ font-size:clamp(1.5rem,3.4vw,2.2rem); font-weight:800; color:var(--ink); margin:0; }
+.rv-sub{ color:var(--ink-soft); font-size:.92rem; margin:8px 0 0; }
+
+.rv-scores{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-bottom:28px;
+}
+.rv-score{
+  flex:1 1 190px; max-width:250px; text-align:center; text-decoration:none;
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px 14px; color:var(--ink);
+  transition:border-color .15s, transform .15s;
+}
+a.rv-score:hover{ border-color:var(--orange); transform:translateY(-2px); }
+.rv-score b{ font-size:1.85rem; font-weight:800; line-height:1; display:block; }
+.rv-score small{ display:block; color:var(--ink-soft); font-size:.78rem; font-weight:600; margin-top:6px; line-height:1.45; }
+.rv-stars{ color:var(--orange); letter-spacing:1px; font-size:.95rem; }
+
+.rv-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:900px){ .rv-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:600px){ .rv-grid{ grid-template-columns:1fr; } }
+
+.rv-card{
+  margin:0; background:var(--card); border:1px solid var(--line);
+  border-radius:14px; padding:18px;
+}
+.rv-card-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.rv-card-t{ display:block; color:var(--ink); font-size:.95rem; margin-bottom:6px; }
+.rv-card blockquote{
+  margin:0; color:var(--ink); font-size:.92rem; line-height:1.62;
+  /* le recensioni sono di lunghezza molto diversa: senza un limite la
+     griglia diventa una scala. Sei righe, poi sfuma. */
+  display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden;
+}
+.rv-card figcaption{ margin-top:12px; color:var(--ink-soft); font-size:.8rem; font-weight:700; }
+.rv-src{
+  font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px;
+  padding:3px 8px; border-radius:6px; white-space:nowrap;
+  background:var(--ph); color:var(--ink-soft);
+}
+/* i colori delle piattaforme, riconoscibili a colpo d'occhio */
+.rv-src-tripadvisor { background:#E8F6EC; color:#14663A; }
+.rv-src-google      { background:#E8F0FE; color:#1A56C4; }
+.rv-src-viator      { background:#E9E6FB; color:#3B2E9B; }
+.rv-src-getyourguide{ background:#FFF0E4; color:#B34700; }
+html[data-theme="dark"] .rv-src-tripadvisor { background:#12321F; color:#63D69A; }
+html[data-theme="dark"] .rv-src-google      { background:#152441; color:#7FAAF5; }
+html[data-theme="dark"] .rv-src-viator      { background:#211C46; color:#A99CF3; }
+html[data-theme="dark"] .rv-src-getyourguide{ background:#3A2005; color:#FFA65C; }
