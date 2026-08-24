@@ -111,7 +111,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <p className="hm-sub">
             Private days and small-group departures from Florence and the cruise ports.
             We own the vehicles and employ the drivers &mdash; so we come and get you
-            wherever you are staying, at the hour you choose.
+            wherever you are staying, at the hour you choose. Every tour books online,
+            with instant confirmation.
           </p>
           <div className="hm-badges">
             <span><i>⭐</i> <b>4.9</b> · 7,139 reviews on Tripadvisor</span>
