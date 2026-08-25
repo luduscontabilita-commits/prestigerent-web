@@ -60,10 +60,10 @@ const BANDIERA: Record<string, string> = { en: '🇬🇧', de: '🇩🇪', it: '
 export async function generateMetadata(): Promise<Metadata> {
   const m = await metaDi('/', 'en');
   return {
-    title: m?.title ?? 'Private & Small Group Tours from Florence — Prestige Rent',
+    title: m?.title ?? 'Private Tours from Florence — Chianti, Siena, Tuscany',
     description:
       m?.description ??
-      'Private tours and small group day trips from Florence to Chianti, Siena and San Gimignano, plus transfers across Italy. Our own minibuses and guides.',
+      'Private day tours from Florence into Chianti, Siena and San Gimignano, with your own driver and hotel pickup. Our own cars, our own English-speaking guides.',
   };
 }
 
@@ -143,16 +143,20 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <span className="hm-kicker">
             ★ {az?.citta}, since {az?.anno_fondazione} · our own fleet
           </span>
+          {/* Le parole che la gente cerca davvero: "private tour Florence",
+              "Chianti wine tour", "Tuscany from Florence". I transfer NON
+              stanno nel titolo -- ci sono, si vendono, ma non e' li' che
+              si guadagna, e il titolo ha spazio per una cosa sola. */}
           <h1 className="hm-title">
-            Tours &amp; transfers across Italy
-            <em>with your own driver</em>
+            Private tours from Florence
+            <em>into Chianti, Siena &amp; Tuscany</em>
           </h1>
           <p className="hm-sub">
-            Private days and small group departures from Florence and the cruise ports.
-            We own the vehicles and employ the people: <b>fluent English-speaking
-            drivers and guides</b>, several of them native speakers, working with us
-            season after season. We collect you wherever you are staying, at the hour
-            you choose.
+            Your own car, your own driver, your own hours &mdash; through the Chianti
+            wineries, Siena and San Gimignano. We own the vehicles and employ the
+            people: <b>fluent English-speaking drivers and guides</b>, several of them
+            native speakers, working with us season after season. We collect you at
+            your hotel in Florence, or anywhere in Italy.
           </p>
           {/* La riga della fiducia risponde alle tre obiezioni di chi
               arriva da un annuncio -- e' vero? posso disdire? chi mi
