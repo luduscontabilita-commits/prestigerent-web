@@ -50,7 +50,15 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
     .select('fonte,voto,quante,url,distintivo')
     .eq('tour_slug', slug);
 
-  const perTour = (data ?? []).filter((v) => v.voto != null && v.quante != null);
+  /* SOTTO LE TRE RECENSIONI NON SI MOSTRA.
+     "5,0 su 1 recensione" e' vero e sembra inventato: e' l'effetto
+     opposto a quello che serve. Il filtro sta qui e non nel database --
+     il dato resta buono, e fra sei mesi quelle righe passeranno la
+     soglia da sole. */
+  const MINIMO = 3;
+  const perTour = (data ?? []).filter(
+    (v) => v.voto != null && v.quante != null && v.quante >= MINIMO
+  );
   if (!perTour.length) return dAzienda;
 
   /* Le etichette si rileggono TUTTE, senza il filtro sui numeri.
@@ -172,7 +180,7 @@ export async function votiPerTour(): Promise<Record<string, VotoTour>> {
 
   const somma: Record<string, { peso: number; n: number }> = {};
   for (const r of data ?? []) {
-    if (r.voto == null || r.quante == null) continue;
+    if (r.voto == null || r.quante == null || r.quante < 3) continue;
     const s = (somma[r.tour_slug] ??= { peso: 0, n: 0 });
     s.peso += Number(r.voto) * r.quante;
     s.n += r.quante;
