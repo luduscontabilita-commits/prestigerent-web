@@ -116,3 +116,42 @@ a.ad-card:hover{ border-color:#ED6707; }
 .ad-foto-fuori > p{ margin:0 0 14px; font-size:.82rem; color:#6B7885; line-height:1.55; }
 .ad-foto-fuori .ad-foto{ opacity:.6; }
 .ad-foto-fuori .ad-foto:hover{ opacity:1; }
+
+/* ─── i numeri da Regiondo ────────────────────────────────────────────
+   La fascia in alto e' la cosa piu' grande della pagina, e non per vezzo:
+   l'eta' dei numeri e' l'unica informazione che non si puo' ricavare
+   guardandoli. Il colore la fa leggere senza leggerla -- verde entro tre
+   ore, ambra entro il giorno, rosso oltre. */
+.ad-fresco{ display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  padding:18px 22px; margin-bottom:16px; border-radius:14px; border:1px solid #E2E8EE; background:#fff; }
+.ad-fresco b{ display:block; font-size:1.35rem; line-height:1.2; }
+.ad-fresco span{ display:block; margin-top:5px; font-size:.83rem; color:#6B7885; line-height:1.5; max-width:70ch; }
+.ad-fresco-attesa{ border-color:#E2E8EE; background:#fff; }
+.ad-fresco-bene{ border-color:#BFE3D0; background:#F4FBF7; }
+.ad-fresco-bene b{ color:#1E8E5A; }
+.ad-fresco-cosi{ border-color:#F5D5B8; background:#FFF9F3; }
+.ad-fresco-cosi b{ color:#B8681E; }
+.ad-fresco-male{ border-color:#F0BEB7; background:#FEF6F5; }
+.ad-fresco-male b{ color:#C0392B; }
+
+.ad-aggiorna{ flex:0 0 auto; padding:14px 26px; border:0; border-radius:11px; background:#ED6707; color:#fff;
+  font:inherit; font-size:.95rem; font-weight:800; cursor:pointer; }
+.ad-aggiorna:hover{ background:#D25B05; }
+.ad-aggiorna:disabled{ opacity:.55; cursor:progress; }
+
+/* Quaranta secondi senza segnali sono lunghi: la barra, il passo in corso
+   e i secondi che scorrono servono a non far ripremere il pulsante. */
+.ad-avanza{ padding:16px 20px; margin-bottom:16px; background:#fff; border:1px solid #E2E8EE; border-radius:14px; }
+.ad-avanza-barra{ height:8px; border-radius:999px; background:#EEF2F5; overflow:hidden; }
+.ad-avanza-barra i{ display:block; height:100%; background:#ED6707; border-radius:999px; transition:width .35s ease; }
+.ad-avanza-passo{ display:flex; justify-content:space-between; gap:14px; margin:10px 0 0; font-size:.85rem; font-weight:700; }
+.ad-avanza-passo em{ font-style:normal; color:#6B7885; font-weight:700; font-variant-numeric:tabular-nums; }
+.ad-avanza-fatti{ margin:10px 0 0; padding:0 0 0 18px; font-size:.8rem; color:#6B7885; line-height:1.7; }
+
+.ad-num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.ad-num b{ font-size:.95rem; }
+.ad-fioco{ color:#6B7885; font-size:.8rem; }
+.ad-eta{ font-size:.8rem; font-weight:700; }
+.ad-eta-bene{ color:#1E8E5A; }
+.ad-eta-cosi{ color:#B8681E; }
+.ad-eta-male{ color:#C0392B; }

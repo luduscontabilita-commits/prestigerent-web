@@ -10,6 +10,7 @@ export default async function Pannello() {
   const voci = [
     { href: '/admin/seo/', titolo: 'Title e description', testo: 'I testi che compaiono su Google, pagina per pagina. 123 pagine.' },
     { href: '/admin/foto/', titolo: 'Foto dei tour', testo: 'L’ordine delle foto. La prima e’ la copertina: elenco della home e anteprime social.' },
+    { href: '/admin/numeri/', titolo: 'Numeri da Regiondo', testo: 'Recensioni, prenotazioni e disponibilita’. Si riaggiornano con un pulsante e dicono quanti anni hanno.' },
   ];
 
   return (
@@ -30,7 +31,7 @@ export default async function Pannello() {
         ))}
         <div className="ad-card ad-prossimo">
           <strong>In arrivo</strong>
-          <span>Video dei tour · Numeri delle recensioni · Caricamenti delle guide</span>
+          <span>Video dei tour · Caricamenti delle guide</span>
         </div>
       </div>
     </main>
