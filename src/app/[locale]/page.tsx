@@ -60,7 +60,7 @@ const BANDIERA: Record<string, string> = { en: '🇬🇧', de: '🇩🇪', it: '
 export async function generateMetadata(): Promise<Metadata> {
   const m = await metaDi('/', 'en');
   return {
-    title: m?.title ?? 'Private Tours from Florence — Chianti, Siena, Tuscany',
+    title: m?.title ?? 'Private Tours from Florence & Chianti — Prestige Rent',
     description:
       m?.description ??
       'Private day tours from Florence into Chianti, Siena and San Gimignano, with your own driver and hotel pickup. Our own cars, our own English-speaking guides.',
@@ -147,9 +147,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               "Chianti wine tour", "Tuscany from Florence". I transfer NON
               stanno nel titolo -- ci sono, si vendono, ma non e' li' che
               si guadagna, e il titolo ha spazio per una cosa sola. */}
+          {/* "Chauffeur" e non "driver": in America e' la parola del
+              servizio premium, quella che cerca chi e' disposto a spendere
+              -- e lo scontrino medio da Google e' 300 euro, non 89. */}
           <h1 className="hm-title">
-            Private tours from Florence
-            <em>into Chianti, Siena &amp; Tuscany</em>
+            Private tours, transfers &amp; chauffeur service
+            <em>from Florence, through Chianti and Tuscany</em>
           </h1>
           <p className="hm-sub">
             Your own car, your own driver, your own hours &mdash; through the Chianti
