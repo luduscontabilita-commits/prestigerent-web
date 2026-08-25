@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { riprova } from '@/lib/riprova';
+import { metaDi } from '@/lib/seo';
 import { fonti, inEvidenza } from '@/lib/recensioni';
 import { FasciaFiducia } from '@/components/Riprova';
 import { Recensioni } from '@/components/Recensioni';
@@ -32,11 +33,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const d = await riprova();
+  const [d, m] = await Promise.all([riprova(), metaDi('/about-us/', 'en')]);
   const anni = d.anni ?? 20;
   return {
-    title: `About Prestige Rent — Florence tour operator since ${d.azienda?.anno_fondazione ?? 2002}`,
-    description:
+    title: m?.title ?? `About Prestige Rent — Florence tour operator since ${d.azienda?.anno_fondazione ?? 2002}`,
+    description: m?.description ??
       `We are a Florence company running our own minibuses and cars with our own employed ` +
       `drivers and guides — ${anni} years, ${d.totale.toLocaleString('en-US')} verified ` +
       `reviews, ${d.voto?.toFixed(1)} average. Not a broker, not a marketplace.`,

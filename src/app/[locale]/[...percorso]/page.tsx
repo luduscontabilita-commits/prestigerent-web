@@ -5,6 +5,7 @@ import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
 import { CATEGORIE, categoriaDi, figlieDi } from '@/lib/categorie';
 import { votiPerTour } from '@/lib/recensioni';
+import { metaDi } from '@/lib/seo';
 import { prezzoDi } from '@/lib/prezzi';
 import { testo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
@@ -46,9 +47,13 @@ export async function generateMetadata({
   const { percorso } = await params;
   const c = categoriaDi(daiParams(percorso));
   if (!c) return {};
+  /* Scritti uno per uno e conservati nella tabella `seo`: qui c'erano
+     30 pagine su 35 SENZA description e 5 con un paragrafo intero al
+     posto del meta, uno da 1.267 caratteri dove Google ne legge 155. */
+  const m = await metaDi(c.path, 'en');
   return {
-    title: `${c.titolo} — Prestige Rent`,
-    description: c.intro.slice(0, 300),
+    title: m?.title ?? `${c.titolo} — Prestige Rent`,
+    description: m?.description ?? c.intro.slice(0, 155),
     alternates: hreflangDi((l) => (l === DEFAULT_LOCALE ? c.path : `/${l}${c.path}`)),
   };
 }
