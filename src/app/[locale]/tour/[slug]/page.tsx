@@ -18,6 +18,7 @@ import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
 import { prenotazioniDi, disponibilitaDi } from '@/lib/riprova';
 import { Urgenza } from '@/components/Urgenza';
+import { Diretto } from '@/components/Diretto';
 import '@/styles/home.css';
 
 const SITE = SITE_URL;
@@ -214,6 +215,10 @@ export default async function TourPage({
       {tour.regiondo_sku && (
         <RegiondoWidget sku={tour.regiondo_sku} title={product?.name || nome} locale={locale} />
       )}
+      {/* SOTTO il calendario, non sopra: chi ha gia' scelto la data non
+          va interrotto. Serve a chi arriva in fondo senza decidersi, ed
+          e' li' che il confronto con Viator si vince o si perde. */}
+      <Diretto whatsapp="https://wa.me/393338424047" />
     </>
   );
 
