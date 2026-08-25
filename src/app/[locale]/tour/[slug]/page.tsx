@@ -15,6 +15,7 @@ import { fonti, punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
+import { metaDi } from '@/lib/seo';
 import '@/styles/home.css';
 
 const SITE = SITE_URL;
@@ -94,9 +95,15 @@ export async function generateMetadata({
 
   const { languages } = { languages: hreflangDi((l) => pathFor(l, slug)) };
 
+  /* Il title e la description arrivano dalla tabella `seo`, dove si
+     vedono tutti insieme e si correggono dal pannello. Se la riga non
+     c'e' si usa quello calcolato qui sotto: una pagina senza meta e' un
+     problema, una pagina che non si apre e' un disastro. */
+  const meta = await metaDi(`/tour/${slug}/`, 'en');
+
   return {
-    title: testo(res.contenuto.name) || slug,
-    description: testo(res.contenuto.description).slice(0, 160),
+    title: meta?.title || testo(res.contenuto.name) || slug,
+    description: meta?.description || testo(res.contenuto.description).slice(0, 160),
     alternates: { canonical: SITE + pathFor(locale, slug), languages },
   };
 }

@@ -1,0 +1,66 @@
+/* Il pannello: volutamente sobrio. Non e' il sito, e' uno strumento --
+   deve far leggere tabelle lunghe senza stancare. */
+.ad{ min-height:100vh; background:#F4F6F8; color:#16202A; }
+.ad-entra{ min-height:100vh; display:grid; place-items:center; padding:20px; background:#16202A; }
+.ad-box{ width:100%; max-width:420px; background:#fff; border-radius:18px; padding:34px 30px; box-shadow:0 24px 60px rgba(0,0,0,.3); }
+.ad-box h1{ font-size:1.25rem; margin:0 0 22px; }
+.ad-box label{ display:block; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#6B7885; margin-bottom:7px; }
+.ad-box input{ width:100%; padding:13px 15px; border:1px solid #D6DDE4; border-radius:11px; font:inherit; font-size:1rem; }
+.ad-box input:focus{ outline:2px solid #ED6707; outline-offset:1px; border-color:transparent; }
+.ad-box button{ width:100%; margin-top:14px; padding:14px; border:0; border-radius:11px; background:#ED6707; color:#fff; font:inherit; font-size:.98rem; font-weight:800; cursor:pointer; }
+.ad-box button:disabled{ opacity:.6; cursor:default; }
+.ad-nota{ margin:16px 0 0; font-size:.8rem; color:#6B7885; line-height:1.55; }
+.ad-ok{ font-size:.95rem; line-height:1.6; }
+.ad-err{ margin:12px 0 0; font-size:.85rem; color:#C0392B; }
+
+.ad-main{ max-width:1240px; margin:0 auto; padding:28px 20px 60px; }
+.ad-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+.ad-head h1{ font-size:1.5rem; margin:0; }
+.ad-head p{ margin:4px 0 0; font-size:.85rem; color:#6B7885; }
+.ad-griglia{ display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+.ad-card{ display:block; background:#fff; border:1px solid #E2E8EE; border-radius:14px; padding:20px; text-decoration:none; color:inherit; }
+a.ad-card:hover{ border-color:#ED6707; }
+.ad-card strong{ display:block; font-size:1rem; margin-bottom:6px; }
+.ad-card span{ font-size:.85rem; color:#6B7885; line-height:1.5; }
+.ad-prossimo{ opacity:.6; }
+
+/* ─── la tabella dei meta ─────────────────────────────────────────────
+   Larga, densa, monospazio sui numeri: e' uno strumento di lavoro. */
+.ad-largo{ max-width:1600px; }
+.ad-back{ font-size:.85rem; font-weight:700; color:#6B7885; text-decoration:none; }
+.ad-back:hover{ color:#ED6707; }
+
+.ad-conta{ display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-bottom:16px; }
+.ad-conta > div{ background:#fff; border:1px solid #E2E8EE; border-radius:12px; padding:14px 16px; }
+.ad-conta b{ display:block; font-size:1.7rem; line-height:1; font-variant-numeric:tabular-nums; }
+.ad-conta span{ display:block; margin-top:5px; font-size:.76rem; color:#6B7885; line-height:1.35; }
+.ad-conta .male b{ color:#C0392B; }
+.ad-conta .bene b{ color:#1E8E5A; }
+
+.ad-barra{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.ad-barra input{ flex:1 1 260px; padding:10px 14px; border:1px solid #D6DDE4; border-radius:10px; font:inherit; font-size:.9rem; }
+.ad-barra button{ padding:9px 15px; border:1px solid #D6DDE4; border-radius:999px; background:#fff; font:inherit; font-size:.83rem; font-weight:700; cursor:pointer; color:#16202A; }
+.ad-barra button.on{ background:#16202A; color:#fff; border-color:#16202A; }
+.ad-quante{ font-size:.8rem; color:#6B7885; margin-left:auto; }
+
+.ad-tab-wrap{ background:#fff; border:1px solid #E2E8EE; border-radius:14px; overflow:auto; }
+.ad-tab{ width:100%; border-collapse:collapse; font-size:.85rem; }
+.ad-tab th{ position:sticky; top:0; z-index:1; background:#F4F6F8; text-align:left; padding:11px 14px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#6B7885; border-bottom:1px solid #E2E8EE; }
+.ad-tab td{ padding:13px 14px; border-bottom:1px solid #EEF2F5; vertical-align:top; }
+.ad-tab tr:last-child td{ border-bottom:0; }
+.ad-tab tr:hover td{ background:#FBFCFD; }
+.ad-perc{ width:250px; }
+.ad-perc a{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.76rem; color:#16202A; text-decoration:none; word-break:break-all; }
+.ad-perc a:hover{ color:#ED6707; text-decoration:underline; }
+.ad-mano{ display:block; margin-top:5px; font-style:normal; font-size:.68rem; font-weight:800; color:#1E8E5A; }
+.ad-prima, .ad-dopo{ width:calc((100% - 250px) / 2); }
+.ad-prima{ background:#FFFBFA; }
+.ad-dopo{ background:#FAFDFB; }
+.ad-t{ font-weight:700; color:#16202A; line-height:1.35; }
+.ad-d{ margin-top:6px; color:#55636F; line-height:1.45; font-size:.82rem; }
+.ad-t i, .ad-d i{ color:#C0392B; font-weight:700; }
+.ad-n{ display:inline-block; margin-left:7px; padding:1px 6px; border-radius:5px; background:#EEF2F5; color:#6B7885; font-size:.68rem; font-weight:800; font-variant-numeric:tabular-nums; vertical-align:1px; }
+.ad-n.ko{ background:#FBE3E0; color:#C0392B; }
+.ad-tag{ margin-top:7px; display:flex; gap:5px; flex-wrap:wrap; }
+.ad-tag em{ font-style:normal; font-size:.67rem; font-weight:800; padding:2px 7px; border-radius:5px; background:#FBE3E0; color:#C0392B; }
+.ad-vuoto{ font-size:.8rem; color:#98A4AF; font-style:italic; }

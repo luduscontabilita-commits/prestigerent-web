@@ -10,6 +10,8 @@ import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
 import { fonti, inEvidenza } from '@/lib/recensioni';
 import { riprova } from '@/lib/riprova';
+import { metaDi } from '@/lib/seo';
+import type { Metadata } from 'next';
 import '@/styles/home.css';
 
 /* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
@@ -44,6 +46,20 @@ function maxOspiti(kind: string): number | null {
   if (kind === 'small_group') return 25;
   if (kind === 'private') return 8;
   return null;
+}
+
+/* La home punta alle chiavi che la gente cerca davvero -- "private tours
+   Florence", "Tuscany small group", "Chianti wine tour" -- non alla parola
+   "Home", che e' quello che c'e' scritto oggi su WordPress e che non cerca
+   nessuno. */
+export async function generateMetadata(): Promise<Metadata> {
+  const m = await metaDi('/', 'en');
+  return {
+    title: m?.title ?? 'Private & Small Group Tours from Florence — Prestige Rent',
+    description:
+      m?.description ??
+      'Private tours and small group day trips from Florence to Chianti, Siena and San Gimignano, plus transfers across Italy. Our own minibuses and guides.',
+  };
 }
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
