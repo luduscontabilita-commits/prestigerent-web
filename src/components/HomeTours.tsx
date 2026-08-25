@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { SearchBar, type Partenza } from './SearchBar';
 import { testo } from '@/lib/prosa';
 
 export type SchedaTour = {
@@ -27,12 +26,13 @@ const ETICHETTA: Record<string, string> = {
 
 export function HomeTours({
   tours,
-  partenze,
+  filtro,
 }: {
   tours: SchedaTour[];
-  partenze: Partenza[];
+  filtro: { da: string; persone: number; tipo?: string } | null;
 }) {
-  const [filtro, setFiltro] = useState<{ da: string; persone: number; tipo?: string } | null>(null);
+  /* Il filtro arriva dal modulo di ricerca, che ora sta nell'hero:
+     lo stato vive nella home, comune ai due. */
   const [categoria, setCategoria] = useState<string>('');
   /* La destinazione arriva dal menu (/?place=siena) e si legge una volta
      sola, al montaggio: e' un filtro che si imposta arrivando, non
@@ -40,6 +40,8 @@ export function HomeTours({
      una sola pagina in cache per tutti invece di una per destinazione. */
   const [luogo, setLuogo] = useState('');
   const [dalMenu, setDalMenu] = useState('');
+  /* la partenza letta dall'indirizzo: si somma a quella del modulo */
+  const [daUrl, setDaUrl] = useState('');
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
@@ -48,7 +50,7 @@ export function HomeTours({
     const fr = q.get('from');
     if (pl) { setLuogo(pl); setDalMenu(pl.replace(/-/g, ' ')); }
     if (kd) setCategoria(kd);
-    if (fr) setFiltro({ da: fr, persone: 0 });
+    if (fr) setDaUrl(fr);
   }, []);
 
   const visibili = useMemo(() => {
@@ -63,13 +65,14 @@ export function HomeTours({
         const nome = t.nome.toLowerCase();
         if (!luogo.split('-').every((parola) => nome.includes(parola))) return false;
       }
-      if (filtro?.da && t.partenza !== filtro.da) return false;
+      const da = filtro?.da || daUrl;
+      if (da && t.partenza !== da) return false;
       /* Un tour privato da 8 posti non serve a chi e' in dodici: nasconderlo
          evita la telefonata "ma allora perche' me lo avete mostrato?". */
       if (filtro?.persone && t.maxOspiti && filtro.persone > t.maxOspiti) return false;
       return true;
     });
-  }, [tours, filtro, categoria, luogo]);
+  }, [tours, filtro, categoria, luogo, daUrl]);
 
   const conteggi = useMemo(() => {
     const m = new Map<string, number>();
@@ -79,8 +82,6 @@ export function HomeTours({
 
   return (
     <>
-      <SearchBar partenze={partenze} onCerca={setFiltro} />
-
       <section className="pr-sec" id="tours">
         <div className="pr-wrap wide">
           <div className="hm-cats">
@@ -115,10 +116,10 @@ export function HomeTours({
                 <button type="button" onClick={() => { setLuogo(''); setDalMenu(''); }} aria-label="Clear">&times;</button>
               </span>
             )}
-            {filtro?.da && (
+            {(filtro?.da || filtro?.tipo || filtro?.persone) && (
               <p className="pr-lead">
-                Departing from {partenze.find((p) => p.valore === filtro.da)?.etichetta}
-                {filtro.persone ? ` · ${filtro.persone} guests` : ''}
+                {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'} match your search
+                {filtro?.persone ? ` · ${filtro.persone} guests` : ''}
               </p>
             )}
           </div>

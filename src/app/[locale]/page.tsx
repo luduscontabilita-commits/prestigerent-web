@@ -3,6 +3,7 @@ import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
@@ -122,7 +123,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             ★ {az?.citta}, since {az?.anno_fondazione} · our own fleet
           </span>
           <h1 className="hm-title">
-            Tours and transfers across Italy,<br />with your own driver
+            Tours &amp; transfers across Italy
+            <em>with your own driver</em>
           </h1>
           <p className="hm-sub">
             Private days and small-group departures from Florence and the cruise ports.
@@ -130,22 +132,53 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             wherever you are staying, at the hour you choose. Every tour books online,
             with instant confirmation.
           </p>
+          {/* La riga della fiducia risponde alle tre obiezioni di chi
+              arriva da un annuncio -- e' vero? posso disdire? chi mi
+              porta? -- prima che cominci a scorrere. */}
           <div className="hm-badges">
             {d.voto != null && (
               <span>
-                <i>⭐</i> <b>{d.voto.toFixed(1)}</b> ·{' '}
+                <i>⭐</i> <b>{d.voto.toFixed(1)}</b> from{' '}
                 {d.totale.toLocaleString('en-US')} verified reviews
               </span>
             )}
-            <span><i>🏆</i> Travellers&rsquo; Choice 2026</span>
-            <span><i>🚐</i> {az?.mezzi_minibus} minibuses &amp; our {az?.mezzi_auto}</span>
-            <span><i>🛡️</i> Free cancellation up to 24h</span>
+            <span><i>🏆</i> Viator Experience Award &amp; Travellers&rsquo; Choice</span>
+            <span><i>🛡️</i> Free cancellation up to 24 hours</span>
+            <span><i>🚐</i> Our own {az?.mezzi_minibus} minibuses, our own drivers</span>
+          </div>
+
+          {/* Il modulo di ricerca STA QUI, sulla foto: e' la prima cosa
+              che si puo' fare. Sotto, in mezzo al bianco, lo trovava solo
+              chi scorreva. */}
+          <Cerca tours={tours} partenze={PARTENZE} />
+
+          <div className="hm-cta">
+            <a className="primo" href="#tours">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+              </svg>
+              Explore tours
+            </a>
+            <a className="secondo" href="https://wa.me/393338424047" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25" />
+              </svg>
+              Ask us anything
+            </a>
           </div>
         </div>
       </section>
 
+      {/* I PREMI SUBITO SOTTO LA RICERCA, non a meta' pagina.
+          Sono medaglie emesse da Viator e Tripadvisor: rispondono da sole
+          alla domanda "e voi chi siete" nel punto esatto in cui uno se la
+          fa, cioe' appena finito di leggere il titolo. Piu' in basso le
+          vedeva solo chi scorreva. */}
+      <Premi />
+
       <div className="pr-wrap wide" style={{ position: 'relative', zIndex: 3 }}>
-        <HomeTours tours={tours} partenze={PARTENZE} />
+        {/* qui atterra la lista, disegnata da Cerca con un portale */}
+        <div id="lista-tour" />
       </div>
 
       {/* La prova sociale con la FONTE linkata. Un numero senza fonte e' una
@@ -244,7 +277,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </section>
 
-      <Premi />
       <Recensioni
         fonti={leFonti}
         recensioni={leRecensioni}

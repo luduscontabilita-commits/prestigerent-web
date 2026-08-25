@@ -6,85 +6,140 @@
    ============================================================ */
 
 /* ---------- hero con il modulo di ricerca ---------- */
+/* L'HERO.
+   Foto a tutta larghezza, velatura, e sopra: occhiello, titolo su due
+   righe -- la seconda in Fraunces corsivo, che e' il carattere del
+   marchio -- sottotitolo breve, il modulo di ricerca, la riga della
+   fiducia e due pulsanti. E' l'ordine in cui si legge: chi sono, cosa
+   fanno, dove cerco, perche' dovrei fidarmi, cosa faccio adesso. */
 .hm-hero{
-  position:relative; min-height:clamp(420px,52vw,560px);
-  display:flex; flex-direction:column; justify-content:flex-end;
-  padding:40px 20px 0; color:#fff; overflow:hidden;
+  position:relative; min-height:clamp(560px,64vw,720px);
+  display:flex; flex-direction:column; justify-content:center;
+  padding:80px 20px 44px; color:#fff; overflow:hidden;
 }
 .hm-hero-bg{ position:absolute; inset:0; z-index:0; }
 .hm-hero-bg img{ width:100%; height:100%; object-fit:cover; display:block; }
-/* la velatura non e' decorazione: sopra una foto di Firenze in pieno sole il
-   testo bianco sparisce, e il titolo e' la prima cosa che deve leggersi */
+/* La velatura non e' decorazione: sopra una foto in pieno sole il testo
+   bianco sparisce, e il titolo e' la prima cosa che deve leggersi. Piu'
+   scura a sinistra, dove sta il testo, e leggera a destra per non
+   spegnere la foto. */
 .hm-hero-bg::after{
   content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg,rgba(15,20,26,.55) 0%,rgba(15,20,26,.28) 45%,rgba(15,20,26,.72) 100%);
+  background:
+    linear-gradient(90deg,rgba(10,15,21,.80) 0%,rgba(10,15,21,.58) 46%,rgba(10,15,21,.22) 100%),
+    linear-gradient(180deg,rgba(10,15,21,.42) 0%,rgba(10,15,21,0) 34%,rgba(10,15,21,.50) 100%);
 }
-.hm-hero-in{ position:relative; z-index:1; max-width:1120px; margin:0 auto; width:100%; }
+.hm-hero-in{ position:relative; z-index:1; max-width:1180px; margin:0 auto; width:100%; }
+
 .hm-kicker{
-  display:inline-flex; align-items:center; gap:7px; margin-bottom:12px;
-  font-size:.74rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
-  color:#FFC79E;
+  display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+  font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--orange-hi, #FF9A4D);
 }
 .hm-title{
-  font-size:clamp(2rem,5.2vw,3.4rem); font-weight:800; line-height:1.08;
-  letter-spacing:-.02em; margin:0; text-shadow:0 2px 18px rgba(0,0,0,.35);
+  font-size:clamp(2.2rem,5.6vw,4rem); font-weight:800; line-height:1.03;
+  letter-spacing:-.025em; margin:0; max-width:16ch;
+  text-shadow:0 2px 22px rgba(0,0,0,.42);
+}
+/* la seconda riga in Fraunces corsivo: e' il carattere delle landing, ed
+   e' quello che rende il titolo riconoscibile a colpo d'occhio */
+.hm-title em{
+  display:block; font-family:Fraunces,Georgia,serif; font-style:italic;
+  font-weight:560; letter-spacing:-.01em;
 }
 .hm-sub{
-  margin:14px 0 0; max-width:640px; font-size:clamp(.98rem,1.6vw,1.1rem);
-  font-weight:600; line-height:1.55; color:rgba(255,255,255,.92);
+  margin:18px 0 0; max-width:52ch; font-size:clamp(1rem,1.5vw,1.12rem);
+  font-weight:600; line-height:1.6; color:rgba(255,255,255,.94);
+  text-shadow:0 1px 12px rgba(0,0,0,.4);
 }
-.hm-badges{ display:flex; flex-wrap:wrap; gap:10px 22px; margin:18px 0 0; }
-.hm-badges span{ font-size:.84rem; font-weight:700; color:#fff; display:inline-flex; gap:7px; align-items:center; }
-.hm-badges i{ font-style:normal; }
+.hm-search{ margin-top:28px; }
 
-/* ---------- il modulo di ricerca: l'elemento che converte di piu' ---------- */
-/* IL MODULO DI RICERCA: tre campi grandi e un pulsante che si vede.
-   Le etichette stanno SOPRA, non dentro come segnaposto: un segnaposto
-   sparisce appena si compila, e chi torna sul modulo non sa piu' cosa
-   aveva scelto. */
+/* la riga della fiducia, sotto il modulo */
+.hm-badges{ display:flex; flex-wrap:wrap; gap:12px 26px; margin:22px 0 0; }
+.hm-badges span{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.87rem; font-weight:800; color:#fff;
+  text-shadow:0 1px 10px rgba(0,0,0,.45);
+}
+.hm-badges i{ font-style:normal; font-size:1rem; }
+.hm-badges b{ color:var(--orange-hi, #FF9A4D); }
+
+/* i due pulsanti in fondo all'hero */
+.hm-cta{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+.hm-cta a{
+  display:inline-flex; align-items:center; gap:9px;
+  padding:14px 26px; border-radius:12px; text-decoration:none;
+  font-size:.92rem; font-weight:800;
+  transition:transform .12s, background .15s;
+}
+.hm-cta a:active{ transform:scale(.98); }
+.hm-cta .primo{ background:var(--orange); color:#fff; box-shadow:0 10px 26px rgba(196,74,8,.4); }
+.hm-cta .primo:hover{ background:var(--orange-d); }
+.hm-cta .secondo{
+  background:rgba(18,24,32,.62); color:#fff;
+  border:1px solid rgba(255,255,255,.35); backdrop-filter:blur(6px);
+}
+.hm-cta .secondo:hover{ background:rgba(18,24,32,.82); }
+.hm-cta svg{ width:17px; height:17px; }
+
+@media (max-width:760px){
+  .hm-hero{ min-height:auto; padding:60px 18px 36px; }
+  .hm-title{ max-width:none; }
+  .hm-cta a{ flex:1 1 auto; justify-content:center; }
+}
+
+/* IL MODULO DI RICERCA, appoggiato sulla foto.
+   Ogni campo e' una pastiglia bianca a se': si legge sopra qualsiasi
+   immagine, mentre una scheda unica creava un rettangolo che spegneva
+   meta' della foto. L'etichetta sta DENTRO la pastiglia, piccola e
+   arancione sopra il valore -- non e' un segnaposto, quindi non sparisce
+   quando si compila e chi torna sul modulo vede ancora cosa aveva scelto. */
 .hm-search{
-  display:grid; gap:10px; align-items:end;
-  grid-template-columns:1.3fr 1.2fr .9fr auto;
-  background:var(--card); border-radius:18px; padding:12px;
-  box-shadow:0 16px 42px rgba(10,18,26,.22);
-  max-width:1000px;
+  display:grid; gap:12px; align-items:stretch;
+  grid-template-columns:1.25fr 1.15fr .85fr auto;
+  max-width:1060px;
 }
 .hm-f{
-  display:flex; flex-direction:column; gap:5px;
-  padding:10px 14px; border-radius:12px; background:var(--ph);
-  min-width:0;
+  display:flex; flex-direction:column; justify-content:center; gap:3px;
+  padding:12px 22px; border-radius:14px;
+  background:#fff; min-width:0; min-height:70px;
+  box-shadow:0 10px 26px rgba(8,14,20,.20);
 }
 .hm-f label{
-  font-size:.66rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
-  color:var(--ink-soft);
+  font-size:.66rem; font-weight:800; letter-spacing:1.1px; text-transform:uppercase;
+  color:#8A94A0;
 }
 .hm-f select{
-  border:0; background:none; padding:0; width:100%;
-  font:inherit; font-size:1rem; font-weight:700; color:var(--ink);
-  cursor:pointer; appearance:none;
-  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  border:0; background:none; padding:0 20px 0 0; width:100%;
+  font:inherit; font-size:1.02rem; font-weight:700; color:#1B2733;
+  cursor:pointer; appearance:none; text-overflow:ellipsis;
+  background-image:linear-gradient(45deg,transparent 50%,#C9531A 50%),linear-gradient(135deg,#C9531A 50%,transparent 50%);
   background-position:calc(100% - 9px) calc(50% + 2px), calc(100% - 4px) calc(50% + 2px);
   background-size:5px 5px,5px 5px; background-repeat:no-repeat;
-  padding-right:20px; text-overflow:ellipsis;
 }
-.hm-f select:focus{ outline:2px solid var(--orange); outline-offset:4px; border-radius:4px; }
+.hm-f select:focus{ outline:2px solid var(--orange); outline-offset:5px; border-radius:4px; }
 .hm-go{
-  display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  padding:0 30px; height:100%; min-height:64px;
-  border:0; border-radius:12px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  padding:0 36px; min-height:70px;
+  border:0; border-radius:14px; cursor:pointer;
   background:var(--orange); color:#fff;
-  font:inherit; font-size:1rem; font-weight:800; white-space:nowrap;
+  font:inherit; font-size:.95rem; font-weight:800;
+  letter-spacing:.6px; text-transform:uppercase; white-space:nowrap;
+  box-shadow:0 10px 26px rgba(196,74,8,.42);
   transition:background .15s, transform .1s;
 }
 .hm-go:hover{ background:var(--orange-d); }
 .hm-go:active{ transform:scale(.985); }
-.hm-go svg{ width:18px; height:18px; }
+.hm-go svg{ width:17px; height:17px; }
 @media (max-width:900px){
-  .hm-search{ grid-template-columns:1fr 1fr; }
-  .hm-go{ grid-column:1 / -1; min-height:54px; }
+  .hm-search{ grid-template-columns:1fr 1fr; gap:10px; }
+  .hm-go{ grid-column:1 / -1; min-height:58px; }
+  .hm-f{ min-height:62px; padding:10px 16px; }
 }
 @media (max-width:520px){
-  .hm-search{ grid-template-columns:1fr; padding:10px; }
+  .hm-search{ grid-template-columns:1fr; }
+}
+
 }
 
 .hm-go:hover{ background:var(--orange-d); }

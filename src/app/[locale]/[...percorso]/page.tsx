@@ -81,7 +81,9 @@ export default async function Categoria_({
 
   const dentro = new Set((appartiene ?? []).map((x) => x.tour_slug));
   const righe = (data ?? []) as unknown as Riga[];
-  const scelti = righe.filter((r) => dentro.has(r.slug));
+  /* "Tours of Italy" non e' una categoria WooCommerce: e' la pagina che
+     mostra tutto. Su WordPress fa lo stesso -- e' l'indice generale. */
+  const scelti = cat.cat === 'tours-of-italy' ? righe : righe.filter((r) => dentro.has(r.slug));
 
   /* I prezzi tutti insieme, non uno dopo l'altro: in fila sarebbero
      decine di attese sommate su una pagina sola. */
