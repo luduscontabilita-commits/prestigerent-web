@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { NoindexBadge } from '@/components/NoindexBadge';
 import { Header } from '@/components/Header';
+import { votiPerTour } from '@/lib/recensioni';
 import { Footer } from '@/components/Footer';
 import '@/styles/landing.css';
 import '@/styles/home.css';
@@ -34,6 +35,9 @@ export default async function LocaleLayout({
   if (!isLocale(locale)) notFound();
 
   const info = getLocale(locale);
+  /* I punteggi per il menu: una lettura sola, non una per voce.
+     Il menu sta su ogni pagina del sito. */
+  const voti = await votiPerTour();
 
   /* dir="rtl" sull'arabo non e' un dettaglio: ribalta l'intero impaginato,
      compresi i margini e l'ordine delle colonne. Va messo qui, sull'<html>,
@@ -75,7 +79,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
-        <Header locale={locale} />
+        <Header locale={locale} voti={voti} />
         {children}
         <Footer locale={locale} />
         <NoindexBadge />

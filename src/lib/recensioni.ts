@@ -151,3 +151,36 @@ export async function inEvidenza(quante = 6): Promise<Recensione[]> {
     .limit(quante);
   return (data ?? []) as Recensione[];
 }
+
+/* I punteggi di tutti i tour in una volta, per il menu.
+ *
+ * Il menu e' sulla pagina di tutti: non puo' fare una richiesta per ogni
+ * voce. Una sola lettura, poi ogni voce pesca dalla mappa.
+ *
+ * Il conteggio somma le piattaforme INDIPENDENTI. Viator dichiara
+ * "recensioni e punteggi totali da Viator e Tripadvisor", quindi il suo
+ * numero comprende gia' Tripadvisor e sommarli conterebbe due volte le
+ * stesse recensioni; GetYourGuide invece e' separato e si somma davvero.
+ * Il voto e' la media pesata sul numero, non la media delle medie.
+ */
+export type VotoTour = { voto: number; quante: number };
+
+export async function votiPerTour(): Promise<Record<string, VotoTour>> {
+  const { data } = await supabase
+    .from('valutazioni_tour')
+    .select('tour_slug,fonte,voto,quante');
+
+  const somma: Record<string, { peso: number; n: number }> = {};
+  for (const r of data ?? []) {
+    if (r.voto == null || r.quante == null) continue;
+    const s = (somma[r.tour_slug] ??= { peso: 0, n: 0 });
+    s.peso += Number(r.voto) * r.quante;
+    s.n += r.quante;
+  }
+
+  const out: Record<string, VotoTour> = {};
+  for (const [slug, s] of Object.entries(somma)) {
+    if (s.n > 0) out[slug] = { voto: Math.round((s.peso / s.n) * 10) / 10, quante: s.n };
+  }
+  return out;
+}
