@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase';
+import { CATEGORIE } from '@/lib/categorie';
 import { DEFAULT_LOCALE, LOCALES } from '@/lib/locales';
 import { SITE } from '@/lib/schema';
 
@@ -58,6 +59,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: alternative('/about-us/'),
     },
   ];
+
+  /* Le trentacinque pagine di categoria di WordPress. Erano nel menu e
+     nell'indice di Google da anni, e sul sito nuovo non esistevano. */
+  for (const c of CATEGORIE) {
+    voci.push({
+      url: percorso(DEFAULT_LOCALE, c.path),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+      alternates: alternative(c.path),
+    });
+  }
 
   for (const t of tours) {
     voci.push({

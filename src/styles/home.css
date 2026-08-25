@@ -200,7 +200,11 @@
 /* ─── la barra delle voci ─────────────────────────────────────────────
    Le voci sono le stesse del sito WordPress: quelle che Google conosce. */
 .hd-nav{ display:flex; align-items:center; gap:2px; margin-left:8px; flex:1 1 auto; }
-.hd-item{ position:relative; display:flex; align-items:center; }
+/* position:static, NON relative: cosi' il pannello si posiziona rispetto
+   alla barra intera e non rispetto alla singola voce. Con `relative` il
+   pannello largo 880px partiva dal centro della voce e sbordava a
+   sinistra, fuori dallo schermo. */
+.hd-item{ position:static; display:flex; align-items:center; }
 .hd-top{
   display:inline-flex; align-items:center; gap:4px;
   padding:20px 10px; text-decoration:none; white-space:nowrap;
@@ -219,19 +223,27 @@
 /* ─── il pannello ─────────────────────────────────────────────────────
    Sempre nell'HTML, nascosto col CSS: montarlo solo all'apertura
    significherebbe che i suoi link non esistono per chi scansiona. */
+/* IL PANNELLO: largo quanto la barra, agganciato sotto di essa.
+   Prima era centrato sulla voce e sbordava; e soprattutto ci finiva
+   SOPRA il velo grigio -- il velo e' figlio dello stesso <header>, viene
+   dopo nel documento e aveva z-index 50 contro il niente del pannello,
+   quindi glielo dipingeva addosso. Da qui la patina grigia. */
 .hd-mega{
-  position:absolute; top:100%; left:50%; transform:translateX(-50%) translateY(-6px);
-  min-width:min(880px, 92vw);
-  background:var(--card); border:1px solid var(--line); border-radius:0 0 16px 16px;
+  position:absolute; top:100%; left:0; right:0; z-index:66;
+  background:var(--card);
   border-top:3px solid var(--orange);
-  box-shadow:0 18px 46px var(--ombra);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 20px 44px var(--ombra);
   opacity:0; visibility:hidden; pointer-events:none;
-  transition:opacity .16s, transform .16s, visibility .16s;
+  transform:translateY(-8px);
+  transition:opacity .15s ease, transform .15s ease, visibility .15s;
 }
-.hd-mega.is-open{ opacity:1; visibility:visible; pointer-events:auto; transform:translateX(-50%); }
+.hd-mega.is-open{ opacity:1; visibility:visible; pointer-events:auto; transform:none; }
 .hd-mega-in{
-  display:grid; gap:8px 26px; padding:24px 26px 20px;
-  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  max-width:1280px; margin:0 auto;
+  display:grid; gap:10px 30px; padding:26px 26px 24px;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  align-items:start;
 }
 .hd-col-t{
   font-size:.68rem; font-weight:800; letter-spacing:.9px; text-transform:uppercase;
@@ -248,6 +260,21 @@
 }
 /* il punteggio vero accanto ai piu' prenotati: convince prima del clic */
 .hd-mega-in a em.hd-voto{ color:var(--orange); font-weight:800; }
+/* LA COLONNA DEI PIU' PRENOTATI, a destra del pannello.
+   E' staccata dalle altre da un filo verticale perche' non e' un altro
+   gruppo di link: e' la risposta a "e allora quale prendo?". */
+.hd-evid{
+  border-left:1px solid var(--line); padding-left:24px;
+}
+.hd-evid a{
+  display:block; padding:9px 0 !important;
+  border-bottom:1px solid var(--line);
+}
+.hd-evid a:last-of-type{ border-bottom:0; }
+.hd-evid b{
+  display:block; font-size:.88rem; font-weight:700; color:inherit; line-height:1.3;
+}
+.hd-evid .hd-voto{ margin-top:3px !important; }
 .hd-tutti{ display:flex; align-items:flex-end; }
 .hd-tutto{
   font-weight:800 !important; color:var(--orange) !important; font-size:.84rem !important;
@@ -345,7 +372,7 @@
 }
 
 .hd-veil{
-  position:fixed; inset:64px 0 0 0; z-index:50;
+  position:fixed; inset:64px 0 0 0; z-index:55;
   background:rgba(12,18,24,.28); border:0; cursor:default;
 }
 
@@ -731,3 +758,59 @@ html[data-theme="dark"] .rv-src-getyourguide{ background:#3A2005; color:#FFA65C;
    Si inverte -- e' l'unico ritocco ammesso su un marchio altrui, perche'
    non ne cambia la forma. */
 html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
+
+/* ─── PAGINE DI CATEGORIA ────────────────────────────────────────────── */
+.ct{ max-width:1180px; margin:0 auto; padding:0 20px 40px; }
+.ct-bric{ padding:16px 0 4px; font-size:.78rem; font-weight:600; color:var(--ink-soft); }
+.ct-bric a{ color:var(--ink-soft); text-decoration:none; }
+.ct-bric a:hover{ color:var(--orange); }
+.ct-bric i{ font-style:normal; margin:0 7px; opacity:.5; }
+.ct-bric b{ color:var(--ink); }
+.ct-head{ padding:10px 0 22px; max-width:760px; }
+.ct-head h1{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; color:var(--ink); margin:0; line-height:1.14; }
+.ct-head p{ margin:12px 0 0; color:var(--ink-soft); font-size:1rem; line-height:1.66; }
+
+.ct-figlie{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
+.ct-figlie a{
+  padding:8px 14px; border-radius:999px; text-decoration:none;
+  border:1px solid var(--line); background:var(--card);
+  font-size:.83rem; font-weight:700; color:var(--ink);
+}
+.ct-figlie a:hover{ border-color:var(--orange); color:var(--orange); }
+
+.ct-griglia{
+  display:grid; gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+}
+.ct-card{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:16px; overflow:hidden;
+  transition:transform .16s, box-shadow .16s, border-color .16s;
+}
+.ct-card:hover{ transform:translateY(-3px); box-shadow:0 12px 30px var(--ombra); border-color:var(--orange); }
+.ct-img{ aspect-ratio:4/3; background:var(--ph); }
+.ct-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.ct-body{ padding:14px 15px 16px; }
+.ct-body strong{ display:block; font-size:.96rem; font-weight:700; color:var(--ink); line-height:1.32; }
+.ct-voto{ display:block; margin-top:7px; font-size:.79rem; font-weight:800; color:var(--orange); }
+.ct-voto i{ font-style:normal; color:var(--ink-soft); font-weight:700; }
+.ct-prezzo{ display:block; margin-top:5px; font-size:.82rem; font-weight:700; color:var(--ink-soft); }
+.ct-prezzo b{ color:var(--ink); font-size:1rem; }
+.ct-vuoto{
+  padding:26px; border:1px dashed var(--line); border-radius:14px;
+  color:var(--ink-soft); font-size:.95rem;
+}
+.ct-vuoto a{ color:var(--link); font-weight:700; }
+
+/* la scheda del tour in evidenza dentro il menu: foto + nome + punteggio */
+.hd-ev{
+  display:flex !important; align-items:center; gap:11px;
+  padding:8px 0 !important; border-bottom:1px solid var(--line);
+}
+.hd-ev:last-of-type{ border-bottom:0; }
+.hd-ev img{
+  width:62px; height:46px; flex:none; object-fit:cover; border-radius:8px;
+  background:var(--ph);
+}
+.hd-ev b{ display:block; font-size:.85rem; font-weight:700; line-height:1.28; }

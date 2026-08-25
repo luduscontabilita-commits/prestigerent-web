@@ -4,6 +4,9 @@ import { getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { NoindexBadge } from '@/components/NoindexBadge';
 import { Header } from '@/components/Header';
 import { votiPerTour } from '@/lib/recensioni';
+import { supabase } from '@/lib/supabase';
+import { SEZIONI } from '@/lib/menu';
+import { testo } from '@/lib/prosa';
 import { Footer } from '@/components/Footer';
 import '@/styles/landing.css';
 import '@/styles/home.css';
@@ -37,7 +40,29 @@ export default async function LocaleLayout({
   const info = getLocale(locale);
   /* I punteggi per il menu: una lettura sola, non una per voce.
      Il menu sta su ogni pagina del sito. */
-  const voti = await votiPerTour();
+  const inRilievo = SEZIONI.flatMap((s) => s.evidenza ?? []);
+  const [voti, schede] = await Promise.all([
+    votiPerTour(),
+    supabase
+      .from('tours')
+      .select('slug, tour_content(locale, blocks)')
+      .in('slug', inRilievo.length ? inRilievo : ['-']),
+  ]);
+
+  /* Foto e nome dei tour in evidenza nel menu: si leggono qui, una volta,
+     e non dentro il componente -- il menu e' su ogni pagina del sito. */
+  const foto: Record<string, string> = {};
+  const nomi: Record<string, string> = {};
+  for (const r of (schede.data ?? []) as unknown as {
+    slug: string;
+    tour_content?: { locale: string; blocks: Record<string, unknown> }[];
+  }[]) {
+    const c = r.tour_content?.find((x) => x.locale === locale) ?? r.tour_content?.[0];
+    const b = (c?.blocks ?? {}) as { name?: string; gallery?: { src: string }[]; images?: string[] };
+    const src = b.gallery?.[0]?.src ?? b.images?.[0];
+    if (src) foto[r.slug] = src;
+    if (b.name) nomi[r.slug] = testo(b.name);
+  }
 
   /* dir="rtl" sull'arabo non e' un dettaglio: ribalta l'intero impaginato,
      compresi i margini e l'ordine delle colonne. Va messo qui, sull'<html>,
@@ -79,7 +104,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
-        <Header locale={locale} voti={voti} />
+        <Header locale={locale} voti={voti} foto={foto} nomi={nomi} />
         {children}
         <Footer locale={locale} />
         <NoindexBadge />

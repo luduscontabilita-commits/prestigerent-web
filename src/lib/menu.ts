@@ -32,7 +32,7 @@ export type Sezione = {
 export const SEZIONI: Sezione[] = [
   {
     testo: 'Small Group Tours',
-    href: '/?kind=small_group',
+    href: '/small-group-tours/',
     gruppi: [
       {
         titolo: 'Our three small-group days',
@@ -63,7 +63,7 @@ export const SEZIONI: Sezione[] = [
 
   {
     testo: 'Private Tours',
-    href: '/?kind=private',
+    href: '/private-tours/',
     gruppi: [
       {
         titolo: 'Wine & Chianti',
@@ -107,49 +107,64 @@ export const SEZIONI: Sezione[] = [
 
   {
     testo: 'Cruise Port Tours',
-    href: '/?kind=cruise',
+    href: '/cruise-port-tours/',
     gruppi: [
       {
-        titolo: 'From Livorno',
+        titolo: 'Ports of call',
         voci: [
-          { testo: 'Florence & Pisa', href: '/tour/florence-and-pisa-from-livorno-tour/' },
-          { testo: 'Siena & San Gimignano', href: '/tour/siena-and-san-gimignano-from-livorno/' },
-          { testo: 'Chianti wineries', href: '/tour/chianti-wineries-from-livorno-port/' },
-          { testo: 'Cinque Terre', href: '/tour/tour-to-cinque-terre-from-livorno/' },
+          { testo: 'Livorno Port (Florence)', href: '/cruise-port-tours/livorno-port/' },
+          { testo: 'La Spezia Port (Cinque Terre)', href: '/cruise-port-tours/la-spezia-port/' },
+          { testo: 'Civitavecchia Port (Rome)', href: '/cruise-port-tours/civitavecchia/' },
+          { testo: 'Naples Port', href: '/cruise-port-tours/naples-port/' },
+          { testo: 'Sorrento Port', href: '/cruise-port-tours/sorrento-port/' },
         ],
       },
       {
-        titolo: 'From La Spezia',
+        titolo: 'Southern Italy & Sicily',
         voci: [
-          { testo: 'Cinque Terre', href: '/tour/tour-to-cinque-terre-from-la-spezia/' },
-          { testo: 'Florence', href: '/tour/private-tour-florence-from-la-spezia/' },
-          { testo: 'Pisa & Lucca', href: '/tour/tour-to-pisa-lucca-from-la-spezia/' },
-          { testo: 'Chianti wineries', href: '/tour/tour-chianti-wineries-from-la-spezia/' },
+          { testo: 'Salerno Port', href: '/cruise-port-tours/salerno-port/' },
+          { testo: 'Amalfi / Positano Port', href: '/cruise-port-tours/amalfi-positano-port/' },
+          { testo: 'Palermo Port', href: '/cruise-port-tours/palermo/' },
+          { testo: 'Messina Port', href: '/cruise-port-tours/messina/' },
+          { testo: 'Taormina Port', href: '/cruise-port-tours/taormina-port/' },
         ],
       },
       {
-        titolo: 'From Civitavecchia',
+        titolo: 'Most booked from the ports',
         voci: [
-          { testo: 'Rome', href: '/tour/private-rome-from-civitavecchia-port/' },
-          { testo: 'Orvieto', href: '/tour/private-orvieto-from-civitavecchia/' },
-          { testo: 'Tarquinia', href: '/tour/private-tarquinia-from-civitavecchia/' },
-        ],
-      },
-      {
-        titolo: 'From Naples',
-        voci: [
-          { testo: 'Pompeii & Vesuvius', href: '/tour/pompeii-vesuvius-from-naples-port/' },
-          { testo: 'Sorrento & Positano', href: '/tour/sorrento-and-positano-from-naples/' },
-          { testo: 'Positano, Amalfi & Ravello', href: '/tour/private-tour-positano-amalfi-ravello/' },
+          { testo: 'Florence & Pisa from Livorno', href: '/tour/florence-and-pisa-from-livorno-tour/' },
+          { testo: 'Rome from Civitavecchia', href: '/tour/private-rome-from-civitavecchia-port/' },
+          { testo: 'Cinque Terre from La Spezia', href: '/tour/tour-to-cinque-terre-from-la-spezia/' },
+          { testo: 'Pompeii & Vesuvius from Naples', href: '/tour/pompeii-vesuvius-from-naples-port/' },
         ],
       },
     ],
+    evidenza: ['tour-to-cinque-terre-from-la-spezia', 'florence-and-pisa-from-livorno-tour'],
   },
 
   {
     testo: 'Transfers',
-    href: '/?kind=transfer',
+    href: '/transfers/',
     gruppi: [
+      {
+        titolo: 'Direct transfers from',
+        voci: [
+          { testo: 'Florence', href: '/transfers/direct-transfers/florence-direct-transfers/' },
+          { testo: 'Rome', href: '/transfers/direct-transfers/rome-direct-transfers/' },
+          { testo: 'Milan', href: '/transfers/direct-transfers/milan-direct-transfers/' },
+          { testo: 'Venice', href: '/transfers/direct-transfers/venice-direct-transfers/' },
+          { testo: 'Naples', href: '/transfers/direct-transfers/naples/' },
+        ],
+      },
+      {
+        titolo: 'Transfers with a stop on the way',
+        voci: [
+          { testo: 'Florence to Rome', href: '/transfers/transfers-with-stop-enroute/florence-to-rome/' },
+          { testo: 'Florence to Venice', href: '/transfers/transfers-with-stop-enroute/florence-to-venice/' },
+          { testo: 'Florence to Milan', href: '/transfers/transfers-with-stop-enroute/florence-to-milan/' },
+          { testo: 'Rome to Naples', href: '/transfers/transfers-with-stop-enroute/rome-to-naples/' },
+        ],
+      },
       {
         titolo: 'Airports & stations',
         voci: [
@@ -159,73 +174,37 @@ export const SEZIONI: Sezione[] = [
           { testo: 'Florence train station', href: '/tour/transfer-florence-train-station/' },
         ],
       },
-      {
-        titolo: 'To Rome',
-        voci: [
-          { testo: 'With a stop in Siena', href: '/tour/florence-to-rome-with-stop-in-siena/' },
-          { testo: 'With a stop in Assisi', href: '/tour/florence-to-rome-with-stop-in-assisi/' },
-          { testo: 'Through Chianti', href: '/tour/transfer-to-rome-via-chianti/' },
-          { testo: 'Via Orvieto', href: '/tour/transfer-florence-rome-via-orvieto/' },
-        ],
-      },
-      {
-        titolo: 'To Venice',
-        voci: [
-          { testo: 'With a stop in Bologna', href: '/tour/florence-venice-with-stop-in-bologna/' },
-          { testo: 'With a stop at Ferrari', href: '/tour/florence-venice-with-stop-at-ferrari/' },
-          { testo: 'With a stop in Padua', href: '/tour/florence-venice-with-stop-in-padua/' },
-          { testo: 'Direct', href: '/tour/transfer-from-florence-to-venice/' },
-        ],
-      },
-      {
-        titolo: 'To Milan',
-        voci: [
-          { testo: 'With a stop at Ferrari', href: '/tour/florence-milan-with-stop-at-ferrari/' },
-          { testo: 'With a stop at Lamborghini', href: '/tour/milan-with-stop-at-lamborghini/' },
-          { testo: 'With a stop in Parma', href: '/tour/transfer-to-milan-with-stop-in-parma/' },
-          { testo: 'Malpensa airport', href: '/tour/transfer-from-florence-to-milan-mxp/' },
-        ],
-      },
     ],
+    evidenza: ['florence-to-rome-with-stop-in-siena', 'transfer-airport-to-florence'],
   },
 
   {
     testo: 'Destinations',
-    href: '/',
-    /* Le destinazioni portano a ELENCHI FILTRATI, non alle singole schede.
-       Puntarle ai tour significherebbe ripetere nel menu link che ci sono
-       gia' sotto "Private Tours" e "Cruise Port Tours": lo stesso
-       indirizzo due volte nella stessa pagina e' peso interno buttato --
-       ed e' precisamente il difetto del menu di WordPress. */
+    href: '/destinations/',
     gruppi: [
       {
-        titolo: 'Tuscany',
+        titolo: 'Where we go',
         voci: [
-          { testo: 'Siena', href: '/?place=siena' },
-          { testo: 'San Gimignano', href: '/?place=san-gimignano' },
-          { testo: 'Chianti', href: '/?place=chianti' },
-          { testo: 'Pisa', href: '/?place=pisa' },
-          { testo: 'Lucca', href: '/?place=lucca' },
-          { testo: 'Montalcino & Montepulciano', href: '/?place=montalcino' },
+          { testo: 'Florence & Tuscany', href: '/destinations/florence-tuscany/' },
+          { testo: 'Rome', href: '/destinations/rome-destinations/' },
+          { testo: 'Venice', href: '/destinations/venice-destinations/' },
+          { testo: 'Milan & Lake Como', href: '/destinations/milan-como-destinations/' },
+          { testo: 'Naples & the Amalfi Coast', href: '/destinations/naples-amalfi-coast/' },
         ],
       },
       {
-        titolo: 'Coast & beyond',
+        titolo: 'From the cruise ports',
         voci: [
-          { testo: 'Cinque Terre', href: '/?place=cinque-terre' },
-          { testo: 'Rome', href: '/?place=rome' },
-          { testo: 'Venice', href: '/?place=venice' },
-          { testo: 'Amalfi & Sorrento', href: '/?place=amalfi' },
+          { testo: 'Livorno port', href: '/destinations/livorno-port-destinations/' },
+          { testo: 'La Spezia port', href: '/destinations/la-spezia-destinations/' },
+          { testo: 'Civitavecchia port', href: '/destinations/civitavecchia-destinations/' },
         ],
       },
       {
-        titolo: 'Departing from',
+        titolo: 'Everything we run',
         voci: [
-          { testo: 'Florence', href: '/?from=florence' },
-          { testo: 'Livorno port', href: '/?from=livorno' },
-          { testo: 'La Spezia port', href: '/?from=la-spezia' },
-          { testo: 'Civitavecchia', href: '/?from=civitavecchia' },
-          { testo: 'Naples port', href: '/?from=naples' },
+          { testo: 'Tours of Italy', href: '/tours-of-italy/' },
+          { testo: 'About Prestige Rent', href: '/about-us/' },
         ],
       },
     ],

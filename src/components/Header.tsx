@@ -40,9 +40,13 @@ import type { VotoTour } from '@/lib/recensioni';
 export function Header({
   locale,
   voti = {},
+  foto = {},
+  nomi = {},
 }: {
   locale: string;
   voti?: Record<string, VotoTour>;
+  foto?: Record<string, string>;
+  nomi?: Record<string, string>;
 }) {
   /* quale sezione e' aperta: il nome, oppure null. Una sola alla volta --
      due pannelli aperti insieme coprirebbero la pagina. */
@@ -131,6 +135,37 @@ export function Header({
                       })}
                     </div>
                   ))}
+
+                  {/* LA COLONNA DEI PIU' PRENOTATI, con la foto e il
+                      punteggio vero -- come nel menu di WordPress, che
+                      accanto agli elenchi metteva i tour in evidenza con
+                      l'immagine. La foto e' quella di copertina del tour,
+                      presa dai nostri dati: non serve copiarla dal
+                      vecchio sito. */}
+                  {s.evidenza && s.evidenza.length > 0 && (
+                    <div className="hd-col hd-evid">
+                      <p className="hd-col-t">Most booked</p>
+                      {s.evidenza.map((slug) => {
+                        const q = voti[slug];
+                        const f = foto[slug];
+                        const nome = nomi[slug] ?? slug.replace(/-/g, ' ');
+                        return (
+                          <a className="hd-ev" key={slug} href={p(`/tour/${slug}/`)}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            {f && <img src={f} alt="" loading="lazy" decoding="async" />}
+                            <span>
+                              <b>{nome}</b>
+                              {q && (
+                                <em className="hd-voto">
+                                  ★ {q.voto.toFixed(1)} &middot; {q.quante.toLocaleString('en-US')} reviews
+                                </em>
+                              )}
+                            </span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   <div className="hd-col hd-tutti">
                     <a className="hd-tutto" href={p(s.href)}>
