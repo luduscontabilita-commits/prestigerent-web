@@ -65,6 +65,15 @@ export function Recensioni({
 }) {
   if (!recensioni.length && !fonti.length) return null;
 
+  const totale = fonti.reduce((s, f) => s + (f.quante ?? 0), 0);
+  /* "Viator & Tripadvisor and GetYourGuide" suonerebbe male: l'ultimo si
+     unisce con "and", gli altri con la virgola. */
+  const etichette = fonti.map((f) => f.etichetta);
+  const nomi =
+    etichette.length > 1
+      ? etichette.slice(0, -1).join(', ') + ' and ' + etichette[etichette.length - 1]
+      : etichette[0];
+
   return (
     <section id="reviews" className="rv">
       <div className="rv-head">
@@ -72,9 +81,22 @@ export function Recensioni({
           {titolo.split(' ').slice(0, -1).join(' ')}{' '}
           <em className="hl place">{titolo.split(' ').slice(-1)}</em>
         </h2>
+        {/* Il totale sommato, ma solo dove sommare e' LECITO.
+            Viator dichiara "recensioni e punteggi totali da Viator e
+            Tripadvisor": il suo numero include gia' Tripadvisor, quindi le
+            due non si sommano mai. GetYourGuide invece e' una piattaforma
+            separata, con un suo pubblico, e li' la somma e' vera.
+            La riga si costruisce da sola: se un domani si aggiunge una
+            fonte, il totale e l'elenco dei nomi si aggiornano insieme. */}
         <p className="rv-sub">
-          Every review below is public on the platform it came from &mdash; click any
-          score to read them all.
+          {totale > 0 ? (
+            <>
+              <b>{totale.toLocaleString('en-US')}</b> verified reviews on{' '}
+              {nomi} &mdash; every one of them public on the platform it came from.
+            </>
+          ) : (
+            <>Every review below is public on the platform it came from.</>
+          )}
         </p>
       </div>
 
