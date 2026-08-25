@@ -24,6 +24,12 @@ export default function proxy(req: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    /* Il pannello e il ritorno dal link di accesso NON sono pagine del
+       sito: non hanno lingua, non devono finire sotto /[locale]/ e non
+       devono mai essere riscritti. Senza questa riga /admin diventerebbe
+       /en/admin e non esisterebbe. */
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/auth') ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();

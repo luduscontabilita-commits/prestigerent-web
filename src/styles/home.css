@@ -405,19 +405,75 @@
 .rv-title{ font-size:clamp(1.5rem,3.4vw,2.2rem); font-weight:800; color:var(--ink); margin:0; }
 .rv-sub{ color:var(--ink-soft); font-size:.92rem; margin:8px 0 0; }
 
-.rv-scores{
-  display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-bottom:28px;
+/* ─── I BADGE DELLE PIATTAFORME ───────────────────────────────────────
+   Ognuno col colore del suo marchio, in una barra sottile in alto: si
+   riconoscono senza leggere il nome. Niente riproduzioni dei loghi
+   ufficiali -- un logo rifatto male fa sembrare finto anche un dato vero.
+   Qui lavorano il colore e la tipografia, che non si possono sbagliare. */
+.rv-badges{
+  display:grid; gap:14px; margin-bottom:30px;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  max-width:940px; margin-left:auto; margin-right:auto;
 }
-.rv-score{
-  flex:1 1 190px; max-width:250px; text-align:center; text-decoration:none;
-  background:var(--card); border:1px solid var(--line); border-radius:14px;
-  padding:16px 14px; color:var(--ink);
-  transition:border-color .15s, transform .15s;
+.rv-badge{
+  position:relative; display:flex; flex-direction:column; align-items:center;
+  text-align:center; text-decoration:none; color:var(--ink);
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:22px 16px 18px; overflow:hidden;
+  box-shadow:0 2px 10px var(--ombra);
+  transition:transform .16s, box-shadow .16s, border-color .16s;
 }
-a.rv-score:hover{ border-color:var(--orange); transform:translateY(-2px); }
-.rv-score b{ font-size:1.85rem; font-weight:800; line-height:1; display:block; }
-.rv-score small{ display:block; color:var(--ink-soft); font-size:.78rem; font-weight:600; margin-top:6px; line-height:1.45; }
-.rv-stars{ color:var(--orange); letter-spacing:1px; font-size:.95rem; }
+a.rv-badge:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 26px var(--ombra);
+  border-color:var(--marchio);
+}
+/* la barra colorata: e' il segno del marchio */
+.rv-b-top{
+  position:absolute; inset:0 0 auto 0; height:4px; background:var(--marchio);
+}
+.rv-b-name{
+  font-size:.72rem; font-weight:800; letter-spacing:.9px; text-transform:uppercase;
+  color:var(--marchio); margin-bottom:10px;
+}
+.rv-b-score{ display:flex; align-items:baseline; gap:2px; line-height:1; }
+.rv-b-score b{
+  font-family:Fraunces,Georgia,serif; font-size:2.5rem; font-weight:640;
+  font-style:italic; color:var(--ink); line-height:1;
+}
+.rv-b-of{ font-size:.85rem; font-weight:700; color:var(--ink-soft); }
+.rv-b-stars{ color:#F5A623; letter-spacing:2px; font-size:.98rem; margin-top:7px; }
+.rv-b-count{
+  font-size:.78rem; font-weight:700; color:var(--ink-soft);
+  margin-top:7px; line-height:1.4;
+}
+.rv-b-award{
+  margin-top:9px; font-size:.66rem; font-weight:800; letter-spacing:.4px;
+  text-transform:uppercase; line-height:1.35;
+  background:var(--marchio); color:#fff;
+  padding:4px 10px; border-radius:999px;
+}
+/* compare al passaggio del mouse solo dove il badge porta davvero da
+   qualche parte -- Viator e GetYourGuide non si linkano */
+.rv-b-go{
+  margin-top:10px; font-size:.72rem; font-weight:800; color:var(--marchio);
+  opacity:0; transform:translateY(-4px); transition:opacity .16s, transform .16s;
+}
+a.rv-badge:hover .rv-b-go{ opacity:1; transform:none; }
+@media (hover:none){ .rv-b-go{ opacity:1; transform:none; } }
+
+/* I colori dei marchi. Uno per piattaforma, usato dalla barra, dal nome,
+   dal nastro del premio e dal bordo al passaggio del mouse. */
+.rv-b-tripadvisor { --marchio:#00A680; }
+.rv-b-google      { --marchio:#1A73E8; }
+.rv-b-viator      { --marchio:#2A2A72; }
+.rv-b-getyourguide{ --marchio:#FF5533; }
+html[data-theme="dark"] .rv-b-tripadvisor { --marchio:#2ED8AC; }
+html[data-theme="dark"] .rv-b-google      { --marchio:#79A9F7; }
+html[data-theme="dark"] .rv-b-viator      { --marchio:#8E88F0; }
+html[data-theme="dark"] .rv-b-getyourguide{ --marchio:#FF7A5C; }
+/* sul nastro serve testo scuro quando il colore si schiarisce */
+html[data-theme="dark"] .rv-b-award{ color:#0B0F13; }
 
 .rv-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
 @media (max-width:900px){ .rv-grid{ grid-template-columns:repeat(2,1fr); } }

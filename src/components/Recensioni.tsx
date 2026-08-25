@@ -85,28 +85,43 @@ export function Recensioni({
         </p>
       </div>
 
-      {/* la fila dei numeri: e' quella che convince prima ancora di leggere */}
+      {/* LA FILA DEI BADGE.
+          E' la cosa che convince prima ancora che si legga una riga. Ogni
+          piattaforma ha il suo colore, la sua barra in alto e il suo peso
+          tipografico: si riconoscono a colpo d'occhio, senza leggere.
+
+          I numeri sono quelli veri, non arrotondati: "1,794" si legge come
+          un dato, "1,800+" si legge come pubblicita'. Invecchiano, e va
+          bene -- fra sei mesi saranno di piu', non di meno. */}
       {fonti.length > 0 && (
-        <div className="rv-scores">
+        <div className="rv-badges">
           {fonti.map((f) => {
             const dentro = (
               <>
-                <b>{f.voto_medio?.toFixed(1)}</b>
-                <span className="rv-stars" aria-hidden="true">{STELLE(Math.round(f.voto_medio!))}</span>
-                <small>
+                <span className="rv-b-top" aria-hidden="true" />
+                <span className="rv-b-name">{f.etichetta}</span>
+                <span className="rv-b-score">
+                  <b>{f.voto_medio?.toFixed(1)}</b>
+                  <span className="rv-b-of">/5</span>
+                </span>
+                <span className="rv-b-stars" aria-hidden="true">
+                  {STELLE(Math.round(f.voto_medio!))}
+                </span>
+                <span className="rv-b-count">
                   {f.quante?.toLocaleString('en-US')}{' '}
-                  {f.suQuestoTour ? 'reviews of this tour on ' : 'reviews on '}
-                  {f.etichetta}
-                  {f.distintivo && <><br />{f.distintivo}</>}
-                </small>
+                  {f.suQuestoTour ? 'reviews of this tour' : 'reviews'}
+                </span>
+                {f.distintivo && <span className="rv-b-award">{f.distintivo}</span>}
               </>
             );
+            const cl = 'rv-badge rv-b-' + f.fonte;
             return f.url && SI_LINKA.has(f.fonte) ? (
-              <a className="rv-score" key={f.fonte} href={f.url} target="_blank" rel="noopener nofollow">
+              <a className={cl} key={f.fonte} href={f.url} target="_blank" rel="noopener nofollow">
                 {dentro}
+                <span className="rv-b-go">Read them on {f.etichetta} &rarr;</span>
               </a>
             ) : (
-              <div className="rv-score" key={f.fonte}>{dentro}</div>
+              <div className={cl} key={f.fonte}>{dentro}</div>
             );
           })}
         </div>
