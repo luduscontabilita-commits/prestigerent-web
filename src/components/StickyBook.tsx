@@ -26,33 +26,47 @@ export function StickyBook({
   const [mostra, setMostra] = useState(false);
 
   useEffect(() => {
-    const hero = document.getElementById('top');
     const form = document.getElementById('bookform');
-    if (!hero || !form || !('IntersectionObserver' in window)) return;
+    if (!('IntersectionObserver' in window)) return;
 
-    let heroFuori = false;
+    /* PRIMA COMPARIVA TROPPO TARDI: aspettava che l'INTERA immagine di
+       testata fosse uscita dallo schermo, e su un telefono l'hero e' alto
+       quanto lo schermo -- quindi per la prima schermata e mezza non
+       c'era modo di prenotare senza risalire.
+       Ora bastano 300px: appena si comincia a scorrere davvero, il
+       prezzo e il pulsante sono li'. */
+    let scorso = false;
     let formDentro = false;
-    const aggiorna = () => setMostra(heroFuori && !formDentro);
+    const aggiorna = () => setMostra(scorso && !formDentro);
 
-    const o1 = new IntersectionObserver(
-      (e) => {
-        heroFuori = !e[0].isIntersecting;
+    const alloScroll = () => {
+      const ora = window.scrollY > 300;
+      if (ora !== scorso) {
+        scorso = ora;
         aggiorna();
-      },
-      { threshold: 0 }
-    );
-    const o2 = new IntersectionObserver(
-      (e) => {
-        formDentro = e[0].isIntersecting;
-        aggiorna();
-      },
-      { threshold: 0 }
-    );
-    o1.observe(hero);
-    o2.observe(form);
+      }
+    };
+    window.addEventListener('scroll', alloScroll, { passive: true });
+    alloScroll();
+
+    /* Il calendario a schermo la fa sparire: mostrarla mentre il modulo
+       di prenotazione e' gia' visibile e' un doppione che copre la
+       pagina. */
+    let o: IntersectionObserver | null = null;
+    if (form) {
+      o = new IntersectionObserver(
+        (e) => {
+          formDentro = e[0].isIntersecting;
+          aggiorna();
+        },
+        { threshold: 0 }
+      );
+      o.observe(form);
+    }
+
     return () => {
-      o1.disconnect();
-      o2.disconnect();
+      window.removeEventListener('scroll', alloScroll);
+      o?.disconnect();
     };
   }, []);
 

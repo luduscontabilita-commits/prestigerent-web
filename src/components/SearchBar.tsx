@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Scelta } from '@/components/Scelta';
 
 /* IL MODULO DI RICERCA sopra la piega.
  *
@@ -58,39 +59,35 @@ export function SearchBar({
         document.getElementById('tours')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }}
     >
-      <div className="hm-f">
-        <label htmlFor="hm-da">Departing from</label>
-        <select id="hm-da" value={da} onChange={(e) => setDa(e.target.value)}>
-          <option value="">Anywhere in Italy</option>
-          {partenze.map((p) => (
-            <option key={p.valore} value={p.valore}>
-              {p.etichetta}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Scelta
+        id="hm-da"
+        etichetta="Departing from"
+        valore={da}
+        onCambia={setDa}
+        opzioni={[
+          { valore: '', etichetta: 'Anywhere in Italy' },
+          ...partenze.map((x) => ({ valore: x.valore, etichetta: x.etichetta })),
+        ]}
+      />
 
-      <div className="hm-f">
-        <label htmlFor="hm-tp">Kind of tour</label>
-        <select id="hm-tp" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-          {TIPI.map((t) => (
-            <option key={t.valore} value={t.valore}>
-              {t.etichetta}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Scelta
+        id="hm-tp"
+        etichetta="Kind of tour"
+        valore={tipo}
+        onCambia={setTipo}
+        opzioni={TIPI}
+      />
 
-      <div className="hm-f">
-        <label htmlFor="hm-px">Guests</label>
-        <select id="hm-px" value={persone} onChange={(e) => setPersone(Number(e.target.value))}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 12, 20, 25].map((n) => (
-            <option key={n} value={n}>
-              {n === 25 ? '20 or more' : n === 1 ? '1 guest' : `${n} guests`}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Scelta
+        id="hm-px"
+        etichetta="Guests"
+        valore={String(persone)}
+        onCambia={(v) => setPersone(Number(v))}
+        opzioni={[1, 2, 3, 4, 5, 6, 7, 8, 12, 20, 25].map((n) => ({
+          valore: String(n),
+          etichetta: n === 25 ? '20 or more' : n === 1 ? '1 guest' : `${n} guests`,
+        }))}
+      />
 
       <button className="hm-go" type="submit">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">

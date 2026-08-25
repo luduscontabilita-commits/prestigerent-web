@@ -156,6 +156,31 @@ export default async function TourPage({
     contenuto.gallery?.length
       ? contenuto.gallery
       : (contenuto.images ?? []).map((src) => ({ src, alt: contenuto.name ?? '' }));
+  /* I tre punti dell'hero, ricavati dai dati e non scritti a mano. */
+  const incluso = Object.entries(tutteLeSchede)
+    .filter(([k]) => /included|prices/i.test(k))
+    .map(([, v]) => String(v))
+    .join(' ')
+    .toLowerCase();
+
+  const usp: { icona: string; testo: string }[] = [
+    { icona: '🛡️', testo: 'Free cancellation up to 24 hours' },
+  ];
+  if (/lunch/.test(incluso)) {
+    usp.push({ icona: '🍷', testo: 'Winery lunch and tastings included' });
+  } else if (/tasting|wine/.test(incluso)) {
+    usp.push({ icona: '🍷', testo: 'Wine tastings included' });
+  } else if (/guide/.test(incluso)) {
+    usp.push({ icona: '🗣️', testo: 'Licensed guide included' });
+  }
+  if (tour.kind === 'private' || tour.kind === 'transfer') {
+    usp.push({ icona: '🚐', testo: 'We collect you where you are staying' });
+  } else if (tour.kind === 'cruise') {
+    usp.push({ icona: '🚢', testo: 'Back on board before all aboard, guaranteed' });
+  } else if (tour.kind === 'small_group') {
+    usp.push({ icona: '👥', testo: 'Never more than 25 guests' });
+  }
+
   const prezzo = prezzoDi(product?.price, schede);
 
   const calendario = (
@@ -234,6 +259,27 @@ export default async function TourPage({
               </span>
             </span>
           </div>
+        )}
+
+        {/* I TRE PUNTI SOTTO IL TITOLO.
+            Rispondono alle tre domande che si fa chi arriva da un annuncio
+            -- posso disdire? cosa e' compreso? chi mi viene a prendere? --
+            prima che cominci a scorrere. Chi non trova quelle risposte
+            subito non scorre: chiude.
+
+            NON sono scritti a mano uguali per tutti: si ricavano dal tipo
+            di tour e da cosa dice davvero la scheda "included". Promettere
+            il pranzo in cantina su un transfer per l'aeroporto farebbe
+            danno, non conversione. */}
+        {usp.length > 0 && (
+          <ul className="pr-usp">
+            {usp.map((u) => (
+              <li key={u.testo}>
+                <span aria-hidden="true">{u.icona}</span>
+                {u.testo}
+              </li>
+            ))}
+          </ul>
         )}
 
         {/* La striscia sta DENTRO l'hero, subito sotto il titolo, come sulla
