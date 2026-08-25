@@ -16,6 +16,7 @@ import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
+import { prenotazioniDi } from '@/lib/riprova';
 import '@/styles/home.css';
 
 const SITE = SITE_URL;
@@ -132,6 +133,7 @@ export default async function TourPage({
   ]);
   /* Dipende da leFonti, quindi non puo' stare nel Promise.all sopra. */
   const iPunteggi = await punteggiDi(slug, leFonti);
+  const quante = await prenotazioniDi(slug);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
@@ -278,6 +280,19 @@ export default async function TourPage({
             di tour e da cosa dice davvero la scheda "included". Promettere
             il pranzo in cantina su un transfer per l'aeroporto farebbe
             danno, non conversione. */}
+        {/* LE PRENOTAZIONI VERE, prese da Regiondo. Non "12 persone
+            stanno guardando": quello si smaschera ricaricando due volte,
+            e chi lo smaschera smette di credere anche ai numeri veri che
+            ci sono sulla stessa pagina. Sotto le dieci non si scrive:
+            "3 prenotazioni questa settimana" lavora contro. */}
+        {quante && quante.ultimi_7 >= 10 && (
+          <p className="pr-caldo">
+            <span aria-hidden="true">🔥</span>
+            <b>{quante.ultimi_7}</b> people booked this tour in the last 7 days
+            {quante.persone_7 > quante.ultimi_7 ? ` — ${quante.persone_7} guests in total` : ''}
+          </p>
+        )}
+
         {usp.length > 0 && (
           <ul className="pr-usp">
             {usp.map((u) => (

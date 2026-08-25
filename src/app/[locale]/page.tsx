@@ -143,10 +143,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <em>with your own driver</em>
           </h1>
           <p className="hm-sub">
-            Private days and small-group departures from Florence and the cruise ports.
-            We own the vehicles and employ the drivers &mdash; so we come and get you
-            wherever you are staying, at the hour you choose. Every tour books online,
-            with instant confirmation.
+            Private days and small group departures from Florence and the cruise ports.
+            We own the vehicles and employ the people: <b>fluent English-speaking
+            drivers and guides</b>, several of them native speakers, working with us
+            season after season. We collect you wherever you are staying, at the hour
+            you choose.
           </p>
           {/* La riga della fiducia risponde alle tre obiezioni di chi
               arriva da un annuncio -- e' vero? posso disdire? chi mi

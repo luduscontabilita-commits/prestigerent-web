@@ -70,3 +70,36 @@ export async function riprova(): Promise<Riprova> {
         : null,
   };
 }
+
+/* Le prenotazioni vere: il riquadro che compare in basso e il contatore
+ * sulla pagina del tour. Nessun numero inventato -- con 418 prenotazioni
+ * in sette giorni non serve. */
+export type AvvisoRiga = {
+  nome: string;
+  iniziale: string | null;
+  paese: string | null;
+  prodotto: string;
+  persone: number | null;
+  quando: string;
+  tour_slug: string | null;
+};
+
+export async function ultimePrenotazioni(quante = 25): Promise<AvvisoRiga[]> {
+  const { data } = await supabase
+    .from('prenotazioni_recenti')
+    .select('nome,iniziale,paese,prodotto,persone,quando,tour_slug')
+    .order('quando', { ascending: false })
+    .limit(quante);
+  return (data ?? []) as AvvisoRiga[];
+}
+
+export type Conteggio = { ultimi_7: number; ultimi_30: number; persone_7: number };
+
+export async function prenotazioniDi(slug: string): Promise<Conteggio | null> {
+  const { data } = await supabase
+    .from('prenotazioni_conteggio')
+    .select('ultimi_7,ultimi_30,persone_7')
+    .eq('tour_slug', slug)
+    .maybeSingle();
+  return (data as Conteggio) ?? null;
+}

@@ -4,6 +4,8 @@ import { getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { NoindexBadge } from '@/components/NoindexBadge';
 import { Header } from '@/components/Header';
 import { votiPerTour } from '@/lib/recensioni';
+import { ultimePrenotazioni } from '@/lib/riprova';
+import { ProvaSociale } from '@/components/ProvaSociale';
 import { supabase } from '@/lib/supabase';
 import { SEZIONI } from '@/lib/menu';
 import { testo } from '@/lib/prosa';
@@ -41,6 +43,7 @@ export default async function LocaleLayout({
   /* I punteggi per il menu: una lettura sola, non una per voce.
      Il menu sta su ogni pagina del sito. */
   const inRilievo = SEZIONI.flatMap((s) => s.evidenza ?? []);
+  const avvisi = await ultimePrenotazioni(25);
   const [voti, schede] = await Promise.all([
     votiPerTour(),
     supabase
@@ -107,6 +110,22 @@ export default async function LocaleLayout({
         <Header locale={locale} voti={voti} foto={foto} nomi={nomi} />
         {children}
         <Footer locale={locale} />
+        {/* I riquadri delle prenotazioni vere. Il prefisso della lingua
+            serve perche' il link deve restare nella lingua che si sta
+            leggendo. */}
+        <ProvaSociale
+          avvisi={avvisi.map((a) => ({
+            nome: a.nome,
+            iniziale: a.iniziale,
+            paese: a.paese,
+            prodotto: a.prodotto,
+            persone: a.persone,
+            quando: a.quando,
+            href: a.tour_slug
+              ? (locale === 'en' ? '' : `/${locale}`) + `/tour/${a.tour_slug}/`
+              : null,
+          }))}
+        />
         <NoindexBadge />
       </body>
     </html>
