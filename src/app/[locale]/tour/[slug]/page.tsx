@@ -242,6 +242,30 @@ export default async function TourPage({
       </section>
 
 
+      {/* L'ITINERARIO STA QUI, fra le foto e i video, e non e' un
+          dettaglio di impaginazione: e' l'ordine in cui uno decide.
+          Le foto dicono "che bel posto", l'itinerario dice "ecco cosa si
+          fa dalle 8 alle 18", i video mostrano com'e' andata davvero.
+          Prima stava in fondo, dopo recensioni e schede informative: ci
+          arrivava solo chi aveva gia' deciso, cioe' chi non ne aveva
+          bisogno. */}
+      {contenuto.itinerary && (
+        <section className="pr-sec" id="itinerary">
+          <div className="pr-wrap">
+            <div className="pr-head">
+              <h2 className="pr-title">The <em className="hl place">itinerary</em></h2>
+            </div>
+            {/* L'itinerario si legge tutto, come sul sito attuale: e' gia'
+                spezzato in titoletti, e il ritaglio a 320px lo troncava a
+                meta' di una frase. */}
+            <div
+              className="pr-prose"
+              dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
+            />
+          </div>
+        </section>
+      )}
+
       {video.length > 0 && <Videos video={video} />}
 
       {/* Le recensioni PRIMA del calendario, non dopo: chi ha ancora
@@ -295,23 +319,6 @@ export default async function TourPage({
               </h2>
             </div>
             <InfoTabs tabs={schede} />
-          </div>
-        </section>
-      )}
-
-      {contenuto.itinerary && (
-        <section className="pr-sec" id="itinerary">
-          <div className="pr-wrap">
-            <div className="pr-head">
-              <h2 className="pr-title">The <em className="hl place">itinerary</em></h2>
-            </div>
-            {/* L'itinerario si legge tutto, come sul sito attuale: e' gia'
-                spezzato in titoletti, e il ritaglio a 320px lo troncava a
-                meta' di una frase. */}
-            <div
-              className="pr-prose"
-              dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
-            />
           </div>
         </section>
       )}
