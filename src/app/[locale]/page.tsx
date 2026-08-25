@@ -6,6 +6,7 @@ import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { Premi } from '@/components/Premi';
 import { fonti, inEvidenza } from '@/lib/recensioni';
 import { riprova } from '@/lib/riprova';
 import '@/styles/home.css';
@@ -243,6 +244,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </section>
 
+      <Premi />
       <Recensioni
         fonti={leFonti}
         recensioni={leRecensioni}

@@ -611,3 +611,27 @@ html[data-theme="dark"] .rv-src-getyourguide{ background:#3A2005; color:#FFA65C;
 /* la scheda aperta si stacca dalle altre, cosi' si capisce cosa e'
    cambiato senza dover rileggere */
 .rv-card.aperta{ border-color:var(--orange); }
+
+/* ─── I PREMI UFFICIALI ──────────────────────────────────────────────── */
+.pw{ max-width:1080px; margin:34px auto 0; padding:0 20px; text-align:center; }
+.pw-in{
+  display:flex; align-items:center; justify-content:center;
+  gap:34px; flex-wrap:wrap;
+}
+.pw-in img{ display:block; height:auto; }
+/* piu' grandi che sulla landing, dove stavano stretti sotto il titolo:
+   340px la' contro 620px qui */
+.pw-viator{ width:min(100%,620px); }
+.pw-ta{ width:132px; }
+.pw-nota{
+  margin:14px 0 0; font-size:.8rem; font-weight:600; color:var(--ink-soft);
+}
+@media (max-width:760px){
+  .pw-in{ gap:22px; }
+  .pw-viator{ width:min(100%,420px); }
+  .pw-ta{ width:96px; }
+}
+/* Il badge Tripadvisor e' nero su trasparente: su fondo scuro sparirebbe.
+   Si inverte -- e' l'unico ritocco ammesso su un marchio altrui, perche'
+   non ne cambia la forma. */
+html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }

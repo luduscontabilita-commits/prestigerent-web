@@ -5,6 +5,7 @@ import { riprova } from '@/lib/riprova';
 import { fonti, inEvidenza } from '@/lib/recensioni';
 import { FasciaFiducia } from '@/components/Riprova';
 import { Recensioni } from '@/components/Recensioni';
+import { Premi } from '@/components/Premi';
 import { ContactSection } from '@/components/ContactSection';
 import { organization, breadcrumb, grafo, hreflangDi } from '@/lib/schema';
 import '@/styles/home.css';
@@ -124,6 +125,7 @@ export default async function ChiSiamo({
         </article>
       </section>
 
+      <Premi />
       <Recensioni
         fonti={leFonti}
         recensioni={leRecensioni}

@@ -10,6 +10,7 @@ import { Videos, type Video } from '@/components/Videos';
 import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { Premi } from '@/components/Premi';
 import { fonti, punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
@@ -247,6 +248,11 @@ export default async function TourPage({
           un dubbio lo risolve qui, un attimo prima di scegliere la
           data. Metterle in fondo vuol dire mostrarle a chi ha gia'
           deciso, cioe' a chi non ne aveva bisogno. */}
+      {/* I premi PRIMA dei punteggi: sono immagini emesse dalle
+          piattaforme, quindi rispondono da soli alla domanda "questi
+          numeri chi me li garantisce". Poi vengono i numeri, poi le
+          recensioni, poi il calendario. */}
+      <Premi />
       <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
 
       {punti.length > 0 && (
