@@ -35,7 +35,16 @@ export default function Entra() {
     });
     if (error) {
       setStato('errore');
-      setMessaggio(error.message);
+      /* Supabase risponde "Database error saving new user" quando il
+         trigger rifiuta l'iscrizione, cioe' quando l'indirizzo non e'
+         nell'elenco degli abilitati. E' il controllo che funziona, ma
+         detto cosi' sembra un guasto -- e la causa piu' frequente e'
+         banale: un refuso nell'indirizzo. */
+      setMessaggio(
+        /database error|saving new user|unexpected/i.test(error.message)
+          ? "Questo indirizzo non è abilitato. Controlla di averlo scritto giusto: basta un punto di troppo."
+          : error.message
+      );
     } else {
       setStato('fatto');
     }
