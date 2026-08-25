@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SearchBar, type Partenza } from './SearchBar';
 import { testo } from '@/lib/prosa';
 
@@ -34,17 +34,41 @@ export function HomeTours({
 }) {
   const [filtro, setFiltro] = useState<{ da: string; persone: number } | null>(null);
   const [categoria, setCategoria] = useState<string>('');
+  /* La destinazione arriva dal menu (/?place=siena) e si legge una volta
+     sola, al montaggio: e' un filtro che si imposta arrivando, non
+     cliccando. Leggerla qui e non sul server tiene la pagina statica --
+     una sola pagina in cache per tutti invece di una per destinazione. */
+  const [luogo, setLuogo] = useState('');
+  const [dalMenu, setDalMenu] = useState('');
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const pl = q.get('place');
+    const kd = q.get('kind');
+    const fr = q.get('from');
+    if (pl) { setLuogo(pl); setDalMenu(pl.replace(/-/g, ' ')); }
+    if (kd) setCategoria(kd);
+    if (fr) setFiltro({ da: fr, persone: 0 });
+  }, []);
 
   const visibili = useMemo(() => {
     return tours.filter((t) => {
       if (categoria && t.kind !== categoria) return false;
+      /* La destinazione si cerca NEL NOME del tour, che e' l'unico posto
+         dove i luoghi sono scritti in modo affidabile. "siena" trova
+         "Siena & San Gimignano" e "Siena and Chianti"; i trattini del
+         parametro diventano spazi perche' negli URL non ci vanno. */
+      if (luogo) {
+        const nome = t.nome.toLowerCase();
+        if (!luogo.split('-').every((parola) => nome.includes(parola))) return false;
+      }
       if (filtro?.da && t.partenza !== filtro.da) return false;
       /* Un tour privato da 8 posti non serve a chi e' in dodici: nasconderlo
          evita la telefonata "ma allora perche' me lo avete mostrato?". */
       if (filtro?.persone && t.maxOspiti && filtro.persone > t.maxOspiti) return false;
       return true;
     });
-  }, [tours, filtro, categoria]);
+  }, [tours, filtro, categoria, luogo]);
 
   const conteggi = useMemo(() => {
     const m = new Map<string, number>();
@@ -84,6 +108,12 @@ export function HomeTours({
             <h2 className="pr-title">
               {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
             </h2>
+            {dalMenu && (
+              <span className="hm-chip">
+                In and around {dalMenu}
+                <button type="button" onClick={() => { setLuogo(''); setDalMenu(''); }} aria-label="Clear">&times;</button>
+              </span>
+            )}
             {filtro?.da && (
               <p className="pr-lead">
                 Departing from {partenze.find((p) => p.valore === filtro.da)?.etichetta}

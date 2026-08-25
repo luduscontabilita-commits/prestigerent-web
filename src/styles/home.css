@@ -297,33 +297,47 @@
 
 /* ─── telefono ────────────────────────────────────────────────────── */
 .hd-mob{ display:none; }
+/* voci che compaiono solo nel pannello del telefono */
+.hd-solo-mob{ display:none !important; }
+
 @media (max-width:1100px){
-  .hd-nav{ display:none; }
+  /* IL PANNELLO DEL TELEFONO E' LO STESSO MENU, non una copia.
+     Il <nav> esce dal flusso, diventa una colonna sotto la barra, e i
+     pannelli delle sezioni si aprono in linea invece che sospesi. */
+  .hd-nav{
+    position:absolute; top:100%; left:0; right:0; z-index:65;
+    flex-direction:column; align-items:stretch; gap:0; margin:0;
+    background:var(--card); border-bottom:1px solid var(--line);
+    box-shadow:0 16px 34px var(--ombra);
+    max-height:0; overflow:hidden; transition:max-height .25s ease;
+  }
+  .hd-nav.is-mob{ max-height:82vh; overflow-y:auto; }
+  .hd-solo-mob{ display:flex !important; }
+
+  .hd-item{ flex-wrap:wrap; border-top:1px solid var(--line); }
+  .hd-top{
+    flex:1 1 auto; padding:14px 18px; border-bottom:0;
+    font-size:.95rem;
+  }
+  .hd-top:hover, .hd-top.is-on{ border-bottom-color:transparent; }
+  .hd-freccia{ padding:14px 18px; }
+  .hd-nav > .hd-plain{ border-top:1px solid var(--line); }
+  .hd-nav > .hd-plain:first-child{ border-top:0; }
+
+  .hd-mega{
+    position:static; transform:none; min-width:0; width:100%;
+    border:0; border-radius:0; box-shadow:none;
+    background:var(--ph);
+    max-height:0; opacity:1; visibility:visible; pointer-events:auto;
+    overflow:hidden; transition:max-height .22s ease;
+  }
+  .hd-mega.is-open{ max-height:1400px; transform:none; }
+  .hd-mega-in{ grid-template-columns:1fr; padding:6px 18px 14px 30px; gap:2px; }
+  .hd-col-t{ margin-top:10px; }
+
   .hd-burger{ display:block; }
   .hd-quick, .hd-wa span{ display:none; }
   .hd-wa{ padding:9px 11px; }
-  .hd-mob{
-    display:block; max-height:0; overflow:hidden;
-    border-top:0 solid var(--line);
-    transition:max-height .25s ease;
-  }
-  .hd-mob.is-open{ max-height:80vh; overflow-y:auto; border-top-width:1px; }
-  .hd-mob > a, .hd-mob summary{
-    display:block; padding:13px 18px; text-decoration:none;
-    font-size:.94rem; font-weight:700; color:var(--ink);
-    border-bottom:1px solid var(--line); cursor:pointer;
-  }
-  .hd-mob details > div{ padding:4px 18px 12px 30px; }
-  .hd-mob details a{
-    display:block; padding:7px 0; text-decoration:none;
-    font-size:.88rem; font-weight:600; color:var(--ink-soft);
-  }
-  .hd-mob .hd-mob-tutto{
-    display:block; padding:10px 18px 6px 30px; color:var(--orange); font-weight:800;
-    text-decoration:none; font-size:.86rem;
-  }
-  .hd-mob .hd-col-t{ padding:8px 0 2px; }
-  .hd-mob-quick{ color:var(--orange) !important; }
 }
 @media (max-width:560px){
   .hd-logo small{ display:none; }

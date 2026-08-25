@@ -77,7 +77,7 @@ export function Header({
           </span>
         </a>
 
-        <nav className="hd-nav" aria-label="Main">
+        <nav className={'hd-nav' + (mobile ? ' is-mob' : '')} aria-label="Main">
           <a className="hd-top hd-plain" href={p('/')}>
             Home
           </a>
@@ -141,6 +141,13 @@ export function Header({
               </div>
             </div>
           ))}
+          {/* visibili solo su telefono: sul desktop stanno gia' a destra */}
+          <a className="hd-top hd-plain hd-solo-mob" href={p('/about-us/')}>
+            About us
+          </a>
+          <a className="hd-top hd-plain hd-solo-mob" href={p('/#contact')}>
+            Quick Request
+          </a>
         </nav>
 
         <div className="hd-right">
@@ -196,39 +203,12 @@ export function Header({
         </div>
       </div>
 
-      {/* SU TELEFONO le stesse voci diventano un elenco a fisarmonica. Sono
-          gli stessi link di sopra, non una seconda copia: il markup e' uno
-          solo e a duplicarlo si tornerebbe agli 84 link di WordPress. */}
-      <div className={'hd-mob' + (mobile ? ' is-open' : '')}>
-        <a href={p('/')} onClick={() => setMobile(false)}>
-          Home
-        </a>
-        {SEZIONI.map((s) => (
-          <details key={s.testo}>
-            <summary>{s.testo}</summary>
-            <a className="hd-mob-tutto" href={p(s.href)}>
-              See all {s.testo.toLowerCase()} &rarr;
-            </a>
-            {s.gruppi.map((g) => (
-              <div key={g.titolo}>
-                <p className="hd-col-t">{g.titolo}</p>
-                {g.voci.map((v) => (
-                  <a key={v.href + v.testo} href={p(v.href)}>
-                    {v.testo}
-                  </a>
-                ))}
-              </div>
-            ))}
-          </details>
-        ))}
-        <a className="hd-mob-quick" href={p('/#contact')} onClick={() => setMobile(false)}>
-          Quick Request
-        </a>
-        <a href={p('/about-us/')} onClick={() => setMobile(false)}>
-          About us
-        </a>
-      </div>
-
+      {/* NIENTE SECONDO MENU PER IL TELEFONO.
+          Ne avevo scritto uno separato e il risultato erano 162 link
+          nell'intestazione -- il doppio degli 84 di WordPress che avevo
+          criticato tre righe piu' su. Su telefono si riusa lo STESSO
+          markup: `.hd-nav` diventa un pannello verticale e i pannelli si
+          aprono in linea. Un solo link per destinazione, sempre. */}
       {(aperta || lingue) && <button className="hd-veil" aria-label="Close menu" onClick={chiudi} />}
     </header>
   );

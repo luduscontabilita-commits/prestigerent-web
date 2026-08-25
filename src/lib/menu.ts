@@ -54,14 +54,6 @@ export const SEZIONI: Sezione[] = [
           },
         ],
       },
-      {
-        titolo: 'Why small group',
-        voci: [
-          { testo: 'Never more than 25 guests', href: '/?kind=small_group', nota: 'in our own minibuses' },
-          { testo: 'Guides on our payroll', href: '/about-us/', nota: 'not subcontracted' },
-          { testo: 'Lunch at a family winery', href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/', nota: 'included in the price' },
-        ],
-      },
     ],
     evidenza: [
       'wine-experience-in-tuscany',
@@ -200,33 +192,30 @@ export const SEZIONI: Sezione[] = [
   {
     testo: 'Destinations',
     href: '/',
+    /* Le destinazioni portano a ELENCHI FILTRATI, non alle singole schede.
+       Puntarle ai tour significherebbe ripetere nel menu link che ci sono
+       gia' sotto "Private Tours" e "Cruise Port Tours": lo stesso
+       indirizzo due volte nella stessa pagina e' peso interno buttato --
+       ed e' precisamente il difetto del menu di WordPress. */
     gruppi: [
       {
         titolo: 'Tuscany',
         voci: [
-          { testo: 'Siena', href: '/tour/private-tour-of-siena-from-florence/' },
-          { testo: 'San Gimignano', href: '/tour/tour-to-san-gimignano-from-florence/' },
-          { testo: 'Chianti', href: '/tour/private-tour-to-chianti-wineries/' },
-          { testo: 'Pisa', href: '/tour/private-tour-pisa-from-florence/' },
-          { testo: 'Lucca', href: '/tour/private-tour-of-lucca-from-florence/' },
-          { testo: 'Montalcino', href: '/tour/montalcino-brunello-wine-tour/' },
+          { testo: 'Siena', href: '/?place=siena' },
+          { testo: 'San Gimignano', href: '/?place=san-gimignano' },
+          { testo: 'Chianti', href: '/?place=chianti' },
+          { testo: 'Pisa', href: '/?place=pisa' },
+          { testo: 'Lucca', href: '/?place=lucca' },
+          { testo: 'Montalcino & Montepulciano', href: '/?place=montalcino' },
         ],
       },
       {
-        titolo: 'Coast & Liguria',
+        titolo: 'Coast & beyond',
         voci: [
-          { testo: 'Cinque Terre', href: '/tour/private-cinque-terre-from-florence/' },
-          { testo: 'Portofino', href: '/tour/tour-to-portofino-santa-margherita/' },
-        ],
-      },
-      {
-        titolo: 'Beyond Tuscany',
-        voci: [
-          { testo: 'Rome', href: '/tour/private-tour-to-rome-from-florence/' },
-          { testo: 'Venice', href: '/tour/private-tour-to-venice-from-florence/' },
-          { testo: 'Assisi & Perugia', href: '/tour/private-tour-to-perugia-and-assisi/' },
-          { testo: 'Orvieto & Bagnoregio', href: '/tour/private-tour-to-orvieto-bagnoregio/' },
-          { testo: 'Amalfi Coast', href: '/tour/tour-sorrento-positano-and-amalfi/' },
+          { testo: 'Cinque Terre', href: '/?place=cinque-terre' },
+          { testo: 'Rome', href: '/?place=rome' },
+          { testo: 'Venice', href: '/?place=venice' },
+          { testo: 'Amalfi & Sorrento', href: '/?place=amalfi' },
         ],
       },
       {
