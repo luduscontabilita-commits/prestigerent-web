@@ -123,7 +123,7 @@ export function Recensioni({
       {recensioni.length > 0 && (
         <div className="rv-grid">
           {recensioni.map((r) => (
-            <RecensioneCard key={r.id} r={r} linkabile={SI_LINKA.has(r.fonte)} />
+            <RecensioneCard key={r.id} r={r} />
           ))}
         </div>
       )}

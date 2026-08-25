@@ -36,13 +36,7 @@ const NOMI: Record<string, string> = {
   getyourguide: 'GetYourGuide',
 };
 
-export function RecensioneCard({
-  r,
-  linkabile,
-}: {
-  r: Recensione;
-  linkabile: boolean;
-}) {
+export function RecensioneCard({ r }: { r: Recensione }) {
   const [aperta, setAperta] = useState(false);
   const lunga = r.testo.length > LUNGA;
   const mostrata = !lunga || aperta ? r.testo : r.testo.slice(0, LUNGA).replace(/\s+\S*$/, '');
@@ -79,17 +73,27 @@ export function RecensioneCard({
         {r.data && <span> &middot; {quando(r.data)}</span>}
       </figcaption>
 
-      {/* Il collegamento all'originale. E' quello che separa "vera" da
-          "sembra vera": chi ha un dubbio ci clicca una volta, non lo rifa'
-          mai piu', e da quel momento crede anche a tutte le altre. */}
-      {r.url_fonte && linkabile && (
-        <a className="rv-verif" href={r.url_fonte} target="_blank" rel="noopener nofollow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-          Verify it on {NOMI[r.fonte]}
-        </a>
-      )}
+      {/* NIENTE LINK QUI, ed e' una decisione, non una dimenticanza.
+
+          Tripadvisor e' di proprieta' di Viator, e la pagina-prodotto del
+          tour ha sopra il pulsante che prenota ATTRAVERSO Viator. Sei
+          link in fondo a sei schede sono sei uscite verso l'intermediario
+          che si trattiene il 25-30% -- partendo da un visitatore che era
+          gia' qui.
+
+          E soprattutto: quel link non porta alla singola recensione,
+          porta all'elenco di tutte. Per verificare quella di Rosharnie
+          bisognerebbe scorrere e cercarsela. Quindi sei link compravano
+          esattamente la stessa credibilita' di uno.
+
+          La verifica resta, ma in un punto solo: il badge in cima, che
+          dice "Read them on Tripadvisor". Una porta dichiarata, dove chi
+          legge non ha ancora deciso niente -- non sei porte accanto al
+          calendario di prenotazione.
+
+          Quando arriveranno le recensioni Google il problema sparisce: la
+          pagina delle recensioni di Google non vende niente, e li' il link
+          per recensione si potra' rimettere senza contropartite. */}
     </figure>
   );
 }
