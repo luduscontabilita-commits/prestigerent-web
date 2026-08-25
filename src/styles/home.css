@@ -15,9 +15,13 @@
 .hm-hero{
   position:relative; min-height:clamp(560px,64vw,720px);
   display:flex; flex-direction:column; justify-content:center;
-  padding:80px 20px 44px; color:#fff; overflow:hidden;
+  padding:80px 20px 44px; color:#fff;
+  /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
+     ma tagliava anche la tendina della ricerca appena sconfinava sotto
+     l'hero -- si vedeva mezzo elenco e basta. Il ritaglio va sullo
+     sfondo, che e' l'unica cosa che deve stare dentro. */
 }
-.hm-hero-bg{ position:absolute; inset:0; z-index:0; }
+.hm-hero-bg{ position:absolute; inset:0; z-index:0; overflow:hidden; }
 .hm-hero-bg img{ width:100%; height:100%; object-fit:cover; display:block; }
 /* La velatura non e' decorazione: sopra una foto in pieno sole il testo
    bianco sparisce, e il titolo e' la prima cosa che deve leggersi. Piu'
@@ -29,7 +33,7 @@
     linear-gradient(90deg,rgba(10,15,21,.80) 0%,rgba(10,15,21,.58) 46%,rgba(10,15,21,.22) 100%),
     linear-gradient(180deg,rgba(10,15,21,.42) 0%,rgba(10,15,21,0) 34%,rgba(10,15,21,.50) 100%);
 }
-.hm-hero-in{ position:relative; z-index:1; max-width:1180px; margin:0 auto; width:100%; }
+.hm-hero-in{ position:relative; z-index:5; max-width:1180px; margin:0 auto; width:100%; }
 
 .hm-kicker{
   display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
@@ -135,7 +139,7 @@
 .sc.is-open .sc-btn > svg{ transform:rotate(180deg); }
 
 .sc-menu{
-  position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:40;
+  position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:80;
   margin:0; padding:6px; list-style:none;
   background:#fff; border-radius:14px;
   box-shadow:0 20px 44px rgba(8,14,20,.32);
@@ -1075,3 +1079,12 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 .dr li span{ flex:none; font-size:.95rem; line-height:1.3; }
 .dr li b{ color:var(--ink); font-weight:800; }
 .dr li a{ color:var(--link); font-weight:800; }
+
+/* il rimando a tutti i tour, sotto le dodici schede della home */
+.hm-tutti{ text-align:center; margin:26px 0 0; }
+.hm-tutti a{
+  display:inline-block; padding:13px 26px; border-radius:12px;
+  border:1px solid var(--line); background:var(--card);
+  text-decoration:none; font-size:.9rem; font-weight:800; color:var(--ink);
+}
+.hm-tutti a:hover{ border-color:var(--orange); color:var(--orange); }

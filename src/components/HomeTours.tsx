@@ -53,6 +53,46 @@ export function HomeTours({
     if (fr) setDaUrl(fr);
   }, []);
 
+  /* QUANTI SE NE DISEGNANO.
+   *
+   * La home stampava tutti e 86 i tour: 212 KB su 231, e 103 immagini.
+   * Nessuno scorre 86 schede, e chi arriva da un annuncio meno di tutti
+   * -- ha in mente una cosa sola e la vuole subito.
+   *
+   * Se ne mostrano 12, e sono quelli che valgono l'85% del fatturato piu'
+   * un campione delle altre famiglie. Gli 86 restano tutti raggiungibili:
+   * dalle pagine di categoria, dal menu, dalla sitemap. Non sparisce
+   * niente, si smette solo di stamparli tutti in prima pagina.
+   *
+   * Quando si cerca, il limite si alza: chi ha filtrato vuole vedere i
+   * risultati, non dodici su venti.
+   */
+  const QUANTI = 12;
+
+  /* QUALI dodici. Non i primi dell'elenco: quelli che vendono.
+   * Tre prodotti fanno l'85% del fatturato e 12.694 delle recensioni --
+   * vanno in cima, sempre. Poi un campione delle altre famiglie, perche'
+   * chi arriva per un transfer o per una crociera deve vedere che
+   * esistono senza dover cercare. */
+  const PRIMI = [
+    'wine-experience-in-tuscany',
+    'small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence',
+    'wine-food-experience-in-tuscany',
+    'private-tour-to-chianti-wineries',
+    'private-tour-siena-and-san-gimignano',
+    'private-cinque-terre-from-florence',
+    'florence-and-pisa-from-livorno-tour',
+    'tour-to-cinque-terre-from-la-spezia',
+    'private-rome-from-civitavecchia-port',
+    'pompeii-vesuvius-from-naples-port',
+    'florence-to-rome-with-stop-in-siena',
+    'transfer-airport-to-florence',
+  ];
+  const posto = (slug: string) => {
+    const i = PRIMI.indexOf(slug);
+    return i < 0 ? 999 : i;
+  };
+
   const visibili = useMemo(() => {
     return tours.filter((t) => {
       const cat = filtro?.tipo || categoria;
@@ -73,6 +113,11 @@ export function HomeTours({
       return true;
     });
   }, [tours, filtro, categoria, luogo, daUrl]);
+
+  const haCercato = Boolean(filtro?.da || filtro?.tipo || filtro?.persone || categoria || luogo || daUrl);
+  const mostrati = haCercato
+    ? visibili
+    : [...visibili].sort((a, b) => posto(a.slug) - posto(b.slug)).slice(0, QUANTI);
 
   const conteggi = useMemo(() => {
     const m = new Map<string, number>();
@@ -134,7 +179,7 @@ export function HomeTours({
             </p>
           ) : (
             <div className="hm-grid">
-              {visibili.map((t) => (
+              {mostrati.map((t) => (
                 <a className="hm-card" href={t.href} key={t.slug}>
                   <div className="hm-card-img">
                     <span className="hm-card-tag">{ETICHETTA[t.kind] ?? t.kind}</span>
@@ -166,10 +211,22 @@ export function HomeTours({
                         <span className="ask">Price on request</span>
                       )}
                     </div>
+
                   </div>
                 </a>
               ))}
             </div>
+          )}
+
+          {!haCercato && visibili.length > QUANTI && (
+            /* Gli altri non spariscono: si smette solo di stamparli in
+               prima pagina. Da qui, dal menu, dalle pagine di categoria e
+               dalla sitemap ci si arriva comunque. */
+            <p className="hm-tutti">
+              <a href="/tours-of-italy/">
+                See all {visibili.length} tours and transfers &rarr;
+              </a>
+            </p>
           )}
         </div>
       </section>
