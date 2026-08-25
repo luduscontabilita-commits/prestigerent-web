@@ -53,7 +53,19 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
   const perTour = (data ?? []).filter((v) => v.voto != null && v.quante != null);
   if (!perTour.length) return dAzienda;
 
-  const etichette = new Map(dAzienda.map((f) => [f.fonte, f.etichetta]));
+  /* Le etichette si rileggono TUTTE, senza il filtro sui numeri.
+   *
+   * Qui c'era un errore che non si vedeva: `dAzienda` arriva da `fonti()`,
+   * che scarta le piattaforme senza voto e conteggio d'azienda. Viator e'
+   * una di quelle -- non ha un voto d'azienda, valuta i prodotti -- quindi
+   * la sua etichetta "Viator & Tripadvisor" non arrivava mai, e il codice
+   * ripiegava su "Viator". Risultato: il controllo che deve accorgersi che
+   * Tripadvisor e' gia' nominato non trovava piu' la parola, e il badge
+   * d'azienda da 7.142 tornava accanto a quello del prodotto. */
+  const { data: righe } = await supabase
+    .from('fonti_recensioni')
+    .select('fonte,etichetta');
+  const etichette = new Map((righe ?? []).map((f) => [f.fonte, f.etichetta]));
   const NOMI: Record<string, string> = {
     tripadvisor: 'Tripadvisor',
     google: 'Google',
