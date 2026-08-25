@@ -75,8 +75,27 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
     suQuestoTour: true,
   }));
 
+  /* Quali badge d'azienda si tengono accanto a quelli del prodotto.
+   *
+   * Non basta escludere la stessa `fonte`: l'etichetta di Viator e'
+   * "Viator & Tripadvisor", perche' il loro numero comprende gia' quelle
+   * di Tripadvisor. Se si tenesse anche il badge Tripadvisor d'azienda,
+   * sulla stessa riga comparirebbero "1.810 di questo tour su Viator &
+   * Tripadvisor" e "7.142 su Tripadvisor" -- due numeri che in parte sono
+   * le stesse recensioni. Si guarda quindi dentro le ETICHETTE, non solo
+   * dentro i codici delle piattaforme.
+   */
+  const nominate = suQuestoTour
+    .map((f) => f.etichetta.toLowerCase())
+    .join(' | ');
   const coperte = new Set(suQuestoTour.map((f) => f.fonte));
-  return [...suQuestoTour, ...dAzienda.filter((f) => !coperte.has(f.fonte))];
+
+  return [
+    ...suQuestoTour,
+    ...dAzienda.filter(
+      (f) => !coperte.has(f.fonte) && !nominate.includes(f.etichetta.toLowerCase())
+    ),
+  ];
 }
 
 /* CHE COSA SI MOSTRA: solo cinque stelle, solo in inglese.
