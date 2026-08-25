@@ -79,14 +79,34 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
   return [...suQuestoTour, ...dAzienda.filter((f) => !coperte.has(f.fonte))];
 }
 
+/* CHE COSA SI MOSTRA: solo cinque stelle, solo in inglese.
+ *
+ * Cinque stelle perche' il sito e' materiale di vendita, non un archivio:
+ * il numero complessivo (7.139 recensioni, 4,9 di media) dice gia' la
+ * verita' sulla distribuzione, ed e' li' sopra, cliccabile. Le singole
+ * servono a far vedere COME sono fatte le nostre giornate.
+ *
+ * Inglese perche' e' la lingua del sito alla radice e di chi prenota. Le
+ * versioni tedesca e italiana filtreranno sulla propria lingua quando ci
+ * saranno recensioni in quelle lingue; finche' non ci sono, meglio inglese
+ * che vuoto.
+ *
+ * AVVERTENZA per il giorno in cui si tirera' giu' da Viator via API: le
+ * loro condizioni per i partner vietano esplicitamente di mostrare solo le
+ * recensioni col voto piu' alto -- o tutte, o nessuna. Questo filtro vale
+ * per le recensioni scelte a mano, non per quelle prese dalla loro API.
+ */
+const SOLO = (q: ReturnType<typeof base>) => q.eq('voto', 5).eq('lingua', 'en');
+
+function base() {
+  return supabase.from('recensioni').select('*').eq('pubblicata', true);
+}
+
 /* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
  * (tour_slug nullo) per non lasciare vuoto un tour che ancora non ne ha. */
 export async function recensioniDi(slug: string, quante = 6): Promise<Recensione[]> {
-  const { data } = await supabase
-    .from('recensioni')
-    .select('*')
+  const { data } = await SOLO(base())
     .or(`tour_slug.eq.${slug},tour_slug.is.null`)
-    .eq('pubblicata', true)
     .order('in_evidenza', { ascending: false })
     .order('data', { ascending: false })
     .limit(quante);
@@ -94,10 +114,7 @@ export async function recensioniDi(slug: string, quante = 6): Promise<Recensione
 }
 
 export async function inEvidenza(quante = 6): Promise<Recensione[]> {
-  const { data } = await supabase
-    .from('recensioni')
-    .select('*')
-    .eq('pubblicata', true)
+  const { data } = await SOLO(base())
     .eq('in_evidenza', true)
     .order('data', { ascending: false })
     .limit(quante);
