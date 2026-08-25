@@ -97,7 +97,12 @@ export function ProvaSociale({ avvisi }: { avvisi: Avviso[] }) {
         <b>{chi}</b>
         {a.paese ? ` from ${a.paese}` : ''} booked <b>{a.prodotto}</b>
         {a.persone && a.persone > 1 ? ` for ${a.persone}` : ''}
-        <em>{quantoFa(a.quando)}</em>
+        <em>
+          {quantoFa(a.quando)}
+          {/* La provenienza sta qui e non in un riquadro a parte: chi
+              dubita cerca proprio in quel punto, sotto la frase. */}
+          <span className="ps-fonte"> &middot; verified booking</span>
+        </em>
       </span>
     </>
   );

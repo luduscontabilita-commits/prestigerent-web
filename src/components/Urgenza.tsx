@@ -54,6 +54,21 @@ export function Urgenza({ conta, posti }: { conta: Conteggio | null; posti?: num
           {r.testo}
         </span>
       ))}
+      {/* DA DOVE VENGONO I NUMERI.
+          Senza questa riga "29 booked today" e' un'affermazione come
+          tante; con questa e' un dato che ha una provenienza. E' la
+          differenza fra un sito che dice di essere popolare e uno che
+          mostra il registro.
+          Non si scrive "verified by Regiondo": Regiondo non ci
+          certifica, e' il sistema che incassa. Dire cosa e' davvero --
+          il nostro sistema di prenotazione, letto in diretta -- e' piu'
+          onesto e, con un lettore attento, anche piu' credibile. */}
+      <em className="ur-fonte">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+        Live figures from Regiondo, our booking system
+      </em>
     </div>
   );
 }

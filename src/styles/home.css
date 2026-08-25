@@ -1037,3 +1037,13 @@ html[data-theme="dark"] .pr-caldo{ background:#3A2005; color:#FFA65C; }
 html[data-theme="dark"] .ur{ background:#2E1A06; border-color:#4A2C0C; }
 html[data-theme="dark"] .ur span{ color:#FFC79E; }
 html[data-theme="dark"] .ur b{ color:#FFA65C; }
+
+/* da dove vengono i numeri: piccolo, ma nel punto esatto in cui uno dubita */
+.ur-fonte{
+  display:flex; align-items:center; gap:6px; margin-top:3px;
+  font-style:normal; font-size:.72rem; font-weight:700;
+  color:#A9722F; opacity:.9;
+}
+.ur-fonte svg{ width:11px; height:11px; }
+html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
+.ps-fonte{ opacity:.75; }
