@@ -1,0 +1,145 @@
+/* GoHighLevel — solo lato server.
+ *
+ * ── A COSA SERVE ────────────────────────────────────────────────────
+ * Non a rifare la casella dei messaggi: quella esiste gia' in GHL, ha
+ * l'app sul telefono, e chi risponde ai clienti lo fa camminando, non
+ * davanti a un pannello.
+ *
+ * Serve al contrario: portare il CONTESTO dentro le chat. Oggi chi
+ * riceve "Hi, what time do we meet?" su WhatsApp deve cercare il nome in
+ * Regiondo. Con questo, sul contatto c'e' gia' scritto: Wine Experience,
+ * 28 agosto, 4 persone, prenotato via Viator.
+ *
+ * ── PERCHE' NON RIVELA I NUMERI DEI CLIENTI ─────────────────────────
+ * Qui dentro passa il telefono vero e il nome intero, che nel sito non
+ * entrano mai. La differenza e' che GHL e' uno strumento interno: quei
+ * dati li avete gia' in Regiondo, li state solo spostando dove servono.
+ * Il sito pubblico continua a vedere solo nome e iniziale.
+ *
+ * Il token e' una "private integration" del sotto-account, non una
+ * chiave d'agenzia: puo' toccare solo Prestige Rent.
+ */
+
+const BASE = 'https://services.leadconnectorhq.com';
+const VERSIONE = '2021-07-28';
+
+function conf() {
+  const token = process.env.GHL_TOKEN;
+  const location = process.env.GHL_LOCATION_ID;
+  if (!token || !location) return null;
+  return { token, location };
+}
+
+export function ghlConfigurato() {
+  return conf() !== null;
+}
+
+async function chiamaGhl<T = unknown>(
+  percorso: string,
+  opzioni: { metodo?: string; corpo?: unknown } = {}
+): Promise<{ ok: boolean; stato: number; dati: T | null; errore?: string }> {
+  const c = conf();
+  if (!c) return { ok: false, stato: 0, dati: null, errore: 'GHL non configurato' };
+
+  const res = await fetch(BASE + percorso, {
+    method: opzioni.metodo ?? 'GET',
+    headers: {
+      Authorization: `Bearer ${c.token}`,
+      Version: VERSIONE,
+      Accept: 'application/json',
+      ...(opzioni.corpo ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: opzioni.corpo ? JSON.stringify(opzioni.corpo) : undefined,
+    cache: 'no-store',
+  });
+
+  const testo = await res.text();
+  let dati: T | null = null;
+  try {
+    dati = testo ? (JSON.parse(testo) as T) : null;
+  } catch {
+    /* GHL risponde HTML sulle pagine di errore: non deve far cadere
+       tutto il ciclo di sincronizzazione per un prodotto solo. */
+  }
+
+  if (!res.ok) {
+    const msg =
+      (dati as { message?: string } | null)?.message ?? testo.slice(0, 160);
+    return { ok: false, stato: res.status, dati, errore: msg };
+  }
+  return { ok: true, stato: res.status, dati };
+}
+
+/** Verifica che il token abbia i permessi giusti PRIMA di provare a
+ *  scrivere: un 401 a meta' di 1.800 contatti lascia il lavoro a meta'. */
+export async function permessiGhl(): Promise<{ contatti: boolean; conversazioni: boolean; errore?: string }> {
+  const c = conf();
+  if (!c) return { contatti: false, conversazioni: false, errore: 'token assente' };
+
+  const [a, b] = await Promise.all([
+    chiamaGhl(`/contacts/?locationId=${c.location}&limit=1`),
+    chiamaGhl(`/conversations/search?locationId=${c.location}&limit=1`),
+  ]);
+  return {
+    contatti: a.ok,
+    conversazioni: b.ok,
+    errore: a.ok && b.ok ? undefined : (a.errore ?? b.errore),
+  };
+}
+
+export type ContattoDaPrenotazione = {
+  nome: string;
+  cognome: string;
+  email: string | null;
+  telefono: string | null;
+  /* cosa ha prenotato: e' questo il motivo per cui esiste tutto il file */
+  tour: string;
+  quando: string;      // data del tour, ISO
+  persone: number;
+  canale: string;      // Viator, GetYourGuide, Own Ticketshop
+  riferimento: string; // numero d'ordine
+};
+
+/* I campi personalizzati vanno creati una volta sola nel pannello GHL
+   (Settings → Custom Fields). Qui si citano per chiave: se mancano, GHL
+   li ignora invece di rifiutare il contatto -- meglio un contatto senza
+   dettagli che nessun contatto. */
+const CAMPI = {
+  tour: 'prestige_tour',
+  data: 'prestige_data_tour',
+  persone: 'prestige_persone',
+  canale: 'prestige_canale',
+  ordine: 'prestige_ordine',
+};
+
+/** Crea o aggiorna il contatto. GHL riconosce da solo chi c'e' gia'
+ *  tramite email o telefono, quindi non si creano doppioni. */
+export async function contattoDaPrenotazione(p: ContattoDaPrenotazione) {
+  const c = conf();
+  if (!c) return { ok: false, errore: 'GHL non configurato' };
+
+  /* Le email delle OTA sono alias di inoltro (customer-xxx@reply.viator.com):
+     valgono come identificativo ma non come indirizzo a cui scrivere.
+     Il telefono invece e' vero nel 98% dei casi, ed e' quello che serve. */
+  const finta = /reply\.(viator|getyourguide|tripadvisor)\.com$/i.test(p.email ?? '');
+
+  const corpo: Record<string, unknown> = {
+    locationId: c.location,
+    firstName: p.nome,
+    lastName: p.cognome,
+    source: `Regiondo · ${p.canale}`,
+    tags: ['prenotazione', p.canale.toLowerCase().replace(/\s+/g, '-')],
+    customFields: [
+      { key: CAMPI.tour, field_value: p.tour },
+      { key: CAMPI.data, field_value: p.quando },
+      { key: CAMPI.persone, field_value: String(p.persone) },
+      { key: CAMPI.canale, field_value: p.canale },
+      { key: CAMPI.ordine, field_value: p.riferimento },
+    ],
+  };
+  if (p.telefono) corpo.phone = p.telefono;
+  if (p.email && !finta) corpo.email = p.email;
+
+  const r = await chiamaGhl('/contacts/upsert', { metodo: 'POST', corpo });
+  return { ok: r.ok, errore: r.errore, dati: r.dati };
+}
