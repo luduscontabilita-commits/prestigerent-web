@@ -48,6 +48,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
       alternates: alternative('/'),
     },
+    {
+      /* La pagina di identita'. Sul sito attuale non esiste -- /about-us/
+         rimanda ai mezzi -- ed e' una delle ragioni per cui il sito sparisce
+         sulle ricerche che non nominano un tour. */
+      url: percorso(DEFAULT_LOCALE, '/about-us/'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: alternative('/about-us/'),
+    },
   ];
 
   for (const t of tours) {

@@ -7,6 +7,7 @@ import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { fonti, inEvidenza } from '@/lib/recensioni';
+import { riprova } from '@/lib/riprova';
 import '@/styles/home.css';
 
 /* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
@@ -56,7 +57,15 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
   const righe = (data ?? []) as unknown as Riga[];
 
-  const [leFonti, leRecensioni] = await Promise.all([fonti(), inEvidenza(6)]);
+  /* Tutti i numeri della riprova sociale da una fonte sola: si
+     cambia la riga `azienda` e cambiano home, footer, chi siamo e
+     ogni pagina tour nello stesso momento. */
+  const [leFonti, leRecensioni, d] = await Promise.all([
+    fonti(),
+    inEvidenza(6),
+    riprova(),
+  ]);
+  const az = d.azienda;
 
   /* I prezzi si chiedono a Regiondo tutti insieme, non uno dopo l'altro:
      in fila sarebbero 49 attese sommate. */
@@ -108,7 +117,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {foto && <img src={foto} alt="Tuscany" fetchPriority="high" />}
         </div>
         <div className="hm-hero-in">
-          <span className="hm-kicker">★ Florence, since 2002 · our own fleet</span>
+          <span className="hm-kicker">
+            ★ {az?.citta}, since {az?.anno_fondazione} · our own fleet
+          </span>
           <h1 className="hm-title">
             Tours and transfers across Italy,<br />with your own driver
           </h1>
@@ -119,9 +130,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             with instant confirmation.
           </p>
           <div className="hm-badges">
-            <span><i>⭐</i> <b>4.9</b> · 7,139 reviews on Tripadvisor</span>
+            {d.voto != null && (
+              <span>
+                <i>⭐</i> <b>{d.voto.toFixed(1)}</b> ·{' '}
+                {d.totale.toLocaleString('en-US')} verified reviews
+              </span>
+            )}
             <span><i>🏆</i> Travellers&rsquo; Choice 2026</span>
-            <span><i>🚐</i> 11 minibuses &amp; 10 Mercedes</span>
+            <span><i>🚐</i> {az?.mezzi_minibus} minibuses &amp; our {az?.mezzi_auto}</span>
             <span><i>🛡️</i> Free cancellation up to 24h</span>
           </div>
         </div>
@@ -140,10 +156,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <section className="pr-sec tight" id="proof">
         <div className="pr-wrap wide">
           <div className="hm-proof">
-            <div><b>4.9</b><span>out of 5 on Tripadvisor</span></div>
-            <div><b>7,139</b><span>traveller reviews</span></div>
-            <div><b>#2</b><span>of 248 transport companies in Florence</span></div>
-            <div><b>2002</b><span>the year we started</span></div>
+            <div><b>{d.voto?.toFixed(1)}</b><span>average out of 5</span></div>
+            <div><b>{d.totale.toLocaleString('en-US')}</b><span>verified traveller reviews</span></div>
+            <div>
+              <b>#{az?.classifica_posizione}</b>
+              <span>of {az?.classifica_su} {az?.classifica_categoria?.toLowerCase()}</span>
+            </div>
+            <div><b>{d.anni}</b><span>years, since {az?.anno_fondazione}</span></div>
           </div>
           <p className="hm-proof-src">
             Travellers&rsquo; Choice 2026 ·{' '}

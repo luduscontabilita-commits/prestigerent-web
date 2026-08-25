@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE } from '@/lib/locales';
+import { riprova } from '@/lib/riprova';
 
 /* Il footer, ricostruito da quello attuale di prestigerent.com con tre
  * scelte diverse e una aggiunta.
@@ -38,6 +39,13 @@ const PARTENZE = [
 ];
 
 /* Qui ci vanno i quattro prodotti che valgono l'85%, non un campione. */
+/* La pagina che sul sito attuale NON esiste: /about-us/ rimanda ai
+   mezzi. E' il buco che il baseline aveva trovato -- 87 pagine di
+   prodotto e zero di identita'. */
+const AZIENDA = [
+  ['About us', '/about-us/'],
+];
+
 const PIU_PRENOTATI = [
   ['Siena & San Gimignano with lunch', '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/'],
   ['Wine Experience in Tuscany', '/tour/wine-experience-in-tuscany/'],
@@ -51,8 +59,13 @@ const SOCIAL = [
   ['GetYourGuide', 'https://www.getyourguide.com/prestige-rent-tours-in-italy-s8058/'],
 ];
 
-export function Footer({ locale }: { locale: string }) {
+export async function Footer({ locale }: { locale: string }) {
   const p = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
+  /* Nessun numero scritto qui dentro: arrivano tutti dalla riga
+     `azienda` e da `fonti_recensioni`. Si cambiano li' e cambiano
+     in tutte le pagine nello stesso momento. */
+  const d = await riprova();
+  const a = d.azienda;
 
   return (
     <footer className="ft">
@@ -62,7 +75,9 @@ export function Footer({ locale }: { locale: string }) {
         <span>🛡️ 24-hour free cancellation</span>
         <span>💳 No booking fees</span>
         <span>⚡ Instant confirmation</span>
-        <span>⭐ 4.9 on Tripadvisor</span>
+        {d.voto != null && (
+          <span>⭐ {d.voto.toFixed(1)} from {d.totale.toLocaleString('en-US')} reviews</span>
+        )}
         <span>📞 24/7 customer care</span>
       </div>
 
@@ -70,14 +85,15 @@ export function Footer({ locale }: { locale: string }) {
         <div className="ft-col ft-about">
           <strong>Prestige Rent</strong>
           <p>
-            Tours and private transfers across Italy, from Florence since 2002. We own
-            our fleet &mdash; 11 minibuses and our Mercedes cars &mdash; and our drivers
-            are our own staff, not subcontractors.
+            Tours and private transfers across Italy, from {a?.citta ?? 'Florence'} since{' '}
+            {a?.anno_fondazione}. We own our fleet &mdash; {a?.mezzi_minibus} minibuses and
+            our {a?.mezzi_auto} &mdash; and our drivers are our own staff, not
+            subcontractors.
           </p>
           <p className="ft-nap">
-            Via Della Saggina 98, 50145 Florence, Italy<br />
-            <a href="tel:+39055286059">+39 055 286059</a> ·{' '}
-            <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>
+            {a?.indirizzo}<br />
+            <a href={`tel:${a?.telefono?.replace(/\s/g, '')}`}>{a?.telefono}</a> ·{' '}
+            <a href={`mailto:${a?.email}`}>{a?.email}</a>
           </p>
           <a className="ft-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
             Message us on WhatsApp
@@ -102,6 +118,9 @@ export function Footer({ locale }: { locale: string }) {
           <p className="ft-t">Most booked</p>
           {PIU_PRENOTATI.map(([t, h]) => (
             <a key={h} href={p(h)}>{t}</a>
+          ))}
+          {AZIENDA.map(([t, h]) => (
+            <a key={h} href={p(h)} style={{ marginTop: 10 }}>{t}</a>
           ))}
         </div>
       </div>

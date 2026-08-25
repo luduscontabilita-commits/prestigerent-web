@@ -1,4 +1,5 @@
 import type { Fonte, Recensione } from '@/lib/recensioni';
+import { RecensioneCard } from '@/components/RecensioneCard';
 
 /* Le recensioni vere, da piu' piattaforme.
  *
@@ -52,14 +53,6 @@ const STELLE = (n: number) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.
  * pagina di recensioni e il link e' quello che rende il 4,9 verificabile.)
  */
 const SI_LINKA = new Set(['google', 'tripadvisor']);
-
-const MESI = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-function quando(d: string | null) {
-  if (!d) return null;
-  const [a, m] = d.split('-');
-  return `${MESI[Number(m) - 1]} ${a}`;
-}
 
 export function Recensioni({
   fonti,
@@ -130,22 +123,11 @@ export function Recensioni({
       {recensioni.length > 0 && (
         <div className="rv-grid">
           {recensioni.map((r) => (
-            <figure className="rv-card" key={r.id}>
-              <div className="rv-card-top">
-                <span className="rv-stars" aria-label={`${r.voto} out of 5`}>{STELLE(r.voto)}</span>
-                <span className={'rv-src rv-src-' + r.fonte}>{r.fonte === 'getyourguide' ? 'GetYourGuide' : r.fonte[0].toUpperCase() + r.fonte.slice(1)}</span>
-              </div>
-              {r.titolo && <strong className="rv-card-t">{r.titolo}</strong>}
-              <blockquote>{r.testo}</blockquote>
-              <figcaption>
-                {r.autore}
-                {r.paese && <span> &middot; {r.paese}</span>}
-                {r.data && <span> &middot; {quando(r.data)}</span>}
-              </figcaption>
-            </figure>
+            <RecensioneCard key={r.id} r={r} linkabile={SI_LINKA.has(r.fonte)} />
           ))}
         </div>
       )}
+
     </section>
   );
 }

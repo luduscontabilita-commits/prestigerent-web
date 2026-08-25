@@ -475,21 +475,27 @@ html[data-theme="dark"] .rv-b-getyourguide{ --marchio:#FF7A5C; }
 /* sul nastro serve testo scuro quando il colore si schiarisce */
 html[data-theme="dark"] .rv-b-award{ color:#0B0F13; }
 
-.rv-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-@media (max-width:900px){ .rv-grid{ grid-template-columns:repeat(2,1fr); } }
-@media (max-width:600px){ .rv-grid{ grid-template-columns:1fr; } }
+/* A COLONNE, NON A GRIGLIA -- e questo e' il punto.
+   Con la griglia tutte le schede avevano la stessa altezza, quindi le
+   recensioni lunghe venivano tagliate con i puntini. Ed e' proprio il
+   taglio che le fa sembrare inventate: una recensione vera finisce, una
+   finta finisce a meta'.
+   Con le colonne ogni scheda e' alta quanto il suo testo. Il bordo
+   inferiore viene irregolare, e va benissimo: e' l'aspetto di un testo
+   che nessuno ha ritagliato per farlo stare in un riquadro. */
+.rv-grid{ column-count:3; column-gap:16px; }
+.rv-card{ break-inside:avoid; -webkit-column-break-inside:avoid; display:inline-block; width:100%; }
+@media (max-width:900px){ .rv-grid{ column-count:2; } }
+@media (max-width:600px){ .rv-grid{ column-count:1; } }
 
 .rv-card{
-  margin:0; background:var(--card); border:1px solid var(--line);
+  margin:0 0 16px; background:var(--card); border:1px solid var(--line);
   border-radius:14px; padding:18px;
 }
 .rv-card-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
 .rv-card-t{ display:block; color:var(--ink); font-size:.95rem; margin-bottom:6px; }
 .rv-card blockquote{
   margin:0; color:var(--ink); font-size:.92rem; line-height:1.62;
-  /* le recensioni sono di lunghezza molto diversa: senza un limite la
-     griglia diventa una scala. Sei righe, poi sfuma. */
-  display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden;
 }
 .rv-card figcaption{ margin-top:12px; color:var(--ink-soft); font-size:.8rem; font-weight:700; }
 .rv-src{
@@ -506,3 +512,102 @@ html[data-theme="dark"] .rv-src-tripadvisor { background:#12321F; color:#63D69A;
 html[data-theme="dark"] .rv-src-google      { background:#152441; color:#7FAAF5; }
 html[data-theme="dark"] .rv-src-viator      { background:#211C46; color:#A99CF3; }
 html[data-theme="dark"] .rv-src-getyourguide{ background:#3A2005; color:#FFA65C; }
+
+/* ─── FASCIA DI FIDUCIA (riprova sociale riutilizzabile) ─────────────── */
+.rp-band{
+  display:grid; gap:2px; margin:34px auto; max-width:1120px;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  background:var(--line); border:1px solid var(--line);
+  border-radius:16px; overflow:hidden;
+}
+.rp-item{
+  background:var(--card); padding:20px 14px; text-align:center;
+}
+.rp-item b{
+  display:block; font-family:Fraunces,Georgia,serif; font-style:italic;
+  font-size:2.05rem; font-weight:640; color:var(--ink); line-height:1;
+}
+.rp-item span{
+  display:block; margin-top:7px; font-size:.76rem; font-weight:700;
+  color:var(--ink-soft); line-height:1.4;
+}
+.rp-compatta .rp-item{ padding:14px 10px; }
+.rp-compatta .rp-item b{ font-size:1.5rem; }
+
+.rp-riga{
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+  gap:6px; margin:14px 0 0; font-size:.9rem; font-weight:600;
+  color:var(--ink-soft);
+}
+.rp-riga b{ color:var(--ink); font-weight:800; }
+.rp-stelle{ color:#F5A623; letter-spacing:1px; }
+
+/* Il collegamento alla recensione originale: e' questo che separa "vera"
+   da "sembra vera". Chi ha un dubbio ci clicca sopra una volta, non lo
+   rifa' mai piu', e da quel momento crede anche a tutte le altre. */
+.rv-verif{
+  display:inline-flex; align-items:center; gap:5px; margin-top:10px;
+  font-size:.72rem; font-weight:800; text-decoration:none;
+  color:var(--ink-soft); border-bottom:1px solid var(--line);
+  padding-bottom:1px; transition:color .15s, border-color .15s;
+}
+.rv-verif:hover{ color:var(--orange); border-color:var(--orange); }
+.rv-verif svg{ width:12px; height:12px; }
+
+/* ─── PAGINA "CHI SIAMO" ─────────────────────────────────────────────── */
+.ab{ max-width:1120px; margin:0 auto; padding:0 20px 40px; }
+.ab-hero{ text-align:center; padding:52px 0 8px; }
+.ab-kicker{
+  font-size:.76rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase;
+  color:var(--orange); margin:0 0 12px;
+}
+.ab-hero h1{
+  font-size:clamp(1.9rem,5vw,3.1rem); font-weight:800; color:var(--ink);
+  line-height:1.12; margin:0;
+}
+.ab-lead{
+  max-width:680px; margin:16px auto 0; color:var(--ink-soft);
+  font-size:1.02rem; line-height:1.68;
+}
+.ab-cols{
+  display:grid; gap:18px; margin:34px 0;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+}
+.ab-cols article{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:16px; padding:22px;
+}
+.ab-cols h2{
+  font-size:1.06rem; font-weight:800; color:var(--ink); margin:0 0 9px;
+}
+.ab-cols p{ margin:0; color:var(--ink-soft); font-size:.93rem; line-height:1.66; }
+.ab-nap{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:16px; padding:24px; margin-top:34px; text-align:center;
+}
+.ab-nap h2{ font-size:1.05rem; font-weight:800; color:var(--ink); margin:0 0 10px; }
+.ab-nap p{ margin:0 0 8px; color:var(--ink-soft); font-size:.93rem; line-height:1.7; }
+.ab-nap a{ color:var(--link); font-weight:700; }
+.ab-links{ margin-top:14px !important; }
+
+/* ─── la scheda recensione: iniziale, espansione, verifica ───────────── */
+.rv-avatar{
+  width:26px; height:26px; flex:none; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--orange); color:#fff;
+  font-size:.8rem; font-weight:800; line-height:1;
+  margin-right:2px;
+}
+.rv-card-top{ gap:8px; justify-content:flex-start; }
+.rv-card-top .rv-src{ margin-left:auto; }
+.rv-fade{ color:var(--ink-soft); }
+.rv-piu{
+  display:inline-flex; align-items:center; gap:5px; margin-top:10px;
+  background:none; border:0; padding:0; cursor:pointer;
+  font:inherit; font-size:.79rem; font-weight:800; color:var(--link);
+}
+.rv-piu:hover{ text-decoration:underline; }
+.rv-piu svg{ width:13px; height:13px; }
+/* la scheda aperta si stacca dalle altre, cosi' si capisce cosa e'
+   cambiato senza dover rileggere */
+.rv-card.aperta{ border-color:var(--orange); }
