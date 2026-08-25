@@ -1021,3 +1021,19 @@ a.ps-in:hover .ps-testo b{ color:var(--orange); }
 }
 .pr-caldo b{ font-weight:800; }
 html[data-theme="dark"] .pr-caldo{ background:#3A2005; color:#FFA65C; }
+
+/* la riga dei fatti sopra il calendario */
+.ur{
+  display:flex; flex-direction:column; gap:7px;
+  margin:0 0 12px; padding:12px 14px; border-radius:12px;
+  background:#FFF4EC; border:1px solid #FFD9BC;
+}
+.ur span{
+  display:flex; align-items:center; gap:9px;
+  font-size:.85rem; font-weight:600; color:#8A4A08; line-height:1.35;
+}
+.ur b{ font-weight:800; color:#B34A02; }
+.ur i{ font-style:normal; font-size:.95rem; }
+html[data-theme="dark"] .ur{ background:#2E1A06; border-color:#4A2C0C; }
+html[data-theme="dark"] .ur span{ color:#FFC79E; }
+html[data-theme="dark"] .ur b{ color:#FFA65C; }

@@ -93,12 +93,18 @@ export async function ultimePrenotazioni(quante = 25): Promise<AvvisoRiga[]> {
   return (data ?? []) as AvvisoRiga[];
 }
 
-export type Conteggio = { ultimi_7: number; ultimi_30: number; persone_7: number };
+export type Conteggio = {
+  oggi: number;
+  ieri: number;
+  ultimi_7: number;
+  ultimi_30: number;
+  persone_7: number;
+};
 
 export async function prenotazioniDi(slug: string): Promise<Conteggio | null> {
   const { data } = await supabase
     .from('prenotazioni_conteggio')
-    .select('ultimi_7,ultimi_30,persone_7')
+    .select('oggi,ieri,ultimi_7,ultimi_30,persone_7')
     .eq('tour_slug', slug)
     .maybeSingle();
   return (data as Conteggio) ?? null;

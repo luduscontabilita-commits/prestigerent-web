@@ -17,6 +17,7 @@ import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_
 import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
 import { prenotazioniDi } from '@/lib/riprova';
+import { Urgenza } from '@/components/Urgenza';
 import '@/styles/home.css';
 
 const SITE = SITE_URL;
@@ -202,6 +203,10 @@ export default async function TourPage({
         <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h</span>
         <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
       </div>
+      {/* L'ultimo centimetro prima della decisione: quante prenotazioni
+          oggi, quante questa settimana, quanti posti per partenza. Tutto
+          da Regiondo, niente inventato. */}
+      <Urgenza conta={quante} posti={tour.kind === 'small_group' ? 25 : null} />
       {tour.regiondo_sku && (
         <RegiondoWidget sku={tour.regiondo_sku} title={product?.name || nome} locale={locale} />
       )}
