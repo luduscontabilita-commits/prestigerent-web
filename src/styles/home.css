@@ -38,26 +38,55 @@
 .hm-badges i{ font-style:normal; }
 
 /* ---------- il modulo di ricerca: l'elemento che converte di piu' ---------- */
+/* IL MODULO DI RICERCA: tre campi grandi e un pulsante che si vede.
+   Le etichette stanno SOPRA, non dentro come segnaposto: un segnaposto
+   sparisce appena si compila, e chi torna sul modulo non sa piu' cosa
+   aveva scelto. */
 .hm-search{
-  position:relative; z-index:2; max-width:1120px; margin:22px auto -34px;
-  background:var(--card); border-radius:16px; box-shadow:0 12px 40px rgba(15,23,42,.18);
-  display:grid; grid-template-columns:1.4fr 1fr 1fr auto; gap:0; overflow:hidden;
+  display:grid; gap:10px; align-items:end;
+  grid-template-columns:1.3fr 1.2fr .9fr auto;
+  background:var(--card); border-radius:18px; padding:12px;
+  box-shadow:0 16px 42px rgba(10,18,26,.22);
+  max-width:1000px;
 }
-.hm-f{ padding:14px 18px; border-inline-end:1px solid var(--line); min-width:0; }
-.hm-f:last-of-type{ border-inline-end:0; }
+.hm-f{
+  display:flex; flex-direction:column; gap:5px;
+  padding:10px 14px; border-radius:12px; background:var(--ph);
+  min-width:0;
+}
 .hm-f label{
-  display:block; font-size:.66rem; font-weight:800; letter-spacing:.13em;
-  text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px;
+  font-size:.66rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
+  color:var(--ink-soft);
 }
-.hm-f select, .hm-f input{
-  width:100%; border:0; outline:0; background:transparent; font:inherit;
-  font-size:.98rem; font-weight:700; color:var(--ink); padding:0;
+.hm-f select{
+  border:0; background:none; padding:0; width:100%;
+  font:inherit; font-size:1rem; font-weight:700; color:var(--ink);
+  cursor:pointer; appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 9px) calc(50% + 2px), calc(100% - 4px) calc(50% + 2px);
+  background-size:5px 5px,5px 5px; background-repeat:no-repeat;
+  padding-right:20px; text-overflow:ellipsis;
 }
+.hm-f select:focus{ outline:2px solid var(--orange); outline-offset:4px; border-radius:4px; }
 .hm-go{
-  border:0; cursor:pointer; background:var(--orange); color:#fff;
-  font:inherit; font-size:.92rem; font-weight:800; letter-spacing:.06em;
-  text-transform:uppercase; padding:0 30px;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:0 30px; height:100%; min-height:64px;
+  border:0; border-radius:12px; cursor:pointer;
+  background:var(--orange); color:#fff;
+  font:inherit; font-size:1rem; font-weight:800; white-space:nowrap;
+  transition:background .15s, transform .1s;
 }
+.hm-go:hover{ background:var(--orange-d); }
+.hm-go:active{ transform:scale(.985); }
+.hm-go svg{ width:18px; height:18px; }
+@media (max-width:900px){
+  .hm-search{ grid-template-columns:1fr 1fr; }
+  .hm-go{ grid-column:1 / -1; min-height:54px; }
+}
+@media (max-width:520px){
+  .hm-search{ grid-template-columns:1fr; padding:10px; }
+}
+
 .hm-go:hover{ background:var(--orange-d); }
 @media (max-width:860px){
   .hm-search{ grid-template-columns:1fr 1fr; margin-bottom:-20px; }

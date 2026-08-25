@@ -32,7 +32,7 @@ export function HomeTours({
   tours: SchedaTour[];
   partenze: Partenza[];
 }) {
-  const [filtro, setFiltro] = useState<{ da: string; persone: number } | null>(null);
+  const [filtro, setFiltro] = useState<{ da: string; persone: number; tipo?: string } | null>(null);
   const [categoria, setCategoria] = useState<string>('');
   /* La destinazione arriva dal menu (/?place=siena) e si legge una volta
      sola, al montaggio: e' un filtro che si imposta arrivando, non
@@ -53,7 +53,8 @@ export function HomeTours({
 
   const visibili = useMemo(() => {
     return tours.filter((t) => {
-      if (categoria && t.kind !== categoria) return false;
+      const cat = filtro?.tipo || categoria;
+      if (cat && t.kind !== cat) return false;
       /* La destinazione si cerca NEL NOME del tour, che e' l'unico posto
          dove i luoghi sono scritti in modo affidabile. "siena" trova
          "Siena & San Gimignano" e "Siena and Chianti"; i trattini del
