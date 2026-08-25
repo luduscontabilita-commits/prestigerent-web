@@ -52,6 +52,11 @@ function maxOspiti(kind: string): number | null {
    Florence", "Tuscany small group", "Chianti wine tour" -- non alla parola
    "Home", che e' quello che c'e' scritto oggi su WordPress e che non cerca
    nessuno. */
+/* Le bandiere stanno qui e non in `locales.ts`: quel file descrive come
+   funzionano le lingue (prefisso, direzione del testo, codice Regiondo),
+   non come si disegnano. */
+const BANDIERA: Record<string, string> = { en: '🇬🇧', de: '🇩🇪', it: '🇮🇹' };
+
 export async function generateMetadata(): Promise<Metadata> {
   const m = await metaDi('/', 'en');
   return {
@@ -302,14 +307,26 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
       <ContactSection />
 
-      <section className="pr-sec tight" style={{ textAlign: 'center' }}>
-        <p className="pr-lead" style={{ fontSize: '.85rem' }}>
+      {/* Le lingue in fondo alla pagina.
+          Non e' un doppione del selettore in alto: quello lo cerca chi sa
+          gia' di volerlo, questo lo trova chi arriva in fondo e non ha
+          capito. La bandiera si riconosce prima della parola, e chi
+          cerca la propria lingua guarda proprio quella. */}
+      <section className="lng">
+        <p className="lng-t">Also available in</p>
+        <div className="lng-in">
           {LOCALES.map((l) => (
-            <span key={l.code} style={{ marginInlineEnd: 12 }}>
-              <a href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>{l.label}</a>
-            </span>
+            <a
+              key={l.code}
+              href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}
+              hrefLang={l.htmlLang}
+              className={l.code === locale ? 'is-on' : undefined}
+            >
+              <span aria-hidden="true">{BANDIERA[l.code] ?? '🌐'}</span>
+              {l.label}
+            </a>
           ))}
-        </p>
+        </div>
       </section>
     </main>
   );
