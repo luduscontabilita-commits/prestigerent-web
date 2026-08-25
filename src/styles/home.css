@@ -303,17 +303,21 @@
 }
 .hd-in{
   max-width:1280px; margin:0 auto; padding:0 18px;
-  display:flex; align-items:center; gap:18px; min-height:64px;
+  display:flex; align-items:center; gap:14px; min-height:64px;
+  /* Senza questo la barra si allarga oltre lo schermo invece di
+     comprimersi, e WhatsApp finisce fuori a destra: un elemento flex non
+     scende sotto la sua larghezza naturale se non glielo si dice. */
+  min-width:0;
 }
 
 .hd-logo{ display:flex; align-items:center; gap:10px; text-decoration:none; flex:none; }
 .hd-logo img{ width:40px; height:40px; border-radius:50%; }
 .hd-logo strong{ display:block; font-size:1rem; font-weight:800; color:var(--ink); line-height:1.15; }
-.hd-logo small{ display:block; font-size:.7rem; font-weight:600; color:var(--ink-soft); }
+.hd-logo small{ display:block; font-size:.68rem; font-weight:600; color:var(--ink-soft); white-space:nowrap; }
 
 /* ─── la barra delle voci ─────────────────────────────────────────────
    Le voci sono le stesse del sito WordPress: quelle che Google conosce. */
-.hd-nav{ display:flex; align-items:center; gap:2px; margin-left:8px; flex:1 1 auto; }
+.hd-nav{ display:flex; align-items:center; gap:0; margin-left:4px; flex:1 1 auto; min-width:0; }
 /* position:static, NON relative: cosi' il pannello si posiziona rispetto
    alla barra intera e non rispetto alla singola voce. Con `relative` il
    pannello largo 880px partiva dal centro della voce e sbordava a
@@ -321,8 +325,8 @@
 .hd-item{ position:static; display:flex; align-items:center; }
 .hd-top{
   display:inline-flex; align-items:center; gap:4px;
-  padding:20px 10px; text-decoration:none; white-space:nowrap;
-  font-size:.88rem; font-weight:700; color:var(--ink);
+  padding:20px 8px; text-decoration:none; white-space:nowrap;
+  font-size:.85rem; font-weight:700; color:var(--ink);
   border-bottom:3px solid transparent; margin-bottom:-1px;
   transition:color .14s, border-color .14s;
 }
@@ -421,7 +425,7 @@
 .hd-aiuto b{ color:var(--ink); }
 
 /* ─── destra: richiesta, tema, lingue, WhatsApp ───────────────────── */
-.hd-right{ display:flex; align-items:center; gap:8px; flex:none; margin-left:auto; }
+.hd-right{ display:flex; align-items:center; gap:7px; flex:none; margin-left:auto; }
 .hd-quick{
   padding:9px 14px; border-radius:10px; text-decoration:none;
   font-size:.82rem; font-weight:800; white-space:nowrap;
@@ -467,7 +471,21 @@
 /* voci che compaiono solo nel pannello del telefono */
 .hd-solo-mob{ display:none !important; }
 
-@media (max-width:1100px){
+/* Fra 1280 e 1440 le voci ci stanno ma appena appena: si tolgono prima
+   il sottotitolo del logo e poi la parola "English", che si capisce lo
+   stesso dal mappamondo. E' meglio togliere due dettagli che far
+   scomparire WhatsApp fuori dallo schermo. */
+@media (max-width:1440px){
+  .hd-logo small{ display:none; }
+  .hd-lang > button span.lg{ display:none; }
+}
+@media (max-width:1340px){
+  .hd-quick{ padding:9px 11px; font-size:.78rem; }
+  .hd-wa span{ display:none; }
+  .hd-wa{ padding:9px 11px; }
+}
+
+@media (max-width:1280px){
   /* IL PANNELLO DEL TELEFONO E' LO STESSO MENU, non una copia.
      Il <nav> esce dal flusso, diventa una colonna sotto la barra, e i
      pannelli delle sezioni si aprono in linea invece che sospesi. */
