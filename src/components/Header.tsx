@@ -171,6 +171,18 @@ export function Header({
                     <a className="hd-tutto" href={p(s.href)}>
                       See all {s.testo.toLowerCase()} &rarr;
                     </a>
+                    {/* Chi apre il menu e non trova quello che cerca
+                        altrimenti chiude la scheda. Qui ha un'alternativa
+                        che costa un messaggio. */}
+                    <a
+                      className="hd-aiuto"
+                      href="https://wa.me/393338424047"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      Not sure which one? <b>Ask us on WhatsApp</b> &mdash; we answer
+                      ourselves, not a call centre.
+                    </a>
                   </div>
                 </div>
               </div>
