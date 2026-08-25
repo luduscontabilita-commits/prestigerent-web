@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
-import { CATEGORIE, categoriaDi, figlieDi, type Categoria } from '@/lib/categorie';
+import { CATEGORIE, categoriaDi, figlieDi } from '@/lib/categorie';
 import { votiPerTour } from '@/lib/recensioni';
 import { prezzoDi } from '@/lib/prezzi';
 import { testo } from '@/lib/prosa';
@@ -55,13 +55,6 @@ export async function generateMetadata({
 
 type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
 
-function combacia(c: Categoria, slug: string, nome: string) {
-  if (c.kind && !slug) return false;
-  if (!c.parole?.length) return true;
-  const dove = (slug + ' ' + nome).toLowerCase();
-  return c.parole.some((p) => dove.includes(p.toLowerCase()));
-}
-
 export default async function Categoria_({
   params,
 }: {
@@ -75,7 +68,10 @@ export default async function Categoria_({
 
   const p = (x: string) => (locale === DEFAULT_LOCALE ? x : `/${locale}${x}`);
 
-  const [{ data }, voti] = await Promise.all([
+  /* Chi sta in questa categoria lo dice WooCommerce, non un elenco di
+     parole: `contains` sull'array delle categorie del tour. */
+  const [{ data: appartiene }, { data }, voti] = await Promise.all([
+    supabase.from('tour_categorie').select('tour_slug').contains('categorie', [cat.cat]),
     supabase
       .from('tours')
       .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, blocks)')
@@ -83,14 +79,9 @@ export default async function Categoria_({
     votiPerTour(),
   ]);
 
+  const dentro = new Set((appartiene ?? []).map((x) => x.tour_slug));
   const righe = (data ?? []) as unknown as Riga[];
-
-  const scelti = righe.filter((r) => {
-    if (cat.kind && r.kind !== cat.kind) return false;
-    const c = r.tour_content?.find((x) => x.locale === locale) ?? r.tour_content?.[0];
-    const nome = testo(String((c?.blocks as { name?: string })?.name ?? ''));
-    return combacia(cat, r.slug, nome);
-  });
+  const scelti = righe.filter((r) => dentro.has(r.slug));
 
   /* I prezzi tutti insieme, non uno dopo l'altro: in fila sarebbero
      decine di attese sommate su una pagina sola. */
