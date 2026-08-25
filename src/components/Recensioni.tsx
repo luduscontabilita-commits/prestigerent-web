@@ -35,6 +35,24 @@ import type { Fonte, Recensione } from '@/lib/recensioni';
 
 const STELLE = (n: number) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
 
+/* QUALI PUNTEGGI SI POSSONO CLICCARE.
+ *
+ * Sembra un dettaglio ed e' una decisione commerciale. Su Viator e
+ * GetYourGuide la pagina delle recensioni E' la pagina di vendita: un
+ * riquadro cliccabile prende un cliente gia' convinto, gia' sul nostro
+ * sito, e lo consegna all'intermediario che si trattiene il 25-30%.
+ * Sarebbe pagare una commissione per una prenotazione che avevamo in mano.
+ *
+ * Il numero pero' serve, e serve proprio perche' viene da loro. Quindi si
+ * mostra e non si linka: chi vuole controllare cerca il nome del tour su
+ * Viator in dieci secondi -- ma lo fa dopo, non con un clic partito da qui.
+ *
+ * Google e Tripadvisor si linkano: sono pagine di recensioni, non carrelli.
+ * (Tripadvisor un pulsante "prenota" ce l'ha, ma la pagina resta una
+ * pagina di recensioni e il link e' quello che rende il 4,9 verificabile.)
+ */
+const SI_LINKA = new Set(['google', 'tripadvisor']);
+
 const MESI = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 function quando(d: string | null) {
@@ -76,12 +94,14 @@ export function Recensioni({
                 <b>{f.voto_medio?.toFixed(1)}</b>
                 <span className="rv-stars" aria-hidden="true">{STELLE(Math.round(f.voto_medio!))}</span>
                 <small>
-                  {f.quante?.toLocaleString('en-US')} reviews on {f.etichetta}
+                  {f.quante?.toLocaleString('en-US')}{' '}
+                  {f.suQuestoTour ? 'reviews of this tour on ' : 'reviews on '}
+                  {f.etichetta}
                   {f.distintivo && <><br />{f.distintivo}</>}
                 </small>
               </>
             );
-            return f.url ? (
+            return f.url && SI_LINKA.has(f.fonte) ? (
               <a className="rv-score" key={f.fonte} href={f.url} target="_blank" rel="noopener nofollow">
                 {dentro}
               </a>

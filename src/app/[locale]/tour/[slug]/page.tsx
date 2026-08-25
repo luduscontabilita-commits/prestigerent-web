@@ -10,7 +10,7 @@ import { Videos, type Video } from '@/components/Videos';
 import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
-import { fonti, recensioniDi } from '@/lib/recensioni';
+import { fonti, punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
@@ -122,6 +122,8 @@ export default async function TourPage({
     fonti(),
     recensioniDi(slug),
   ]);
+  /* Dipende da leFonti, quindi non puo' stare nel Promise.all sopra. */
+  const iPunteggi = await punteggiDi(slug, leFonti);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
@@ -245,7 +247,7 @@ export default async function TourPage({
           un dubbio lo risolve qui, un attimo prima di scegliere la
           data. Metterle in fondo vuol dire mostrarle a chi ha gia'
           deciso, cioe' a chi non ne aveva bisogno. */}
-      <Recensioni fonti={leFonti} recensioni={leRecensioni} />
+      <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
 
       {punti.length > 0 && (
         <section className="pr-sec tight" id="highlights">

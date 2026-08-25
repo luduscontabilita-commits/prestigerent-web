@@ -7,6 +7,8 @@ export type Fonte = {
   quante: number | null;
   url: string | null;
   distintivo: string | null;
+  /* vero quando il numero e' di QUESTO tour, non dell'azienda */
+  suQuestoTour?: boolean;
 };
 
 export type Recensione = {
@@ -31,6 +33,50 @@ export async function fonti(): Promise<Fonte[]> {
     .select('fonte,etichetta,voto_medio,quante,url,distintivo')
     .order('ordine');
   return (data ?? []).filter((f) => f.voto_medio != null && f.quante != null) as Fonte[];
+}
+
+/* I punteggi della singola pagina tour.
+ *
+ * Viator e GetYourGuide non hanno un voto d'azienda: valutano il PRODOTTO.
+ * Tripadvisor li ha entrambi. Quindi qui il voto del prodotto VINCE su
+ * quello dell'azienda per la stessa piattaforma -- mostrare due riquadri
+ * Tripadvisor con numeri diversi (4,9 su 1.794 di questo tour, 4,9 su 7.139
+ * dell'azienda) e' solo confusione. Le piattaforme che per questo tour non
+ * hanno un voto proprio restano con quello d'azienda, che e' comunque vero.
+ */
+export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte[]> {
+  const { data } = await supabase
+    .from('valutazioni_tour')
+    .select('fonte,voto,quante,url,distintivo')
+    .eq('tour_slug', slug);
+
+  const perTour = (data ?? []).filter((v) => v.voto != null && v.quante != null);
+  if (!perTour.length) return dAzienda;
+
+  const etichette = new Map(dAzienda.map((f) => [f.fonte, f.etichetta]));
+  const NOMI: Record<string, string> = {
+    tripadvisor: 'Tripadvisor',
+    google: 'Google',
+    viator: 'Viator',
+    getyourguide: 'GetYourGuide',
+  };
+
+  const suQuestoTour: Fonte[] = perTour.map((v) => ({
+    fonte: v.fonte,
+    etichetta: etichette.get(v.fonte) ?? NOMI[v.fonte] ?? v.fonte,
+    voto_medio: v.voto,
+    quante: v.quante,
+    url: v.url,
+    distintivo: v.distintivo,
+    /* la dicitura cambia: non e' "recensioni sull'azienda", e' "su questo
+       tour". Dirlo e' anche piu' onesto, e converte di piu': un numero
+       riferito a QUESTA giornata pesa piu' di uno riferito a tutta la
+       ditta. */
+    suQuestoTour: true,
+  }));
+
+  const coperte = new Set(suQuestoTour.map((f) => f.fonte));
+  return [...suQuestoTour, ...dAzienda.filter((f) => !coperte.has(f.fonte))];
 }
 
 /* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
