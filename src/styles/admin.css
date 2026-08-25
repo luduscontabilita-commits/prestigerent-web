@@ -64,3 +64,55 @@ a.ad-card:hover{ border-color:#ED6707; }
 .ad-tag{ margin-top:7px; display:flex; gap:5px; flex-wrap:wrap; }
 .ad-tag em{ font-style:normal; font-size:.67rem; font-weight:800; padding:2px 7px; border-radius:5px; background:#FBE3E0; color:#C0392B; }
 .ad-vuoto{ font-size:.8rem; color:#98A4AF; font-style:italic; }
+
+/* ─── le foto dei tour ────────────────────────────────────────────────
+   Qui il contenuto SONO le immagini: la griglia deve mostrarle grandi
+   abbastanza da riconoscerle a colpo d'occhio, perche' il lavoro e'
+   "questa non e' la copertina giusta", non "questa riga e' sbagliata". */
+.ad-col-ant{ width:120px; }
+.ad-ant{ display:block; width:96px; height:64px; object-fit:cover; border-radius:8px; background:#E2E8EE; }
+.ad-ant-vuota{ border:1px dashed #C6D0D9; background:#F4F6F8; }
+.ad-col-n{ width:70px; text-align:right; }
+.ad-riga-tour{ display:block; text-decoration:none; color:inherit; }
+.ad-riga-tour strong{ display:block; font-size:.92rem; line-height:1.3; }
+.ad-riga-tour code{ display:block; margin-top:3px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.72rem; color:#6B7885; word-break:break-all; }
+.ad-riga-tour:hover strong{ color:#ED6707; }
+.ad-tag-neutro em{ background:#EEF2F5; color:#6B7885; }
+.ad-tag-neutro em.ad-tag-ko{ background:#FBE3E0; color:#C0392B; }
+
+.ad-avviso{ margin:0 0 16px; padding:12px 15px; background:#FFF6EE; border:1px solid #F5D5B8; border-radius:11px; font-size:.86rem; line-height:1.55; color:#6B4A2C; }
+.ad-avviso b{ color:#16202A; }
+
+.ad-foto-barra{ position:sticky; top:0; z-index:5; padding:10px 0; margin-bottom:10px; background:#F4F6F8; }
+.ad-quante-sx{ margin-left:0; margin-right:auto; }
+.ad-salva{ background:#ED6707 !important; border-color:#ED6707 !important; color:#fff !important; padding:10px 22px !important; }
+.ad-salva:disabled{ opacity:.45; cursor:default; }
+.ad-esito-ok{ margin:0 0 14px; font-size:.86rem; font-weight:700; color:#1E8E5A; }
+.ad-esito-ko{ margin:0 0 14px; font-size:.86rem; font-weight:700; color:#C0392B; }
+
+.ad-foto-griglia{ display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); }
+.ad-foto-griglia.ad-piccola{ grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
+.ad-foto{ margin:0; background:#fff; border:1px solid #E2E8EE; border-radius:12px; overflow:hidden; }
+/* Il riquadro trascinato deve stare SOPRA gli altri mentre si muove:
+   senza questo scivola dietro alle foto vicine e sembra sparito. */
+.ad-trascino{ position:relative; z-index:20; box-shadow:0 14px 34px rgba(0,0,0,.25); opacity:.9; }
+.ad-copertina{ border-color:#ED6707; box-shadow:0 0 0 2px rgba(237,103,7,.22); }
+
+.ad-presa{ position:relative; display:block; cursor:grab; touch-action:none; }
+.ad-presa:active{ cursor:grabbing; }
+.ad-presa img{ display:block; width:100%; aspect-ratio:3/2; object-fit:cover; background:#E2E8EE; pointer-events:none; }
+.ad-pos{ position:absolute; top:7px; left:7px; min-width:22px; padding:2px 6px; border-radius:6px; background:rgba(22,32,42,.82); color:#fff; font-size:.7rem; font-weight:800; text-align:center; font-variant-numeric:tabular-nums; }
+.ad-bollo{ position:absolute; bottom:7px; left:7px; padding:4px 9px; border-radius:6px; background:#ED6707; color:#fff; font-size:.66rem; font-weight:800; letter-spacing:.1em; }
+
+.ad-foto figcaption{ padding:9px 10px 10px; }
+.ad-dida{ margin-bottom:7px; font-size:.75rem; color:#6B7885; line-height:1.35; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.ad-foto-azioni{ display:flex; gap:6px; flex-wrap:wrap; }
+.ad-foto-azioni button{ flex:1 1 auto; padding:6px 9px; border:1px solid #D6DDE4; border-radius:8px; background:#fff; font:inherit; font-size:.73rem; font-weight:700; color:#16202A; cursor:pointer; }
+.ad-foto-azioni button:hover{ border-color:#16202A; }
+.ad-foto-azioni .ad-togli:hover{ border-color:#C0392B; color:#C0392B; }
+
+.ad-foto-fuori{ margin-top:34px; padding-top:22px; border-top:1px solid #E2E8EE; }
+.ad-foto-fuori h2{ font-size:1rem; margin:0 0 5px; }
+.ad-foto-fuori > p{ margin:0 0 14px; font-size:.82rem; color:#6B7885; line-height:1.55; }
+.ad-foto-fuori .ad-foto{ opacity:.6; }
+.ad-foto-fuori .ad-foto:hover{ opacity:1; }

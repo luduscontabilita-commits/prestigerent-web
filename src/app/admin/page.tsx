@@ -9,6 +9,7 @@ export default async function Pannello() {
 
   const voci = [
     { href: '/admin/seo/', titolo: 'Title e description', testo: 'I testi che compaiono su Google, pagina per pagina. 123 pagine.' },
+    { href: '/admin/foto/', titolo: 'Foto dei tour', testo: 'L’ordine delle foto. La prima e’ la copertina: elenco della home e anteprime social.' },
   ];
 
   return (
@@ -29,7 +30,7 @@ export default async function Pannello() {
         ))}
         <div className="ad-card ad-prossimo">
           <strong>In arrivo</strong>
-          <span>Foto e video dei tour · Numeri delle recensioni · Caricamenti delle guide</span>
+          <span>Video dei tour · Numeri delle recensioni · Caricamenti delle guide</span>
         </div>
       </div>
     </main>

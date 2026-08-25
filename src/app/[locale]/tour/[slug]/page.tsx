@@ -16,7 +16,7 @@ import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
-import { prenotazioniDi } from '@/lib/riprova';
+import { prenotazioniDi, disponibilitaDi } from '@/lib/riprova';
 import { Urgenza } from '@/components/Urgenza';
 import '@/styles/home.css';
 
@@ -134,7 +134,7 @@ export default async function TourPage({
   ]);
   /* Dipende da leFonti, quindi non puo' stare nel Promise.all sopra. */
   const iPunteggi = await punteggiDi(slug, leFonti);
-  const quante = await prenotazioniDi(slug);
+  const [quante, laDisp] = await Promise.all([prenotazioniDi(slug), disponibilitaDi(slug)]);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
@@ -206,7 +206,11 @@ export default async function TourPage({
       {/* L'ultimo centimetro prima della decisione: quante prenotazioni
           oggi, quante questa settimana, quanti posti per partenza. Tutto
           da Regiondo, niente inventato. */}
-      <Urgenza conta={quante} posti={tour.kind === 'small_group' ? 25 : null} />
+      <Urgenza
+        conta={quante}
+        disp={laDisp}
+        posti={tour.kind === 'small_group' ? 25 : null}
+      />
       {tour.regiondo_sku && (
         <RegiondoWidget sku={tour.regiondo_sku} title={product?.name || nome} locale={locale} />
       )}

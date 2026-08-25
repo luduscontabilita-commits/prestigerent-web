@@ -110,22 +110,13 @@ export default async function LocaleLayout({
         <Header locale={locale} voti={voti} foto={foto} nomi={nomi} />
         {children}
         <Footer locale={locale} />
-        {/* I riquadri delle prenotazioni vere. Il prefisso della lingua
-            serve perche' il link deve restare nella lingua che si sta
-            leggendo. */}
-        <ProvaSociale
-          avvisi={avvisi.map((a) => ({
-            nome: a.nome,
-            iniziale: a.iniziale,
-            paese: a.paese,
-            prodotto: a.prodotto,
-            persone: a.persone,
-            quando: a.quando,
-            href: a.tour_slug
-              ? (locale === 'en' ? '' : `/${locale}`) + `/tour/${a.tour_slug}/`
-              : null,
-          }))}
-        />
+        {/* I riquadri delle prenotazioni vere. Le righe passano cosi' come
+            sono e il link se lo costruisce il componente: ogni minuto ne
+            rilegge di nuove da /api/prenotazioni, e se il collegamento si
+            componesse qui quelle nuove resterebbero senza. La lingua serve
+            proprio a quello -- il link deve restare nella lingua che si
+            sta leggendo. */}
+        <ProvaSociale avvisi={avvisi} locale={locale} />
         <NoindexBadge />
       </body>
     </html>

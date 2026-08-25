@@ -1,4 +1,4 @@
-import type { Conteggio } from '@/lib/riprova';
+import type { Conteggio, Disponibilita } from '@/lib/riprova';
 
 /* LA RIGA SOPRA IL CALENDARIO.
  *
@@ -17,12 +17,28 @@ import type { Conteggio } from '@/lib/riprova';
  * prende nessuno". In quel caso si mostra il dato settimanale, che e'
  * piu' grande, o niente.
  */
-export function Urgenza({ conta, posti }: { conta: Conteggio | null; posti?: number | null }) {
-  if (!conta) return null;
+const GIORNI = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MESI = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function quandoParte(iso: string) {
+  const d = new Date(iso + 'T12:00:00');
+  return `${GIORNI[d.getDay()]} ${d.getDate()} ${MESI[d.getMonth()]}`;
+}
+
+export function Urgenza({
+  conta,
+  posti,
+  disp,
+}: {
+  conta: Conteggio | null;
+  posti?: number | null;
+  disp?: Disponibilita | null;
+}) {
+  if (!conta && !disp) return null;
 
   const righe: { icona: string; testo: React.ReactNode }[] = [];
 
-  if (conta.oggi >= 3) {
+  if (conta && conta.oggi >= 3) {
     righe.push({
       icona: '🔥',
       testo: (
@@ -32,16 +48,57 @@ export function Urgenza({ conta, posti }: { conta: Conteggio | null; posti?: num
         </>
       ),
     });
-  } else if (conta.ultimi_7 >= 10) {
+  } else if (conta && conta.ultimi_7 >= 10) {
     righe.push({ icona: '🔥', testo: <><b>{conta.ultimi_7}</b> booked in the last 7 days</> });
   }
 
-  if (conta.persone_7 >= 20) {
+  if (conta && conta.persone_7 >= 20) {
     righe.push({ icona: '👥', testo: <><b>{conta.persone_7}</b> guests joined this week</> });
   }
 
+  /* LA SCARSITA' VERA, e solo dove esiste davvero.
+     Un transfer ha capienza illimitata: scrivere "posti rimasti" li'
+     sarebbe una bugia, e infatti `posti_prima` e' nullo. Sotto i 12
+     posti si dice il numero; sopra si dice solo la data, perche' "27
+     posti rimasti" non mette fretta a nessuno. */
+  if (disp?.prima_libera) {
+    const pochi = disp.posti_prima != null && disp.posti_prima <= 12;
+    righe.push({
+      icona: pochi ? '⚠️' : '📅',
+      testo: (
+        <>
+          Next departure <b>{quandoParte(disp.prima_libera)}</b>
+          {pochi ? <> — only <b>{disp.posti_prima}</b> seats left</> : null}
+        </>
+      ),
+    });
+  }
+
+  if (disp && disp.esaurite_30gg > 0) {
+    righe.push({
+      icona: '🚫',
+      testo: (
+        <>
+          <b>{disp.esaurite_30gg}</b> of the next {disp.date_totali_30gg} dates are
+          already full
+        </>
+      ),
+    });
+  } else if (disp && disp.date_totali_30gg > 0 && disp.date_totali_30gg < 25) {
+    /* Non parte tutti i giorni: e' scarsita' anche questa, e nessuno la
+       dice mai. 18 date su 30 significa che dodici giorni non si va. */
+    righe.push({
+      icona: '📆',
+      testo: (
+        <>
+          Runs on <b>{disp.date_totali_30gg}</b> dates in the next 30 days
+        </>
+      ),
+    });
+  }
+
   if (posti) {
-    righe.push({ icona: '🚐', testo: <>Only <b>{posti}</b> seats per departure</> });
+    righe.push({ icona: '🚐', testo: <>Never more than <b>{posti}</b> guests</> });
   }
 
   if (!righe.length) return null;

@@ -996,10 +996,21 @@ a.ps-in:hover .ps-testo b{ color:var(--orange); }
 }
 .ps-testo{ font-size:.84rem; line-height:1.42; color:var(--ink-soft); }
 .ps-testo b{ color:var(--ink); font-weight:800; transition:color .15s; }
+/* La riga di sotto porta tre cose separate da un punto: quando, per
+   quante persone, e da dove viene il dato. Va lasciata libera di andare a
+   capo -- con un nome di tour lungo e "for 12 guests" dentro un riquadro
+   da 390px una riga sola non basta, e troncare proprio la parte che deve
+   rassicurare sarebbe il modo peggiore di risparmiare spazio. */
 .ps-testo em{
   display:block; margin-top:3px; font-style:normal;
   font-size:.72rem; font-weight:700; color:var(--ink-soft); opacity:.75;
+  line-height:1.5;
 }
+/* Il numero di persone e' l'unico dato concreto della riga: "for 4 guests"
+   e' una prenotazione con dentro qualcuno, "verified booking" e'
+   un'etichetta. Sta un gradino sopra il resto, non allo stesso livello. */
+.ps-ospiti{ color:var(--ink); }
+.ps-fonte{ opacity:.75; }
 .ps-x{
   flex:none; align-self:flex-start; background:none; border:0; cursor:pointer;
   padding:8px 11px 8px 4px; font-size:1.1rem; line-height:1;
@@ -1046,4 +1057,3 @@ html[data-theme="dark"] .ur b{ color:#FFA65C; }
 }
 .ur-fonte svg{ width:11px; height:11px; }
 html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
-.ps-fonte{ opacity:.75; }

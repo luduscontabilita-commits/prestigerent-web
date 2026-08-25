@@ -84,10 +84,20 @@ export type AvvisoRiga = {
   tour_slug: string | null;
 };
 
+/* `riferimento` non si legge e non si espone: e' il codice con cui si apre
+ * una prenotazione vera, e questi dati finiscono in chiaro nel browser di
+ * chiunque passi. Per riconoscere una riga gia' mostrata basta nome+quando.
+ *
+ * Le righe senza nome o senza prodotto si scartano qui e non nel
+ * componente: senza uno dei due la frase diventa "booked ." -- un buco
+ * visibile, che e' peggio di un riquadro in meno. */
 export async function ultimePrenotazioni(quante = 25): Promise<AvvisoRiga[]> {
   const { data } = await supabase
     .from('prenotazioni_recenti')
     .select('nome,iniziale,paese,prodotto,persone,quando,tour_slug')
+    .not('nome', 'is', null)
+    .not('prodotto', 'is', null)
+    .not('quando', 'is', null)
     .order('quando', { ascending: false })
     .limit(quante);
   return (data ?? []) as AvvisoRiga[];
@@ -108,4 +118,38 @@ export async function prenotazioniDi(slug: string): Promise<Conteggio | null> {
     .eq('tour_slug', slug)
     .maybeSingle();
   return (data as Conteggio) ?? null;
+}
+
+export type ConteggioTour = Conteggio & { tour_slug: string };
+
+/* Tutti i conteggi in una lettura sola: la tabella ha una riga per tour
+ * (poche decine), quindi filtrare lato database per uno slug costerebbe
+ * quanto prenderli tutti ma renderebbe la risposta impossibile da mettere
+ * in cache una volta per tutti i visitatori. Serve alla rotta /api. */
+export async function tuttiIConteggi(): Promise<ConteggioTour[]> {
+  const { data } = await supabase
+    .from('prenotazioni_conteggio')
+    .select('tour_slug,oggi,ieri,ultimi_7,ultimi_30,persone_7');
+  return (data ?? []) as ConteggioTour[];
+}
+
+/* La disponibilita' vera, dal calendario Regiondo. E' la scarsita' che
+ * si puo' dichiarare senza inventare: quanti posti restano sulla prima
+ * partenza, quante date sono gia' piene, e in quanti giorni su trenta il
+ * tour parte davvero. */
+export type Disponibilita = {
+  esaurite_su_3: number;
+  prima_libera: string | null;
+  posti_prima: number | null;
+  esaurite_30gg: number;
+  date_totali_30gg: number;
+};
+
+export async function disponibilitaDi(slug: string): Promise<Disponibilita | null> {
+  const { data } = await supabase
+    .from('disponibilita')
+    .select('esaurite_su_3,prima_libera,posti_prima,esaurite_30gg,date_totali_30gg')
+    .eq('tour_slug', slug)
+    .maybeSingle();
+  return (data as Disponibilita) ?? null;
 }
