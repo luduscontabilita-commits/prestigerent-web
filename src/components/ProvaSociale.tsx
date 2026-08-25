@@ -153,7 +153,7 @@ export function ProvaSociale({ avvisi, locale }: { avvisi: Avviso[]; locale: Loc
         /* `no-store` riguarda solo la cache del browser: la richiesta esce
            comunque, ma si ferma sulla CDN, che serve la stessa risposta a
            tutti per un minuto. Il database non la vede. */
-        const r = await fetch('/api/prenotazioni', { cache: 'no-store' });
+        const r = await fetch('/api/prenotazioni/', { cache: 'no-store' });
         if (!r.ok) return;
         const j = (await r.json()) as { avvisi?: Avviso[] };
         if (Array.isArray(j.avvisi) && j.avvisi.length) {

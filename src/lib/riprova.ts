@@ -91,6 +91,17 @@ export type AvvisoRiga = {
  * Le righe senza nome o senza prodotto si scartano qui e non nel
  * componente: senza uno dei due la frase diventa "booked ." -- un buco
  * visibile, che e' peggio di un riquadro in meno. */
+/* Ripulisce i nomi come arrivano da Regiondo: "Dr.hartmut" e' quello che
+   il cliente ha scritto nel campo, titolo compreso e senza maiuscola.
+   Un riquadro scritto male sembra finto, e qui la credibilita' e' tutto. */
+export function nomePulito(n: string): string {
+  const senzaTitolo = n
+    .replace(/^(dr|mr|mrs|ms|miss|prof|sig|sig\.ra)\.?\s*/i, '')
+    .trim();
+  const buono = senzaTitolo || n.trim();
+  return buono.charAt(0).toUpperCase() + buono.slice(1);
+}
+
 export async function ultimePrenotazioni(quante = 25): Promise<AvvisoRiga[]> {
   const { data } = await supabase
     .from('prenotazioni_recenti')
@@ -100,7 +111,7 @@ export async function ultimePrenotazioni(quante = 25): Promise<AvvisoRiga[]> {
     .not('quando', 'is', null)
     .order('quando', { ascending: false })
     .limit(quante);
-  return (data ?? []) as AvvisoRiga[];
+  return ((data ?? []) as AvvisoRiga[]).map((r) => ({ ...r, nome: nomePulito(r.nome) }));
 }
 
 export type Conteggio = {
