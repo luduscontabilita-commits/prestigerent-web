@@ -1192,3 +1192,44 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 @media (max-width:620px){ .vt-item{ max-width:320px; margin-inline:auto; } }
 
 .vt-cap{ margin:9px 2px 0; font-size:.82rem; line-height:1.45; color:var(--ink-soft); }
+
+/* ---------- l'alternanza delle foto dell'hero (HeroFoto.tsx) ---------- */
+/* LE FOTO SONO IMPILATE, NON IN FILA.
+   Stanno tutte nello stesso posto, `inset:0` dentro `.hm-hero-bg` che e' gia'
+   assoluto e ritagliato: nessuna occupa spazio nel flusso, quindi montarne
+   altre cinque a pagina caricata non sposta di un pixel il titolo, la ricerca
+   o quello che c'e' sotto. E' l'unico modo di aggiungere immagini a una
+   pagina gia' disegnata senza pagarlo in CLS. */
+.hm-hero-bg .hm-hero-foto{
+  position:absolute; inset:0; z-index:1;
+  opacity:0; transition:opacity 1.4s ease-in-out;
+  /* si anima SOLO `opacity` e `transform`: sono le due cose che la scheda
+     grafica sa fare da sola, senza far ridisegnare la pagina. Un `filter` o
+     un `background-position` qui costerebbero un ridisegno a tutto schermo
+     sessanta volte al secondo, sopra un hero che occupa 720px. */
+  will-change:opacity;
+}
+.hm-hero-bg .hm-hero-foto.on{ opacity:1; }
+
+/* La velatura resta sopra a tutte, non solo sopra la prima: e' lei a tenere
+   leggibile il titolo bianco, e senza questa riga dipenderebbe dall'ordine in
+   cui capitano gli elementi nel documento. */
+.hm-hero-bg::after{ z-index:2; }
+
+/* IL MOVIMENTO CHE NON SI VEDE.
+   Sei per cento in venti secondi sono tre millesimi di scala al secondo: a
+   guardarla di proposito non si vede muovere, ma la foto smette di sembrare
+   un fondale incollato. Parte solo con `.viva`, cioe' a pagina caricata --
+   durante i primi secondi la prima foto e' ferma, perche' e' quella che il
+   browser sta cronometrando e non va disturbata. */
+@keyframes hm-hero-zoom{ from{ transform:scale(1); } to{ transform:scale(1.06); } }
+.hm-hero-bg.viva .hm-hero-foto.on{ animation:hm-hero-zoom 20s linear forwards; }
+
+/* Chi ha chiesto di non vedere animazioni vede una foto e basta. Il
+   componente esce prima ancora di montare le altre, quindi in pratica qui non
+   ci arriva niente: questo blocco e' la garanzia che vale comunque, anche se
+   un domani il JavaScript cambia. */
+@media (prefers-reduced-motion: reduce){
+  .hm-hero-bg .hm-hero-foto{ transition:none; }
+  .hm-hero-bg.viva .hm-hero-foto.on{ animation:none; }
+}

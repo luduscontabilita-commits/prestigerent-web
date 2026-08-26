@@ -4,6 +4,7 @@ import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import { HeroFoto } from '@/components/HeroFoto';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
@@ -146,11 +147,42 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     };
   });
 
-  /* La foto dell'hero e' quella della home attuale di prestigerent.com,
-     non la prima immagine che capita fra gli 87 tour: e' scelta, ed e'
-     gia' quella che il cliente riconosce. */
-  const foto =
-    'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-scaled.jpg';
+  /* LE FOTO DELL'HERO: SEI, SCELTE A MANO, UNA PER LUOGO.
+   *
+   * Sono la prima immagine di sei tour precisi, non "la prima delle 87 righe":
+   * ogni riga dice da quale slug arriva. L'indirizzo pero' e' copiato qui e
+   * non letto da `tours[].foto`, di proposito: chi riordina le immagini di un
+   * tour dal pannello sta sistemando quella pagina, non sceglie lo sfondo
+   * della home, e non deve poterlo cambiare senza saperlo. Se una di queste
+   * sei deve cambiare, si cambia qui.
+   *
+   * La prima resta quella della home di prestigerent.com: e' l'unica che il
+   * cliente riconosce, ed e' quella che il browser cronometra (vedi sotto).
+   *
+   * SCARTATE PERCHE' TROPPO CHIARE A SINISTRA. Il titolo e' bianco e sta a
+   * sinistra; sopra la foto c'e' la velatura di `.hm-hero-bg::after`, che a
+   * sinistra copre bene ma su telefono ritaglia il centro della foto, dove
+   * la velatura e' molto piu' leggera. Misurato il contrasto del bianco su
+   * ogni candidata in quel ritaglio: `Cinque-Terre5-1.jpg` (la prima di
+   * `private-cinque-terre-from-florence`) sta a 2,5:1 contro il 3,8:1 della
+   * foto attuale -- mare e cielo occupano mezza inquadratura -- e
+   * `firenze-cupola.jpg` a 3,4:1. Al loro posto: la prima del tour delle
+   * Cinque Terre da La Spezia e la cattedrale di Firenze, che sulla stessa
+   * misura stanno a 3,9:1 e 8,3:1. */
+  const FOTO = [
+    /* wine-experience-in-tuscany -- e' la foto della home di oggi */
+    'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-scaled.jpg',
+    /* private-tour-siena-and-san-gimignano -- Siena */
+    'https://prestigerent.com/wp-content/uploads/2021/09/Sam-Domenico-Church-Siena.jpg',
+    /* private-tour-to-chianti-wineries -- il Chianti e il vino */
+    'https://prestigerent.com/wp-content/uploads/2021/09/PVT-6.jpg',
+    /* florence-and-pisa-from-livorno-tour -- Firenze */
+    'https://prestigerent.com/wp-content/uploads/2021/09/firenze-cattedrale.jpg',
+    /* private-tour-pisa-from-florence -- Pisa */
+    'https://prestigerent.com/wp-content/uploads/2021/03/pisa-torre.jpg',
+    /* tour-to-cinque-terre-from-la-spezia -- le Cinque Terre */
+    'https://prestigerent.com/wp-content/uploads/2021/09/Cinque-Terre9.jpg',
+  ];
 
   /* SI CHIEDE LA FOTO PRIMA DI AVER LETTO LA PAGINA.
    *
@@ -163,16 +195,19 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * differenza fra vedere la foto e vedere un rettangolo grigio.
    *
    * Sta in questa pagina e non nel layout perche' vale solo per la home:
-   * un preload di un'immagine che non c'e' e' peggio che nessun preload. */
-  ReactDOM.preload(foto, { as: 'image', fetchPriority: 'high' });
+   * un preload di un'immagine che non c'e' e' peggio che nessun preload.
+   *
+   * SI CHIEDE SOLO LA PRIMA, e le altre cinque nemmeno si nominano. Un
+   * preload e' una precedenza, e cinque precedenze sono zero precedenze: sei
+   * richieste ad alta priorita' in partenza insieme si rubano la banda a
+   * vicenda e la prima -- l'unica che viene cronometrata -- arriverebbe
+   * dopo, non prima. Le altre se le prende `HeroFoto` a pagina caricata. */
+  ReactDOM.preload(FOTO[0], { as: 'image', fetchPriority: 'high' });
 
   return (
     <main>
       <section className="hm-hero">
-        <div className="hm-hero-bg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {foto && <img src={foto} alt="Tuscany" fetchPriority="high" />}
-        </div>
+        <HeroFoto foto={FOTO} alt="Tuscany" />
         <div className="hm-hero-in">
           <span className="hm-kicker">
             ★ {az?.citta}, since {az?.anno_fondazione} · our own fleet
