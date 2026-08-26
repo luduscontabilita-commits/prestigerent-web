@@ -95,19 +95,56 @@ export function HeroFoto({ foto, alt }: { foto: string[]; alt: string }) {
     <div className={viva ? 'hm-hero-bg viva' : 'hm-hero-bg'}>
       {foto.map((src, n) => {
         if (n > 0 && !viva) return null;
-        const classe = n === quale ? 'hm-hero-foto on' : 'hm-hero-foto';
+
+        /* LA PILA, NON LO SCAMBIO.
+         *
+         * `passi` e' quanti cambi fa questa foto era quella in primo piano:
+         * 0 e' quella di adesso, 1 quella appena scavalcata, e cosi' via
+         * all'indietro fino in fondo al mazzo. Il modulo serve al giro di
+         * boa, quando dall'ultima si torna alla prima.
+         *
+         * Da qui esce l'ordine di impilamento: la piu' recente sta sopra a
+         * tutte. Cosi' la nuova non ha bisogno che quella sotto si tolga di
+         * mezzo -- le si mette davanti. E' tutta la differenza fra una
+         * dissolvenza che si vede e una che non si vede: se le due foto si
+         * scambiano l'opacita' a meta' strada stanno tutte e due a mezzo, e
+         * due veli al 50% non fanno un muro -- si vede attraverso fino allo
+         * sfondo della pagina, che qui e' chiaro. Con il velo scuro sopra il
+         * risultato e' un lampo torbido esattamente a meta' transizione. */
+        const passi = (quale - n + quante) % quante;
+
+        /* `sotto` e' la penultima: resta OPACA per tutto il tempo in cui la
+           nuova le sta salendo davanti, e solo dopo puo' sparire. E' lei il
+           fondo pieno che impedisce di vedere attraverso. */
+        const classe =
+          passi === 0 ? 'hm-hero-foto on' : passi === 1 ? 'hm-hero-foto sotto' : 'hm-hero-foto';
+
+        /* Lo `z-index` sta qui e non nel CSS perche' dipende da quante foto
+           passa la pagina: e' l'unica cosa che il foglio di stile non puo'
+           sapere da solo. Nessuna misura, nessun ridisegno -- solo l'ordine
+           in cui la scheda grafica sovrappone livelli che ha gia' pronti. */
+        const pila = { zIndex: quante - passi };
+
         /* La prima esce gia' dal server con la classe `on` addosso: senza
            JavaScript, e nel mezzo secondo prima dell'idratazione, l'hero e'
            esattamente quello di prima -- una foto, ferma, opaca. */
         if (n === 0) {
           return (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} className={classe} src={src} alt={alt} fetchPriority="high" />
+            <img key={src} className={classe} style={pila} src={src} alt={alt} fetchPriority="high" />
           );
         }
         return (
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={src} className={classe} src={src} alt="" loading="lazy" decoding="async" />
+          <img
+            key={src}
+            className={classe}
+            style={pila}
+            src={src}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         );
       })}
     </div>

@@ -1200,21 +1200,42 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    altre cinque a pagina caricata non sposta di un pixel il titolo, la ricerca
    o quello che c'e' sotto. E' l'unico modo di aggiungere immagini a una
    pagina gia' disegnata senza pagarlo in CLS. */
+
+/* NON E' UNA DISSOLVENZA INCROCIATA: ENTRA SOLO QUELLA CHE ENTRA.
+   Prima le due foto si scambiavano l'opacita' -- una da 1 a 0, l'altra da 0 a
+   1 -- e a meta' strada stavano tutte e due a 0,5. Due livelli semitrasparenti
+   sovrapposti non fanno un livello opaco: un quarto dello sfondo della pagina
+   (chiaro) restava visibile attraverso entrambe, e siccome sopra c'e' il velo
+   scuro di `::after` il risultato era un buco di luminosita' proprio
+   nell'istante centrale. E' quello che il cliente vedeva.
+   Adesso quella che esce non si muove: resta opaca sotto finche' la nuova non
+   le e' salita davanti del tutto. Non c'e' nessun momento in cui si veda
+   attraverso, perche' sotto c'e' sempre una foto piena. */
 .hm-hero-bg .hm-hero-foto{
   position:absolute; inset:0; z-index:1;
-  opacity:0; transition:opacity 1.4s ease-in-out;
-  /* si anima SOLO `opacity` e `transform`: sono le due cose che la scheda
-     grafica sa fare da sola, senza far ridisegnare la pagina. Un `filter` o
-     un `background-position` qui costerebbero un ridisegno a tutto schermo
-     sessanta volte al secondo, sopra un hero che occupa 720px. */
-  will-change:opacity;
+  /* `linear` e non `ease-in-out`: la luminosita' percepita di un livello che
+     si sovrappone a uno pieno segue l'opacita' quasi in proporzione, quindi
+     una rampa costante e' l'unica che non ha un'accelerazione da notare.
+     `ease-in-out` era il compagno naturale della dissolvenza incrociata e ne
+     accentuava il difetto, rallentando proprio dove il buco era peggiore. */
+  opacity:0; transition:opacity 1.4s linear;
+  /* NIENTE `will-change` QUI. Prima c'era, su tutte e sei: sei livelli a tutto
+     schermo tenuti in memoria video per sempre, mentre in un dato momento se
+     ne muove uno solo. Su un telefono e' un costo netto. Chi entra sta gia'
+     ricevendo l'animazione dello zoom nello stesso fotogramma in cui comincia
+     la dissolvenza, quindi il livello viene promosso comunque. */
 }
-.hm-hero-bg .hm-hero-foto.on{ opacity:1; }
+/* Due foto sono opache insieme, ed e' voluto: quella nuova e quella che sta
+   coprendo. La terza indietro e le successive stanno a zero, ma sono gia'
+   sepolte sotto una foto piena -- il loro spegnersi non si vede. */
+.hm-hero-bg .hm-hero-foto.on,
+.hm-hero-bg .hm-hero-foto.sotto{ opacity:1; }
 
-/* La velatura resta sopra a tutte, non solo sopra la prima: e' lei a tenere
-   leggibile il titolo bianco, e senza questa riga dipenderebbe dall'ordine in
-   cui capitano gli elementi nel documento. */
-.hm-hero-bg::after{ z-index:2; }
+/* La velatura resta sopra a TUTTE, e adesso deve stare sopra a un mucchio che
+   cresce con il numero delle foto (lo `z-index` di ciascuna lo mette il
+   componente). Un numero alto e fisso: e' lei a tenere leggibile il titolo
+   bianco, e non deve dipendere da quante foto ci sono in pagina. */
+.hm-hero-bg::after{ z-index:50; }
 
 /* IL MOVIMENTO CHE NON SI VEDE.
    Sei per cento in venti secondi sono tre millesimi di scala al secondo: a
@@ -1223,7 +1244,23 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    durante i primi secondi la prima foto e' ferma, perche' e' quella che il
    browser sta cronometrando e non va disturbata. */
 @keyframes hm-hero-zoom{ from{ transform:scale(1); } to{ transform:scale(1.06); } }
-.hm-hero-bg.viva .hm-hero-foto.on{ animation:hm-hero-zoom 20s linear forwards; }
+
+/* QUI STAVA LO SCATTO, ed era il difetto piu' vistoso dei due.
+   L'animazione era agganciata alla sola `.on`: nell'istante del cambio la
+   foto uscente perdeva la classe, quindi perdeva l'animazione, e il suo
+   `transform` tornava di colpo da scale(1,021) a scale(1) -- un salto secco
+   del due per cento su un'immagine a tutto schermo, mentre era ancora
+   completamente visibile. Nessuna transizione lo ammorbidiva, perche' qui si
+   transiziona solo `opacity`.
+   Tenendola anche su `.sotto` l'animazione non viene mai tolta a una foto che
+   si vede: le proprieta' dichiarate sono identiche nelle due regole, quindi
+   passando da `.on` a `.sotto` l'animazione prosegue da dov'era invece di
+   ripartire. Continua a scorrere per tutto il tempo in cui la nuova la sta
+   coprendo, e sparisce solo dopo, quando ormai e' sepolta. Al secondo giro,
+   invece, la foto arriva da senza-animazione: li' riparte da capo, ed e'
+   giusto cosi'. */
+.hm-hero-bg.viva .hm-hero-foto.on,
+.hm-hero-bg.viva .hm-hero-foto.sotto{ animation:hm-hero-zoom 20s linear forwards; }
 
 /* Chi ha chiesto di non vedere animazioni vede una foto e basta. Il
    componente esce prima ancora di montare le altre, quindi in pratica qui non
@@ -1231,5 +1268,5 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    un domani il JavaScript cambia. */
 @media (prefers-reduced-motion: reduce){
   .hm-hero-bg .hm-hero-foto{ transition:none; }
-  .hm-hero-bg.viva .hm-hero-foto.on{ animation:none; }
+  .hm-hero-bg.viva .hm-hero-foto{ animation:none; }
 }
