@@ -1,6 +1,6 @@
 /* ================================================================
    PRESTIGE RENT — IL MOTORE
-   versione 1 · 26 agosto 2026, sera
+   versione 2 · 26 agosto 2026, sera
    ================================================================
 
    Questo file vive su Vercel. Dentro Google Ads c'e' solo un ponte di
@@ -12,6 +12,8 @@
    1. Stampa sempre il quadro: cosa trova e cosa farebbe.
    2. Sposta le negative geografiche in una lista dedicata.
    3. Prova a correggere UN sitelink, per capire se si puo'.
+   4. Scrive tutto in un foglio Google, sempre lo stesso, cosi' il log
+      si legge da fuori senza aprire il riquadro di Google Ads.
 
    Le due campagne private NON sono qui dentro. Crearle richiede
    `AdsApp.mutate()`, che su questo account non ho mai visto girare: la
@@ -23,7 +25,16 @@
    conseguenze per vedere il piano.
    ================================================================ */
 
-var VERSIONE = 'v1 — 26 agosto 2026, sera';
+var VERSIONE = 'v2 — 26 agosto 2026, sera';
+
+/* IL NOME DEL FOGLIO DOVE FINISCE IL LOG.
+ *
+ * Il ponte porta il codice da Vercel a Google Ads, ma il log tornava
+ * indietro solo dentro quel riquadro -- che e' proprio quello che non
+ * si deve piu' aprire. Ogni esecuzione riscrive QUESTO foglio, sempre
+ * lo stesso: cosi' l'indirizzo si passa una volta sola e poi non serve
+ * piu' nemmeno quello. */
+var FOGLIO = 'Prestige Rent — log del motore';
 
 /* Gli interruttori. Li tengo io qui, e li accendo solo dopo che il piano
    e' stato letto e approvato. */
@@ -85,6 +96,10 @@ var SITELINK_PROVA = {
 
 /* ================================================================ */
 
+/* Va dichiarato QUI, prima della prima riga di log: `var` viene issato
+   ma il valore no, e L() morirebbe sulla prima chiamata. */
+var RIGHE = [];
+
 var ANTEPRIMA = true;
 try { ANTEPRIMA = AdsApp.getExecutionInfo().isPreview(); } catch (e) {}
 
@@ -101,9 +116,13 @@ tre_provaSitelink();
 L('');
 L('=== FINE ===');
 
+scriviIlFoglio();
+
 /* ---------------------------------------------------------------- */
 
-function L(s) { Logger.log(s); }
+/* Ogni riga va sia nel riquadro di Google Ads sia nel foglio: la prima
+   serve a chi guarda li' in quel momento, il secondo a chi legge dopo. */
+function L(s) { Logger.log(s); RIGHE.push([String(s)]); }
 function pad(s, n) { s = String(s); while (s.length < n) s += ' '; return s; }
 
 function sez(t) {
@@ -280,5 +299,53 @@ function tre_provaSitelink() {
     L('>>> mutate() non utilizzabile qui: ' + e);
     L('>>> I sitelink si correggono a mano, e le campagne private si');
     L('>>> creano dal pannello. Il resto del motore funziona lo stesso.');
+  }
+}
+
+/* ---------------------------------------------------------------- */
+
+function scriviIlFoglio() {
+  var ss = null;
+  try {
+    /* Si cerca per nome: se il foglio c'e' gia' si riusa, cosi' l'indirizzo
+       resta lo stesso per sempre e non si accumula un foglio per ogni
+       lancio. */
+    var trovati = DriveApp.getFilesByName(FOGLIO);
+    if (trovati.hasNext()) {
+      ss = SpreadsheetApp.open(trovati.next());
+    } else {
+      ss = SpreadsheetApp.create(FOGLIO);
+    }
+  } catch (e) {
+    Logger.log('!! non riesco ad aprire il foglio: ' + e);
+    return;
+  }
+
+  try {
+    var f = ss.getActiveSheet();
+    f.clear();
+    var testa = [['MOTORE ' + VERSIONE + '  —  ' +
+      Utilities.formatDate(new Date(), AdsApp.currentAccount().getTimeZone(),
+                           'yyyy-MM-dd HH:mm') +
+      (ANTEPRIMA ? '  (anteprima)' : '  (esecuzione reale)')]];
+    var tutto = testa.concat(RIGHE);
+    f.getRange(1, 1, tutto.length, 1).setValues(tutto);
+    f.getRange(1, 1).setFontWeight('bold');
+    f.setColumnWidth(1, 900);
+
+    /* Chiunque abbia il collegamento puo' leggere: serve perche' il foglio
+       lo legge chi non e' loggato con questo account. */
+    try {
+      DriveApp.getFileById(ss.getId())
+        .setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e2) { Logger.log('(non condiviso: ' + e2 + ')'); }
+
+    Logger.log('');
+    Logger.log('================================================================');
+    Logger.log('LOG SCRITTO QUI:');
+    Logger.log(ss.getUrl());
+    Logger.log('================================================================');
+  } catch (e3) {
+    Logger.log('!! non riesco a scrivere nel foglio: ' + e3);
   }
 }
