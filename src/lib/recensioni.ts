@@ -118,46 +118,91 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
   ];
 }
 
-/* CHE COSA SI MOSTRA: solo cinque stelle, solo in inglese.
+/* CHE COSA SI MOSTRA: da quattro stelle in su, nella lingua della pagina.
  *
- * Cinque stelle perche' il sito e' materiale di vendita, non un archivio:
- * il numero complessivo (7.139 recensioni, 4,9 di media) dice gia' la
- * verita' sulla distribuzione, ed e' li' sopra, cliccabile. Le singole
- * servono a far vedere COME sono fatte le nostre giornate.
+ * Quattro e non cinque. Prima si mostravano solo i cinque, e il risultato
+ * era un muro perfetto che il lettore non crede: nessuna azienda al mondo
+ * ha solo cinque stelle, e chi legge lo sa. Il quattro sincero fa da
+ * controprova agli altri e le recensioni a quattro stelle erano gia' in
+ * tabella, pubblicate, senza uscire mai da nessuna parte. Il numero
+ * complessivo (7.139 recensioni, 4,9 di media) sta li' sopra, cliccabile,
+ * e dice gia' la verita' sulla distribuzione.
  *
- * Inglese perche' e' la lingua del sito alla radice e di chi prenota. Le
- * versioni tedesca e italiana filtreranno sulla propria lingua quando ci
- * saranno recensioni in quelle lingue; finche' non ci sono, meglio inglese
- * che vuoto.
+ * Sotto il quattro no: il sito resta materiale di vendita, non un archivio.
+ * Chi vuole l'archivio ha il link alla piattaforma.
  *
  * AVVERTENZA per il giorno in cui si tirera' giu' da Viator via API: le
  * loro condizioni per i partner vietano esplicitamente di mostrare solo le
  * recensioni col voto piu' alto -- o tutte, o nessuna. Questo filtro vale
  * per le recensioni scelte a mano, non per quelle prese dalla loro API.
  */
-const SOLO = (q: ReturnType<typeof base>) => q.eq('voto', 5).eq('lingua', 'en');
+const VOTO_MINIMO = 4;
+
+/* La lingua e' un parametro, non una costante.
+ *
+ * Prima era fissa a 'en' dentro il filtro: le recensioni in tedesco,
+ * spagnolo e italiano erano in tabella e non uscivano in NESSUNA lingua del
+ * sito, nemmeno in quella tedesca. Chi legge la pagina tedesca si fida di
+ * piu' di un tedesco che racconta la giornata in tedesco.
+ */
+const RIPIEGO = 'en';
+
+const SOLO = (q: ReturnType<typeof base>, lingua: string) =>
+  q.gte('voto', VOTO_MINIMO).eq('lingua', lingua);
 
 function base() {
   return supabase.from('recensioni').select('*').eq('pubblicata', true);
 }
 
-/* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
- * (tour_slug nullo) per non lasciare vuoto un tour che ancora non ne ha. */
-export async function recensioniDi(slug: string, quante = 6): Promise<Recensione[]> {
-  const { data } = await SOLO(base())
-    .or(`tour_slug.eq.${slug},tour_slug.is.null`)
-    .order('in_evidenza', { ascending: false })
-    .order('data', { ascending: false })
-    .limit(quante);
-  return (data ?? []) as Recensione[];
+/* Se nella lingua chiesta non ce ne sono abbastanza si completa con
+ * l'inglese, che e' la lingua in cui i tour si svolgono davvero: un blocco
+ * mezzo vuoto sembra un errore del sito, un blocco misto no. Le due liste si
+ * uniscono per `id` perche' la stessa recensione non deve comparire due
+ * volte se un domani venisse salvata in piu' lingue. */
+async function conRipiego(
+  lingua: string,
+  quante: number,
+  leggi: (lingua: string) => Promise<Recensione[]>
+): Promise<Recensione[]> {
+  const prime = await leggi(lingua);
+  if (lingua === RIPIEGO || prime.length >= quante) return prime;
+
+  const inglesi = await leggi(RIPIEGO);
+  const gia = new Set(prime.map((r) => r.id));
+  return [...prime, ...inglesi.filter((r) => !gia.has(r.id))].slice(0, quante);
 }
 
-export async function inEvidenza(quante = 6): Promise<Recensione[]> {
-  const { data } = await SOLO(base())
-    .eq('in_evidenza', true)
-    .order('data', { ascending: false })
-    .limit(quante);
-  return (data ?? []) as Recensione[];
+/* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
+ * (tour_slug nullo) per non lasciare vuoto un tour che ancora non ne ha.
+ *
+ * L'ordine resta in evidenza e poi le piu' recenti. NON si ordina per voto:
+ * ordinando per voto i cinque stelle occuperebbero tutti e sei i posti e la
+ * soglia a quattro non servirebbe a niente. */
+export async function recensioniDi(
+  slug: string,
+  quante = 6,
+  lingua: string = RIPIEGO
+): Promise<Recensione[]> {
+  const leggi = async (l: string) => {
+    const { data } = await SOLO(base(), l)
+      .or(`tour_slug.eq.${slug},tour_slug.is.null`)
+      .order('in_evidenza', { ascending: false })
+      .order('data', { ascending: false })
+      .limit(quante);
+    return (data ?? []) as Recensione[];
+  };
+  return conRipiego(lingua, quante, leggi);
+}
+
+export async function inEvidenza(quante = 6, lingua: string = RIPIEGO): Promise<Recensione[]> {
+  const leggi = async (l: string) => {
+    const { data } = await SOLO(base(), l)
+      .eq('in_evidenza', true)
+      .order('data', { ascending: false })
+      .limit(quante);
+    return (data ?? []) as Recensione[];
+  };
+  return conRipiego(lingua, quante, leggi);
 }
 
 /* I punteggi di tutti i tour in una volta, per il menu.

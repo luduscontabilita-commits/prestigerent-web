@@ -58,14 +58,28 @@ export function Recensioni({
   fonti,
   recensioni,
   titolo = 'What our guests actually say',
+  totale: totaleDato,
 }: {
   fonti: Fonte[];
   recensioni: Recensione[];
   titolo?: string;
+  /* IL TOTALE ARRIVA DA FUORI, e non si ricalcola qui.
+   *
+   * Prima questo componente sommava le `fonti` che riceveva, e sulla home
+   * il risultato era 7.142 -- mentre venti centimetri piu' su la fascia
+   * `#proof` ne stampava 12.563, perche' `riprova()` somma anche
+   * GetYourGuide e Regiondo. Due numeri diversi per la stessa cosa, nella
+   * stessa pagina: chi li nota smette di credere a tutti e due, e con
+   * loro a tutta la riprova sociale intorno.
+   *
+   * Quando il totale d'azienda esiste, si usa quello e basta. La somma
+   * locale resta solo per le pagine tour, dove le fonti sono quelle del
+   * singolo prodotto e sommarle e' l'unica cosa giusta da fare. */
+  totale?: number;
 }) {
   if (!recensioni.length && !fonti.length) return null;
 
-  const totale = fonti.reduce((s, f) => s + (f.quante ?? 0), 0);
+  const totale = totaleDato ?? fonti.reduce((s, f) => s + (f.quante ?? 0), 0);
   /* "Viator & Tripadvisor and GetYourGuide" suonerebbe male: l'ultimo si
      unisce con "and", gli altri con la virgola. */
   const etichette = fonti.map((f) => f.etichetta);

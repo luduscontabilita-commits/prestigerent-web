@@ -11,12 +11,13 @@ import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
-import { fonti, punteggiDi, recensioniDi } from '@/lib/recensioni';
+import { FasciaFiducia } from '@/components/Riprova';
+import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
-import { prenotazioniDi, disponibilitaDi } from '@/lib/riprova';
+import { prenotazioniDi, disponibilitaDi, riprova } from '@/lib/riprova';
 import { Urgenza } from '@/components/Urgenza';
 import { Diretto } from '@/components/Diretto';
 import '@/styles/home.css';
@@ -126,15 +127,27 @@ export default async function TourPage({
   /* Regiondo e le recensioni si leggono INSIEME, non una dopo l'altra:
      sono due richieste indipendenti e in fila costerebbero il doppio del
      tempo su ogni pagina. */
-  const [product, leFonti, leRecensioni] = await Promise.all([
+  const [product, fiducia, leRecensioni] = await Promise.all([
     tour.regiondo_sku
       ? fetchProduct(tour.regiondo_sku, regiondoLocale(locale))
       : Promise.resolve(null),
-    fonti(),
+    /* QUI PRIMA C'ERA `fonti()` DA SOLO, e su 124 pagine mancava tutto il
+       resto: il voto d'azienda, il totale multi-piattaforma, gli anni dal
+       2002, il "#2 of 248", i minibus di proprieta'. La pagina tour mostrava
+       solo i numeri del singolo prodotto -- ed e' proprio la pagina su cui
+       si atterra da Google e su cui si prenota, cioe' l'unica in cui la
+       domanda "di chi mi sto fidando" viene davvero fatta.
+
+       Si chiama `riprova()` e non `fonti()` perche' `riprova()` le fonti le
+       legge gia' dentro di se' e le restituisce in `fiducia.fonti`: tenere
+       tutte e due sarebbe la stessa lettura fatta due volte su ogni pagina,
+       e nulla garantirebbe che i due risultati coincidano. */
+    riprova(),
     recensioniDi(slug),
   ]);
-  /* Dipende da leFonti, quindi non puo' stare nel Promise.all sopra. */
-  const iPunteggi = await punteggiDi(slug, leFonti);
+  /* Dipende dalle fonti d'azienda, quindi non puo' stare nel Promise.all
+     sopra. Le prende da `fiducia`: nessuna query in piu'. */
+  const iPunteggi = await punteggiDi(slug, fiducia.fonti);
   const [quante, laDisp] = await Promise.all([prenotazioniDi(slug), disponibilitaDi(slug)]);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
@@ -359,6 +372,46 @@ export default async function TourPage({
           numeri chi me li garantisce". Poi vengono i numeri, poi le
           recensioni, poi il calendario. */}
       <Premi />
+
+      {/* I NUMERI DELL'AZIENDA, e stanno esattamente qui.
+       *
+       * Il posto non e' scelto per riempire un buco: e' il punto in cui la
+       * domanda cambia. Fin qui il lettore ha chiesto "com'e' questa
+       * giornata" -- foto, itinerario, video -- e ha finito di leggere.
+       * Da qui in avanti chiede "e chi me la vende?", perche' il calendario
+       * gli sta accanto sulla colonna di destra e il prossimo gesto e'
+       * mettere una carta di credito.
+       *
+       * Non in cima: sopra, nell'hero, ci sono gia' il voto e le recensioni
+       * di QUESTO tour. Due fasce di numeri attaccate non si sommano, si
+       * annullano -- chi ne legge dieci non ne ricorda nessuno, e il
+       * confronto fra "4,9 su 1.810" e "4,9 su 12.590" a due centimetri di
+       * distanza sembra un errore invece che due cose diverse.
+       *
+       * Fra i premi e le recensioni, invece, l'ordine si legge da solo e
+       * completa quello gia' scritto qui sotto: i loghi delle piattaforme
+       * dicono CHI garantisce, questi numeri dicono QUANTO, le recensioni
+       * dicono COSA -- e poi si prenota.
+       *
+       * `compatta` perche' qui la colonna e' stretta (il calendario si
+       * prende 400px fissi): con la spaziatura piena le cinque voci
+       * andrebbero a capo su tre righe e la fascia diventerebbe un muro. */}
+      {/* La fascia sta dentro un `pr-sec tight`, non nuda: `.rp-band` e'
+          centrata ma non ha margini laterali propri, e appoggiata
+          direttamente sulla colonna toccherebbe i bordi dello schermo sul
+          telefono -- dove passa la maggior parte di questo traffico. */}
+      <section className="pr-sec tight" aria-label="Why guests trust Prestige Rent">
+        <div className="pr-wrap wide">
+          <FasciaFiducia dati={fiducia} compatta />
+        </div>
+      </section>
+
+      {/* Niente prop `totale` qui, ed e' voluto: `Recensioni` sa sommare da
+          se' le fonti che riceve, e su questa pagina sono quelle del SINGOLO
+          tour. Passargli il totale d'azienda (12.590) sotto il titolo delle
+          recensioni di questo tour vorrebbe dire attribuire a una giornata
+          le recensioni di ventiquattro anni. Il totale d'azienda ha il suo
+          posto, ed e' la fascia qui sopra. */}
       <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
 
       {punti.length > 0 && (

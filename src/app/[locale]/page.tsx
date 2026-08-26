@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
@@ -8,8 +9,9 @@ import { prezzoDi } from '@/lib/prezzi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
-import { fonti, inEvidenza } from '@/lib/recensioni';
-import { riprova } from '@/lib/riprova';
+import { fonti, inEvidenza, votiPerTour } from '@/lib/recensioni';
+import { riprova, tuttiIConteggi } from '@/lib/riprova';
+import { VideoTestimonianze } from '@/components/VideoTestimonianze';
 import { metaDi } from '@/lib/seo';
 import type { Metadata } from 'next';
 import '@/styles/home.css';
@@ -83,10 +85,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   /* Tutti i numeri della riprova sociale da una fonte sola: si
      cambia la riga `azienda` e cambiano home, footer, chi siamo e
      ogni pagina tour nello stesso momento. */
-  const [leFonti, leRecensioni, d] = await Promise.all([
+  /* `voti` e `conteggi` sono gia' calcolati e gia' mostrati altrove -- i
+     voti nel menu e su ogni pagina di categoria, i conteggi nell'API delle
+     prenotazioni -- e la home era l'unica lista di tour del sito a non
+     usarli. Due letture in piu' dentro lo stesso Promise.all: nessuna
+     attesa aggiuntiva, perche' vanno in parallelo con le altre. */
+  const [leFonti, leRecensioni, d, voti, conteggi] = await Promise.all([
     fonti(),
     inEvidenza(6),
     riprova(),
+    votiPerTour(),
+    tuttiIConteggi(),
   ]);
   const az = d.azienda;
 
@@ -101,6 +110,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         if (p) prezzi.set(r.slug, { prezzo: p.price, ore: p.durationHours });
       })
   );
+
+  /* I conteggi arrivano come elenco, uno per tour: si trasformano in
+     dizionario una volta sola invece di cercarli dentro l'array ottantasette
+     volte. */
+  const perSlug = new Map(conteggi.map((c) => [c.tour_slug, c]));
 
   const tours: SchedaTour[] = righe.map((r) => {
     const c = (r.tour_content?.find((x) => x.locale === locale) ??
@@ -123,6 +137,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       ore: p?.ore ?? null,
       partenza: partenzaDa(r.slug),
       maxOspiti: maxOspiti(r.kind),
+      /* Gli stessi voti che il menu mostra da sempre. `votiPerTour` fa gia'
+         da se' la media pesata fra le piattaforme e scarta chi ha meno di
+         tre recensioni, quindi qui non c'e' nessuna soglia da rifare. */
+      voto: voti[r.slug]?.voto ?? null,
+      quante: voti[r.slug]?.quante ?? null,
+      oggi: perSlug.get(r.slug)?.oggi ?? null,
     };
   });
 
@@ -131,6 +151,20 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
      gia' quella che il cliente riconosce. */
   const foto =
     'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-scaled.jpg';
+
+  /* SI CHIEDE LA FOTO PRIMA DI AVER LETTO LA PAGINA.
+   *
+   * L'immagine dell'hero e' l'elemento piu' grande dello schermo, quindi e'
+   * lei a decidere il punteggio di velocita' che Google misura. Con il solo
+   * `fetchPriority="high"` sul tag il browser la scopre tardi: prima deve
+   * leggere tutto il corpo della pagina fino a trovarla. Dichiarandola qui
+   * parte insieme al foglio di stile, con qualche centinaio di millisecondi
+   * di vantaggio -- su telefono, dove il collegamento e' lento, e' la
+   * differenza fra vedere la foto e vedere un rettangolo grigio.
+   *
+   * Sta in questa pagina e non nel layout perche' vale solo per la home:
+   * un preload di un'immagine che non c'e' e' peggio che nessun preload. */
+  ReactDOM.preload(foto, { as: 'image', fetchPriority: 'high' });
 
   return (
     <main>
@@ -306,9 +340,22 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </section>
 
+      {/* I VOLTI, PRIMA DELLE RECENSIONI SCRITTE.
+          Un testo firmato "Sarah, US" lo si puo' inventare, e chi legge lo
+          sa: e' per questo che le recensioni scritte convincono meno di
+          quanto costano. Un ospite che parla in camera, girato col suo
+          telefono, non si falsifica -- e prepara chi legge a credere alle
+          righe che vengono subito dopo. */}
+      <VideoTestimonianze />
+
+      {/* Il totale arriva da `riprova()` e non si ricalcola dentro il
+          componente: prima la stessa pagina stampava 12.563 nella fascia
+          qui sopra e 7.142 qui, ed erano lo stesso numero contato in due
+          modi. Chi se ne accorge non crede piu' a nessuno dei due. */}
       <Recensioni
         fonti={leFonti}
         recensioni={leRecensioni}
+        totale={d.totale}
         titolo="Twenty-four years, one reputation"
       />
 

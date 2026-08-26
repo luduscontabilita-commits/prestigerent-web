@@ -1,0 +1,90 @@
+{\rtf1\ansi\ansicpg1252\deff0
+{\fonttbl{\f0\fswiss Calibri;}{\f1\fmodern Consolas;}}
+\viewkind4\uc1\pard\sa180\sl276\slmult1\f0\fs22
+
+\pard\sa120\qc\b\fs36 Google Ads API - Tool Design Document\b0\fs22\par
+\pard\sa240\qc\i Prestige Rent Campaign Operations Tool\i0\par
+
+\pard\sa120
+\b Applicant:\b0  Ing. Mocciola Montomoli\par
+\b Website:\b0  https://systemialab.it/\par
+\b Google Ads Manager Account (MCC):\b0  137-623-9597\par
+\b Managed account:\b0  447-009-4152 (Prestige Rent S.r.l.)\par
+\b Google Cloud project number:\b0  165932604706\par
+\b Google Cloud project ID:\b0  prestigerent-analytics\par
+\b API contact:\b0  redattorisulweb@gmail.com\par
+\b Document version:\b0  1.0\par
+
+\pard\sa120\b\fs28 1. Business model\b0\fs22\par
+\pard\sa120
+Ing. Mocciola Montomoli is a technical consultancy run by two engineers, Mocciola and Montomoli, providing digital marketing and software engineering services. We have a single client for Google Ads work: Prestige Rent S.r.l., a licensed tour operator based in Florence, Italy, which sells guided day tours and private transfers in Tuscany.\par
+Prestige Rent sells through its own website (prestigerent.com) and through online travel agencies. Bookings are processed by Regiondo, a third-party booking platform. Approximately 96 direct bookings per month originate from paid search, with an average order value of about EUR 337.\par
+We are paid a fixed monthly consultancy fee by Prestige Rent. We do not resell Google Ads services, we do not charge per click or per conversion, and we do not offer this tool to any other party. There is no revenue model attached to the tool itself.\par
+
+\pard\sa120\b\fs28 2. What the tool is\b0\fs22\par
+\pard\sa120
+The tool is an internal web dashboard, built for our own use, that consolidates three data sources which today live in separate systems and cannot be compared:\par
+\pard\li360\sa60
+1. Google Ads performance data (cost, clicks, conversions, search terms, negative keywords).\par
+2. Booking data from Regiondo, the client's booking platform, retrieved through Regiondo's own signed REST API.\par
+3. Contact and follow-up data from GoHighLevel, the client's CRM.\par
+\pard\sa120
+The purpose is to compute a true cost per acquisition. Google Ads currently reports roughly 10 conversions per month for this account, while Regiondo records approximately 64 attributable direct bookings in the same period. The gap is caused by browser cookie restrictions, in particular Safari Intelligent Tracking Prevention, and by the fact that checkout completes inside a Regiondo iframe served from a different domain. Without reconciling the two data sets, campaign decisions are being made on roughly one sixth of the real signal.\par
+The tool addresses this in two directions: it reads Google Ads data for reporting, and it writes back the missing conversions so that Google Ads bidding can learn from complete data.\par
+
+\pard\sa120\b\fs28 3. Users and access\b0\fs22\par
+\pard\sa120
+Internal only. Three named people will have access: the two engineers in the firm (redattorisulweb@gmail.com, michele.mocciola.ing@gmail.com) and the client's marketing manager. Access is by e-mail magic link against an explicit allow-list; there is no public sign-up and no self-service registration. The tool is not distributed, sold, licensed or made available to any third party, and it is not a product.\par
+The application operates on exactly one Google Ads account: 447-009-4152, linked under manager account 137-623-9597. It uses a single OAuth2 refresh token belonging to the manager account.\par
+
+\pard\sa120\b\fs28 4. Architecture\b0\fs22\par
+\pard\sa120
+Front end and back end: Next.js 16 (React 19), deployed on Vercel. Data store: PostgreSQL on Supabase, with row level security enabled on every table. Authentication: Supabase Auth, e-mail magic link, restricted allow-list.\par
+All Google Ads API calls are made server-side only, from Next.js route handlers. The developer token, OAuth client secret and refresh token are stored as encrypted environment variables on Vercel and are never sent to the browser. The client-side JavaScript bundle contains no Google Ads credentials and makes no direct calls to googleads.googleapis.com.\par
+Requests are made with the official Google Ads API client library for Node.js, against the current stable API version.\par
+
+\pard\sa120\b\fs28 5. Google Ads API services used\b0\fs22\par
+\pard\sa120
+\b 5.1 GoogleAdsService.SearchStream (read)\b0\par
+Used for all reporting. Planned GAQL queries, each scoped to customer 447-009-4152:\par
+\pard\li360\sa60\f1\fs18
+SELECT campaign.id, campaign.name, campaign.status, campaign_budget.amount_micros, metrics.cost_micros, metrics.clicks, metrics.impressions, metrics.conversions, metrics.conversions_value FROM campaign WHERE segments.date DURING LAST_30_DAYS\par
+SELECT ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type, metrics.cost_micros, metrics.conversions FROM keyword_view WHERE segments.date DURING LAST_30_DAYS\par
+SELECT search_term_view.search_term, metrics.cost_micros, metrics.clicks, metrics.conversions FROM search_term_view WHERE segments.date DURING LAST_30_DAYS\par
+SELECT campaign_criterion.keyword.text, campaign_criterion.negative FROM campaign_criterion WHERE campaign_criterion.negative = TRUE\par
+SELECT conversion_action.name, conversion_action.type, conversion_action.status, conversion_action.primary_for_goal FROM conversion_action\par
+SELECT segments.device, metrics.cost_micros, metrics.conversions FROM campaign WHERE segments.date DURING LAST_30_DAYS\par
+\pard\sa120\f0\fs22
+\b 5.2 ConversionUploadService.UploadClickConversions (write)\b0\par
+This is the core reason for the application. The website stores the gclid, wbraid and gbraid parameters in first-party browser storage on landing. When a booking is later confirmed in Regiondo, a nightly server job matches the booking to the stored click identifier and uploads the conversion, with its real monetary value in EUR, back to Google Ads. Because this path does not depend on third-party cookies, it recovers conversions that are currently lost. Uploads are idempotent: each Regiondo order number is recorded locally once and never re-sent.\par
+\b 5.3 ConversionAdjustmentUploadService.UploadConversionAdjustments (write)\b0\par
+Tour bookings are cancelled or refunded in a measurable minority of cases. When Regiondo reports a cancellation, the corresponding conversion is retracted, or its value restated, so that reported revenue matches money actually collected.\par
+\b 5.4 CampaignCriterionService and AdGroupCriterionService (write)\b0\par
+Used to add negative keywords identified in the search terms report. This is a review-then-apply flow: the tool proposes candidates, a human ticks the ones to apply, and only then is the mutate call issued. No criterion is created without explicit human confirmation. The client already maintains a large negative keyword list, and the tool reads the existing lists first so duplicates are never created.\par
+\b 5.5 CustomerService.ListAccessibleCustomers (read)\b0\par
+Called once at setup to validate the OAuth credentials and confirm the linked account.\par
+
+\pard\sa120\b\fs28 6. Screens\b0\fs22\par
+\pard\sa120
+\b Screen 1 - Overview.\b0  A single table, one row per campaign, showing campaign name, 30-day spend, clicks, conversions as reported by Google Ads, bookings as recorded in Regiondo, true CPA and true ROAS. This screen exists precisely because the two conversion figures disagree.\par
+\b Screen 2 - Search terms.\b0  Every search term with spend and zero recorded bookings over the period, sorted by wasted spend. Each row has a checkbox to add the term as a negative keyword. A confirmation dialog lists exactly what will be written before anything is sent.\par
+\b Screen 3 - Conversion reconciliation.\b0  A log of the nightly upload job: bookings matched to a click identifier, bookings with no identifier, upload results and errors. Read-only.\par
+\b Screen 4 - Account audit.\b0  A read-only inventory of conversion actions, bid strategies, budgets, negative keyword lists and ad group structure, used to review account hygiene.\par
+
+\pard\sa120\b\fs28 7. Data handling and privacy\b0\fs22\par
+\pard\sa120
+No personal data is sent to the Google Ads API. Conversion uploads contain only the click identifier (gclid, wbraid or gbraid), a timestamp, a conversion action resource name and a monetary value. Customer names, e-mail addresses and telephone numbers held in Regiondo and in the CRM are never transmitted to Google Ads through this tool.\par
+Google Ads data retrieved through the API is stored only in the client's own Supabase database, is used only to produce the four screens described above, and is not shared with, sold to, or made visible to any third party. Row level security is enabled on all tables. Retention is 24 months, after which aggregated rows are kept and detail rows are deleted.\par
+The website that collects click identifiers publishes a cookie and privacy notice and operates a consent banner in line with EU requirements. Prestige Rent S.r.l. is the data controller; we act as data processor under a written agreement.\par
+
+\pard\sa120\b\fs28 8. Quotas, rate limiting and error handling\b0\fs22\par
+\pard\sa120
+Expected volume is modest and predictable: approximately 20 to 40 reporting requests per day, one conversion upload batch per night containing typically 2 to 10 conversions, and occasional criterion mutates performed by hand. This is far below Basic access limits.\par
+Reporting results are cached for 60 minutes so that opening a screen repeatedly does not generate repeated requests. Requests are issued sequentially, never in parallel bursts. Failures are handled by error type: RESOURCE_EXHAUSTED and transient UNAVAILABLE errors are retried with exponential backoff up to three attempts; authentication errors stop the job and raise an alert rather than retrying; validation errors are logged with the offending payload and are not retried. Every API call is logged with request id, latency and outcome.\par
+The conversion upload job uses partial_failure so that one malformed row cannot discard an entire batch, and inspects the partial failure response to log which rows were rejected and why.\par
+
+\pard\sa120\b\fs28 9. Compliance\b0\fs22\par
+\pard\sa120
+We have read and accept the Google Ads API Terms and Conditions and the Required Minimum Functionality policy. Specifically we confirm that: the tool is used solely to manage the advertising of one client whose account we manage under our manager account; the tool is not offered to third parties and has no external users; we do not use another developer's token or another developer's software; we do not use the App Conversion Tracking and Remarketing API; we do not aggregate, resell or redistribute Google Ads data; and we will not exceed the operations permitted at the access level granted.\par
+\par
+}

@@ -14,6 +14,19 @@ export type SchedaTour = {
   ore: number | null;
   partenza: string;
   maxOspiti: number | null;
+  /* IL VOTO E LE RECENSIONI DEL SINGOLO TOUR.
+   *
+   * Erano gia' nel database, gia' letti dalla home, gia' mostrati nel menu
+   * e su tutte le pagine di categoria -- e queste schede erano le uniche
+   * di tutto il sito a non averli. In mezzo alla griglia dei dodici tour
+   * ci sono cinquemila pixel di scorrimento su telefono, ed e' esattamente
+   * il tratto in cui uno sta scegliendo il prodotto: era l'unico punto
+   * della pagina senza un solo segnale di fiducia. */
+  voto: number | null;
+  quante: number | null;
+  /* Quante prenotazioni ha preso OGGI. Si mostra solo sopra una soglia
+   * (vedi SOGLIA_OGGI): "1 booked today" fa piu' danno del silenzio. */
+  oggi: number | null;
 };
 
 const ETICHETTA: Record<string, string> = {
@@ -23,6 +36,20 @@ const ETICHETTA: Record<string, string> = {
   transfer: 'Transfer',
   other: 'Tour',
 };
+
+/* SOTTO QUESTA SOGLIA IL NUMERO NON SI SCRIVE.
+ *
+ * E' la stessa regola gia' usata in Urgenza.tsx sulle pagine tour, e
+ * vale la pena tenerle allineate: "3 booked today" e' una fila, "1
+ * booked today" e' una stanza vuota. Un numero basso detto ad alta
+ * voce lavora contro chi lo dice. */
+const SOGLIA_OGGI = 3;
+
+/* Le stelle piene sono arrotondate al voto: 4,9 fa cinque stelle piene,
+   4,4 ne fa quattro. Il numero esatto sta accanto, quindi nessuno viene
+   ingannato -- le stelle servono a farsi riconoscere da lontano, la cifra
+   a farsi credere da vicino. */
+const STELLE = (n: number) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
 
 export function HomeTours({
   tours,
@@ -183,6 +210,12 @@ export function HomeTours({
                 <a className="hm-card" href={t.href} key={t.slug}>
                   <div className="hm-card-img">
                     <span className="hm-card-tag">{ETICHETTA[t.kind] ?? t.kind}</span>
+                    {/* Le prenotazioni di oggi, prese da Regiondo. Non e' una
+                        finta urgenza: se il numero non c'e' o e' basso, il
+                        chip non compare affatto. */}
+                    {t.oggi != null && t.oggi >= SOGLIA_OGGI && (
+                      <span className="hm-card-hot">{t.oggi} booked today</span>
+                    )}
                     {t.foto && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t.foto} alt={t.nome} loading="lazy" decoding="async" />
@@ -190,6 +223,22 @@ export function HomeTours({
                     <h3 className="hm-card-name">{testo(t.nome)}</h3>
                   </div>
                   <div className="hm-card-body">
+                    {/* IL VOTO, SUBITO SOTTO IL NOME.
+                        Va prima dei dettagli e prima del prezzo perche' e'
+                        la domanda che uno si fa per prima -- "questo e'
+                        buono?" -- e perche' un prezzo letto dopo un 4,9
+                        sembra piu' basso dello stesso prezzo letto da solo. */}
+                    {t.voto != null && t.quante != null && (
+                      <div className="hm-card-proof">
+                        <span className="hm-stars" aria-hidden="true">
+                          {STELLE(Math.round(t.voto))}
+                        </span>
+                        <b>{t.voto.toFixed(1)}</b>
+                        <span className="hm-revs">
+                          {t.quante.toLocaleString('en-US')} reviews
+                        </span>
+                      </div>
+                    )}
                     <div className="hm-meta">
                       {t.ore ? <span>{t.ore} hours</span> : null}
                       {t.maxOspiti ? <span>up to {t.maxOspiti} guests</span> : null}
