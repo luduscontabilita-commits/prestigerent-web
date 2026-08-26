@@ -30,6 +30,26 @@ export default function proxy(req: NextRequest) {
        /en/admin e non esisterebbe. */
     pathname.startsWith('/admin') ||
     pathname.startsWith('/auth') ||
+    /* LE LANDING E LA PAGINA DI CONFERMA NON SONO PAGINE DI QUESTO SITO.
+     *
+     * `/lp/...` sono le quattro landing su cui atterrano tutte le campagne
+     * Google Ads, e `/myb/...` e' la pagina che il cliente riceve per email
+     * dopo aver prenotato. Vivono sul vecchio hosting e ci restano: le
+     * modifica un'altra persona via FTP, e portarle qui dentro romperebbe
+     * il suo modo di lavorare.
+     *
+     * Senza questa riga finivano sotto /en/ e quindi nel nulla, perche' la
+     * lista dei file pubblici qui sopra non contempla `.html` -- e nessuno
+     * se ne sarebbe accorto finche' un cliente non avesse cliccato un
+     * annuncio. Escluse qui, i rewrite di next.config.ts le inoltrano al
+     * vecchio hosting mantenendo l'indirizzo identico.
+     *
+     * Oggi, senza LEGACY_HOST impostata, questa riga non cambia niente:
+     * quei percorsi semplicemente non esistono e danno 404 come prima. */
+    pathname.startsWith('/lp/') ||
+    pathname === '/lp' ||
+    pathname.startsWith('/myb/') ||
+    pathname === '/myb' ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();

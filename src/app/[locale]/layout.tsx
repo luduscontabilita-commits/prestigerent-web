@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { SEZIONI } from '@/lib/menu';
 import { testo } from '@/lib/prosa';
 import { Footer } from '@/components/Footer';
+import { Tracciamento } from '@/components/Tracciamento';
 import '@/styles/landing.css';
 import '@/styles/home.css';
 import '@/styles/theme.css';
@@ -107,6 +108,28 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
+        {/* IL TRACCIAMENTO, MONTATO QUI E NON NELLE PAGINE.
+
+            Sta nel layout perche' questo componente e' l'unico punto che
+            attraversa tutte le pagine pubbliche di tutte e otto le lingue:
+            montandolo qui il contenitore GTM si carica una volta sola e
+            l'ascoltatore dei clic si registra una volta sola. Se stesse in
+            una pagina, cambiando pagina Next lo smonterebbe e rimonterebbe,
+            e ogni volta ripartirebbe una `gtm.js` in piu'.
+
+            Sta come primo figlio del <body> e non dentro <head> per due
+            motivi. Primo: e' un componente client con `useEffect`, e nel
+            App Router dentro <head> ci vanno solo tag statici. Secondo:
+            `next/script` con `afterInteractive` non stampa niente nell'HTML,
+            inietta lo script da solo dopo l'idratazione -- quindi la
+            posizione nell'albero non cambia quando parte, ma essere il primo
+            figlio garantisce che il dataLayer esista prima che il resto
+            dell'interfaccia cominci a parlarci.
+
+            Nota: si accende da solo solo su prestigerent.com. Su
+            prestigerent-web.vercel.app resta spento apposta, per non
+            sporcare i dati delle campagne. Non e' un bug da "sistemare". */}
+        <Tracciamento />
         <Header locale={locale} voti={voti} foto={foto} nomi={nomi} />
         {children}
         <Footer locale={locale} />
