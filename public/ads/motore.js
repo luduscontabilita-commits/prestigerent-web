@@ -122,7 +122,14 @@ scriviIlFoglio();
 
 /* Ogni riga va sia nel riquadro di Google Ads sia nel foglio: la prima
    serve a chi guarda li' in quel momento, il secondo a chi legge dopo. */
-function L(s) { Logger.log(s); RIGHE.push([String(s)]); }
+function L(s) {
+  Logger.log(s);
+  /* Fogli scambia per formula qualsiasi cella che comincia con = + - @,
+     e le righe di separazione diventavano #ERROR!. L'apostrofo iniziale
+     dice "questo e' testo" e non si vede nella cella. */
+  var t = String(s);
+  RIGHE.push([/^[=+\-@]/.test(t) ? "'" + t : t]);
+}
 function pad(s, n) { s = String(s); while (s.length < n) s += ' '; return s; }
 
 function sez(t) {
