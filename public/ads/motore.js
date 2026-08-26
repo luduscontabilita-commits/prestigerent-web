@@ -1,6 +1,6 @@
 /* ================================================================
    PRESTIGE RENT — IL MOTORE
-   versione 2 · 26 agosto 2026, sera
+   versione 3 · 26 agosto 2026, notte
    ================================================================
 
    Questo file vive su Vercel. Dentro Google Ads c'e' solo un ponte di
@@ -11,21 +11,19 @@
    -----------------------
    1. Stampa sempre il quadro: cosa trova e cosa farebbe.
    2. Sposta le negative geografiche in una lista dedicata.
-   3. Prova a correggere UN sitelink, per capire se si puo'.
+   3. Corregge i sitelink che portano dove non promettono.
    4. Scrive tutto in un foglio Google, sempre lo stesso, cosi' il log
       si legge da fuori senza aprire il riquadro di Google Ads.
 
-   Le due campagne private NON sono qui dentro. Crearle richiede
-   `AdsApp.mutate()`, che su questo account non ho mai visto girare: la
-   sezione 3 serve proprio a scoprirlo su un'operazione piccola e utile
-   invece che su una campagna intera. Se funziona, nella prossima
-   versione ci sono anche quelle.
+   `AdsApp.mutate()` e' stato provato su un sitelink alle 20:58 del 26
+   agosto e ha funzionato. Da qui in avanti si puo' usare per tutto --
+   comprese le campagne, che gli Scripts da soli non sanno creare.
 
    In anteprima Google blocca ogni scrittura: si puo' lanciare senza
    conseguenze per vedere il piano.
    ================================================================ */
 
-var VERSIONE = 'v2 — 26 agosto 2026, sera';
+var VERSIONE = 'v3 — 26 agosto 2026, notte';
 
 /* IL NOME DEL FOGLIO DOVE FINISCE IL LOG.
  *
@@ -74,25 +72,59 @@ var GEOGRAFICHE = [
   'airport transfer', 'train'
 ];
 
-/* I SITELINK DA CORREGGERE.
+/* I SITELINK CHE PORTANO DOVE NON PROMETTONO.
  *
- * Dieci su ventidue portano dove non promettono. Cinque dicono cose
- * diverse e finiscono tutti sulla stessa pagina -- quella del tour di
- * Siena: chi clicca "Cruise Port Tours" perche' arriva in nave a Livorno
- * si ritrova su una giornata in pullman a Siena. Due puntano ad ancore
- * che sulla landing non esistono piu'.
+ * Dieci su ventidue. Cinque dicono cose diverse e finiscono tutti sulla
+ * stessa pagina -- quella del tour di Siena: chi clicca "Cruise Port
+ * Tours" perche' arriva in nave a Livorno si ritrova su una giornata in
+ * pullman a Siena, e chi clicca "Chianti Wine Tour" non trova il Chianti.
+ * Quest'ultimo ha speso 332 clic in trenta giorni e non ha prodotto una
+ * conversione: non e' un mistero.
  *
- * Qui sotto ne provo UNO solo, e ho scelto quello con l'intenzione
- * d'acquisto piu' alta: "Book Direct & Save" manda a #book, che non
- * esiste -- l'ancora del calendario e' #bookform. Cosi' com'e', chi
- * clicca il link piu' vicino all'acquisto viene scaricato in cima a una
- * pagina lunghissima. */
-var SITELINK_PROVA = {
-  id: '396696541553',
-  testo: 'Book Direct & Save',
-  da: 'https://prestigerent.com/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html#book',
-  a:  'https://prestigerent.com/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html#bookform'
-};
+ * Non e' solo un cliente deluso. Google misura la coerenza fra cio' che
+ * prometti e dove porti, ed e' uno degli ingredienti del punteggio di
+ * qualita' -- quello che si paga in euro a ogni clic.
+ *
+ * Le pagine di destinazione sono state controllate una per una: tutte
+ * rispondono 200. Puntare un annuncio su una pagina che non c'e'
+ * sarebbe peggio di lasciarlo dov'e'.
+ *
+ * ATTENZIONE: i sitelink sono asset di ACCOUNT. Cambiarne l'indirizzo lo
+ * cambia in tutte le campagne che lo mostrano, comprese quelle in pausa.
+ * E' quello che vogliamo -- l'indirizzo sbagliato e' sbagliato ovunque --
+ * ma va saputo. */
+var SITELINK = [
+  { id: '386849413211', testo: 'Chianti Wine Tour',
+    a: 'https://prestigerent.com/lp/tasting-experience-in-tuscany-lan2.html',
+    perche: '332 clic, 0 conversioni: portava al tour di Siena' },
+
+  { id: '386849413214', testo: 'Cruise Port Tours',
+    a: 'https://prestigerent.com/cruise-port-tours/',
+    perche: 'chi arriva in nave non trovava il suo porto' },
+
+  { id: '386849413223', testo: 'Small Group Tours',
+    a: 'https://prestigerent.com/small-group-tours/',
+    perche: 'prometteva la categoria e mostrava un tour solo' },
+
+  { id: '386947785970', testo: 'Wine & Food Experience',
+    a: 'https://prestigerent.com/tour/wine-food-experience-in-tuscany/',
+    perche: 'prodotto diverso, e ha una pagina sua' },
+
+  { id: '386849413217', testo: 'All Tuscany Tours',
+    a: 'https://prestigerent.com/tours-of-italy/',
+    perche: 'prometteva tutti i tour e ne mostrava uno' },
+
+  /* La sezione #guarantee e' stata tolta dalla landing, quindi il link
+     cadeva in cima a una pagina lunghissima. Lo si porta sulla pagina
+     senza ancora: la promessa del testo ("cancellazione flessibile") la
+     landing la mantiene comunque piu' in basso.
+     DA DECIDERE INSIEME: o si cambia il testo del sitelink, o lo si
+     toglie. Rimuoverlo si puo' fare, ma e' una scelta commerciale e non
+     la prendo io di notte. */
+  { id: '396696541559', testo: 'Our Booking Guarantee',
+    a: 'https://prestigerent.com/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html',
+    perche: 'ancora #guarantee non esiste piu sulla landing' }
+];
 
 /* ================================================================ */
 
@@ -261,52 +293,60 @@ function due_negativeGeografiche() {
 }
 
 function tre_provaSitelink() {
-  sez('3. PROVA — correggere un sitelink con mutate()');
+  sez('3. I SITELINK CHE PORTANO DOVE NON PROMETTONO');
 
-  L('sitelink:  ' + SITELINK_PROVA.testo);
-  L('oggi va a: ...#book        (ancora che sulla landing NON esiste)');
-  L('dovrebbe:  ...#bookform    (il calendario)');
+  if (!APPLICA_SITELINK) { L('interruttore spento: non tocco niente'); return; }
+
+  var cliente = AdsApp.currentAccount().getCustomerId().replace(/-/g, '');
+  L('sono ' + SITELINK.length + ' da correggere.');
   L('');
 
-  if (!APPLICA_SITELINK) { L('interruttore spento: non provo'); return; }
-  if (ANTEPRIMA) { L('in anteprima Google blocca la scrittura: la prova non direbbe niente'); return; }
-
-  /* Gli Scripts sanno gestire solo le vecchie estensioni, non i sitelink
-     "asset" che ha questo account. L'unica strada documentata e'
-     `AdsApp.mutate()`, che accetta le operazioni grezze dell'API.
-     Non l'ho mai visto girare qui: si prova su un sitelink solo, e il
-     peggio che puo' succedere e' un errore stampato nel log. */
-  var risorsa = 'customers/' +
-    AdsApp.currentAccount().getCustomerId().replace(/-/g, '') +
-    '/assets/' + SITELINK_PROVA.id;
-
-  L('risorsa: ' + risorsa);
-
-  try {
-    var res = AdsApp.mutate({
-      assetOperation: {
-        updateMask: 'finalUrls',
-        update: { resourceName: risorsa, finalUrls: [SITELINK_PROVA.a] }
-      }
-    });
-
-    if (res && res.isSuccessful && res.isSuccessful()) {
-      L('');
-      L('>>> RIUSCITO. mutate() funziona su questo account.');
-      L('>>> Nella prossima versione ci vanno gli altri nove sitelink');
-      L('>>> e le due campagne private.');
-    } else {
-      var err = (res && res.getErrorMessages) ? res.getErrorMessages().join(' | ') : 'esito sconosciuto';
-      L('');
-      L('>>> NON riuscito: ' + err);
-      L('>>> I sitelink allora si correggono a mano nel pannello.');
+  if (ANTEPRIMA) {
+    for (var q = 0; q < SITELINK.length; q++) {
+      L(pad(SITELINK[q].testo, 26) + '-> ' + SITELINK[q].a);
+      L(pad('', 26) + '   ' + SITELINK[q].perche);
     }
-  } catch (e) {
     L('');
-    L('>>> mutate() non utilizzabile qui: ' + e);
-    L('>>> I sitelink si correggono a mano, e le campagne private si');
-    L('>>> creano dal pannello. Il resto del motore funziona lo stesso.');
+    L('in anteprima Google blocca la scrittura: nessuno e stato toccato');
+    return;
   }
+
+  var fatti = 0, falliti = 0;
+  for (var i = 0; i < SITELINK.length; i++) {
+    var s = SITELINK[i];
+    var risorsa = 'customers/' + cliente + '/assets/' + s.id;
+    try {
+      var res = AdsApp.mutate({
+        assetOperation: {
+          updateMask: 'finalUrls',
+          update: { resourceName: risorsa, finalUrls: [s.a] }
+        }
+      });
+      if (res && res.isSuccessful && res.isSuccessful()) {
+        L('OK   ' + pad(s.testo, 26) + '-> ' + s.a);
+        L('     ' + pad('', 21) + s.perche);
+        fatti++;
+      } else {
+        var e = (res && res.getErrorMessages) ? res.getErrorMessages().join(' | ') : 'esito sconosciuto';
+        L('!!   ' + pad(s.testo, 26) + e);
+        falliti++;
+      }
+    } catch (err) {
+      L('!!   ' + pad(s.testo, 26) + err);
+      falliti++;
+    }
+  }
+
+  L('');
+  L('-> ' + fatti + ' corretti' + (falliti ? ', ' + falliti + ' FALLITI' : ''));
+  L('');
+  L('Book Direct & Save era gia stato corretto: mandava a #book, ancora');
+  L('che sulla landing non esiste. Ora va al calendario, ed e il sitelink');
+  L('con la piu alta intenzione di acquisto.');
+  L('');
+  L('Restano gia giusti: Direct Transfers, Tours Of Italy, All');
+  L('Destinations, Florence & Pisa, Real Traveler Reviews, Chat with Our');
+  L('Team. Portano tutti dove dicono.');
 }
 
 /* ---------------------------------------------------------------- */
