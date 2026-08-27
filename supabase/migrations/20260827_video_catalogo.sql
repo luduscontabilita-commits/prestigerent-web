@@ -63,6 +63,7 @@ select tour_id, locale, blocks from public.tour_content where blocks ? 'videos'
 on conflict (tour_id, locale) do nothing;
 
 alter table public.video_blocks_storico enable row level security;
+drop policy if exists "scrittura_video_blocks_storico" on public.video_blocks_storico;
 create policy "scrittura_video_blocks_storico" on public.video_blocks_storico
   for all to authenticated using (e_admin()) with check (e_admin());
 /* nessuna policy di lettura pubblica: e' un archivio, non contenuto */
@@ -101,8 +102,10 @@ comment on table public.video_clip is
   'Le testimonianze girate col telefono dagli ospiti. I file stanno su Storage sotto lp/video/. Nessun prezzo, nessun dato personale.';
 
 alter table public.video_clip enable row level security;
+drop policy if exists "lettura_video_clip" on public.video_clip;
 create policy "lettura_video_clip" on public.video_clip
   for select to public using (attivo);
+drop policy if exists "scrittura_video_clip" on public.video_clip;
 create policy "scrittura_video_clip" on public.video_clip
   for all to authenticated using (e_admin()) with check (e_admin());
 
@@ -119,8 +122,10 @@ comment on table public.tour_video_tema is
   'Quali temi di video puo` mostrare un tour. Un tour senza riga qui non mostra la sezione video: meglio niente che i filmati di un`altra giornata.';
 
 alter table public.tour_video_tema enable row level security;
+drop policy if exists "lettura_tour_video_tema" on public.tour_video_tema;
 create policy "lettura_tour_video_tema" on public.tour_video_tema
   for select to public using (true);
+drop policy if exists "scrittura_tour_video_tema" on public.tour_video_tema;
 create policy "scrittura_tour_video_tema" on public.tour_video_tema
   for all to authenticated using (e_admin()) with check (e_admin());
 

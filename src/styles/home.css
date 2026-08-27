@@ -1432,3 +1432,272 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
   clip-path:inset(50%);
   white-space:nowrap;
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   LE SCHEDE DELLA GRIGLIA — rifacimento
+   ══════════════════════════════════════════════════════════════════════
+
+   Aggiunto in coda e non riscritto sopra, e SOPRATTUTTO non dentro
+   landing.css: quella e' la grafica ereditata dalla landing Siena, gia'
+   collaudata su traffico a pagamento, e non si tocca.
+
+   ── COSA NON ANDAVA, GUARDANDO LA GRIGLIA ────────────────────────────
+   1. Il titolo stava sopra la foto con una velatura che partiva dal
+      nulla e un'ombra sul testo. Su `Private Transfer Florence Airport`
+      la foto e' cielo chiaro: il bianco spariva, e l'ombra -- a quella
+      grandezza -- si vedeva come una sbavatura grigia intorno alle
+      lettere invece di aiutare.
+   2. I testi erano piu' piccoli della foto in proporzione: la gerarchia
+      era al contrario, l'immagine gridava e il nome del prodotto
+      sussurrava.
+   3. `15 minutes` da una parte e le stelle col conteggio dall'altra:
+      due blocchi separati che dicono la stessa cosa, cioe' i fatti
+      oggettivi del prodotto.
+   4. Foto e testo si toccavano.
+
+   ── LA VELATURA, CHE E' IL PUNTO ─────────────────────────────────────
+   Una sfumatura lineare da trasparente a nero ha un difetto: l'occhio
+   vede il bordo dove comincia, e sulle foto chiare in cima non copre
+   abbastanza mentre in fondo copre troppo. Qui la scala e' a piu'
+   fermate, con i valori presi da una curva e non da una retta: e' lo
+   stesso trucco delle sfumature "eased", e a schermo la fascia scura
+   sembra non cominciare mai.
+
+   Il colore e' un blu-nero (14 20 27) e non nero puro: sulle foto calde
+   -- botti, mattoni, tramonti -- il nero puro vira al marrone sporco.
+
+   La velatura e' tarata perche' il bianco sopra resti leggibile sulle
+   due foto agli estremi del catalogo: il cielo chiaro del transfer per
+   l'aeroporto e le botti scure della cantina. Sotto il titolo la
+   copertura non scende mai sotto .78, che sulla foto piu' chiara del
+   catalogo tiene il bianco ben oltre il 4,5:1 delle WCAG.
+
+   E niente `text-shadow`: con una velatura che fa il suo mestiere non
+   serve, e a quella grandezza in grassetto si vedeva.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ---------- la foto e il titolo che ci sta sopra ---------- */
+
+.hm-card-img,
+.ct-img{
+  position:relative;
+  aspect-ratio:4/3;
+  background:var(--ph);
+  overflow:hidden;
+}
+.hm-card-img img,
+.ct-img img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .45s cubic-bezier(.2,.6,.2,1);
+}
+.hm-card:hover .hm-card-img img,
+.ct-card:hover .ct-img img{ transform:scale(1.04); }
+
+.hm-card-img::after,
+.ct-img::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background:linear-gradient(
+    to top,
+    rgba(14,20,27,.92) 0%,
+    rgba(14,20,27,.88) 8%,
+    rgba(14,20,27,.78) 18%,
+    rgba(14,20,27,.62) 28%,
+    rgba(14,20,27,.44) 38%,
+    rgba(14,20,27,.28) 48%,
+    rgba(14,20,27,.15) 58%,
+    rgba(14,20,27,.06) 70%,
+    rgba(14,20,27,0)   84%
+  );
+}
+
+.hm-card-name,
+.ct-nome{
+  position:absolute; z-index:2;
+  inset-inline:16px; bottom:14px; margin:0;
+  color:#fff;
+  /* Piu' grande della .96rem di prima, e legato alla larghezza della
+     scheda: nella colonna stretta delle categorie resta leggibile, su
+     tre colonne larghe cresce. */
+  font-size:clamp(1.02rem, 1.15vw + .78rem, 1.24rem);
+  font-weight:800; line-height:1.22; letter-spacing:-.01em;
+  text-shadow:none;
+  /* DUE RIGHE E BASTA. Alcuni nomi sono lunghissimi ("Private tour to
+     Siena, San Gimignano, Chianti and Pisa from Florence"): a tutta
+     lunghezza coprivano meta' della foto, e la scheda accanto -- col
+     nome corto -- sembrava un altro componente. */
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+}
+
+/* ---------- il corpo della scheda ---------- */
+
+.hm-card-body,
+.ct-body{
+  /* il respiro che mancava fra foto e testo */
+  padding:16px 16px 18px;
+  display:flex; flex-direction:column; flex:1;
+  gap:10px;
+}
+.ct-card{ display:flex; flex-direction:column; }
+
+/* I FATTI SU UNA RIGA SOLA.
+   Durata, posti, voto e conteggio erano due blocchi sovrapposti. Sono la
+   stessa informazione -- che cos'e' questo prodotto, oggettivamente -- e
+   vanno letti in un colpo d'occhio. Il punto mediano fra un dato e
+   l'altro lo mette il CSS, cosi' non c'e' da decidere nel markup quale
+   sia l'ultimo quando uno dei tre manca. */
+.hm-fatti{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:0 9px; min-width:0;
+  font-size:.82rem; font-weight:700; color:var(--ink-soft);
+  line-height:1.35;
+}
+.hm-fatti > * + *::before{
+  content:"\00b7";
+  margin-inline-end:9px;
+  color:var(--line);
+  font-weight:800;
+}
+.hm-durata{ white-space:nowrap; }
+.hm-voto{ display:inline-flex; align-items:baseline; gap:5px; min-width:0; }
+.hm-voto .hm-stars{
+  font-style:normal; flex:none;
+  color:var(--orange); font-size:.8rem; letter-spacing:.5px;
+}
+.hm-voto b{ flex:none; color:var(--ink); font-weight:800; }
+/* A 320px il conteggio non ci sta: si accorcia con i puntini. Se andasse
+   a capo, la scheda crescerebbe di una riga solo per lui e nella griglia
+   si vedrebbe -- le schede accanto resterebbero corte. */
+.hm-voto em{
+  font-style:normal; flex:1 1 auto; min-width:0;
+  font-weight:600; font-size:.76rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* LA RIGA DI PROSA, tagliata a due righe dal browser.
+   `line-clamp` mette i puntini da solo e li mette dove il testo finisce
+   davvero, che dipende dalla larghezza della colonna: tagliare a un
+   numero fisso di caratteri nel codice darebbe puntini a meta' riga su
+   schermo largo e parole spezzate su schermo stretto. */
+.hm-sommario{
+  margin:0;
+  font-size:.85rem; line-height:1.5; color:var(--ink-soft);
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+}
+
+/* I DUE-TRE PUNTI. Erano righe di prosa lunga con un pallino davanti;
+   adesso sono nomi brevi di cose che si vedono e si fanno, quindi
+   possono stare piu' grandi e piu' scuri -- e la spunta al posto del
+   pallino dice "compreso", che e' quello che sono. */
+.hm-hl{ list-style:none; margin:0; padding:0; display:grid; gap:7px; }
+.hm-hl li{
+  font-size:.87rem; font-weight:700; color:var(--ink);
+  padding-inline-start:23px; position:relative; line-height:1.35;
+}
+/* La spunta e' un ritaglio nel disco arancione: nessun carattere da
+   caricare, nessuna icona, e resta nitida a qualsiasi ingrandimento.
+   Dove `mask` non c'e', resta il disco pieno -- cioe' il pallino di
+   prima, che andava benissimo. */
+.hm-hl li::before{
+  content:"";
+  position:absolute; inset-inline-start:0; top:.16em;
+  width:15px; height:15px; border-radius:50%;
+  background:var(--orange);
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor){
+  .hm-hl li::before{
+    -webkit-mask:
+      url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12.5 4.2 4.2L19 7' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px 11px no-repeat,
+      linear-gradient(#000,#000);
+    -webkit-mask-composite:xor;
+    mask:
+      url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 12.5 4.2 4.2L19 7' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px 11px no-repeat,
+      linear-gradient(#000,#000);
+    mask-composite:exclude;
+  }
+}
+
+/* IL PREZZO, in fondo e piu' grande di tutto il resto del corpo.
+   E' la seconda cosa che si guarda dopo la foto, e stava a .82rem in
+   mezzo agli altri dati. `margin-top:auto` lo incolla in basso: cosi' in
+   una fila di schede i prezzi restano allineati fra loro anche quando i
+   punti sopra sono due invece di tre.
+   La cifra e' in EURO, con il punto decimale e non con la virgola -- e
+   i decimali non si stampano affatto, perche' sono sempre ,00 e a quella
+   grandezza rubano spazio alla cifra che conta. */
+.hm-price{
+  margin-top:auto; padding-top:12px;
+  border-top:1px solid var(--line);
+  display:flex; align-items:baseline; gap:8px;
+}
+.hm-price small{
+  font-size:.68rem; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-soft);
+}
+.hm-price b{ font-size:1.5rem; font-weight:800; color:var(--ink); letter-spacing:-.02em; }
+.hm-price .ask{ font-size:.9rem; font-weight:800; color:var(--wine); }
+
+/* ---------- la griglia di categoria eredita la scheda della home ---------- */
+/* 270px e non 250: dentro ci stanno adesso una riga di fatti, due righe
+   di prosa e due o tre punti, e a 250 il conteggio delle recensioni
+   spariva sempre nei puntini. */
+.ct-griglia{ gap:20px; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); }
+.ct-card:hover{ box-shadow:0 14px 34px var(--ombra); }
+/* Il nome del tour adesso sta sulla foto: la vecchia riga nel corpo non
+   viene piu' stampata, la regola resta per i fogli in cache. */
+.ct-body strong{ display:none; }
+
+/* ---------- tema scuro ---------- */
+/* La velatura sulla foto resta scura in entrambi i temi, ed e' giusto:
+   sta sopra una fotografia, non sopra il fondo pagina. Qui si abbassa
+   solo la luminosita' delle immagini, come si fa gia' per .hm-card. */
+html[data-theme="dark"] .ct-card{ border-color:var(--line); }
+html[data-theme="dark"] .ct-card img{ filter:brightness(.9); transition:filter .2s; }
+html[data-theme="dark"] .ct-card:hover img{ filter:none; }
+/* Il punto mediano fra i fatti usa --line, che su fondo scuro e' quasi
+   invisibile: li' si prende il grigio del testo, smorzato. */
+html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacity:.55; }
+
+/* ---------- chi ha chiesto meno movimento ---------- */
+/* Lo zoom della foto e il sollevamento della scheda sono decorazione:
+   per chi soffre di cinetosi sono un fastidio vero, e il browser lo
+   dichiara. Si spengono i MOVIMENTI, non gli stati: l'ombra e il bordo
+   arancione al passaggio del mouse restano, perche' sono il modo in cui
+   la scheda dice "sono cliccabile". */
+@media (prefers-reduced-motion: reduce){
+  .hm-card-img img,
+  .ct-img img,
+  .hm-card,
+  .ct-card{ transition:none; }
+  .hm-card:hover .hm-card-img img,
+  .ct-card:hover .ct-img img{ transform:none; }
+  .hm-card:hover,
+  .ct-card:hover{ transform:none; }
+}
+
+/* Il link al pannello, in fondo al piede. Deliberatamente sottotono:
+   chi lavora al sito lo trova, un cliente non ci inciampa. */
+.ft-admin {
+  display: block;
+  text-align: center;
+  margin: 22px 0 -6px;
+  font-size: 11px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: var(--muted, #8b8b8b);
+  opacity: .55;
+  text-decoration: none;
+}
+.ft-admin:hover,
+.ft-admin:focus-visible { opacity: 1; text-decoration: underline; }
+
+.ad-opt { font-weight: 400; opacity: .6; text-transform: none; letter-spacing: 0; }

@@ -170,6 +170,18 @@ export async function Footer({ locale }: { locale: string }) {
         </div>
       )}
 
+      {/* L'accesso al pannello. Piccolo e in fondo: serve a chi lavora al
+
+
+          sito, non ai clienti. Non e' un segreto -- l'indirizzo si
+
+
+          indovina in un secondo -- ma non deve rubare spazio a niente. */}
+
+
+      <a className="ft-admin" href="/admin/">Staff</a>
+
+
       <div className="ft-bottom">
         <span className="ft-social">
           {SOCIAL.map(([t, h]) => (

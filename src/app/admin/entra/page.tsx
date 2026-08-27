@@ -19,6 +19,7 @@ import '@/styles/admin.css';
  */
 export default function Entra() {
   const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
   const [stato, setStato] = useState<'fermo' | 'invio' | 'fatto' | 'errore'>('fermo');
   const [messaggio, setMessaggio] = useState('');
 
@@ -29,10 +30,20 @@ export default function Entra() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
     );
-    const { error } = await sb.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin/` },
-    });
+    /* DUE STRADE, E LA PASSWORD E' FACOLTATIVA.
+       Il link via email resta il modo consigliato -- non c'e' niente da
+       rubare e niente da ricordare -- ma chi entra spesso vuole poter
+       digitare e basta. Se il campo password e' vuoto si manda il link,
+       se e' pieno si prova la password: nessuno deve scegliere prima. */
+    const { error } = pw
+      ? await sb.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password: pw,
+        })
+      : await sb.auth.signInWithOtp({
+          email: email.trim().toLowerCase(),
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin/` },
+        });
     if (error) {
       setStato('errore');
       /* Supabase risponde "Database error saving new user" quando il
@@ -45,6 +56,11 @@ export default function Entra() {
           ? "Questo indirizzo non è abilitato. Controlla di averlo scritto giusto: basta un punto di troppo."
           : error.message
       );
+    } else if (pw) {
+      /* La password entra subito: non c'e' nessun link da aprire, quindi
+         non si passa da /auth/callback e la redirezione la fa questa
+         pagina. */
+      window.location.href = '/admin/';
     } else {
       setStato('fatto');
     }
@@ -72,13 +88,28 @@ export default function Entra() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nome@esempio.com"
             />
+            <label htmlFor="pw">
+              Password <span className="ad-opt">facoltativa</span>
+            </label>
+            <input
+              id="pw"
+              type="password"
+              autoComplete="current-password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder="lascia vuoto per ricevere il link"
+            />
             <button type="submit" disabled={stato === 'invio'}>
-              {stato === 'invio' ? 'Invio in corso…' : 'Ricevi il link di accesso'}
+              {stato === 'invio'
+                ? (pw ? 'Accesso…' : 'Invio in corso…')
+                : (pw ? 'Entra' : 'Ricevi il link di accesso')}
             </button>
             {stato === 'errore' && <p className="ad-err">{messaggio}</p>}
             <p className="ad-nota">
-              Nessuna password. Ricevi un link via email e sei dentro. Funziona solo con
-              gli indirizzi abilitati.
+              Con la password entri subito. Lasciandola vuota ricevi un link via email:
+              e&rsquo; il modo consigliato, perche&rsquo; non c&rsquo;e&rsquo; niente da
+              ricordare e niente da rubare. In tutti e due i casi funziona solo con gli
+              indirizzi abilitati.
             </p>
           </form>
         )}

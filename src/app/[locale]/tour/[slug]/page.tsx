@@ -15,6 +15,7 @@ import { Premi } from '@/components/Premi';
 import { FasciaFiducia } from '@/components/Riprova';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
+import { ripulisciPunti } from '@/lib/punti';
 import { badgeIncluso } from '@/lib/inclusi';
 import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
@@ -219,12 +220,19 @@ export default async function TourPage({
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
-  /* "Read more" e' il link di WordPress finito nell'estrazione: compariva
-     fra i punti forti come se fosse uno di essi. Si filtra qui e non nel
-     database, cosi' vale anche per i contenuti che arriveranno domani. */
-  const punti = (contenuto.highlights ?? []).filter(
-    (p) => !/^(read more|leggi (tutto|di piu))/i.test(p.trim())
-  );
+  /* Qui l'elenco resta lungo -- chi e' su questa pagina ha gia' scelto e
+     legge anche le condizioni -- ma passa da `ripulisciPunti`, che toglie
+     due cose:
+       - "Read more", il link di WordPress finito nell'estrazione, che
+         compariva fra i punti forti come se fosse uno di essi;
+       - la riga sulla sanificazione dei veicoli, che su 55 schede su 87
+         era il PRIMO punto, e con lei l'occhiello "Safe for money!" che le
+         faceva da gemello: tolta la prima, la seconda resta sola e suona
+         strana, mentre l'informazione che porta -- la cancellazione
+         gratuita -- e' buona e va tenuta.
+     Si filtra qui e non nel database, cosi' vale anche per i contenuti che
+     arriveranno domani dallo stesso WordPress. Vedi src/lib/punti.ts. */
+  const punti = ripulisciPunti(contenuto.highlights ?? []);
   /* L'ordine delle schede lo decide la pagina, non l'ordine in cui sono
      state estratte da WordPress -- che metteva le FAQ per prime, cioe' la
      cosa piu' secondaria nel posto piu' importante. Si comincia da cosa e'

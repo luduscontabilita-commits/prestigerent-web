@@ -7,6 +7,7 @@ import { CATEGORIE, categoriaDi, figlieDi } from '@/lib/categorie';
 import { votiPerTour } from '@/lib/recensioni';
 import { metaDi } from '@/lib/seo';
 import { prezzoDi } from '@/lib/prezzi';
+import { puntiScheda } from '@/lib/punti';
 import { testo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
@@ -73,7 +74,9 @@ export async function generateMetadata({
   };
 }
 
-type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
+type Riga = TourRow & {
+  tour_content?: { locale: string; meta_description: string | null; blocks: Record<string, unknown> }[];
+};
 
 export default async function Categoria_({
   params,
@@ -94,7 +97,7 @@ export default async function Categoria_({
     supabase.from('tour_categorie').select('tour_slug').contains('categorie', [cat.cat]),
     supabase
       .from('tours')
-      .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, blocks)')
+      .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, meta_description, blocks)')
       .eq('status', 'published'),
     votiPerTour(),
   ]);
@@ -107,13 +110,21 @@ export default async function Categoria_({
 
   /* I prezzi tutti insieme, non uno dopo l'altro: in fila sarebbero
      decine di attese sommate su una pagina sola. */
-  const prezzi = new Map<string, number | null>();
+  /* Si chiedeva gia' il prodotto a Regiondo per il prezzo e si buttava via
+     tutto il resto: la durata era li' dentro, nella stessa risposta, e la
+     scheda di categoria era l'unica del sito a non mostrarla. Nessuna
+     chiamata in piu'. */
+  const daRegiondo = new Map<string, { prezzo: number | null; ore: string | null }>();
   await Promise.all(
     scelti
       .filter((r) => r.regiondo_sku)
       .map(async (r) => {
         const pr = await fetchProduct(r.regiondo_sku!, regiondoLocale(locale));
-        if (pr) prezzi.set(r.slug, prezzoDi(pr.price, {})?.valore ?? null);
+        if (pr)
+          daRegiondo.set(r.slug, {
+            prezzo: prezzoDi(pr.price, {})?.valore ?? null,
+            ore: pr.durationLabel,
+          });
       })
   );
 
@@ -162,32 +173,68 @@ export default async function Categoria_({
         <div className="ct-griglia">
           {scelti.map((r) => {
             const c = r.tour_content?.find((x) => x.locale === locale) ?? r.tour_content?.[0];
-            const b = (c?.blocks ?? {}) as { name?: string; gallery?: { src: string }[]; images?: string[] };
+            const b = (c?.blocks ?? {}) as {
+              name?: string;
+              gallery?: { src: string }[];
+              images?: string[];
+              highlights?: string[];
+              tabs?: Record<string, string>;
+            };
             const nome = testo(b.name ?? r.slug.replace(/-/g, ' '));
             const foto = b.gallery?.[0]?.src ?? b.images?.[0];
             const q = voti[r.slug];
-            const pr = prezzi.get(r.slug);
+            const rg = daRegiondo.get(r.slug);
+            /* Le stesse due o tre righe della home, dalla stessa funzione:
+               una griglia che dice altro dall'altra e' come se parlasse di
+               due prodotti diversi. Vedi src/lib/punti.ts. */
+            const punti = puntiScheda(b);
             return (
               <a className="ct-card" key={r.slug} href={p(`/tour/${r.slug}/`)}>
                 <div className="ct-img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {foto && <img src={foto} alt={nome} loading="lazy" decoding="async" />}
+                  <h3 className="ct-nome">{nome}</h3>
                 </div>
                 <div className="ct-body">
-                  <strong>{nome}</strong>
-                  {q && (
-                    <span className="ct-voto">
-                      ★ {q.voto.toFixed(1)}{' '}
-                      <i>
-                        {q.quante.toLocaleString('en-US')} reviews {q.dove}
-                      </i>
-                    </span>
+                  {/* durata, posti e recensioni su una riga sola */}
+                  <div className="hm-fatti">
+                    {rg?.ore ? <span className="hm-durata">{rg.ore}</span> : null}
+                    {q && (
+                      <span className="hm-voto">
+                        <i className="hm-stars" aria-hidden="true">
+                          {'★★★★★'.slice(0, Math.round(q.voto))}
+                          {'☆☆☆☆☆'.slice(0, 5 - Math.round(q.voto))}
+                        </i>
+                        <b>{q.voto.toFixed(1)}</b>
+                        <em>
+                          {q.quante.toLocaleString('en-US')} reviews {q.dove}
+                        </em>
+                      </span>
+                    )}
+                  </div>
+
+                  {c?.meta_description && (
+                    <p className="hm-sommario">{testo(c.meta_description)}</p>
                   )}
-                  {pr != null && (
-                    <span className="ct-prezzo">
-                      from <b>&euro;{pr.toFixed(0)}</b>
-                    </span>
+
+                  {punti.length > 0 && (
+                    <ul className="hm-hl">
+                      {punti.map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
                   )}
+
+                  <div className="hm-price">
+                    {rg?.prezzo != null ? (
+                      <>
+                        <small>from</small>
+                        <b>&euro;{rg.prezzo.toFixed(0)}</b>
+                      </>
+                    ) : (
+                      <span className="ask">Price on request</span>
+                    )}
+                  </div>
                 </div>
               </a>
             );

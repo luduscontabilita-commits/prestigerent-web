@@ -9,7 +9,20 @@ export type SchedaTour = {
   nome: string;
   kind: string;
   foto: string | null;
+  /* DUE O TRE RIGHE CORTE SU COSA SI VEDE E SI FA.
+   *
+   * Non e' piu' `highlights` cosi' come arriva da WordPress: quello
+   * cominciava con "Safe for health! All our vehicles are cleaned/
+   * sanitized before each service" su 55 schede su 87, cioe' la prima
+   * riga che il cliente legge era una policy del 2020. Le righe di qui
+   * le costruisce `puntiScheda` (src/lib/punti.ts) dagli stessi dati,
+   * tenendo solo cio' che descrive QUELLA giornata. Elenco vuoto sui
+   * transfer punto-a-punto: la scheda mostra titolo, durata e prezzo e
+   * basta, che e' meglio di tre promesse buone per chiunque. */
   punti: string[];
+  /** La riga di prosa sotto la durata: la meta description del tour,
+   *  tagliata a due righe dal CSS. */
+  descrizione: string | null;
   prezzo: number | null;
   /* Gia' scritta per esteso ("4 hours", "15 minutes"): l'unita' la
      decide Regiondo e la traduce `durataInParole`. Quando qui c'era un
@@ -232,26 +245,39 @@ export function HomeTours({
                     <h3 className="hm-card-name">{testo(t.nome)}</h3>
                   </div>
                   <div className="hm-card-body">
-                    {/* IL VOTO, SUBITO SOTTO IL NOME.
-                        Va prima dei dettagli e prima del prezzo perche' e'
-                        la domanda che uno si fa per prima -- "questo e'
-                        buono?" -- e perche' un prezzo letto dopo un 4,9
-                        sembra piu' basso dello stesso prezzo letto da solo. */}
-                    {t.voto != null && t.quante != null && (
-                      <div className="hm-card-proof">
-                        <span className="hm-stars" aria-hidden="true">
-                          {STELLE(Math.round(t.voto))}
-                        </span>
-                        <b>{t.voto.toFixed(1)}</b>
-                        <span className="hm-revs">
-                          {t.quante.toLocaleString('en-US')} reviews {t.dove}
-                        </span>
-                      </div>
-                    )}
-                    <div className="hm-meta">
-                      {t.ore ? <span>{t.ore}</span> : null}
+                    {/* DURATA, VOTO E RECENSIONI SU UNA RIGA SOLA.
+                        Erano due blocchi separati, uno sopra l'altro: la
+                        durata da una parte e "★★★★★ 5.0 · 3 reviews"
+                        dall'altra, scollegati, e sulla foto chiara del
+                        transfer per l'aeroporto sembravano due schede
+                        diverse. Sono la stessa cosa -- i dati oggettivi
+                        del prodotto -- e stanno su una riga, separati da
+                        un punto mediano. */}
+                    <div className="hm-fatti">
+                      {t.ore ? <span className="hm-durata">{t.ore}</span> : null}
                       {t.maxOspiti ? <span>up to {t.maxOspiti} guests</span> : null}
+                      {t.voto != null && t.quante != null && (
+                        <span className="hm-voto">
+                          <i className="hm-stars" aria-hidden="true">
+                            {STELLE(Math.round(t.voto))}
+                          </i>
+                          <b>{t.voto.toFixed(1)}</b>
+                          <em>
+                            {t.quante.toLocaleString('en-US')} reviews {t.dove}
+                          </em>
+                        </span>
+                      )}
                     </div>
+
+                    {/* LA RIGA DI PROSA. E' la meta description, gia'
+                        scritta per stare in piedi da sola. Il taglio a due
+                        righe con i puntini lo fa il CSS: tagliarla qui a
+                        un numero di caratteri spezzerebbe le parole e
+                        soprattutto darebbe una lunghezza diversa da quella
+                        che poi si vede, perche' dipende dalla larghezza
+                        della colonna. */}
+                    {t.descrizione && <p className="hm-sommario">{testo(t.descrizione)}</p>}
+
                     {t.punti.length > 0 && (
                       <ul className="hm-hl">
                         {t.punti.slice(0, 3).map((p) => (
@@ -259,6 +285,13 @@ export function HomeTours({
                         ))}
                       </ul>
                     )}
+
+                    {/* IL PREZZO IN FONDO, con l'occhiello sopra la cifra.
+                        £ e $ non c'entrano: si incassa in euro, e il punto
+                        decimale e' quello inglese -- "€676,00" per un
+                        americano e' seicentomila. Qui i decimali non ci
+                        sono affatto: sono sempre ,00 e a quella grandezza
+                        rubano spazio alla cifra che conta. */}
                     <div className="hm-price">
                       {t.prezzo != null ? (
                         <>
@@ -269,7 +302,6 @@ export function HomeTours({
                         <span className="ask">Price on request</span>
                       )}
                     </div>
-
                   </div>
                 </a>
               ))}

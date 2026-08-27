@@ -7,6 +7,7 @@ import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
+import { puntiScheda } from '@/lib/punti';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
@@ -96,11 +97,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   const { data } = await supabase
     .from('tours')
-    .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, blocks)')
+    .select('id, slug, kind, regiondo_sku, status, rating, reviews_count, reviews_source, tour_content(locale, meta_description, blocks)')
     .eq('status', 'published')
     .order('kind');
 
-  type Riga = TourRow & { tour_content?: { locale: string; blocks: Record<string, unknown> }[] };
+  type Riga = TourRow & {
+    tour_content?: { locale: string; meta_description: string | null; blocks: Record<string, unknown> }[];
+  };
   const righe = (data ?? []) as unknown as Riga[];
 
   /* Tutti i numeri della riprova sociale da una fonte sola: si
@@ -138,8 +141,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const perSlug = new Map(conteggi.map((c) => [c.tour_slug, c]));
 
   const tours: SchedaTour[] = righe.map((r) => {
-    const c = (r.tour_content?.find((x) => x.locale === locale) ??
-      r.tour_content?.find((x) => x.locale === 'en'))?.blocks as
+    const riga =
+      r.tour_content?.find((x) => x.locale === locale) ??
+      r.tour_content?.find((x) => x.locale === 'en');
+    const c = riga?.blocks as
       | { name?: string; images?: string[]; highlights?: string[]; tabs?: Record<string, string> }
       | undefined;
     const p = prezzi.get(r.slug);
@@ -153,7 +158,16 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       nome: c?.name ?? r.slug.replace(/-/g, ' '),
       kind: r.kind,
       foto: c?.images?.[0] ?? null,
-      punti: c?.highlights ?? [],
+      /* NON `c.highlights`: quello e' l'elenco lungo di WordPress, che
+         comincia con la riga sulla sanificazione dei veicoli. `puntiScheda`
+         ne ricava due o tre righe corte su cosa si vede e si fa in QUESTA
+         giornata, e restituisce l'elenco vuoto dove non c'e' niente da
+         dire -- i transfer punto-a-punto. Vedi src/lib/punti.ts. */
+      punti: puntiScheda(c),
+      /* La riga di prosa sotto la durata. E' la meta description, che
+         esiste su tutte e 87 le schede ed e' gia' scritta per essere letta
+         da sola in 126-154 caratteri: non serve scriverne un'altra. */
+      descrizione: riga?.meta_description ?? null,
       prezzo: prezzo?.valore ?? null,
       ore: p?.ore ?? null,
       partenza: partenzaDa(r.slug),
