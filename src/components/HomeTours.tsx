@@ -11,7 +11,11 @@ export type SchedaTour = {
   foto: string | null;
   punti: string[];
   prezzo: number | null;
-  ore: number | null;
+  /* Gia' scritta per esteso ("4 hours", "15 minutes"): l'unita' la
+     decide Regiondo e la traduce `durataInParole`. Quando qui c'era un
+     numero e la scheda ci appiccicava "hours", i quindici minuti del
+     transfer dall'aeroporto diventavano quindici ore. */
+  ore: string | null;
   partenza: string;
   maxOspiti: number | null;
   /* IL VOTO E LE RECENSIONI DEL SINGOLO TOUR.
@@ -240,7 +244,7 @@ export function HomeTours({
                       </div>
                     )}
                     <div className="hm-meta">
-                      {t.ore ? <span>{t.ore} hours</span> : null}
+                      {t.ore ? <span>{t.ore}</span> : null}
                       {t.maxOspiti ? <span>up to {t.maxOspiti} guests</span> : null}
                     </div>
                     {t.punti.length > 0 && (

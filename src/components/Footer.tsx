@@ -132,11 +132,20 @@ export async function Footer({ locale }: { locale: string }) {
       </div>
 
       {/* IL PROMEMORIA. Sta in fondo, e' rosso e ha un link che porta dritto
-          dove si spegne. Deve dare fastidio: e' l'unica difesa contro i due
-          errori che non danno nessun sintomo -- andare online col noindex
-          acceso, e lasciare pubblico il repo del cliente. Ogni riga sparisce
-          da sola quando la sua variabile viene spenta. */}
-      {(process.env.SITE_NOINDEX !== 'false' || process.env.REPO_PUBLIC === 'true') && (
+          dove si spegne. Deve dare fastidio: e' l'unica difesa contro un
+          errore che non da' nessun sintomo -- andare online col noindex
+          acceso e sparire da Google senza accorgersene.
+
+          🔴 E' SCRITTO IN ITALIANO E LINKA AL PANNELLO PRIVATO, quindi non
+          deve MAI essere visibile a un cliente. Per questo tutto il blocco
+          -- compresa la riga sul repository pubblico, che prima aveva una
+          condizione sua -- vive dentro `SITE_NOINDEX !== 'false'`: il
+          giorno del passaggio si spegne quella variabile e sparisce tutto
+          insieme, senza che nessuno debba ricordarsi di una seconda riga.
+          Prima bastava REPO_PUBLIC=true perche' un avviso in italiano, con
+          il link alle impostazioni di GitHub, restasse in fondo a tutte e
+          123 le pagine viste da un cliente americano. */}
+      {process.env.SITE_NOINDEX !== 'false' && (
         <div className="ft-warn">
           {process.env.SITE_NOINDEX !== 'false' && (
             <a

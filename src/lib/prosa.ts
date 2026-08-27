@@ -8,11 +8,35 @@
  */
 
 export function pulisci(html: string): string {
-  return (html || '')
-    // i paragrafi-spaziatore: nel CSS della landing diventano buchi
-    .replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
-    .replace(/(&nbsp;\s*){2,}/g, ' ')
-    .trim();
+  return importiInInglese(
+    (html || '')
+      // i paragrafi-spaziatore: nel CSS della landing diventano buchi
+      .replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '')
+      .replace(/(&nbsp;\s*){2,}/g, ' ')
+      .trim()
+  );
+}
+
+/* 🔴 IL PUNTO DECIMALE, SEMPRE. Su 75 schede su 87 i due formati stanno
+ * nello stesso elenco puntato:
+ *
+ *     Winery visit and wine tasting – Approx. Euro 40.00 per person
+ *     Extra hours with driver, Euro 90,00 per hour, per party
+ *
+ * Il sito e' in inglese e i clienti sono americani: "Euro 90,00" per loro
+ * e' novemila euro, e l'ora in piu' col conducente diventa una cifra da
+ * cui si scappa. Sono 140 importi, tutti nella forma "NN,00" -- nessuno
+ * con il separatore delle migliaia, quindi la conversione e' meccanica e
+ * non puo' cambiare il valore.
+ *
+ * Si fa qui, in fondo all'imbuto da cui passa OGNI scheda e ogni
+ * itinerario, e non con un aggiornamento dei dati: cosi' vale anche per i
+ * contenuti che verranno importati domani dallo stesso WordPress. */
+export function importiInInglese(html: string): string {
+  return (html || '').replace(
+    /((?:Euro|EUR|€)\s*[0-9]+),([0-9]{2})(?![0-9])/gi,
+    (_, prima: string, decimali: string) => `${prima}.${decimali}`
+  );
 }
 
 export type Domanda = { q: string; a: string };
@@ -121,4 +145,38 @@ export function spezzaTitolo(nome: string): { prima: string; accento: string; do
   }
   const parole = n.split(' ');
   return { prima: parole.slice(0, -1).join(' ') + ' ', accento: parole[parole.length - 1], dopo: '' };
+}
+
+/* ── LE SEZIONI DENTRO UNA SCHEDA ────────────────────────────────────────
+ *
+ * Le schede di WordPress non sono testo libero: dentro hanno dei titoletti
+ * in grassetto -- "Included:", "Not included:", "Optional:", "Important:" --
+ * e sotto ciascuno un elenco puntato. Sono TRE cose diverse, e leggerle
+ * come se fossero una sola e' esattamente il bug che metteva il badge
+ * "pranzo incluso" su una pagina che sotto scrive "Not Included: Lunch".
+ *
+ * `primaSezione` restituisce solo il pezzo che sta PRIMA del primo
+ * titoletto di chiusura: cioe' quello che il tour da' davvero, senza cio'
+ * che nega o che fa pagare a parte.
+ */
+export function primaSezione(html: string | undefined | null, chiude: RegExp): string {
+  if (!html) return '';
+  /* Ogni <p> puo' aprire un titoletto: si taglia sul primo che chiude. Il
+     lookahead tiene attaccato al titoletto l'elenco che lo segue. */
+  const pezzi = html.split(/(?=<p[\s>])/i);
+  const dentro: string[] = [];
+  for (const p of pezzi) {
+    const nudo = testo(p.replace(/<[^>]*>/g, ' ')).toLowerCase();
+    if (nudo && chiude.test(nudo)) break;
+    dentro.push(p);
+  }
+  return dentro.join('');
+}
+
+/** Le voci di un elenco puntato, ripulite: una promessa per riga. */
+export function vociElenco(html: string | undefined | null): string[] {
+  if (!html) return [];
+  return (html.match(/<li[\s\S]*?<\/li>/gi) ?? [])
+    .map((v) => testo(v.replace(/<[^>]*>/g, ' ')).toLowerCase())
+    .filter(Boolean);
 }

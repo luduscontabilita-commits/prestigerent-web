@@ -19,8 +19,10 @@ export type RegiondoProduct = {
   /** prezzo "a partire da", in euro */
   price: number | null;
   currency: string;
-  /** ore di servizio, quando dichiarate */
-  durationHours: number | null;
+  /** minuti di servizio, quando dichiarati */
+  durationMinutes: number | null;
+  /** gia' scritta per il lettore: "15 minutes", "4 hours", "1 hour 30 minutes" */
+  durationLabel: string | null;
   shortDescription: string;
   description: string;
   included: string;
@@ -33,14 +35,45 @@ export type RegiondoProduct = {
   urlKey: string;
 };
 
-/** La durata arriva serializzata da PHP (Varien_Object di Magento).
- *  Non vale la pena un parser: serve solo il numero di ore. */
+/* 🔴 LA DURATA HA UN'UNITA', E VA LETTA.
+ *
+ * Arriva serializzata da PHP (Varien_Object di Magento) e contiene DUE
+ * campi: i valori e il tipo.
+ *
+ *     "values";a:1:{i:0;d:15;}  "type";s:6:"minute"
+ *
+ * Il vecchio parser prendeva solo il numero e la pagina stampava "15
+ * hours": il transfer dall'aeroporto di Firenze in citta' -- un quarto
+ * d'ora -- risultava una giornata intera. Due pagine su 87, ma sono due
+ * transfer, cioe' l'acquisto in cui l'orario e' tutto.
+ *
+ * I valori possono essere piu' di uno (una durata per opzione di
+ * prenotazione, indicizzata per id opzione: `{i:0;d:9;i:21;d:8;}`). Si
+ * prende il massimo -- la giornata piena -- e non il primo che capita:
+ * su tre prodotti il primo valore e' `d:0` e la durata spariva del tutto.
+ */
 function parseDuration(raw: unknown): number | null {
   if (typeof raw !== 'string') return null;
-  const m = raw.match(/"values";a:1:\{i:0;d:([0-9.]+);\}/);
-  if (m) return Number(m[1]);
-  const m2 = raw.match(/d:([0-9.]+);/);
-  return m2 ? Number(m2[1]) : null;
+  const blocco = raw.match(/"values";a:\d+:\{([^}]*)\}/);
+  const valori = [...(blocco?.[1] ?? raw).matchAll(/d:([0-9.]+);/g)]
+    .map((m) => Number(m[1]))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (!valori.length) return null;
+
+  const quanti = Math.max(...valori);
+  const unita = raw.match(/"type";s:\d+:"(\w+)"/)?.[1] ?? 'hour';
+  const perUnita: Record<string, number> = { minute: 1, hour: 60, day: 60 * 24 };
+  return Math.round(quanti * (perUnita[unita] ?? 60));
+}
+
+/** La durata come la legge un cliente, non come la conserva Magento. */
+export function durataInParole(minuti: number | null): string | null {
+  if (!minuti || minuti <= 0) return null;
+  if (minuti < 60) return `${minuti} minutes`;
+  const ore = Math.floor(minuti / 60);
+  const resto = minuti % 60;
+  const parteOre = `${ore} ${ore === 1 ? 'hour' : 'hours'}`;
+  return resto ? `${parteOre} ${resto} minutes` : parteOre;
 }
 
 function str(v: unknown): string {
@@ -84,12 +117,15 @@ export async function fetchProduct(
       ? Number(priceRaw) || null
       : null;
 
+  const minuti = parseDuration(d.ticket_duration);
+
   return {
     sku: str(d.sku),
     name: str(d.name),
     price,
     currency: 'EUR',
-    durationHours: parseDuration(d.ticket_duration),
+    durationMinutes: minuti,
+    durationLabel: durataInParole(minuti),
     shortDescription: str(d.short_description),
     description: str(d.description),
     included: str(d.faq_included),

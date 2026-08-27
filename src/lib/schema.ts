@@ -79,7 +79,7 @@ export function touristTrip(opts: {
   locale: string;
   immagini?: string[];
   prezzo?: number | null;
-  ore?: number | null;
+  durata?: string | null;
   tappe?: string[];
 }) {
   const t: Record<string, unknown> = {
@@ -91,8 +91,10 @@ export function touristTrip(opts: {
   };
   if (opts.descrizione) t.description = opts.descrizione;
   if (opts.immagini?.length) t.image = opts.immagini.slice(0, 6);
-  /* Durata in formato ISO 8601: 8 ore -> PT8H */
-  if (opts.ore) t.subjectOf = { '@type': 'CreativeWork', abstract: `${opts.ore} hours` };
+  /* La durata arriva gia' scritta per il lettore ("15 minutes", "8 hours"):
+     la costruisce `durataInParole` in regiondo.ts, che l'unita' di Magento
+     la legge davvero. Qui si ricopia, non si reinterpreta. */
+  if (opts.durata) t.subjectOf = { '@type': 'CreativeWork', abstract: opts.durata };
   if (opts.prezzo != null) {
     t.offers = {
       '@type': 'Offer',

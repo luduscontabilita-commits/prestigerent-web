@@ -122,13 +122,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   /* I prezzi si chiedono a Regiondo tutti insieme, non uno dopo l'altro:
      in fila sarebbero 49 attese sommate. */
-  const prezzi = new Map<string, { prezzo: number | null; ore: number | null }>();
+  const prezzi = new Map<string, { prezzo: number | null; ore: string | null }>();
   await Promise.all(
     righe
       .filter((r) => r.regiondo_sku)
       .map(async (r) => {
         const p = await fetchProduct(r.regiondo_sku!, regiondoLocale(locale));
-        if (p) prezzi.set(r.slug, { prezzo: p.price, ore: p.durationHours });
+        if (p) prezzi.set(r.slug, { prezzo: p.price, ore: p.durationLabel });
       })
   );
 

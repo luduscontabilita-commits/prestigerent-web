@@ -14,9 +14,10 @@ import { Premi } from '@/components/Premi';
 import { FasciaFiducia } from '@/components/Riprova';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
+import { badgeIncluso } from '@/lib/inclusi';
 import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
-import { prezzoDi } from '@/lib/prezzi';
+import { prezzoDi, unitaDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
 import { prenotazioniDi, disponibilitaDi, riprova } from '@/lib/riprova';
 import { Urgenza } from '@/components/Urgenza';
@@ -236,23 +237,19 @@ export default async function TourPage({
     contenuto.gallery?.length
       ? contenuto.gallery
       : (contenuto.images ?? []).map((src) => ({ src, alt: contenuto.name ?? '' }));
-  /* I tre punti dell'hero, ricavati dai dati e non scritti a mano. */
-  const incluso = Object.entries(tutteLeSchede)
-    .filter(([k]) => /included|prices/i.test(k))
-    .map(([, v]) => String(v))
-    .join(' ')
-    .toLowerCase();
-
+  /* I tre punti dell'hero, ricavati dai dati e non scritti a mano.
+   *
+   * Il secondo -- quello che promette qualcosa di compreso nel prezzo --
+   * lo decide `badgeIncluso` leggendo l'elenco "Included" della scheda,
+   * voce per voce. Prima bastava che la parola comparisse da qualche
+   * parte nel blocco, e la pagina si contraddiceva da sola: vedi il
+   * commento in testa a `src/lib/inclusi.ts`. Se non c'e' niente di vero
+   * da dire, il posto resta vuoto. */
   const usp: { icona: string; testo: string }[] = [
     { icona: '🛡️', testo: 'Free cancellation up to 24 hours' },
   ];
-  if (/lunch/.test(incluso)) {
-    usp.push({ icona: '🍷', testo: 'Winery lunch and tastings included' });
-  } else if (/tasting|wine/.test(incluso)) {
-    usp.push({ icona: '🍷', testo: 'Wine tastings included' });
-  } else if (/guide/.test(incluso)) {
-    usp.push({ icona: '🗣️', testo: 'Licensed guide included' });
-  }
+  const compreso = badgeIncluso(tutteLeSchede);
+  if (compreso) usp.push(compreso);
   if (tour.kind === 'private' || tour.kind === 'transfer') {
     usp.push({ icona: '🚐', testo: 'We collect you where you are staying' });
   } else if (tour.kind === 'cruise') {
@@ -381,7 +378,7 @@ export default async function TourPage({
         {prezzo != null && (
           <p className="hero-dep">
             <b>from &euro;{prezzo.valore.toFixed(0)}</b>
-            {product?.durationHours ? ` · ${product.durationHours} hours` : null}
+            {product?.durationLabel ? ` · ${product.durationLabel}` : null}
             {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
@@ -592,7 +589,7 @@ export default async function TourPage({
                 locale,
                 immagini: foto,
                 prezzo: prezzo?.valore ?? null,
-                ore: product?.durationHours ?? null,
+                durata: product?.durationLabel ?? null,
                 tappe: punti.slice(0, 8),
               }),
               /* 🔴 `Product` ACCANTO A `TouristTrip`, non al suo posto.
@@ -629,7 +626,7 @@ export default async function TourPage({
       <StickyBook
         titolo={nome}
         prezzo={prezzo?.valore ?? null}
-        unita={tour.kind === 'private' ? 'per party' : 'per person'}
+        unita={unitaDi(tutteLeSchede, tour.kind)}
       />
       </div>{/* /.pg-cols */}
     </main>
