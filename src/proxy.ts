@@ -50,6 +50,12 @@ export default function proxy(req: NextRequest) {
     pathname === '/lp' ||
     pathname.startsWith('/myb/') ||
     pathname === '/myb' ||
+    /* /mp/ e' il punto d'incontro: sta sul vecchio hosting come /lp e
+       /myb, ed era l'unica delle tre a non essere esclusa qui. Senza,
+       diventa /en/mp/ e da li' un 404 -- proprio per chi ha appena pagato
+       e sta cercando dove ci si vede. */
+    pathname.startsWith('/mp/') ||
+    pathname === '/mp' ||
     /* Le cartelle di WordPress: le foto dei tour (/wp-content/) e jQuery,
        da cui dipendono le landing (/wp-includes/). Quasi tutte finiscono
        gia' in PUBLIC_FILE per via dell'estensione, ma non tutte -- e un

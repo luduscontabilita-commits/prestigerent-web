@@ -222,10 +222,33 @@ const nextConfig: NextConfig = {
        raccoglie i file, che la barra non ce l'hanno mai perche' Next
        gliela toglie (/lp/...-lan2.html, /lp/video/*.mp4, /lp/img/*). */
     const inoltra = (chiesto: string, sulVecchio: string) => [
+      /* 🔴 LA REGOLA DELLA CARTELLA, SCRITTA PER ESTESO E PER PRIMA.
+         Serve solo a /myb/ e /mp/: sono cartelle, e il vecchio server le
+         vuole con la barra. Se arrivassero senza, risponderebbe con un suo
+         301 verso la versione con la barra, e quel redirect arriva al
+         browser: nella barra degli indirizzi comparirebbe l'hostname del
+         vecchio hosting al posto di prestigerent.com, proprio davanti a
+         chi ha appena pagato. Scritta senza `:path*` perche' un percorso
+         esatto non e' ambiguo. */
       {
-        source: `${chiesto}/:path*/`,
-        destination: `https://${hostLegacy}${sulVecchio}/:path*/`,
+        source: `${chiesto}/`,
+        destination: `https://${hostLegacy}${sulVecchio}/`,
       },
+      /* TUTTO IL RESTO, SENZA BARRA IN FONDO.
+         Prima qui c'era `${'${chiesto}'}/:path*​/` -- con la barra -- e stava
+         PER PRIMA. Sembrava giusto e non lo era: Next aggiunge da se' una
+         barra finale OPZIONALE a ogni `source`, quindi quella regola
+         catturava anche gli indirizzi senza barra e compilava la
+         destinazione CON la barra.
+         Misurato il 27/08/2026 sul deploy pubblico:
+             /lp/tasting-...-lan2.html  -> 404, 437.672 byte
+         e il 404 di WordPress che tornava indietro dichiarava di aver
+         ricevuto il nome del file con una barra attaccata in fondo.
+         Sarebbero saltate insieme le quattro landing delle campagne
+         (3.645 euro al mese), il logo su tutte e 123 le pagine, la foto
+         grande della home e jQuery, da cui dipende il JavaScript delle
+         landing. Nessuna di queste cose si vede provando il sito, perche'
+         senza LEGACY_HOST le regole non nascono nemmeno. */
       {
         source: `${chiesto}/:path*`,
         destination: `https://${hostLegacy}${sulVecchio}/:path*`,
@@ -277,6 +300,7 @@ const nextConfig: NextConfig = {
          dall'alias @/.) La strada pulita e' escludere /lp e /myb nel proxy
          come gia' si fa per /admin e /auth: fatto quello, queste due righe
          diventano inutili e si possono togliere. */
+      ...inoltra('/en/mp', '/mp'),
       ...inoltra('/en/lp', '/lp'),
       ...inoltra('/en/myb', '/myb'),
     ];
