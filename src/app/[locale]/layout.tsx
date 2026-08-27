@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getLocale, isLocale, LOCALES } from '@/lib/locales';
+import { DEFAULT_LOCALE, getLocale, isLocale, LOCALES } from '@/lib/locales';
+import { ogDiBase, TWITTER } from '@/lib/og';
+import { SITE } from '@/lib/schema';
 import { NoindexBadge } from '@/components/NoindexBadge';
 import { Header } from '@/components/Header';
 import { votiPerTour } from '@/lib/recensioni';
@@ -10,20 +12,46 @@ import { supabase } from '@/lib/supabase';
 import { SEZIONI } from '@/lib/menu';
 import { testo } from '@/lib/prosa';
 import { Footer } from '@/components/Footer';
+import { Consenso } from '@/components/Consenso';
 import { Tracciamento } from '@/components/Tracciamento';
 import '@/styles/landing.css';
 import '@/styles/home.css';
 import '@/styles/theme.css';
 
-export const metadata: Metadata = {
-  title: 'Prestige Rent — Tours & Transfers in Italy',
-  /* Il marchio tondo, lo stesso delle landing e dell'intestazione: e' il
-     segno con cui si riconosce la scheda fra venti aperte. */
-  icons: {
-    icon: 'https://prestigerent.com/lp/img/logo-prestige.png',
-    apple: 'https://prestigerent.com/lp/img/logo-prestige.png',
-  },
-};
+/* 🔴 ERA UN OGGETTO FISSO, ORA E' UNA FUNZIONE: SERVE LA LINGUA.
+ *
+ * `og:locale` deve dire in che lingua e' la pagina, e la lingua sta nei
+ * params -- che a un `export const metadata` non arrivano. Il titolo e le
+ * icone restano identici: cambia solo il modo di consegnarli.
+ *
+ * 🔴 `metadataBase` MANCAVA, e non era innocuo. Senza, Next risolve ogni
+ * indirizzo relativo dei metadata contro `http://localhost:3000` (o, su
+ * Vercel, contro l'hostname del deploy di prova): un'anteprima che punta
+ * a localhost non si apre a nessuno. Qui c'e' scritto una volta sola che
+ * la casa e' prestigerent.com.
+ *
+ * L'Open Graph di base sta QUI e non nelle pagine perche' e' l'unico
+ * punto che le attraversa tutte e 123. Titolo e descrizione li mette ogni
+ * pagina da se': vedi la nota lunga in src/lib/og.ts. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    metadataBase: new URL(SITE),
+    title: 'Prestige Rent — Tours & Transfers in Italy',
+    /* Il marchio tondo, lo stesso delle landing e dell'intestazione: e' il
+       segno con cui si riconosce la scheda fra venti aperte. */
+    icons: {
+      icon: 'https://prestigerent.com/lp/img/logo-prestige.png',
+      apple: 'https://prestigerent.com/lp/img/logo-prestige.png',
+    },
+    openGraph: ogDiBase(isLocale(locale) ? locale : DEFAULT_LOCALE),
+    twitter: TWITTER,
+  };
+}
 
 /* Le otto lingue si generano tutte in anticipo: sono poche e fisse. */
 export function generateStaticParams() {
@@ -108,6 +136,22 @@ export default async function LocaleLayout({
         />
       </head>
       <body>
+        {/* IL CONSENSO, PRIMA DEL TRACCIAMENTO.
+
+            Non e' un dettaglio d'ordine: `gtag('consent','default',...)`
+            deve essere gia' nel dataLayer quando gtm.js parte. Se GTM
+            arrivasse per primo leggerebbe "nessun segnale" e i tag
+            partirebbero comunque -- il banner ci sarebbe, ma non
+            servirebbe a niente, e ogni visitatore europeo verrebbe
+            profilato dal primo millisecondo. Il sito WordPress che
+            questo sostituisce il consenso ce l'ha e funziona: andare
+            online senza sarebbe una regressione, non una mancanza.
+
+            `beforeInteractive` contro l'`afterInteractive` di
+            <Tracciamento /> e' cio' che rende l'ordine garantito e non
+            una corsa fra due script. */}
+        <Consenso />
+
         {/* IL TRACCIAMENTO, MONTATO QUI E NON NELLE PAGINE.
 
             Sta nel layout perche' questo componente e' l'unico punto che

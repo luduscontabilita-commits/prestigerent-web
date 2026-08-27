@@ -1,3 +1,7 @@
+import { DEFAULT_LOCALE } from '@/lib/locales';
+import { testiModulo } from '@/lib/testi';
+import { ModuloRichiesta } from '@/components/ModuloRichiesta';
+
 /* "Talk to a real person", con la foto del team.
  *
  * E' lo stesso blocco della landing, e non e' un vezzo: su un sito che vende
@@ -7,8 +11,31 @@
  *
  * Sta in un componente solo perche' compare in home e su tutte le pagine
  * tour: cambiare un numero di telefono deve essere una modifica sola.
+ *
+ * ── L'ORDINE DEI DUE MODI DI SCRIVERCI ──────────────────────────────
+ * Prima i tre riquadri -- WhatsApp, telefono, email -- e SOLO DOPO il
+ * modulo. Non e' un'abitudine: e' il giudizio che aveva gia' portato a
+ * togliere il vecchio modulo dal footer (WhatsApp converte molto meglio,
+ * e chi puo' chattare deve chattare). Il modulo raccoglie l'altra meta':
+ * chi guarda la pagina quando a Firenze e' notte, chi WhatsApp non ce
+ * l'ha, e chi ha una domanda troppo lunga per una chat.
+ *
+ * ── L'INTESTAZIONE STA QUI E NON NEL MODULO ─────────────────────────
+ * Questo e' un componente server: titolo e sottotitolo li disegna il
+ * server e non finiscono nel JavaScript che il visitatore scarica. Nel
+ * componente client va solo quello che deve reagire ai tasti.
  */
-export function ContactSection() {
+export function ContactSection({
+  locale = DEFAULT_LOCALE,
+  tour,
+}: {
+  /** la lingua della pagina: senza, il modulo parlerebbe inglese ovunque */
+  locale?: string;
+  /** il nome del tour, quando questa sezione sta su una scheda tour */
+  tour?: string;
+} = {}) {
+  const t = testiModulo(locale);
+
   return (
     <section className="pr-sec tight alt" id="contact">
       <div className="pr-wrap">
@@ -67,6 +94,21 @@ export function ContactSection() {
             <div><b>usa@prestigerent.com</b><span>Email us</span></div>
           </a>
         </div>
+
+        {/* L'ancora serve per davvero: e' l'indirizzo a cui mandare chi
+            clicca "CONTACT" da un annuncio o da una pagina senza
+            calendario, e deve restare stabile. */}
+        <div className="pr-head" id="richiesta" style={{ marginTop: 42, marginBottom: 0, scrollMarginTop: 90 }}>
+          <p className="pr-kicker">{t.occhiello}</p>
+          <h2 className="pr-title">
+            {t.titolo}
+            <em className="hl place">{t.accento}</em>
+            {t.titoloCoda}
+          </h2>
+          <p className="pr-lead">{t.sottotitolo}</p>
+        </div>
+
+        <ModuloRichiesta locale={locale} tour={tour} />
       </div>
     </section>
   );

@@ -41,8 +41,9 @@ export async function generateMetadata({
       `We are a Florence company running our own minibuses and cars with our own employed ` +
       `drivers and guides — ${anni} years, ${d.totale.toLocaleString('en-US')} verified ` +
       `reviews, ${d.voto?.toFixed(1)} average. Not a broker, not a marketplace.`,
-    alternates: hreflangDi((l) =>
-      l === DEFAULT_LOCALE ? '/about-us/' : `/${l}/about-us/`
+    alternates: hreflangDi(
+      (l) => (l === DEFAULT_LOCALE ? '/about-us/' : `/${l}/about-us/`),
+      locale
     ),
   };
 }
@@ -148,7 +149,7 @@ export default async function ChiSiamo({
         </p>
       </section>
 
-      <ContactSection />
+      <ContactSection locale={locale} />
     </main>
   );
 }

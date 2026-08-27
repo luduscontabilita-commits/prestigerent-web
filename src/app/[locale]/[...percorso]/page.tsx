@@ -9,6 +9,7 @@ import { metaDi } from '@/lib/seo';
 import { prezzoDi } from '@/lib/prezzi';
 import { testo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
+import { ogDiPagina } from '@/lib/og';
 import { Premi } from '@/components/Premi';
 import { ContactSection } from '@/components/ContactSection';
 import '@/styles/home.css';
@@ -44,7 +45,9 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; percorso: string[] }>;
 }): Promise<Metadata> {
-  const { percorso } = await params;
+  /* `locale` serviva gia' qui sotto per il canonical ma non veniva
+     estratto: il file non compilava proprio (TS2552). */
+  const { locale, percorso } = await params;
   const c = categoriaDi(daiParams(percorso));
   if (!c) return {};
   /* Scritti uno per uno e conservati nella tabella `seo`: qui c'erano
@@ -54,7 +57,19 @@ export async function generateMetadata({
   return {
     title: m?.title ?? `${c.titolo} — Prestige Rent`,
     description: m?.description ?? c.intro.slice(0, 155),
-    alternates: hreflangDi((l) => (l === DEFAULT_LOCALE ? c.path : `/${l}${c.path}`)),
+    alternates: hreflangDi(
+      (l) => (l === DEFAULT_LOCALE ? c.path : `/${l}${c.path}`),
+      locale
+    ),
+    /* Titolo e testo dell'anteprima li mette Next da solo copiando i due
+       campi qui sopra (vedi src/lib/og.ts); qui si aggiunge l'indirizzo
+       pubblico giusto -- che Next da solo sbaglierebbe, perche' dentro
+       l'applicazione l'inglese vive sotto /en/. La foto e' quella di
+       ripiego: una pagina di categoria non ne ha una propria. */
+    openGraph: ogDiPagina({
+      locale,
+      path: locale === DEFAULT_LOCALE ? c.path : `/${locale}${c.path}`,
+    }),
   };
 }
 
@@ -186,7 +201,7 @@ export default async function Categoria_({
       )}
 
       <Premi />
-      <ContactSection />
+      <ContactSection locale={locale} />
     </main>
   );
 }

@@ -1270,3 +1270,118 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
   .hm-hero-bg .hm-hero-foto{ transition:none; }
   .hm-hero-bg.viva .hm-hero-foto{ animation:none; }
 }
+
+/* ============================================================
+   IL MODULO DI RICHIESTA RAPIDA
+   Sta qui e non in landing.css: quello e' la grafica ereditata dalla
+   landing, gia' collaudata su traffico a pagamento, e questo e' un
+   blocco nuovo. Non usa un solo colore proprio -- solo --card, --line,
+   --ink, --ink-soft e --orange -- cosi' il tema scuro lo segue senza
+   una riga in piu' in theme.css.
+   ============================================================ */
+.mr{
+  max-width:720px; margin:26px auto 0;
+  display:flex; flex-direction:column; gap:14px;
+  text-align:left;
+}
+
+/* Due campi per riga sul desktop, uno per riga sul telefono. Su schermo
+   stretto due caselle affiancate diventano entrambe illeggibili, e il
+   telefono e' dove sta la meta' del traffico. */
+.mr-riga{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:640px){ .mr-riga{ grid-template-columns:1fr; } }
+
+.mr-campo{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.mr-campo > span{
+  font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-soft);
+}
+/* "facoltativo" accanto all'etichetta, non sotto: dice prima di
+   cominciare che si puo' saltare, ed e' il motivo per cui il modulo non
+   spaventa nonostante abbia sette caselle. */
+.mr-campo > span > i{
+  font-style:normal; font-weight:700; letter-spacing:.04em;
+  text-transform:none; opacity:.7;
+}
+
+.mr-campo input,
+.mr-campo textarea{
+  font-family:inherit; font-size:1rem; font-weight:500; color:var(--ink);
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:12px 14px; width:100%;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+.mr-campo textarea{ resize:vertical; min-height:96px; line-height:1.55; }
+.mr-campo input::placeholder,
+.mr-campo textarea::placeholder{ color:var(--ink-soft); opacity:.62; }
+
+.mr-campo input:focus,
+.mr-campo textarea:focus{
+  outline:none; border-color:var(--orange);
+  box-shadow:0 0 0 3px rgba(245,118,11,.18);
+}
+
+/* Il campo che il server ha rifiutato. Il bordo da solo non basta a chi
+   non distingue i colori: sopra c'e' comunque la frase che dice cosa
+   fare, e questo serve solo a far trovare la casella in fretta. */
+.mr-campo input.mr-rotto,
+.mr-campo textarea.mr-rotto{ border-color:#C8102E; box-shadow:0 0 0 3px rgba(200,16,46,.14); }
+
+/* Il calendario nativo in tema scuro disegna l'icona in nero su nero. */
+html[data-theme="dark"] .mr-campo input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1) opacity(.7);
+}
+
+/* L'ESCA. Fuori schermo, non `display:none`: i bot saltano i campi
+   dichiaratamente nascosti, e un campo che nessuno vede ma che esiste
+   nel DOM e' esattamente quello che li fa cadere. */
+.mr-esca{
+  position:absolute; left:-9999px; width:1px; height:1px;
+  overflow:hidden; opacity:0; pointer-events:none;
+}
+
+.mr-errore{
+  margin:0; padding:11px 14px; border-radius:12px;
+  background:rgba(200,16,46,.08); border:1px solid rgba(200,16,46,.28);
+  font-size:.92rem; font-weight:600; line-height:1.5; color:#C8102E;
+}
+html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
+
+.mr-fondo{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:4px; }
+
+/* Il pulsante ha il peso dell'arancione del marchio, come i CTA di
+   prenotazione, ma non la loro dimensione: qui non si compra, si chiede.
+   Se fosse identico al "BOOK NOW" competerebbe con lui sulla stessa
+   pagina, e vincerebbe il piu' facile -- che e' questo. */
+.mr-invia{
+  font-family:inherit; font-size:1rem; font-weight:800; letter-spacing:.02em;
+  color:#fff; background:var(--orange); border:0; border-radius:12px;
+  padding:14px 30px; cursor:pointer;
+  box-shadow:0 6px 18px rgba(237,103,7,.26);
+  transition:background .18s ease, transform .12s ease;
+}
+.mr-invia:hover:not(:disabled){ background:var(--orange-d); transform:translateY(-2px); }
+.mr-invia:active:not(:disabled){ transform:none; }
+.mr-invia:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
+.mr-invia:disabled{ opacity:.6; cursor:default; }
+
+.mr-privacy{ margin:0; font-size:.8rem; font-weight:600; line-height:1.5; color:var(--ink-soft); text-align:center; }
+
+/* LA CONFERMA, al posto del modulo. Verde e non arancione: l'arancione
+   qui dentro vuol dire "premi", e dopo l'invio non c'e' piu' niente da
+   premere. */
+.mr-fatto{
+  max-width:720px; margin:26px auto 0;
+  display:flex; align-items:flex-start; gap:14px; text-align:left;
+  background:var(--card); border:1px solid var(--line); border-left:4px solid var(--teal);
+  border-radius:14px; padding:20px 22px;
+  box-shadow:0 2px 10px rgba(36,51,63,.05);
+}
+.mr-fatto svg{ width:26px; height:26px; flex-shrink:0; color:var(--teal); margin-top:2px; }
+.mr-fatto b{ display:block; font-size:1.06rem; font-weight:800; color:var(--ink); line-height:1.3; }
+.mr-fatto p{ margin:6px 0 0; font-size:.95rem; font-weight:500; line-height:1.6; color:var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce){
+  .mr-invia{ transition:none; }
+  .mr-invia:hover:not(:disabled){ transform:none; }
+}

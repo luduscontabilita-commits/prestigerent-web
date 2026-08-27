@@ -41,3 +41,16 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# registro dei giri del travaso dei media: serve solo su questa macchina
+scripts/*.log.jsonl
+
+# File di lavoro degli script e scarichi temporanei: non vanno versionati.
+# `tutti.mjs` legge .env.local e ha identificativi in chiaro; le bozze
+# legali sono la fotografia di lavoro delle pagine gia' installate.
+/bozze-legali/
+/storico.mjs
+/tutti.mjs
+/home.html
+/t.html
+/r.json

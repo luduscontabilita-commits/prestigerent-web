@@ -100,6 +100,9 @@ export function touristTrip(opts: {
       priceCurrency: 'EUR',
       availability: 'https://schema.org/InStock',
       url: opts.url,
+      /* Lo aveva il WordPress e qui mancava: senza, l'offerta risulta
+         incompleta. Vedi `fraUnAnno()` in fondo al file. */
+      priceValidUntil: fraUnAnno(),
       seller: { '@id': ORG_ID },
     };
   }
@@ -122,9 +125,133 @@ export function grafo(nodi: unknown[]) {
   return { '@context': 'https://schema.org', '@graph': nodi };
 }
 
-export function hreflangDi(path: (locale: string) => string) {
+/* 🔴 Restituisce l'oggetto `alternates` INTERO, canonical compreso.
+ *
+ * Prima restituiva solo la mappa delle lingue, e due pagine su tre la
+ * passavano cosi' com'era a `alternates:`. Next accetta senza protestare
+ * le chiavi che non conosce -- `Metadata['alternates']` non e' un tipo
+ * chiuso -- quindi TypeScript non diceva niente, non c'era nessun errore
+ * a video, e il risultato era che home, /about-us/ e tutte e 35 le
+ * categorie uscivano SENZA canonical e SENZA hreflang. Verificato con
+ * curl: il canonical c'era solo sulle 86 schede tour, che erano le uniche
+ * a comporre l'oggetto a mano.
+ *
+ * Ora la funzione restituisce la forma giusta e basta: chi la usa non
+ * puo' piu' sbagliarsi, perche' non c'e' piu' un passaggio da fare.
+ * Il parametro e' la funzione che, data una lingua, dice a che indirizzo
+ * sta quella pagina in quella lingua. */
+export function hreflangDi(
+  path: (locale: string) => string,
+  locale: string = DEFAULT_LOCALE
+) {
   const languages: Record<string, string> = {};
   for (const l of LOCALES) languages[l.htmlLang] = SITE + path(l.code);
   languages['x-default'] = SITE + path(DEFAULT_LOCALE);
-  return languages;
+  return { canonical: SITE + path(locale), languages };
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   DA QUI IN GIU': I NODI AGGIUNTI PER LA GALLERIA DEI RISULTATI
+   ARRICCHITI DI GOOGLE.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* `priceValidUntil` vuole una data, e il vecchio sito ce l'aveva. Senza,
+ * Search Console segnala l'offerta come incompleta; con una data nel
+ * PASSATO Google smette proprio di mostrare il prezzo -- che e' peggio di
+ * non averla messa.
+ *
+ * Si calcola a un anno da oggi e non si scrive a mano proprio per questo:
+ * una costante scritta nel codice scade in silenzio, e nessuno se ne
+ * accorge finche' il prezzo non e' gia' sparito dallo snippet. Le pagine
+ * si rigenerano ogni ora (`revalidate = 3600`), quindi la data resta
+ * sempre a dodici mesi di distanza da sola. */
+export function fraUnAnno(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/* 🔴 `Product` IN PARALLELO A `TouristTrip`, NELLO STESSO @graph.
+ *
+ * `TouristTrip` e' il tipo semanticamente giusto per una gita, e resta.
+ * Ma **non e' nella galleria dei risultati arricchiti di Google**: con
+ * quello soltanto, nello snippet non compaiono ne' il prezzo ne' le
+ * stelle. Il WordPress che stiamo sostituendo usava `Product` + `Offer` e
+ * nella galleria ci arrivava: passare al tipo "piu' corretto" senza
+ * questo nodo vorrebbe dire vincere la disputa semantica e perdere il
+ * prezzo nello snippet su ottantasei pagine.
+ *
+ * Due tipi per la stessa cosa dentro un solo `@graph` sono leciti -- e'
+ * esattamente a questo che serve `@graph` -- e hanno `@id` diversi, quindi
+ * per una macchina non sono un doppione ma due descrizioni della stessa
+ * pagina.
+ *
+ * 🔴 `aggregateRating` SI COSTRUISCE SOLO DAI NUMERI CHE STANNO SCRITTI
+ * SULLA PAGINA. Non e' scrupolo: le linee guida di Google dicono che il
+ * voto dev'essere visibile al lettore, e un voto dichiarato solo nel
+ * JSON-LD e' motivo di penalizzazione manuale. Chi chiama passa `voto` e
+ * `quante` SOLO quando li sta anche stampando; se non li stampa, passa
+ * null e il nodo esce senza stelle. */
+export function product(opts: {
+  nome: string;
+  descrizione?: string;
+  url: string;
+  immagini?: string[];
+  prezzo?: number | null;
+  /** il voto STAMPATO sulla pagina, o null se la pagina non lo mostra */
+  voto?: number | null;
+  /** quante recensioni, STAMPATE sulla pagina */
+  quante?: number | null;
+}) {
+  const p: Record<string, unknown> = {
+    '@type': 'Product',
+    /* `@id` diverso da quello del TouristTrip: sono due nodi, non uno
+       ripetuto due volte. */
+    '@id': `${opts.url}#product`,
+    name: opts.nome,
+    url: opts.url,
+    brand: { '@id': ORG_ID },
+  };
+  if (opts.descrizione) p.description = opts.descrizione;
+  if (opts.immagini?.length) p.image = opts.immagini.slice(0, 6);
+
+  if (opts.prezzo != null) {
+    p.offers = {
+      '@type': 'Offer',
+      price: opts.prezzo.toFixed(2),
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      url: opts.url,
+      priceValidUntil: fraUnAnno(),
+      seller: { '@id': ORG_ID },
+    };
+  }
+
+  /* `reviewCount` sotto 1 non e' un dato, e' un campo vuoto: Google
+     scarta l'intero nodo se il conteggio non e' positivo. */
+  if (opts.voto != null && opts.quante != null && opts.quante > 0) {
+    p.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: opts.voto,
+      reviewCount: opts.quante,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+  return p;
+}
+
+/* Il nodo `WebSite`: dice a una macchina che le 123 pagine sono UN sito
+ * con un nome, e non 123 documenti sciolti che capitano sullo stesso
+ * dominio. Va in coppia con `Organization`, a cui rimanda per `@id`
+ * invece di ridescriverla. */
+export function sitoWeb(locale: string = DEFAULT_LOCALE) {
+  return {
+    '@type': 'WebSite',
+    '@id': `${SITE}/#website`,
+    url: `${SITE}/`,
+    name: 'Prestige Rent',
+    inLanguage: getLocale(locale).htmlLang,
+    publisher: { '@id': ORG_ID },
+  };
 }

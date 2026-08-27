@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
 import { getLocale, isLocale, LOCALES, DEFAULT_LOCALE, regiondoLocale } from '@/lib/locales';
@@ -14,7 +14,8 @@ import { Premi } from '@/components/Premi';
 import { FasciaFiducia } from '@/components/Riprova';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
-import { breadcrumb, grafo, hreflangDi, organization, touristTrip, SITE as SITE_URL } from '@/lib/schema';
+import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
+import { ogDiPagina } from '@/lib/og';
 import { prezzoDi } from '@/lib/prezzi';
 import { metaDi } from '@/lib/seo';
 import { prenotazioniDi, disponibilitaDi, riprova } from '@/lib/riprova';
@@ -79,13 +80,20 @@ async function getTour(slug: string, locale: string) {
     .maybeSingle();
   if (!data) return null;
 
-  const righe = (data as unknown as { tour_content?: { locale: string; blocks: Contenuto }[] })
-    .tour_content ?? [];
+  const righe = (data as unknown as {
+    tour_content?: { locale: string; blocks: Contenuto; meta_description?: string | null }[];
+  }).tour_content ?? [];
   /* Finche' le traduzioni non ci sono, si mostra l'inglese invece di una
      pagina vuota: meglio la lingua sbagliata che il nulla. */
   const c = righe.find((r) => r.locale === locale) ?? righe.find((r) => r.locale === 'en');
 
-  return { tour: data as unknown as TourRow, contenuto: (c?.blocks ?? {}) as Contenuto };
+  return {
+    tour: data as unknown as TourRow,
+    contenuto: (c?.blocks ?? {}) as Contenuto,
+    /* La description scritta a mano su WordPress. La query la chiedeva gia'
+       ma nessuno la leggeva: vedi la nota in `generateMetadata`. */
+    metaScritta: c?.meta_description ?? null,
+  };
 }
 
 export async function generateMetadata({
@@ -97,7 +105,7 @@ export async function generateMetadata({
   const res = await getTour(slug, locale);
   if (!res) return {};
 
-  const { languages } = { languages: hreflangDi((l) => pathFor(l, slug)) };
+  const alternates = hreflangDi((l) => pathFor(l, slug), locale);
 
   /* Il title e la description arrivano dalla tabella `seo`, dove si
      vedono tutti insieme e si correggono dal pannello. Se la riga non
@@ -107,8 +115,27 @@ export async function generateMetadata({
 
   return {
     title: meta?.title || testo(res.contenuto.name) || slug,
-    description: meta?.description || testo(res.contenuto.description).slice(0, 160),
-    alternates: { canonical: SITE + pathFor(locale, slug), languages },
+    /* `meta_description` E' IL SECONDO RIPIEGO, NON IL PRIMO SCARTO.
+       `getTour` la legge gia' da `tour_content` -- sono le description
+       scritte a mano su WordPress, 82 diverse su 87 righe -- e finora
+       veniva letta e buttata via: se la riga in `seo` fosse mancata, la
+       pagina sarebbe caduta sul corpo del testo troncato a 160 caratteri
+       invece che sul meta scritto apposta. Oggi le righe in `seo` ci sono
+       tutte, quindi questo ramo non si vede; e' la rete per quando non ci
+       saranno (una lingua nuova, un tour nuovo). */
+    description:
+      meta?.description ||
+      testo(res.metaScritta) ||
+      testo(res.contenuto.description).slice(0, 160),
+    alternates,
+    /* La PRIMA FOTO DEL TOUR, non la foto della home: chi incolla in chat
+       il link di Siena deve vedere Siena. Se la scheda non ha immagini si
+       ripiega da sola sulla foto della home -- vedi src/lib/og.ts. */
+    openGraph: ogDiPagina({
+      locale,
+      path: pathFor(locale, slug),
+      foto: res.contenuto.images?.[0],
+    }),
   };
 }
 
@@ -121,7 +148,36 @@ export default async function TourPage({
   if (!isLocale(locale)) notFound();
 
   const res = await getTour(slug, locale);
-  if (!res) notFound();
+  if (!res) {
+    /* 🔴 LO STESSO INDIRIZZO SCRITTO CON LE MAIUSCOLE.
+     *
+     * Su WordPress /tour/small-group-tour-to-Siena-San-Gimignano-.../
+     * risponde 200 da anni ed e' linkato in giro; qui gli slug si cercano
+     * su Supabase con `eq`, che le maiuscole le distingue, e la pagina
+     * cadeva nel 404.
+     *
+     * PERCHE' NON UN REDIRECT IN next.config.ts, che sarebbe il posto
+     * naturale: **Next e Vercel confrontano i `source` senza distinguere
+     * le maiuscole**. Verificato oggi sul deploy pubblico, chiedendo la
+     * regola che c'e' gia' scritta con una lettera cambiata:
+     *
+     *   /tour/SIENA-san-gimignano-the-tuscan-countryside-landing/  ->  308
+     *
+     * Ha risposto lo stesso. Quindi una regola con `source` in maiuscolo
+     * prenderebbe ANCHE l'indirizzo in minuscolo -- cioe' la pagina vera,
+     * quella che vale l'85% del fatturato -- e la manderebbe a se stessa:
+     * ciclo infinito, pagina irraggiungibile, e ce se ne accorge dal
+     * fatturato. path-to-regexp compila con `sensitive: false`
+     * (node_modules/next/dist/lib/build-custom-route.js).
+     *
+     * Qui invece il confronto e' un confronto fra stringhe, e il ciclo e'
+     * impossibile per costruzione: si reindirizza SOLO se la versione
+     * minuscola e' diversa da quella chiesta. Vale per tutte e ottantasei
+     * le schede, non solo per quella che qualcuno ha notato. */
+    const minuscolo = slug.toLowerCase();
+    if (minuscolo !== slug) permanentRedirect(pathFor(locale, minuscolo));
+    notFound();
+  }
 
   const { tour, contenuto } = res;
   /* Regiondo e le recensioni si leggono INSIEME, non una dopo l'altra:
@@ -206,6 +262,56 @@ export default async function TourPage({
   }
 
   const prezzo = prezzoDi(product?.price, schede);
+
+  /* 🔴 IL VOTO PER `aggregateRating`, E DA DOVE PUO' VENIRE.
+   *
+   * Regola non negoziabile di Google: il voto dichiarato nei dati
+   * strutturati dev'essere VISIBILE a chi legge la pagina. Un voto che sta
+   * solo nel JSON-LD e' motivo di penalizzazione manuale -- si perderebbe
+   * molto piu' delle stelle che si vorrebbero guadagnare. Quindi qui non
+   * si inventa niente: si guarda cosa la pagina sta gia' stampando.
+   *
+   * Due fonti, in quest'ordine:
+   *
+   *  1. `tour.rating` e `tour.reviews_count`, che l'hero stampa qui sopra
+   *     alla lettera ("4,9 · 1.810 reviews on Viator"). E' il caso piu'
+   *     pulito: il numero nel JSON-LD e' lo stesso carattere per carattere.
+   *     Oggi pero' quelle due colonne sono piene su UNA riga di 86.
+   *
+   *  2. i punteggi DI QUESTO TOUR che il blocco `Recensioni` qui sotto
+   *     mostra uno per piattaforma. `punteggiDi` li marca con
+   *     `suQuestoTour`, e sono 20 schede su 86. Su 18 di quelle la
+   *     piattaforma e' una sola, quindi il numero passa di peso, identico
+   *     a quello scritto. Sulle altre due (Siena in piccolo gruppo e Wine
+   *     Experience) le piattaforme sono tre e si fa la media pesata sul
+   *     numero di recensioni -- che non e' una media inventata qui: e'
+   *     esattamente quella di `votiPerTour()`, cioe' il voto che il sito
+   *     stampa gia' per lo stesso tour nel menu e sulla scheda della
+   *     pagina di categoria da cui si arriva.
+   *
+   * Nessun rischio di contare due volte le stesse recensioni: le righe per
+   * tour sono di Viator, GetYourGuide e Regiondo, e Tripadvisor non c'e'
+   * (il suo numero e' gia' dentro quello di Viator -- e' il motivo per cui
+   * `punteggiDi` guarda dentro le etichette prima di affiancare i badge
+   * d'azienda). */
+  const suQuestoTour = iPunteggi.filter(
+    (f) => f.suQuestoTour && f.voto_medio != null && f.quante != null
+  );
+  const recDaPiattaforme = suQuestoTour.reduce((s, f) => s + f.quante!, 0);
+  const voto =
+    tour.rating != null && tour.reviews_count != null
+      ? { valore: tour.rating, quante: tour.reviews_count }
+      : recDaPiattaforme > 0
+        ? {
+            valore:
+              Math.round(
+                (suQuestoTour.reduce((s, f) => s + f.voto_medio! * f.quante!, 0) /
+                  recDaPiattaforme) *
+                  10
+              ) / 10,
+            quante: recDaPiattaforme,
+          }
+        : null;
 
   const calendario = (
     <>
@@ -478,7 +584,10 @@ export default async function TourPage({
               ]),
               touristTrip({
                 nome,
-                descrizione: contenuto.description,
+                /* `testo()` e non il campo grezzo: su 6 schede su 87 la
+                   descrizione contiene ancora entita' HTML (&amp;) prese da
+                   WordPress, e nel JSON-LD uscirebbero cosi' come sono. */
+                descrizione: testo(contenuto.description),
                 url: SITE + pathFor(locale, slug),
                 locale,
                 immagini: foto,
@@ -486,12 +595,35 @@ export default async function TourPage({
                 ore: product?.durationHours ?? null,
                 tappe: punti.slice(0, 8),
               }),
+              /* 🔴 `Product` ACCANTO A `TouristTrip`, non al suo posto.
+               *
+               * `TouristTrip` descrive bene cos'e' una gita, ma non e' nella
+               * galleria dei risultati arricchiti di Google: con quello solo,
+               * nello snippet non compaiono ne' il prezzo ne' le stelle su
+               * nessuna delle ottantasei schede. Il WordPress che stiamo
+               * sostituendo usava `Product` + `Offer` e ci arrivava.
+               *
+               * `voto` e `quante` sono ESATTAMENTE i due numeri stampati
+               * nell'hero qui sopra, sotto la stessa condizione: se la
+               * pagina non li mostra, qui non si dichiarano. Google chiede
+               * che il voto sia visibile a chi legge, e un voto che sta solo
+               * nel JSON-LD e' un motivo di penalizzazione manuale -- si
+               * perderebbe molto piu' di quello che si guadagna. */
+              prodottoJsonLd({
+                nome,
+                descrizione: testo(contenuto.description),
+                url: SITE + pathFor(locale, slug),
+                immagini: foto,
+                prezzo: prezzo?.valore ?? null,
+                voto: voto?.valore ?? null,
+                quante: voto?.quante ?? null,
+              }),
             ])
           ),
         }}
       />
 
-      <ContactSection />
+      <ContactSection locale={locale} tour={nome} />
       </div>{/* /.pg-main-b */}
 
       <StickyBook

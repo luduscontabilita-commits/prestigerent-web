@@ -14,6 +14,8 @@ import { fonti, inEvidenza, votiPerTour } from '@/lib/recensioni';
 import { riprova, tuttiIConteggi } from '@/lib/riprova';
 import { VideoTestimonianze } from '@/components/VideoTestimonianze';
 import { metaDi } from '@/lib/seo';
+import { ogDiPagina } from '@/lib/og';
+import { grafo, hreflangDi, organization, sitoWeb } from '@/lib/schema';
 import type { Metadata } from 'next';
 import '@/styles/home.css';
 
@@ -60,13 +62,31 @@ function maxOspiti(kind: string): number | null {
    non come si disegnano. */
 const BANDIERA: Record<string, string> = { en: '🇬🇧', de: '🇩🇪', it: '🇮🇹' };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = isLocale(locale) ? locale : DEFAULT_LOCALE;
   const m = await metaDi('/', 'en');
+  const percorso = (x: string) => (x === DEFAULT_LOCALE ? '/' : `/${x}/`);
   return {
     title: m?.title ?? 'Private Tours from Florence & Chianti — Prestige Rent',
     description:
       m?.description ??
       'Private day tours from Florence into Chianti, Siena and San Gimignano, with your own driver and hotel pickup. Our own cars, our own English-speaking guides.',
+    /* 🔴 LA HOME NON AVEVA IL CANONICAL. Le schede tour, /about-us/ e le
+       trentacinque categorie lo hanno perche' chiamano `hreflangDi`; qui
+       la chiamata non c'era proprio, e la pagina piu' importante del sito
+       usciva senza canonical e senza hreflang -- in tre lingue, cioe' tre
+       home che si contendono la stessa ricerca. */
+    alternates: hreflangDi(percorso, l),
+    /* La foto dell'hero e' la prima cosa che si vede aprendo il sito: e'
+       giusto che sia anche quella che si vede quando il link viene
+       incollato in chat. E' la stessa `FOTO[0]` di qui sotto, nel taglio
+       leggero -- vedi src/lib/og.ts. */
+    openGraph: ogDiPagina({ locale: l, path: percorso(l) }),
   };
 }
 
@@ -206,6 +226,24 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   return (
     <main>
+      {/* 🔴 LA HOME NON AVEVA NESSUN BLOCCO JSON-LD.
+          Le schede tour ce l'hanno, le trentacinque categorie ce l'hanno,
+          /about-us/ ce l'ha. La home no -- ed e' la pagina che una
+          macchina legge per prima quando le si chiede "chi e' Prestige
+          Rent". Senza `Organization` qui, l'entita' e' descritta ovunque
+          tranne che al suo indirizzo principale.
+          `WebSite` sta in coppia con lei e dice che le 123 pagine sono un
+          sito solo con un nome, non 123 documenti sciolti.
+          Niente `BreadcrumbList` qui: sulla home avrebbe una voce sola,
+          cioe' la home stessa, e una briciola di pane che non porta da
+          nessuna parte e' rumore, non struttura. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(grafo([organization(), sitoWeb(locale)])),
+        }}
+      />
+
       <section className="hm-hero">
         <HeroFoto foto={FOTO} alt="Tuscany" />
         <div className="hm-hero-in">
@@ -219,8 +257,19 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {/* "Chauffeur" e non "driver": in America e' la parola del
               servizio premium, quella che cerca chi e' disposto a spendere
               -- e lo scontrino medio da Google e' 300 euro, non 89. */}
+          {/* 🔴 QUELLO SPAZIO NON E' UN VEZZO: `{' '}`.
+              L'`<em>` e' `display:block` (home.css), quindi a schermo le
+              due righe erano gia' separate e a occhio non si vedeva
+              niente. Ma JSX butta via l'a-capo fra un testo e il tag che
+              segue, e nel documento le due stringhe finivano attaccate:
+              Google, che legge il testo e non il disegno, trovava
+              "chauffeur servicefrom Florence" nell'H1 della home -- una
+              parola che non esiste, proprio dove sta la promessa
+              principale del sito. Uno spazio esplicito rimette la parola
+              al suo posto senza spostare un pixel: fra due blocchi lo
+              spazio non si vede. */}
           <h1 className="hm-title">
-            Private tours, transfers &amp; chauffeur service
+            Private tours, transfers &amp; chauffeur service{' '}
             <em>from Florence, through Chianti and Tuscany</em>
           </h1>
           <p className="hm-sub">
@@ -394,7 +443,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         titolo="Twenty-four years, one reputation"
       />
 
-      <ContactSection />
+      <ContactSection locale={locale} />
 
       {/* Le lingue in fondo alla pagina.
           Non e' un doppione del selettore in alto: quello lo cerca chi sa

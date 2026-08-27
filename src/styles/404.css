@@ -1,0 +1,90 @@
+/* LA PAGINA "NON TROVATA".
+ *
+ * Un file suo, piccolo, invece di righe in fondo a home.css: quel foglio
+ * lo tocca chi lavora sulla home e sulle schede tour, e una regola per il
+ * 404 in mezzo non la cerca nessuno. Qui si vede da solo a cosa serve.
+ *
+ * I colori non sono scritti: sono le variabili di theme.css, le stesse del
+ * resto del sito. Cosi' la pagina segue il tema chiaro o scuro senza che
+ * ci sia una sola riga in piu' -- ed e' proprio il 404 il posto dove un
+ * riquadro bianco sparato di notte si nota, perche' e' l'unica cosa che
+ * c'e' da guardare.
+ */
+
+.nf {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 72px 0 96px;
+  text-align: center;
+}
+
+.nf-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto 22px;
+  display: block;
+}
+
+/* Il numero c'e' perche' chi sa leggerlo capisce subito di cosa si tratta,
+   ma sta in secondo piano: la frase sotto vale di piu' di tre cifre. */
+.nf-cod {
+  margin: 0;
+  font-family: Fraunces, Georgia, serif;
+  font-style: italic;
+  font-size: 3.2rem;
+  font-weight: 560;
+  line-height: 1;
+  color: var(--orange);
+}
+
+.nf h1 {
+  margin: 10px 0 0;
+  font-size: clamp(1.5rem, 3.6vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.16;
+  color: var(--ink);
+}
+
+.nf-sub {
+  margin: 14px auto 0;
+  max-width: 46ch;
+  font-size: 1rem;
+  line-height: 1.66;
+  color: var(--ink-soft);
+}
+
+/* Le pastiglie sono quelle delle pagine di categoria (.ct-figlie): stesso
+   segno, quindi chi le ha gia' viste sa che si clicca. Qui si centrano e
+   basta. */
+.nf-links {
+  justify-content: center;
+  margin: 28px 0 0;
+}
+
+.nf-cta {
+  justify-content: center;
+  margin-top: 26px;
+}
+
+/* .hm-cta e' nato sopra la foto dell'hero, dove il testo e' bianco su
+   scuro. Qui sotto c'e' il fondo pagina: il bottone secondario va rivestito
+   con i colori del tema, altrimenti su fondo chiaro sparisce. */
+.nf-cta .nf-wa {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  backdrop-filter: none;
+}
+
+.nf-cta .nf-wa:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: var(--card);
+}
+
+@media (max-width: 760px) {
+  .nf {
+    padding: 48px 0 64px;
+  }
+}

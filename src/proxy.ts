@@ -50,6 +50,14 @@ export default function proxy(req: NextRequest) {
     pathname === '/lp' ||
     pathname.startsWith('/myb/') ||
     pathname === '/myb' ||
+    /* Le cartelle di WordPress: le foto dei tour (/wp-content/) e jQuery,
+       da cui dipendono le landing (/wp-includes/). Quasi tutte finiscono
+       gia' in PUBLIC_FILE per via dell'estensione, ma non tutte -- e un
+       solo file che sfugge diventa /en/wp-content/... e da li' un 404.
+       Escluse per nome, come /lp e /myb, invece che fidarsi dell'elenco
+       delle estensioni. */
+    pathname.startsWith('/wp-content/') ||
+    pathname.startsWith('/wp-includes/') ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();

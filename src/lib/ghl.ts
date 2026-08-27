@@ -143,3 +143,66 @@ export async function contattoDaPrenotazione(p: ContattoDaPrenotazione) {
   const r = await chiamaGhl('/contacts/upsert', { metodo: 'POST', corpo });
   return { ok: r.ok, errore: r.errore, dati: r.dati };
 }
+
+export type ContattoDaRichiesta = {
+  nome: string;
+  email: string;
+  telefono: string | null;
+  tour: string | null;
+  /** la data desiderata, ISO, oppure null: nel modulo e' facoltativa */
+  quando: string | null;
+  persone: number | null;
+  /** in che lingua va scritta la risposta */
+  lingua: string;
+  /** la pagina che ha prodotto la richiesta */
+  pagina: string | null;
+};
+
+/* LA RICHIESTA DAL MODULO, PORTATA DOVE SI RISPONDE.
+ *
+ * Vale lo stesso motivo di `contattoDaPrenotazione` -- il contesto deve
+ * stare nella chat, non in una tabella che qualcuno deve ricordarsi di
+ * aprire -- ma la differenza e' piu' grossa di quanto sembri: una
+ * prenotazione e' gia' incassata, una richiesta e' un cliente che sta
+ * ancora decidendo. Se resta ferma sei ore, ha gia' scritto a qualcun
+ * altro.
+ *
+ * Il contatto nasce con l'etichetta `richiesta-sito`, che e' la cosa che
+ * permette a GHL di far partire un'automazione o una notifica: senza
+ * un'etichetta diversa da quelle delle prenotazioni, le richieste
+ * finirebbero nello stesso mucchio e nessuno saprebbe quali hanno
+ * ancora bisogno di una risposta.
+ *
+ * Il cognome non si chiede nel modulo: chiedere due caselle dove ne
+ * basta una fa abbandonare, e per rispondere a un'email il cognome non
+ * serve. Qui il nome intero va tutto in `firstName`.
+ */
+export async function contattoDaRichiesta(p: ContattoDaRichiesta) {
+  const c = conf();
+  if (!c) return { ok: false, errore: 'GHL non configurato' };
+
+  const corpo: Record<string, unknown> = {
+    locationId: c.location,
+    firstName: p.nome,
+    email: p.email,
+    source: 'Sito — modulo richiesta',
+    tags: ['richiesta-sito', `lingua-${p.lingua}`],
+    customFields: [
+      /* Le stesse chiavi delle prenotazioni: se un domani la stessa
+         persona prenota davvero, GHL la riconosce dall'email e i campi
+         si sovrascrivono invece di raddoppiarsi. */
+      { key: CAMPI.tour, field_value: p.tour ?? '' },
+      { key: CAMPI.data, field_value: p.quando ?? '' },
+      { key: CAMPI.persone, field_value: p.persone != null ? String(p.persone) : '' },
+      { key: CAMPI.canale, field_value: 'Sito' },
+      { key: CAMPI.ordine, field_value: p.pagina ?? '' },
+    ],
+  };
+  /* Qui il telefono e' quello che ha scritto il visitatore e puo' essere
+     qualunque cosa: si manda solo se c'e', e GHL lo normalizza da se'.
+     Se non gli piace rifiuta il campo, non il contatto. */
+  if (p.telefono) corpo.phone = p.telefono;
+
+  const r = await chiamaGhl('/contacts/upsert', { metodo: 'POST', corpo });
+  return { ok: r.ok, errore: r.errore, dati: r.dati };
+}

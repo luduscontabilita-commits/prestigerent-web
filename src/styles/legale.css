@@ -1,0 +1,221 @@
+/* LE PAGINE LEGALI — privacy, cookie, termini.
+ *
+ * Va copiato in `src/styles/legale.css`. Le tre pagine lo importano.
+ *
+ * Perche' un file a parte e non le classi `.ab-*` di "chi siamo":
+ * quelle sono fatte per una pagina a riquadri centrata, e un documento
+ * legale e' prosa lunga da leggere in colonna. Le variabili sono le
+ * stesse del tema, quindi chiaro e scuro funzionano senza aggiungere
+ * niente.
+ *
+ * La misura: 68 caratteri circa. Un testo legale largo tutto lo schermo
+ * non lo legge nessuno, e "non lo legge nessuno" e' esattamente il
+ * difetto che una pagina legale non puo' permettersi.
+ */
+
+.lg {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px 56px;
+}
+
+.lg-hero {
+  padding: 48px 0 10px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 30px;
+}
+
+.lg-hero h1 {
+  font-size: clamp(1.7rem, 4.4vw, 2.6rem);
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.14;
+  margin: 0;
+}
+
+.lg-lead {
+  margin: 16px 0 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.lg-date {
+  margin: 18px 0 22px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.lg-body h2 {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 34px 0 10px;
+  line-height: 1.3;
+}
+
+.lg-body h3 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 22px 0 8px;
+}
+
+.lg-body p,
+.lg-body li {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.lg-body p {
+  margin: 0 0 12px;
+}
+
+.lg-body ul {
+  margin: 0 0 14px;
+  padding-inline-start: 22px;
+}
+
+.lg-body li {
+  margin-bottom: 7px;
+}
+
+.lg-body strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lg-body a {
+  color: var(--link);
+  font-weight: 700;
+}
+
+/* IL SEGNAPOSTO SI DEVE VEDERE.
+ *
+ * Ogni [[DA COMPLETARE: ...]] rimasto nel testo va notato al primo
+ * sguardo, da chiunque apra la pagina — non solo da chi legge il
+ * sorgente. Se un segnaposto arriva in produzione e passa inosservato,
+ * il danno e' peggiore di una pagina che manca: una pagina che manca la
+ * si nota, una privacy con un buco in mezzo sembra completa.
+ *
+ * Il modo piu' semplice: chi installa le pagine cerca "DA COMPLETARE"
+ * nel repo e non deve trovare niente prima di pubblicare. */
+.lg mark {
+  background: #ffe8a3;
+  color: #6b4a00;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LA RIGA LEGALE DEL FOOTER
+   ═══════════════════════════════════════════════════════════════════
+
+   Perche' queste regole stanno qui e non in `home.css` accanto alle
+   altre `.ft-*`: `home.css` in questo momento e' in mano ad altri, e
+   due persone che scrivono in fondo allo stesso file si scontrano a
+   ogni pull. Vivono qui insieme al resto della roba legale, e `Footer`
+   importa questo foglio. Il giorno in cui `home.css` e' libero si
+   spostano di sotto senza cambiare una riga.
+
+   Il footer sta su fondo scuro (`--deep`), quindi i colori sono
+   dichiarati espliciti: `.ft-col a` non li copre, perche' questo
+   blocco non e' dentro una colonna. */
+.ft-legale {
+  text-align: center;
+  padding: 14px 20px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* I dati societari: D.Lgs. 70/2003 art. 7 li vuole "facilmente e
+   permanentemente accessibili". Piccoli, non nascosti. */
+.ft-dati {
+  margin: 0 0 10px;
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.ft-legali {
+  margin: 0 0 10px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ft-legali a,
+.ft-cookie {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: underline;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ft-legali a:hover,
+.ft-cookie:hover {
+  color: #fff;
+}
+
+/* Il bottone che riapre il banner deve SEMBRARE gli altri tre link: chi
+   cerca "come tolgo il consenso" cerca un link, non un bottone. */
+.ft-cookie {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ft-copy {
+  margin: 0;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   L'INFORMATIVA E LA SPUNTA DEL MODULO DI RICHIESTA
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* La spunta sta SOPRA il pulsante, non sotto: una scelta che compare
+   dopo il gesto che la chiude non e' una scelta. La misura e' la stessa
+   del pulsante, cosi' la casella non attraversa tutto lo schermo su
+   desktop e non si perde il filo della frase. */
+.mr-consenso {
+  max-width: 520px;
+  margin: 2px auto 0;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mr-consenso input {
+  margin-top: 3px;
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--orange);
+}
+
+.mr-consenso span {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* Il link alla privacy dentro l'informativa: sottolineato, non solo di
+   un altro colore. E' l'unico modo per cui si vede che e' un link anche
+   a chi non distingue i colori. */
+.mr-privacy a {
+  color: var(--link);
+  font-weight: 700;
+  text-decoration: underline;
+}

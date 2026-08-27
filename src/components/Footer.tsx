@@ -1,5 +1,11 @@
 import { DEFAULT_LOCALE } from '@/lib/locales';
 import { riprova } from '@/lib/riprova';
+import { RiapriPreferenze } from '@/components/Consenso';
+/* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
+   altre `.ft-*`: `home.css` e' in mano ad altri in questo momento, e due
+   persone che scrivono in fondo allo stesso file si scontrano a ogni
+   pull. Il foglio e' lo stesso delle tre pagine legali, ed e' piccolo. */
+import '@/styles/legale.css';
 
 /* Il footer, ricostruito da quello attuale di prestigerent.com con tre
  * scelte diverse e una aggiunta.
@@ -156,12 +162,50 @@ export async function Footer({ locale }: { locale: string }) {
       )}
 
       <div className="ft-bottom">
-        <span>&copy; {new Date().getFullYear()} Prestige Rent S.R.L. &mdash; Florence, Italy</span>
         <span className="ft-social">
           {SOCIAL.map(([t, h]) => (
             <a key={h} href={h} target="_blank" rel="noopener">{t}</a>
           ))}
         </span>
+      </div>
+
+      {/* LA RIGA LEGALE.
+       *
+       * Prima qui c'era solo il copyright. Il D.Lgs. 70/2003 art. 7
+       * chiede che denominazione, sede, partita IVA e iscrizione al
+       * registro imprese siano "facilmente e permanentemente
+       * accessibili": sul sito nuovo la partita IVA e il REA non
+       * comparivano da nessuna parte, ne' qui, ne' in /about-us/, ne'
+       * nel JSON-LD Organization.
+       *
+       * I numeri NON sono inventati: P.IVA 05745220482 e REA FI 571489
+       * sono pubblicati oggi su prestigerent.com in due punti diversi --
+       * il footer e i termini e condizioni -- e le due fonti concordano.
+       *
+       * L'indirizzo e' scritto qui e non letto da `azienda` come quello
+       * della colonna qui sopra: quello e' il recapito commerciale, che
+       * un giorno puo' cambiare senza che cambi la sede legale, e questa
+       * riga deve dire la SEDE LEGALE. Se un giorno divergono, il bug e'
+       * farle arrivare dalla stessa fonte. */}
+      <div className="ft-legale">
+        <p className="ft-dati">
+          <strong>Prestige Rent S.r.l.</strong> &mdash; Via della Saggina 98, 50145
+          Florence, Italy &middot; VAT no. 05745220482 &middot; Florence Register of
+          Companies, REA no. FI 571489 &middot; share capital{' '}
+          [[DA COMPLETARE: capitale sociale]]
+        </p>
+        <p className="ft-legali">
+          <a href={p('/privacy-policy/')}>Privacy Policy</a>
+          <a href={p('/cookie-policy/')}>Cookie Policy</a>
+          <a href={p('/terms-and-conditions/')}>Terms &amp; Conditions</a>
+          {/* Il consenso dev'essere revocabile con la stessa facilita' con
+              cui e' stato dato: senza questo bottone l'unico modo e'
+              cancellare i cookie a mano. Arriva da `Consenso.tsx`. */}
+          <RiapriPreferenze />
+        </p>
+        <p className="ft-copy">
+          &copy; {new Date().getFullYear()} Prestige Rent S.r.l. &mdash; Florence, Italy
+        </p>
       </div>
     </footer>
   );
