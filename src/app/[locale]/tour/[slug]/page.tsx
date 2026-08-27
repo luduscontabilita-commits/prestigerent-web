@@ -15,7 +15,7 @@ import { Premi } from '@/components/Premi';
 import { FasciaFiducia } from '@/components/Riprova';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
-import { ripulisciPunti } from '@/lib/punti';
+import { ripulisciPunti, senzaCovid } from '@/lib/punti';
 import { badgeIncluso } from '@/lib/inclusi';
 import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
@@ -240,11 +240,17 @@ export default async function TourPage({
   const ORDINE = ['INCLUDED', 'PRICES', 'IMPORTANT INFO', 'TIME / LOCATION', 'TOUR SCHEDULE'];
   const tutteLeSchede = contenuto.tabs ?? {};
   const schede = Object.fromEntries(
-    Object.entries(tutteLeSchede).sort(([a], [b]) => {
-      const pa = /^faq/i.test(a) ? 99 : ORDINE.indexOf(a.toUpperCase());
-      const pb = /^faq/i.test(b) ? 99 : ORDINE.indexOf(b.toUpperCase());
-      return (pa < 0 ? 50 : pa) - (pb < 0 ? 50 : pb);
-    })
+    Object.entries(tutteLeSchede)
+      .sort(([a], [b]) => {
+        const pa = /^faq/i.test(a) ? 99 : ORDINE.indexOf(a.toUpperCase());
+        const pb = /^faq/i.test(b) ? 99 : ORDINE.indexOf(b.toUpperCase());
+        return (pa < 0 ? 50 : pa) - (pb < 0 ? 50 : pb);
+      })
+      /* La riga del veicolo dentro IMPORTANT INFO finiva con "Cleaned and
+         sanitized" su 32 pagine su 87 -- le stesse 32 che avevano la
+         sanificazione anche come primo punto forte, quindi la diceva due
+         volte. Vedi `senzaCovid` in src/lib/punti.ts. */
+      .map(([k, v]) => [k, senzaCovid(v)] as const)
   );
   /* Il mosaico .hero-gallery e' nascosto sopra i 760px (sulla landing, li'
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.

@@ -36,11 +36,17 @@
  * TOUR SCHEDULE, che e' letteralmente l'elenco di cosa si fa e a che ora.
  *
  * ── QUANDO NON SI MOSTRA NIENTE ─────────────────────────────────────────
- * Sette transfer punto-a-punto (Pisa->Firenze, Firenze->Venezia...) non
- * hanno una sola voce che descriva un'esperienza: hanno solo policy,
- * perche' un trasferimento in aeroporto NON e' un'esperienza. Su quelli
- * l'elenco non compare affatto. Una scheda con titolo, durata e prezzo e'
- * pulita; una che promette "sanifichiamo i veicoli" no.
+ * Provato su tutte le schede pubblicate: 68 su 86 escono con due o tre
+ * righe buone (59 con tre, 9 con due). Le altre 18 -- 17 transfer
+ * punto-a-punto piu' la gita allo spaccio da Livorno -- non hanno una
+ * sola voce che descriva un'esperienza, e non e' un difetto dei dati:
+ * un trasferimento dall'aeroporto di Pisa a Firenze NON e'
+ * un'esperienza, e' un passaggio. Su quelle schede l'elenco non compare
+ * affatto.
+ *
+ * Meglio cosi' che riempirlo: una scheda con titolo, durata, una riga di
+ * prosa e il prezzo e' pulita; una che al posto dei punti forti promette
+ * "sanifichiamo i veicoli" dice al cliente che non c'e' niente da dire.
  */
 
 import { testo } from './prosa';
@@ -411,4 +417,28 @@ export function ripulisciPunti(punti: string[]): string[] {
     .map((p) => testo(p).replace(/^safe for (health|money)\s*!\s*/i, ''))
     .map((p) => (p ? p.charAt(0).toUpperCase() + p.slice(1) : p))
     .filter(Boolean);
+}
+
+/* ── LA SANIFICAZIONE DENTRO LE SCHEDE INFORMATIVE ────────────────────────
+ * Oltre alle 55 volte in `highlights`, la stessa cosa e' scritta altre 32
+ * volte dentro la scheda IMPORTANT INFO, in coda alla riga del veicolo:
+ *
+ *     Vehicle: Mercedes sedan or van, depending on your party size and
+ *     amount of luggage. Cleaned and sanitized
+ *
+ * E' una variante sola, identica su tutte e 32 le pagine -- verificato con
+ * una query, non a occhio. Togliendo la frase finale la riga resta una
+ * frase compiuta e utile ("Mercedes sedan or van, depending on your party
+ * size and amount of luggage"), che e' il motivo per cui si toglie qui e
+ * non si riscrive il testo nel database: il testo di WordPress resta la
+ * fonte, e domani un nuovo import non riporta indietro la frase.
+ */
+export function senzaCovid(html: string): string {
+  /* Il punto della frase precedente si tiene: senza, la riga finirebbe
+     con "amount of luggage" e nessuna punteggiatura, in mezzo a un
+     elenco dove tutte le altre righe il punto ce l'hanno. */
+  return (html || '').replace(
+    /(\.)?\s*(deeply\s+)?cleaned\s+(and|\/)\s*sanitiz(ed|ised)\b\.?/gi,
+    (_m, punto: string | undefined) => punto ?? ''
+  );
 }
