@@ -1,0 +1,86 @@
+# Pubblica su Vercel a ogni push su main.
+#
+# PERCHE' SERVE: il progetto Vercel non risulta collegato a questo
+# repository, e finche' non lo e' un `git push` non costruisce NIENTE --
+# il codice arriva su GitHub, il sito resta quello di prima, e non lo dice
+# nessuno. E' successo il 27 agosto 2026: nove minuti passati a guardare
+# un deploy che non sarebbe mai partito.
+#
+# Il collegamento nativo va autorizzato a mano su GitHub (serve il login
+# del proprietario, un token non basta). Finche' non e' fatto, ci pensa
+# questo: chiama l'API di Vercel dicendole quale commit costruire.
+#
+# 🔴 IL REPOSITORY E' PUBBLICO. Per questo:
+#   - si attiva SOLO su push a main, mai su pull request. Su una PR da un
+#     estraneo il segreto finirebbe in mano a chi l'ha aperta.
+#   - i permessi sono a sola lettura: non deve scrivere niente qui.
+# Il giorno in cui il repository diventa privato, o il collegamento viene
+# autorizzato, questo file si puo' togliere.
+
+name: Pubblica su Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:      # e a mano, dal pannello Actions
+
+permissions:
+  contents: read
+
+concurrency:
+  # Due push ravvicinati non devono costruire in parallelo: conta
+  # l'ultimo. `cancel-in-progress` ferma quello vecchio a meta'.
+  group: vercel-produzione
+  cancel-in-progress: true
+
+jobs:
+  pubblica:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lancia il deploy di produzione
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          PROGETTO: prj_Hfz8Kk0e7oYh9HHzyooc0LaVbQls
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::error::manca il segreto VERCEL_TOKEN"; exit 1
+          fi
+
+          RISPOSTA=$(curl -sS -X POST \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.vercel.com/v13/deployments?forceNew=1" \
+            -d "{
+              \"name\": \"prestigerent-web\",
+              \"project\": \"$PROGETTO\",
+              \"target\": \"production\",
+              \"gitSource\": {
+                \"type\": \"github\",
+                \"org\": \"${GITHUB_REPOSITORY%%/*}\",
+                \"repo\": \"${GITHUB_REPOSITORY##*/}\",
+                \"ref\": \"$GITHUB_SHA\"
+              }
+            }")
+
+          ID=$(echo "$RISPOSTA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))")
+          if [ -z "$ID" ]; then
+            echo "::error::Vercel non ha accettato: $RISPOSTA"; exit 1
+          fi
+          echo "deploy $ID lanciato per $GITHUB_SHA"
+
+          # Si aspetta l'esito: un'azione verde su un build fallito e'
+          # peggio che nessuna azione, perche' fa credere che sia andata.
+          for _ in $(seq 1 60); do
+            sleep 15
+            STATO=$(curl -sS -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments/$ID" \
+              | python3 -c "import sys,json;print(json.load(sys.stdin).get('readyState',''))")
+            echo "  $STATO"
+            case "$STATO" in
+              READY)   echo "pubblicato"; exit 0 ;;
+              ERROR|CANCELED)
+                echo "::error::build $STATO -- il log sta su vercel.com"; exit 1 ;;
+            esac
+          done
+          echo "::error::scaduto il tempo di attesa"; exit 1
