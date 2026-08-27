@@ -392,9 +392,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </p>
           </div>
 
+          {/* I numeri della flotta vengono dal database, non da qui.
+              Erano scritti a mano, e quello delle auto diceva 10 mentre
+              sono 8: e' una promessa al cliente, e stava nell'unico posto
+              dove nessuno sarebbe andato a correggerlo. */}
           <div className="hm-fleet-count">
-            <div><b>11</b><span>25-seat minibuses</span></div>
-            <div><b>10</b><span>Mercedes cars &amp; vans</span></div>
+            <div><b>{az?.mezzi_minibus ?? 11}</b><span>25-seat minibuses</span></div>
+            <div><b>{az?.mezzi_auto_numero ?? 8}</b><span>Mercedes cars &amp; vans</span></div>
             <div><b>25</b><span>guests in one vehicle</span></div>
           </div>
 

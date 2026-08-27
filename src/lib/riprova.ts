@@ -22,6 +22,10 @@ export type Azienda = {
   classifica_url: string | null;
   mezzi_minibus: number | null;
   mezzi_auto: string | null;
+  /* Quante auto sono. `mezzi_auto` e' la loro descrizione a parole
+     ("Mercedes cars"), non un conteggio: il numero stava scritto a mano
+     dentro page.tsx e diceva 10 mentre sono 8. */
+  mezzi_auto_numero: number | null;
   citta: string | null;
   indirizzo: string | null;
   telefono: string | null;

@@ -69,6 +69,14 @@
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 14px;
   margin: 0 0 24px;
+  /* Due cinture, e nessuna delle due e' decorativa: `min-width:0` toglie
+     il minimo automatico che un elemento di griglia si porta dietro (senza,
+     un figlio piu' largo del contenitore allarga la traccia invece di
+     essere contenuto), `max-width:100%` impedisce comunque alla fila di
+     superare il pannello. E' la regola che mancava e che sul telefono
+     faceva sembrare la foto uscita fuori. */
+  min-width: 0;
+  max-width: 100%;
 }
 
 .hd-mega-in .hd-card {
@@ -181,21 +189,52 @@
     font-size: 0.94rem;
   }
 
+  /* LA STRISCIA STA DENTRO IL PANNELLO.
+     Prima sbordava di proposito fino ai bordi dello schermo, con margini
+     negativi che annullavano il rientro del pannello: doveva dire "c'e'
+     dell'altro, trascina". Diceva un'altra cosa. Su una finestra stretta si
+     vedeva una foto tagliata a meta' contro il bordo destro mentre l'elenco
+     dei link sotto restava rientrato, e due allineamenti diversi nella
+     stessa colonna si leggono come un errore, non come un invito.
+
+     Ora la striscia comincia e finisce esattamente dove comincia e finisce
+     l'elenco dei link. Resta trascinabile col dito -- i riquadri NON vanno
+     a capo in colonna, che su un telefono sarebbe uno schermo e mezzo di
+     scorrimento prima dei link -- ma il riquadro che sbuca a destra sbuca
+     DENTRO un contenitore che si vede, e sotto c'e' una barra sottile che
+     dice che si scorre. */
   .hd-mega-in .hd-vetrina {
     display: flex;
     gap: 10px;
-    margin: 0 -18px 18px -30px;
-    padding: 0 18px 6px 30px;
+    margin: 0 0 16px;
+    padding: 0 0 8px;
+    min-width: 0;
+    max-width: 100%;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
-    scrollbar-width: none;
+    scrollbar-width: thin;
   }
   .hd-mega-in .hd-vetrina::-webkit-scrollbar {
-    display: none;
+    height: 4px;
   }
+  .hd-mega-in .hd-vetrina::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .hd-mega-in .hd-vetrina::-webkit-scrollbar-thumb {
+    background: rgba(140, 150, 160, 0.55);
+    border-radius: 4px;
+  }
+
+  /* La larghezza e' una percentuale del contenitore, mai un numero fisso:
+     a 320px un riquadro da 260px starebbe piu' largo di quello che lo
+     contiene. Il tetto serve al caso opposto -- su un tablet da 900px il
+     58% sarebbe una foto da 500px dentro una tendina. */
   .hd-mega-in .hd-card {
-    flex: 0 0 62%;
+    flex: 0 0 auto;
+    width: 58%;
+    max-width: 260px;
+    min-width: 0;
     scroll-snap-align: start;
   }
   /* col dito non c'e' `hover`: l'ingrandimento non scatterebbe mai e
@@ -206,7 +245,8 @@
 }
 @media (max-width: 560px) {
   .hd-mega-in .hd-card {
-    flex-basis: 74%;
+    width: 70%;
+    max-width: 240px;
   }
 }
 
