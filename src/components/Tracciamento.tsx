@@ -115,6 +115,28 @@ function suProduzione() {
   return /(^|\.)prestigerent\.com$/i.test(window.location.hostname);
 }
 
+/* ── L'INTERRUTTORE DI COLLAUDO ──────────────────────────────────────
+ *
+ * `?prova=1` accende GTM anche fuori produzione, per una visita sola.
+ *
+ * Serve perche' il widget di Regiondo decide da se' a chi parlare
+ * guardando cosa trova in pagina: senza il contenitore GTM non attiva
+ * l'adattatore di GTM, e una prenotazione di prova non proverebbe la
+ * catena vera -- proverebbe una catena diversa, che in produzione non
+ * esistera' mai.
+ *
+ * Non e' un ripiego da togliere dopo: e' la sola maniera di collaudare
+ * una prenotazione senza spegnere il sito vero, e serve allo stesso modo
+ * fra sei mesi. Non si ricorda in un cookie apposta -- vale per la
+ * singola visita, e chi non mette il parametro non accende niente.
+ *
+ * In produzione non cambia nulla: li' GTM si carica comunque, e questo
+ * ramo non viene nemmeno guardato. */
+function collaudoRichiesto() {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('prova') === '1';
+}
+
 export function Tracciamento() {
   /* Il percorso serve a riarmare l'osservatore del calendario a ogni
      cambio di pagina: questo componente sta nel layout e non viene mai
@@ -271,8 +293,12 @@ export function Tracciamento() {
   /* Il contenitore GTM solo sul dominio vero. Su
      prestigerent-web.vercel.app resta spento apposta: ogni evento
      inquinerebbe i dati veri delle campagne, e i dati sporchi sono
-     peggio dei dati mancanti perche' non si sa quali buttare. */
-  if (typeof window !== 'undefined' && !suProduzione()) return null;
+     peggio dei dati mancanti perche' non si sa quali buttare.
+     L'unica eccezione e' `?prova=1`, per collaudare una prenotazione
+     vera senza toccare il sito in produzione. */
+  if (typeof window !== 'undefined' && !suProduzione() && !collaudoRichiesto()) {
+    return null;
+  }
 
   return (
     <Script id="gtm" strategy="afterInteractive">
