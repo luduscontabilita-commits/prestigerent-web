@@ -77,11 +77,15 @@ export function immagineOg(src?: string | null): NonNullable<Metadata['openGraph
 /* Il blocco comune a tutte le pagine. Senza titolo e senza descrizione,
    apposta: vedi la nota in cima. */
 export function ogDiBase(locale: string): Metadata['openGraph'] {
+  /* Le altre lingue in cui la pagina esiste. Con una lingua sola l'elenco e'
+     vuoto: si omette la chiave invece di scrivere `og:locale:alternate` a
+     vuoto. Torna da sola quando `LINGUE_ATTIVE` cresce. */
+  const altre = LOCALES.filter((l) => l.code !== locale).map((l) => ogLocale(l.code));
   return {
     type: 'website',
     siteName: NOME_SITO,
     locale: ogLocale(locale),
-    alternateLocale: LOCALES.filter((l) => l.code !== locale).map((l) => ogLocale(l.code)),
+    ...(altre.length ? { alternateLocale: altre } : {}),
     images: immagineOg(),
   };
 }

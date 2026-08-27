@@ -1,4 +1,4 @@
-import { LOCALES, DEFAULT_LOCALE, getLocale } from './locales';
+import { LOCALES, DEFAULT_LOCALE, PIU_LINGUE, getLocale } from './locales';
 
 export const SITE = 'https://prestigerent.com';
 
@@ -140,14 +140,29 @@ export function grafo(nodi: unknown[]) {
  * puo' piu' sbagliarsi, perche' non c'e' piu' un passaggio da fare.
  * Il parametro e' la funzione che, data una lingua, dice a che indirizzo
  * sta quella pagina in quella lingua. */
+/* 🔴 CON UNA LINGUA SOLA GLI HREFLANG NON SI SCRIVONO, IL CANONICAL SI'.
+ *
+ * Un cluster hreflang che punta solo a se stesso non dice niente a Google:
+ * e' rumore, e per un periodo ha detto anche una bugia -- collegava /de/ e
+ * /it/ come traduzioni di pagine che erano lo stesso testo inglese.
+ * Il canonical invece serve SEMPRE, ed e' proprio il motivo per cui questa
+ * funzione esiste (vedi la nota qui sopra): senza, home, /about-us/ e le 35
+ * categorie tornerebbero a uscire senza. Quindi qui sotto cade `languages`,
+ * mai `canonical`.
+ *
+ * Il giorno che si riaccende una lingua in `LINGUE_ATTIVE` gli hreflang
+ * tornano da soli, bidirezionali e con x-default, senza toccare niente. */
 export function hreflangDi(
   path: (locale: string) => string,
   locale: string = DEFAULT_LOCALE
 ) {
+  const canonical = SITE + path(locale);
+  if (!PIU_LINGUE) return { canonical };
+
   const languages: Record<string, string> = {};
   for (const l of LOCALES) languages[l.htmlLang] = SITE + path(l.code);
   languages['x-default'] = SITE + path(DEFAULT_LOCALE);
-  return { canonical: SITE + path(locale), languages };
+  return { canonical, languages };
 }
 
 /* ─────────────────────────────────────────────────────────────────────

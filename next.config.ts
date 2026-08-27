@@ -257,6 +257,15 @@ const nextConfig: NextConfig = {
       ...inoltra('/wp-content', '/wp-content'),
       ...inoltra('/wp-includes', '/wp-includes'),
 
+      /* /mp/ e' la pagina del punto d'incontro, ed e' linkata da due posti
+         che contano: dal piede di /myb/ -- cioe' da chi ha appena pagato e
+         sta cercando dove ci si vede -- e da dentro il testo di quattro
+         schede tour, fra cui le due Siena/San Gimignano che valgono l'85%
+         del fatturato. Sul sito nuovo non esiste e nessuno l'aveva
+         prevista: senza questa riga, il giorno del passaggio chi ha pagato
+         cerca l'appuntamento e trova un errore. */
+      ...inoltra('/mp', '/mp'),
+
       /* src/proxy.ts gira prima dei rewrite e mette davanti la lingua
          predefinita a tutto quello che non riconosce: quando la richiesta
          arriva qui non e' piu' /lp/tour.html ma /en/lp/tour.html. I .mp4 e

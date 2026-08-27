@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DEFAULT_LOCALE, LOCALES, getLocale } from '@/lib/locales';
+import { DEFAULT_LOCALE, LOCALES, PIU_LINGUE, getLocale } from '@/lib/locales';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { SEZIONI } from '@/lib/menu';
 import type { VotoTour } from '@/lib/recensioni';
@@ -204,30 +204,37 @@ export function Header({
 
           <ThemeToggle />
 
-          <div className="hd-lang">
-            <button
-              type="button"
-              onClick={() => {
-                setLingue(!lingue);
-                setAperta(null);
-              }}
-              aria-expanded={lingue}
-            >
-              🌐 <span className="lg">{info.label}</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            {lingue && (
-              <div className="hd-lang-menu">
-                {LOCALES.map((l) => (
-                  <a key={l.code} href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>
-                    {l.label}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* 🔴 IL SELETTORE C'E' SOLO SE C'E' QUALCOSA DA SELEZIONARE.
+              Con una lingua sola era un menu a tendina che si apriva su una
+              voce sola, gia' quella attiva: promette una scelta e non la
+              mantiene. Sparisce da solo, e da solo torna il giorno che si
+              riaccende una lingua in `LINGUE_ATTIVE` (src/lib/locales.ts). */}
+          {PIU_LINGUE && (
+            <div className="hd-lang">
+              <button
+                type="button"
+                onClick={() => {
+                  setLingue(!lingue);
+                  setAperta(null);
+                }}
+                aria-expanded={lingue}
+              >
+                🌐 <span className="lg">{info.label}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {lingue && (
+                <div className="hd-lang-menu">
+                  {LOCALES.map((l) => (
+                    <a key={l.code} href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}>
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <a className="hd-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

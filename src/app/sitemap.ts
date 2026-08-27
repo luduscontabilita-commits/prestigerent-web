@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIE } from '@/lib/categorie';
-import { DEFAULT_LOCALE, LOCALES } from '@/lib/locales';
+import { DEFAULT_LOCALE, LOCALES, PIU_LINGUE } from '@/lib/locales';
 import { SITE } from '@/lib/schema';
 
 /* La sitemap con dentro gli hreflang.
@@ -11,9 +11,11 @@ import { SITE } from '@/lib/schema';
  * causa piu' comune di fallimento internazionale, perche' un cluster
  * incoerente si nota solo a scala e nella sitemap e' verificabile.
  *
- * Regole rispettate qui: bidirezionalita' (ogni lingua elenca tutte le
- * altre), auto-referenza (ogni pagina include se stessa) e `x-default` verso
- * l'inglese.
+ * Regole rispettate qui QUANDO LE LINGUE SONO PIU' D'UNA: bidirezionalita'
+ * (ogni lingua elenca tutte le altre), auto-referenza (ogni pagina include
+ * se stessa) e `x-default` verso l'inglese. Oggi le lingue accese sono una
+ * sola, quindi di hreflang non se ne scrive nessuno -- vedi `alternative()`
+ * qui sotto e la nota in cima a src/lib/locales.ts.
  *
  * `lastMod` e' quello VERO preso dal database, non la data di build: una
  * sitemap che dichiara "tutto aggiornato oggi" a ogni pubblicazione perde
@@ -26,7 +28,19 @@ function percorso(locale: string, path: string) {
   return locale === DEFAULT_LOCALE ? `${SITE}${path}` : `${SITE}/${locale}${path}`;
 }
 
-function alternative(path: string) {
+/* 🔴 Con una lingua sola non si scrive nessun `xhtml:link`.
+ *
+ * Finche' erano tre, ogni voce ne portava quattro (en-US, de-DE, it-IT e
+ * x-default): 123 URL per 4 = 492 righe, che dichiaravano a Google 369
+ * indirizzi distinti dove le pagine vere erano 123. Le 246 in /de/ e /it/
+ * erano il testo inglese identico -- vedi la nota in cima a locales.ts.
+ *
+ * Restituire `undefined` invece di una mappa con una sola voce non e' un
+ * dettaglio: un cluster hreflang che punta solo a se stesso e' rumore.
+ * Quando `LINGUE_ATTIVE` torna a due, gli hreflang tornano da soli. */
+function alternative(path: string): { languages: Record<string, string> } | undefined {
+  if (!PIU_LINGUE) return undefined;
+
   const languages: Record<string, string> = {};
   for (const l of LOCALES) languages[l.htmlLang] = percorso(l.code, path);
   languages['x-default'] = percorso(DEFAULT_LOCALE, path);

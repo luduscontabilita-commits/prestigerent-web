@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { DEFAULT_LOCALE, LOCALE_CODES } from '@/lib/locales';
+import { DEFAULT_LOCALE, LOCALE_CODES, LOCALE_CODES_SPENTI } from '@/lib/locales';
 
 /* L'inglese sta alla radice, le altre lingue in sottocartella.
  *
@@ -73,6 +73,29 @@ export default function proxy(req: NextRequest) {
     const rest = pathname.slice(DEFAULT_LOCALE.length + 1);
     url.pathname = rest && rest !== '/' ? rest : '/';
     return NextResponse.redirect(url, 308);
+  }
+
+  /* 🔴 LE LINGUE SPENTE: 301, MAI 404.
+   *
+   * `de` e `it` sono state servite per un periodo (200, con dentro il testo
+   * inglese) e dichiarate nella sitemap come traduzioni: 246 indirizzi che
+   * Google puo' aver raccolto e che qualcuno puo' avere nei preferiti o in
+   * un link. Spegnere la lingua senza redirect li trasformerebbe tutti in
+   * 404 -- che e' esattamente il modo di buttare via il poco che avevano.
+   *
+   * Si toglie il prefisso e si manda alla pagina inglese, che e' la STESSA
+   * pagina: il contenuto che l'utente vedeva li' era gia' questo.
+   * 301 e non 308 apposta: e' permanente e non deve preservare il metodo,
+   * sono pagine che si aprono in GET.
+   *
+   * Quando la lingua si riaccende (`LINGUE_ATTIVE` in src/lib/locales.ts)
+   * questo ramo si svuota da solo e le URL tornano a servire pagine vere,
+   * senza toccare una riga qui. */
+  if ((LOCALE_CODES_SPENTI as string[]).includes(first)) {
+    const url = req.nextUrl.clone();
+    const rest = pathname.slice(first.length + 1);
+    url.pathname = rest && rest !== '/' ? rest : '/';
+    return NextResponse.redirect(url, 301);
   }
 
   if (LOCALE_CODES.includes(first as never)) {

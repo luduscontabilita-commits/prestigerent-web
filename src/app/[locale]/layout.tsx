@@ -53,7 +53,10 @@ export async function generateMetadata({
   };
 }
 
-/* Le otto lingue si generano tutte in anticipo: sono poche e fisse. */
+/* Le lingue ACCESE si generano tutte in anticipo: sono poche e fisse.
+   Oggi e' solo l'inglese -- `LINGUE_ATTIVE` in src/lib/locales.ts spiega
+   perche' e cosa serve per riaccendere de e it. Le rotte /[locale]/
+   restano tutte al loro posto: cambia solo quante se ne generano. */
 export function generateStaticParams() {
   return LOCALES.map((l) => ({ locale: l.code }));
 }

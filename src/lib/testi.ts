@@ -21,13 +21,21 @@ import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/locales';
  * il primo. Quando il footer verra' tradotto, si aggiunge un secondo
  * blocco qui e non si inventa un altro meccanismo.
  *
- * ── LE LINGUE SONO TRE ──────────────────────────────────────────────
+ * ── LE LINGUE SONO TRE, ANCHE SE ONLINE NE GIRA UNA ─────────────────
  * en, de, it. Non otto: `locales.ts` le ha ridotte apposta, e il
  * masterplan §5.5 vieta esplicitamente di riaprirne otto insieme. Se un
  * domani se ne aggiunge una, TypeScript fa fallire la compilazione qui
  * finche' non la si traduce -- che e' il comportamento giusto: meglio
  * un errore in fase di build che una pagina meta' in una lingua e meta'
  * in un'altra.
+ *
+ * 🔴 DAL 27/08/2026 SUL SITO PUBBLICO E' ACCESO SOLO L'INGLESE, perche'
+ * `tour_content` e `seo` non hanno una sola riga in de o it (vedi la nota
+ * in cima a `locales.ts`). I testi tedeschi e italiani qui sotto NON si
+ * cancellano: sono la meta' gia' fatta del lavoro di riaccensione, e il
+ * tipo `Locale` resta a tre proprio per tenerli in piedi e compilati.
+ * `testiModulo('de')` continua a restituire il tedesco: e' `isLocale` a
+ * dire che oggi quella pagina non si serve, non questo file.
  */
 
 export type TestiModulo = {

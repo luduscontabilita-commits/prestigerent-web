@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
-import { DEFAULT_LOCALE, isLocale, LOCALES, regiondoLocale } from '@/lib/locales';
+import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { Cerca } from '@/components/Cerca';
@@ -450,22 +450,28 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           gia' di volerlo, questo lo trova chi arriva in fondo e non ha
           capito. La bandiera si riconosce prima della parola, e chi
           cerca la propria lingua guarda proprio quella. */}
-      <section className="lng">
-        <p className="lng-t">Also available in</p>
-        <div className="lng-in">
-          {LOCALES.map((l) => (
-            <a
-              key={l.code}
-              href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}
-              hrefLang={l.htmlLang}
-              className={l.code === locale ? 'is-on' : undefined}
-            >
-              <span aria-hidden="true">{BANDIERA[l.code] ?? '🌐'}</span>
-              {l.label}
-            </a>
-          ))}
-        </div>
-      </section>
+      {/* 🔴 "Also available in" con una lingua sola diceva il falso: la
+          pagina non e' disponibile in altre lingue, e la riga elencava
+          soltanto quella in cui il lettore stava gia' leggendo. Sparisce
+          finche' non c'e' davvero una seconda lingua. */}
+      {PIU_LINGUE && (
+        <section className="lng">
+          <p className="lng-t">Also available in</p>
+          <div className="lng-in">
+            {LOCALES.map((l) => (
+              <a
+                key={l.code}
+                href={l.code === DEFAULT_LOCALE ? '/' : `/${l.code}/`}
+                hrefLang={l.htmlLang}
+                className={l.code === locale ? 'is-on' : undefined}
+              >
+                <span aria-hidden="true">{BANDIERA[l.code] ?? '🌐'}</span>
+                {l.label}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
