@@ -50,7 +50,7 @@ const CLIP: Clip[] = [
   { nome: 'testimonial-sg2', tema: 'siena', poster: true, didascalia: 'A guest describing the afternoon in San Gimignano.' },
   { nome: 'testimonial-proposal', tema: 'wine', poster: true, didascalia: 'A guest who proposed to his partner during a wine tour, filmed shortly afterwards.' },
   { nome: 'testimonial-t3', tema: 'wine', poster: true, didascalia: 'Recorded between two tastings, still at the table.' },
-  { nome: 'testimonial-sg3', tema: 'siena', poster: true, didascalia: 'A guest speaking after the walk through the centre of Siena.' },
+  { nome: 'testimonial-sg3', tema: 'siena', poster: true, didascalia: 'A guest speaking after the walk through the center of Siena.' },
   { nome: 'testimonial-t4', tema: 'wine', poster: true, didascalia: 'A guest talking about the drive through the vineyards.' },
   { nome: 'testimonial-sg4', tema: 'siena', poster: true, didascalia: 'Filmed in San Gimignano, at the end of the visit.' },
 ];

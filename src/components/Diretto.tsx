@@ -27,7 +27,7 @@ export function Diretto({ whatsapp }: { whatsapp: string }) {
         <li>
           <span aria-hidden="true">💬</span>
           <b>Before</b> — <a href={whatsapp} target="_blank" rel="noopener">ask us anything
-          before you pay</a>. We answer ourselves: not a call centre, not a chatbot.
+          before you pay</a>. We answer ourselves: not a call center, not a chatbot.
         </li>
         <li>
           <span aria-hidden="true">📞</span>

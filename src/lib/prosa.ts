@@ -56,11 +56,41 @@ export function faqDa(html: string): Domanda[] {
   const out: Domanda[] = [];
 
   const paragrafi = pulito.match(/<p>[\s\S]*?<\/p>/gi) ?? [];
-  for (const p of paragrafi) {
+  for (let i = 0; i < paragrafi.length; i++) {
+    const p = paragrafi[i];
     const m = p.match(/^<p>\s*<strong>([\s\S]*?)<\/strong>\s*([?？:]?)\s*(?:<br\s*\/?>)?([\s\S]*)<\/p>$/i);
     if (!m) continue;
     const q = (m[1] + (m[2] || '')).replace(/<[^>]+>/g, '').trim();
-    const a = m[3].trim();
+
+    /* 🔴 LA RISPOSTA CONTINUA NEI PARAGRAFI SUCCESSIVI.
+     *
+     * Prima si leggeva solo quello che stava DENTRO lo stesso <p> della
+     * domanda, e tutto il resto spariva senza dire niente. Misurato:
+     * 1.079 paragrafi su 1.621 buttati via, su 86 pagine su 87.
+     *
+     * Fra quello che il cliente non vedeva mai:
+     *   "You can convert your existing payments to credit, and use it on
+     *    your next trip, up to 24 hr prior departure"
+     *   "You can transfer your credit to a friend or family member, at no
+     *    extra cost"
+     *   le istruzioni sulle misure della sedia a rotelle
+     * e il listino delle quattro esperienze in cantina, che sembrava
+     * "perso nell'importazione" ed era li' da sempre.
+     *
+     * Su WordPress una FAQ e' scritta cosi': un <p> con la domanda in
+     * grassetto, e la risposta puo' continuare nei <p> seguenti finche'
+     * non ne comincia un altro in grassetto -- che e' la domanda dopo.
+     * Quindi si va avanti finche' non si incontra il prossimo grassetto. */
+    const pezzi = [m[3].trim()];
+    for (let j = i + 1; j < paragrafi.length; j++) {
+      if (/^<p>\s*<strong>/i.test(paragrafi[j])) break;
+      const corpo = paragrafi[j].replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+      /* Un paragrafo vuoto o fatto solo di spazi unificatori non aggiunge
+         niente e produrrebbe righe vuote dentro l'accordion. */
+      if (corpo.replace(/<[^>]+>|&nbsp;|\s/g, '')) pezzi.push(corpo);
+      i = j;
+    }
+    const a = pezzi.filter(Boolean).join('<br>');
 
     /* Senza risposta non e' una domanda: e' un titoletto in grassetto, e
        trasformarlo in accordion produrrebbe una riga che si apre sul vuoto. */

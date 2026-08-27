@@ -1,7 +1,7 @@
 /* I PREMI UFFICIALI, presi pari pari dalla landing collaudata.
  *
  * Sono immagini rilasciate dalle piattaforme stesse: il Viator Experience
- * Award 2025 e 2023 e il Tripadvisor Travellers' Choice. Sono l'unico modo
+ * Award 2025 e 2023 e il Tripadvisor Travelers' Choice. Sono l'unico modo
  * legittimo di mettere in pagina il marchio verde di Viator e il gufo di
  * Tripadvisor -- ce li hanno dati loro, non li abbiamo ridisegnati noi.
  *
@@ -39,7 +39,7 @@ export function Premi({ nota }: { nota?: string | null }) {
           height={300}
           loading="lazy"
           decoding="async"
-          alt="Tripadvisor Travellers' Choice Awards 2025"
+          alt="Tripadvisor Travelers' Choice Awards 2025"
         />
       </div>
       {nota && <p className="pw-nota">{nota}</p>}

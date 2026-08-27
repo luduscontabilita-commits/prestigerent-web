@@ -171,7 +171,7 @@ const EN: TestiModulo = {
     email: 'Please check the email address — that is where our answer goes.',
     telefono: 'That phone number looks too short. Leave it empty if you prefer email only.',
     quando: 'Please pick a date from today onwards, within the next two years.',
-    persone: 'How many people are travelling? Any number from 1 to 60.',
+    persone: 'How many people are traveling? Any number from 1 to 60.',
     messaggio: 'Your message is too long — please keep it under 2,000 characters.',
     troppo_veloce: 'That was quick. Take a moment to check the fields, then send again.',
     troppe: 'You have already sent us a few requests. Give us a little time to answer, or message us on WhatsApp.',

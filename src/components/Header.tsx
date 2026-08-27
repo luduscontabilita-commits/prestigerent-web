@@ -327,7 +327,7 @@ export function Header({
                         rel="noopener"
                       >
                         Not sure which one? <b>Ask us on WhatsApp</b> &mdash; we answer
-                        ourselves, not a call centre.
+                        ourselves, not a call center.
                       </a>
                     </div>
                   </div>

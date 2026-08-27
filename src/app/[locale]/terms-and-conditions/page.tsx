@@ -189,7 +189,7 @@ export default async function TerminiCondizioni({
         <p>
           If for any reason the Company cancels the tour or service, the client may claim
           refund for the paid amount, only. In any case the Company is not responsible for
-          additional expenses that may be incurred by a client due to a cancelled tour or
+          additional expenses that may be incurred by a client due to a canceled tour or
           service (i.e. train tickets, flights, hotels, etc.).
         </p>
 
@@ -215,7 +215,7 @@ export default async function TerminiCondizioni({
         <h2>Accessibility &mdash; walking difficulties &mdash; wheelchair/scooter users</h2>
         <p>
           Private services can be customized to suit specific requests, but it is mandatory
-          to specify all your needs at the time of reservation; in case you are travelling
+          to specify all your needs at the time of reservation; in case you are traveling
           with a wheelchair or an electric scooter, etc. you need to give us all the specific
           details (weight, dimensions, etc.), in order to be sure the vehicle assigned fits
           your needs.
@@ -227,7 +227,7 @@ export default async function TerminiCondizioni({
 
         <h2>Transfers &mdash; delays, cancellations, changes</h2>
         <p>
-          If your arrival flight or train is cancelled due to weather or unforeseen
+          If your arrival flight or train is canceled due to weather or unforeseen
           circumstances, no charge will be made, if we have been advised of it. If you miss
           or change your flight or train, you must advise us as soon as possible.
         </p>
@@ -330,7 +330,7 @@ export default async function TerminiCondizioni({
         <p>
           For Italian law, all luggage is to be placed in the luggage compartment provided.
           The driver must agree to any item the client wishes to take into the vehicle with
-          them. You must specify the amount of luggage you will be travelling with at the
+          them. You must specify the amount of luggage you will be traveling with at the
           time of the booking, so we can confirm the right size vehicle to avoid possible
           problems due to excess luggage. The Company is not responsible for excess of
           luggage not declared at the time of reservation.
@@ -340,7 +340,7 @@ export default async function TerminiCondizioni({
         <p>
           If any of our vehicles are damaged or soiled as a result of a passenger&rsquo;s
           actions, we will charge the client named on the contract fully for the amount to
-          rectify the vehicle and for time lost whilst the vehicle was taken out of the
+          rectify the vehicle and for time lost while the vehicle was taken out of the
           fleet.
         </p>
 
@@ -356,7 +356,7 @@ export default async function TerminiCondizioni({
           Excess charges may be incurred for any private service made on a public holiday or
           during the night (10:00pm &ndash; 7:00am). In any case the exact amount will be
           clearly specified at the time of the reservation. If the date or time of travel
-          falls on one of these cases, please make this known to our staff whilst making the
+          falls on one of these cases, please make this known to our staff while making the
           reservation and the tariff will be amended accordingly.
         </p>
 
@@ -372,7 +372,7 @@ export default async function TerminiCondizioni({
         <p>
           The Company does not accept responsibility for the following: delays due to adverse
           weather conditions; theft or damage of any item belonging to any of the passengers
-          travelling in our vehicles; delays caused by road traffic accidents; other traffic
+          traveling in our vehicles; delays caused by road traffic accidents; other traffic
           conditions or acts of God. Any passenger leaving possessions or items in the
           vehicle does so at their own risk.
         </p>
@@ -401,7 +401,7 @@ export default async function TerminiCondizioni({
         <h2>Compliments and reviews</h2>
         <p>
           If you are happy with our service and would like to comment, please send us an
-          email, or write a review on your favourite channel.
+          email, or write a review on your favorite channel.
         </p>
 
         <h2>Law and jurisdiction</h2>
@@ -420,7 +420,7 @@ export default async function TerminiCondizioni({
 
         <p>
           Prestige Rent takes much pride in the service we offer. We wish you the most
-          pleasurable experience and journey whilst travelling with us. Thank you for taking
+          pleasurable experience and journey while traveling with us. Thank you for taking
           the time to read our Terms and Conditions set out above.
         </p>
       </section>

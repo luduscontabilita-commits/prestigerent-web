@@ -289,7 +289,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 {d.totale.toLocaleString('en-US')} verified reviews
               </span>
             )}
-            <span><i>🏆</i> Viator Experience Award &amp; Travellers&rsquo; Choice</span>
+            <span><i>🏆</i> Viator Experience Award &amp; Travelers&rsquo; Choice</span>
             <span><i>🛡️</i> Free cancellation up to 24 hours</span>
             <span><i>🚐</i> Our own {az?.mezzi_minibus} minibuses, our own drivers</span>
           </div>
@@ -346,7 +346,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <div><b>{d.anni}</b><span>years, since {az?.anno_fondazione}</span></div>
           </div>
           <p className="hm-proof-src">
-            Travellers&rsquo; Choice 2026 ·{' '}
+            Travelers&rsquo; Choice 2026 ·{' '}
             <a href="https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html"
                target="_blank" rel="noopener">
               verified on Tripadvisor
@@ -388,7 +388,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <p className="pr-lead">
               Not a marketplace reselling someone else&rsquo;s coach: the cars are ours and
               the drivers are our employees. That is why we can send the right vehicle for
-              your party, and why we can enter the restricted historic centres.
+              your party, and why we can enter the restricted historic centers.
             </p>
           </div>
 
