@@ -214,17 +214,23 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * larghezza -- e il ritaglio parte dal centro, che e' il posto sbagliato in
    * tre casi su sei. Misurato su ognuna dove sta davvero il soggetto:
    *
-   *   Tuscany_wine_experience  il gruppo occupa il 18-78% della larghezza,
-   *                            centro reale al 48%: il centro va bene.
-   *   Sam-Domenico-Church      la chiesa sta a SINISTRA (0-55%), la cupola
-   *                            del Duomo al 78%. Col centro si vede la coda
-   *                            della chiesa e degli alberi.
-   *   PVT-6                    il vignaiolo e' al 30-58%, faccia al 40%.
-   *   firenze-cattedrale       facciata a tutto campo: qualunque taglio va.
-   *   pisa-torre               la torre e' al 55-75%: col centro se ne vede
-   *                            il bordo sinistro e basta. E' il caso che il
-   *                            titolare ha visto ("il soggetto e' fuori").
-   *   Cinque-Terre9            il paese e' al 10-65%, la meta' destra e' mare.
+   *   48%  Tuscany_wine_experience -- il gruppo sta fra il 18% e il 78%,
+   *        centro vero al 48%. E' largo piu' della finestra (49%), quindi
+   *        qualcuno ai bordi si taglia comunque: meglio simmetrico.
+   *    8%  Sam-Domenico-Church -- la chiesa sta tutta a SINISTRA (2-65%) e
+   *        la cupola del Duomo al 75-83%. Nella finestra (67%) ci sta la
+   *        chiesa INTERA oppure la cupola, non tutte e due: si tiene quella
+   *        che l'immagine promette. Col centro non si vedeva ne' l'una ne'
+   *        l'altra -- coda della chiesa, alberi, e mezza cupola.
+   *   44%  PVT-6 -- il vignaiolo e' al 32-64%, la faccia al 45%.
+   *  auto  firenze-cattedrale -- facciata a tutto campo, non c'e' un
+   *        soggetto da centrare: resta 'center'.
+   *   72%  pisa-torre -- la torre e' al 56-80%. Col centro la finestra
+   *        arriva al 78% e ne mostrava il fianco sinistro tagliato: e'
+   *        questo il caso che il titolare ha visto. Al 72% la finestra e'
+   *        31-87% e la torre ci sta dentro con aria da tutte e due i lati.
+   *   34%  Cinque-Terre9 -- il paese e' allo 0-68%, la meta' destra e' mare
+   *        aperto. Al 34% la finestra e' 11-77%: paese tutto, un po' di mare.
    *
    * La percentuale VERTICALE resta `center` su tutte: nel quadrato l'altezza
    * viene mostrata intera, quindi non c'e' niente da scegliere. Serve solo
@@ -269,7 +275,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     {
       /* private-tour-siena-and-san-gimignano -- Siena */
       src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Sam-Domenico-Church-Siena.jpg',
-      fuoco: '38% center',
+      fuoco: '8% center',
     },
     {
       /* private-tour-to-chianti-wineries -- il Chianti e il vino */
@@ -284,12 +290,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     {
       /* private-tour-pisa-from-florence -- Pisa */
       src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/03/pisa-torre.jpg',
-      fuoco: '62% center',
+      fuoco: '72% center',
     },
     {
       /* tour-to-cinque-terre-from-la-spezia -- le Cinque Terre */
       src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Cinque-Terre9.jpg',
-      fuoco: '40% center',
+      fuoco: '34% center',
     },
   ];
 
@@ -371,7 +377,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               peggio di come lo raccontava.
 
               LA VERSIONE CORTA NON E' UN SECONDO PARAGRAFO: e' questo, con
-              tre pezzi spenti. Gli <span className="hm-piu"> spariscono
+              tre pezzi spenti. Gli span di classe hm-piu spariscono
               sotto i 760px (home.css) e quello che resta e':
 
                 "Your own car, your own driver, your own hours. We own the

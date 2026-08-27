@@ -442,3 +442,25 @@ export function senzaCovid(html: string): string {
     (_m, punto: string | undefined) => punto ?? ''
   );
 }
+
+/* ── QUANDO IL NOME DEL TOUR E' TROPPO LUNGO PER LA SCHEDA ────────────────
+ * Misurati tutti e 86: mediana 46 caratteri, ma un terzo sta sopra i 52 e
+ * si arriva a 67 ("Private Tour Etruscans and Tarquinia from Civitavecchia
+ * (Rome) Port"). Con due righe piene quei nomi occupano quasi tutta la
+ * parte bassa della foto.
+ *
+ * Il CSS non sa quanto e' lungo un testo -- non esiste una query sul
+ * contenuto -- ma il server si': il nome ce l'ha in mano nel momento in cui
+ * disegna la scheda. Quindi la decisione si prende qui, una volta, e le due
+ * griglie la prendono uguale.
+ *
+ * La soglia e' 52 e non la mediana: a 46 sarebbe stata meta' del catalogo,
+ * e un titolo piu' piccolo su meta' delle schede non e' piu' un'eccezione,
+ * e' un secondo stile. A 52 sono 26 schede su 86 -- quelle che il problema
+ * ce l'hanno davvero.
+ */
+const LUNGO = 52;
+
+export function classeTitolo(base: string, nome: string): string {
+  return nome.length > LUNGO ? `${base} lungo` : base;
+}

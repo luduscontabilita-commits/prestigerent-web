@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { testo } from '@/lib/prosa';
+import { classeTitolo } from '@/lib/punti';
 
 export type SchedaTour = {
   slug: string;
@@ -242,7 +243,7 @@ export function HomeTours({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t.foto} alt={t.nome} loading="lazy" decoding="async" />
                     )}
-                    <h3 className="hm-card-name">{testo(t.nome)}</h3>
+                    <h3 className={classeTitolo('hm-card-name', testo(t.nome))}>{testo(t.nome)}</h3>
                   </div>
                   <div className="hm-card-body">
                     {/* DURATA, VOTO E RECENSIONI SU UNA RIGA SOLA.

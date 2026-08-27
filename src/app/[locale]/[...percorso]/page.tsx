@@ -7,7 +7,7 @@ import { CATEGORIE, categoriaDi, figlieDi } from '@/lib/categorie';
 import { votiPerTour } from '@/lib/recensioni';
 import { metaDi } from '@/lib/seo';
 import { prezzoDi } from '@/lib/prezzi';
-import { puntiScheda } from '@/lib/punti';
+import { classeTitolo, puntiScheda } from '@/lib/punti';
 import { testo } from '@/lib/prosa';
 import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
@@ -193,7 +193,7 @@ export default async function Categoria_({
                 <div className="ct-img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {foto && <img src={foto} alt={nome} loading="lazy" decoding="async" />}
-                  <h3 className="ct-nome">{nome}</h3>
+                  <h3 className={classeTitolo('ct-nome', nome)}>{nome}</h3>
                 </div>
                 <div className="ct-body">
                   {/* durata, posti e recensioni su una riga sola */}

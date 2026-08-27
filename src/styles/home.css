@@ -1291,7 +1291,7 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
  * browser ingrandisce finche' non ha coperto il lato lungo -- l'altezza -- e
  * di conseguenza della larghezza ne resta dentro una fetta:
  *
- *     prima, hero alto 1158px:  16,6% della foto del vino
+ *     prima, hero alto ~1170px: 16,5% della foto del vino
  *                               22,5% di Siena e delle Cinque Terre
  *
  * Cioe' si vedeva un sesto di fotografia. Non e' un difetto di scelta delle
@@ -1588,19 +1588,34 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
 .hm-card-img::after,
 .ct-img::after{
   content:"";
-  position:absolute; inset:0;
+  /* ⚠️ NON `inset:0`. La prima versione stendeva la sfumatura su TUTTA
+     l'altezza della foto: anche partendo da trasparente, a meta' altezza
+     era gia' a .28 e a un terzo a .44, e il risultato non era una velatura
+     per leggere il testo ma un filtro sulla fotografia. Sulla scheda delle
+     Cinque Terre da La Spezia il paese colorato -- che e' il motivo per
+     cui uno clicca -- si vedeva mangiato a meta'.
+
+     Adesso l'elemento esiste solo nell'ULTIMO 44% della foto. Sopra quella
+     riga non c'e' niente da comporre: la foto e' esattamente la foto. */
+  position:absolute; inset:auto 0 0 0; height:44%;
   pointer-events:none;
+  /* La curva sale TARDI. Le fermate sono in percentuale della fascia, non
+     della foto: il .69 sta al 45% della fascia, cioe' al 20% della foto.
+     Fino a meta' fascia -- l'ultimo quinto della foto -- si e' sotto il
+     .70, e negli ultimi due terzi della fascia si crolla da .56 a zero in
+     poco spazio. E' il contrario di prima: prima saliva presto e piano,
+     adesso resta a zero a lungo e chiude in fretta. */
   background:linear-gradient(
     to top,
-    rgba(14,20,27,.92) 0%,
-    rgba(14,20,27,.88) 8%,
-    rgba(14,20,27,.78) 18%,
-    rgba(14,20,27,.62) 28%,
-    rgba(14,20,27,.44) 38%,
-    rgba(14,20,27,.28) 48%,
-    rgba(14,20,27,.15) 58%,
-    rgba(14,20,27,.06) 70%,
-    rgba(14,20,27,0)   84%
+    rgba(14,20,27,.88)   0%,
+    rgba(14,20,27,.86)  15%,
+    rgba(14,20,27,.79)  30%,
+    rgba(14,20,27,.69)  45%,
+    rgba(14,20,27,.56)  60%,
+    rgba(14,20,27,.40)  72%,
+    rgba(14,20,27,.22)  82%,
+    rgba(14,20,27,.08)  92%,
+    rgba(14,20,27,0)   100%
   );
 }
 
@@ -1613,18 +1628,77 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
      scheda: nella colonna stretta delle categorie resta leggibile, su
      tre colonne larghe cresce. */
   font-size:clamp(1.02rem, 1.15vw + .78rem, 1.24rem);
-  font-weight:800; line-height:1.22; letter-spacing:-.01em;
+  font-weight:800; line-height:1.18; letter-spacing:-.015em;
   text-shadow:none;
-  /* DUE RIGHE E BASTA. Alcuni nomi sono lunghissimi ("Private tour to
-     Siena, San Gimignano, Chianti and Pisa from Florence"): a tutta
-     lunghezza coprivano meta' della foto, e la scheda accanto -- col
-     nome corto -- sembrava un altro componente. */
+  /* Con due righe piene, "Private Tour Florence and Pisa from Livorno
+     Port" spezzato male lascia cinque parole sopra e una sotto. Bilanciarle
+     non fa risparmiare altezza ma toglie la riga mozza, che e' quello che
+     si nota. Dove non e' sostenuto non succede niente. */
+  text-wrap:balance;
+
+  /* ── DUE RIGHE E BASTA, E QUI C'E' UNA TRAPPOLA ────────────────────
+     Alcuni nomi sono lunghissimi ("Private Tour Etruscans and Tarquinia
+     from Civitavecchia (Rome) Port", 67 caratteri): a tutta lunghezza
+     coprono meta' della foto.
+
+     🔴 `-webkit-line-clamp` DA SOLO NON BASTA. Sulla scheda di
+     `Private Tour the best of Rome from Civitavecchia (Rome) Port` si
+     vedeva spuntare sotto una TERZA riga tagliata a meta' altezza dei
+     caratteri -- la cosa che si nota di piu' in tutta la griglia.
+     Il ritaglio funziona solo se il browser tiene in piedi tutte e tre
+     le dichiarazioni (-webkit-box, box-orient, line-clamp): basta che il
+     minificatore ne lasci cadere una -- ed e' quello che succede quando
+     accanto c'e' anche la proprieta' standard `line-clamp`, che alcuni
+     ottimizzatori considerano equivalente e collassano in una sola --
+     e il ritaglio sparisce del tutto, lasciando il testo a scorrere.
+
+     Percio': la proprieta' standard NON si mette accanto alle -webkit-,
+     e sotto c'e' una rete di sicurezza che non dipende da nessuna delle
+     tre. `max-height` vale esattamente due caselle di riga
+     (2 x line-height 1.18 = 2.36em), quindi anche nel caso peggiore il
+     taglio cade su un confine di riga e non a meta' di una lettera:
+     si perde la terza riga, che e' cio' che si voleva, e non si vede
+     mezzo carattere. */
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
-  line-clamp:2;
+  max-height:2.36em;
   overflow:hidden;
 }
+
+/* I NOMI DAVVERO LUNGHI, UN GRADINO PIU' PICCOLI.
+   Mediana 46 caratteri, ma 26 tour su 86 stanno sopra i 52 e con quelli
+   due righe piene occupano quasi tutta la parte bassa della foto. Il
+   CSS non sa quanto e' lungo un testo; il server si', perche' il nome ce
+   l'ha in mano quando disegna la scheda -- vedi `LUNGO` in
+   HomeTours.tsx. Si scende di circa un punto e mezzo, non di piu': la
+   gerarchia giusta e' quella, il titolo resta la cosa piu' grande della
+   scheda. Sotto i 52 caratteri non cambia niente. */
+.hm-card-name.lungo,
+.ct-nome.lungo{
+  font-size:clamp(.94rem, .95vw + .74rem, 1.12rem);
+  letter-spacing:-.02em;
+}
+
+/* ── LA GRIGLIA DI CATEGORIA HA LA FOTO PIU' BASSA ────────────────────
+ * Le sue colonne sono `auto-fill minmax(270px,1fr)`: restano intorno ai
+ * 270-300px anche su schermo largo, quindi la foto e' alta ~203px contro
+ * i ~270px della home. Il titolo pero' e' dimensionato in `vw`, che della
+ * larghezza della COLONNA non sa niente: usciva alla stessa misura della
+ * home, e due righe si mangiavano il 30% di una foto che ne ha un terzo
+ * in meno.
+ *
+ * Conseguenza vera, non estetica: la cima del titolo finiva dove la
+ * velatura e' ancora leggera, e su una foto chiara il bianco scendeva a
+ * 2,7:1 -- sotto il 3:1 che le WCAG chiedono per il testo grande.
+ *
+ * La correzione giusta e' rimpicciolire il titolo QUI, non allargare la
+ * velatura: allargarla e' esattamente cio' che il titolare ha chiesto di
+ * non fare, ed e' questa la griglia da cui e' partita la segnalazione.
+ * A 1.04rem il titolo resta la cosa piu' grande della scheda e il
+ * contrasto risale a 3,2:1 sulla foto piu' chiara del catalogo. */
+.ct-nome{ font-size:1.04rem; }
+.ct-nome.lungo{ font-size:.95rem; }
 
 /* ---------- il corpo della scheda ---------- */
 
@@ -1682,7 +1756,11 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
-  line-clamp:2;
+  /* Stessa rete di sicurezza del titolo, e stesso motivo: senza, se il
+     ritaglio non prende, la prosa scorre a tre o quattro righe e la
+     scheda cresce solo lei in mezzo alla fila. 2 x line-height 1.5 = 3em,
+     quindi il taglio cade comunque su un confine di riga. */
+  max-height:3em;
   overflow:hidden;
 }
 

@@ -161,12 +161,17 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
               alt={alt}
               fetchPriority="high"
               onError={(e) => {
-                /* una volta sola: si toglie il gestore prima di cambiare
-                   indirizzo, altrimenti un ripiego che a sua volta fallisce
-                   rimetterebbe se stesso all'infinito. */
-                if (!f.ripiego) return;
+                /* UNA VOLTA SOLA. Il segno sta nel DOM e non in una
+                   variabile: React non toglie il proprio gestore assegnando
+                   `img.onerror = null` -- quello e' un'altra cosa -- e senza
+                   il segno un ripiego che a sua volta fallisce si
+                   rimetterebbe da capo all'infinito.
+                   NOTA ONESTA: se l'immagine fallisce PRIMA che la pagina si
+                   idrati, questo gestore non c'e' ancora e nessuno la
+                   sostituisce. Copre il caso probabile, non tutti. */
                 const img = e.currentTarget;
-                img.onerror = null;
+                if (!f.ripiego || img.dataset.ripiego === 'si') return;
+                img.dataset.ripiego = 'si';
                 img.src = f.ripiego;
               }}
             />
