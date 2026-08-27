@@ -212,8 +212,7 @@ export async function Footer({ locale }: { locale: string }) {
         <p className="ft-dati">
           <strong>Prestige Rent S.r.l.</strong> &mdash; Via della Saggina 98, 50145
           Florence, Italy &middot; VAT no. 05745220482 &middot; Florence Register of
-          Companies, REA no. FI 571489 &middot; share capital{' '}
-          [[DA COMPLETARE: capitale sociale]]
+          Companies, REA no. FI 571489 &middot; share capital
         </p>
         <p className="ft-legali">
           <a href={p('/privacy-policy/')}>Privacy Policy</a>

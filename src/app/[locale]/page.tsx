@@ -206,19 +206,91 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * `firenze-cupola.jpg` a 3,4:1. Al loro posto: la prima del tour delle
    * Cinque Terre da La Spezia e la cattedrale di Firenze, che sulla stessa
    * misura stanno a 3,9:1 e 8,3:1. */
+  /* IL PUNTO DI FUOCO (`fuoco`) -- DOVE STA IL SOGGETTO, IN PERCENTUALE.
+   *
+   * Su telefono la foto non e' piu' una striscia centrale (vedi home.css, il
+   * blocco a max-width:760px: la scatola diventa quadrata), ma un quadrato
+   * ritagliato da una foto orizzontale butta via da un terzo a meta' della
+   * larghezza -- e il ritaglio parte dal centro, che e' il posto sbagliato in
+   * tre casi su sei. Misurato su ognuna dove sta davvero il soggetto:
+   *
+   *   Tuscany_wine_experience  il gruppo occupa il 18-78% della larghezza,
+   *                            centro reale al 48%: il centro va bene.
+   *   Sam-Domenico-Church      la chiesa sta a SINISTRA (0-55%), la cupola
+   *                            del Duomo al 78%. Col centro si vede la coda
+   *                            della chiesa e degli alberi.
+   *   PVT-6                    il vignaiolo e' al 30-58%, faccia al 40%.
+   *   firenze-cattedrale       facciata a tutto campo: qualunque taglio va.
+   *   pisa-torre               la torre e' al 55-75%: col centro se ne vede
+   *                            il bordo sinistro e basta. E' il caso che il
+   *                            titolare ha visto ("il soggetto e' fuori").
+   *   Cinque-Terre9            il paese e' al 10-65%, la meta' destra e' mare.
+   *
+   * La percentuale VERTICALE resta `center` su tutte: nel quadrato l'altezza
+   * viene mostrata intera, quindi non c'e' niente da scegliere. Serve solo
+   * l'orizzontale, ed e' un valore solo che vale a ogni larghezza -- sul
+   * desktop la scatola e' cosi' larga che la foto ci sta tutta e la
+   * percentuale non sposta nulla. */
   const FOTO = [
-    /* wine-experience-in-tuscany -- e' la foto della home di oggi */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2025/07/Tuscany_wine_experience-scaled.jpg',
-    /* private-tour-siena-and-san-gimignano -- Siena */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Sam-Domenico-Church-Siena.jpg',
-    /* private-tour-to-chianti-wineries -- il Chianti e il vino */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/PVT-6.jpg',
-    /* florence-and-pisa-from-livorno-tour -- Firenze */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/firenze-cattedrale.jpg',
-    /* private-tour-pisa-from-florence -- Pisa */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/03/pisa-torre.jpg',
-    /* tour-to-cinque-terre-from-la-spezia -- le Cinque Terre */
-    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Cinque-Terre9.jpg',
+    {
+      /* wine-experience-in-tuscany -- e' la foto della home di oggi.
+       *
+       * E' L'UNICA CHE PASSA DA /render/image/. L'originale e' il file di
+       * WordPress: 2560px e 756 KB, ed e' l'immagine che Google cronometra
+       * (LCP) sul telefono, dove ne servono al massimo 1600 di larghezza.
+       * Chiesta a 1920 esce in webp a 307 KB -- il 59% in meno, e 1920 e'
+       * abbastanza per non ingrandire nemmeno su un desktop grande, quindi
+       * non si perde nitidezza da nessuna parte.
+       *
+       * 1920x947 e' il RAPPORTO DELL'ORIGINALE (2560x1262 = 2,028): con
+       * `resize=cover` il server toglie un pixel di larghezza e nient'altro.
+       * Non e' un ritaglio -- il ritaglio lo fa `object-fit` nel browser,
+       * dove sappiamo quant'e' larga la finestra e dove sta il soggetto.
+       *
+       * 🔴 QUESTO INDIRIZZO E' LO STESSO CHE VA NEL `preload` QUI SOTTO.
+       * Se si cambia uno dei due e non l'altro, il browser scarica due
+       * immagini invece di una e il tempo raddoppia: e' esattamente il
+       * contrario di quello che il preload serve a fare.
+       *
+       * Le altre cinque restano l'originale: pesano dai 44 ai 232 KB, e
+       * ripassate da /render/image/ alla loro dimensione nativa TRE DELLE
+       * CINQUE diventano piu' pesanti, non piu' leggere (Siena 109->159 KB,
+       * Cinque Terre 110->163). Non si cronometrano -- si montano a pagina
+       * caricata -- quindi non c'e' niente da guadagnare e qualcosa da
+       * perdere. */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/render/image/public/media/wp/2025/07/Tuscany_wine_experience-scaled.jpg?width=1920&height=947&resize=cover&quality=68',
+      /* se la trasformazione delle immagini venisse spenta sul progetto
+         Supabase, l'indirizzo qui sopra risponderebbe in errore: `HeroFoto`
+         rimette questo. Pesante, non rotto -- come fa il menu. */
+      ripiego:
+        'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2025/07/Tuscany_wine_experience-scaled.jpg',
+      fuoco: '48% center',
+    },
+    {
+      /* private-tour-siena-and-san-gimignano -- Siena */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Sam-Domenico-Church-Siena.jpg',
+      fuoco: '38% center',
+    },
+    {
+      /* private-tour-to-chianti-wineries -- il Chianti e il vino */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/PVT-6.jpg',
+      fuoco: '44% center',
+    },
+    {
+      /* florence-and-pisa-from-livorno-tour -- Firenze */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/firenze-cattedrale.jpg',
+      fuoco: 'center',
+    },
+    {
+      /* private-tour-pisa-from-florence -- Pisa */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/03/pisa-torre.jpg',
+      fuoco: '62% center',
+    },
+    {
+      /* tour-to-cinque-terre-from-la-spezia -- le Cinque Terre */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Cinque-Terre9.jpg',
+      fuoco: '40% center',
+    },
   ];
 
   /* SI CHIEDE LA FOTO PRIMA DI AVER LETTO LA PAGINA.
@@ -239,7 +311,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * richieste ad alta priorita' in partenza insieme si rubano la banda a
    * vicenda e la prima -- l'unica che viene cronometrata -- arriverebbe
    * dopo, non prima. Le altre se le prende `HeroFoto` a pagina caricata. */
-  ReactDOM.preload(FOTO[0], { as: 'image', fetchPriority: 'high' });
+  ReactDOM.preload(FOTO[0].src, { as: 'image', fetchPriority: 'high' });
 
   return (
     <main>
@@ -289,12 +361,46 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             Private tours, transfers &amp; chauffeur service{' '}
             <em>from Florence, through Chianti and Tuscany</em>
           </h1>
+          {/* 🔴 SESSANTA PAROLE SOPRA LA FOTO, SU UNO SCHERMO DA 390 PIXEL.
+              Misurato con i font veri (Manrope 600, 16px, interlinea 1,6):
+              54 parole, OTTO righe su un iPhone da 390 e NOVE su un Android
+              da 360 -- 205 e 230 pixel di testo, che sommati al titolo
+              facevano 441 e 466 pixel, cioe' il 52% e il 63% dell'altezza
+              dello schermo occupati da parole prima ancora di vedere la
+              ricerca. E' il "un po' troppo testo" del titolare, ed era anche
+              peggio di come lo raccontava.
+
+              LA VERSIONE CORTA NON E' UN SECONDO PARAGRAFO: e' questo, con
+              tre pezzi spenti. Gli <span className="hm-piu"> spariscono
+              sotto i 760px (home.css) e quello che resta e':
+
+                "Your own car, your own driver, your own hours. We own the
+                 vehicles and employ the people: English-speaking drivers
+                 and guides. Hotel pickup in Florence."
+
+              25 parole, QUATTRO righe sia a 390 sia a 360.
+
+              PERCHE' NON DUE PARAGRAFI, uno per il telefono e uno per il
+              desktop: sarebbero due copie dello stesso testo nel documento,
+              e Google le legge tutte e due -- nel punto piu' importante
+              della pagina piu' importante del sito. Cosi' invece la frase e'
+              scritta una volta sola e sul telefono se ne legge un pezzo.
+
+              QUELLO CHE NON SI PUO' SPEGNERE, e infatti non e' dentro
+              nessuno span: "we own the vehicles and employ the people". E'
+              la ragione per cui uno prenota qui invece che su Viator -- se
+              sparisce sul telefono, sparisce proprio dove serve. Via invece
+              "fluent" (lo dice gia' "English-speaking"), l'elenco dei
+              luoghi (sono nel titolo, due righe sopra) e "several of them
+              native speakers, working with us season after season", che e'
+              la prova del punto, non il punto. */}
           <p className="hm-sub">
-            Your own car, your own driver, your own hours &mdash; through the Chianti
-            wineries, Siena and San Gimignano. We own the vehicles and employ the
-            people: <b>fluent English-speaking drivers and guides</b>, several of them
-            native speakers, working with us season after season. We collect you at
-            your hotel in Florence, or anywhere in Italy.
+            Your own car, your own driver, your own hours
+            <span className="hm-piu"> &mdash; through the Chianti wineries, Siena and San Gimignano</span>.
+            We own the vehicles and employ the people:{' '}
+            <b><span className="hm-piu">fluent </span>English-speaking drivers and guides</b>
+            <span className="hm-piu">, several of them native speakers, working with us season after season</span>.
+            Hotel pickup in Florence<span className="hm-piu">, or anywhere in Italy</span>.
           </p>
           {/* La riga della fiducia risponde alle tre obiezioni di chi
               arriva da un annuncio -- e' vero? posso disdire? chi mi

@@ -88,7 +88,18 @@
 
 @media (max-width:760px){
   .hm-hero{ min-height:auto; padding:60px 18px 36px; }
-  .hm-title{ max-width:none; }
+  /* IL TITOLO SI RIMPICCIOLISCE, PERCHE' A 2,2rem ANDAVA IN SEI RIGHE.
+     Il clamp di sopra ha per minimo 2,2rem, e sotto i 630px di finestra e'
+     sempre il minimo a vincere: 35,2px fissi. Misurato con Manrope 800 sul
+     testo vero, a 390px di schermo fanno sei righe (218px) e a 360 pure --
+     un titolo alto quanto un quarto dello schermo. Con 8vw il carattere
+     torna a seguire la finestra (31px a 390, 29 a 360) e le righe diventano
+     QUATTRO: 129 e 119 pixel, novanta in meno. Il minimo di 1,75rem e' il
+     punto sotto il quale un H1 comincia a sembrare un sottotitolo. */
+  .hm-title{ max-width:none; font-size:clamp(1.75rem,8vw,2.2rem); }
+  /* i pezzi del sottotitolo che sul telefono non ci stanno: vedi il
+     commento sopra il paragrafo, in page.tsx */
+  .hm-piu{ display:none; }
   .hm-cta a{ flex:1 1 auto; justify-content:center; }
 }
 
@@ -1269,6 +1280,87 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 @media (prefers-reduced-motion: reduce){
   .hm-hero-bg .hm-hero-foto{ transition:none; }
   .hm-hero-bg.viva .hm-hero-foto{ animation:none; }
+}
+
+/* ---------- SUL TELEFONO LA FOTO E' UN QUADRATO, NON UNA STRISCIA ----------
+ *
+ * IL PROBLEMA. La scatola della foto e' 'inset:0' dentro l'hero, cioe' alta
+ * quanto TUTTO l'hero: su un telefono da 390 pixel sono 390 di larghezza per
+ * circa 940 di altezza, un rettangolo verticale con rapporto 0,41. Le sei
+ * foto sono orizzontali (da 1,5:1 a 2,03:1). Con 'object-fit:cover' il
+ * browser ingrandisce finche' non ha coperto il lato lungo -- l'altezza -- e
+ * di conseguenza della larghezza ne resta dentro una fetta:
+ *
+ *     prima, hero alto 1158px:  16,6% della foto del vino
+ *                               22,5% di Siena e delle Cinque Terre
+ *
+ * Cioe' si vedeva un sesto di fotografia. Non e' un difetto di scelta delle
+ * immagini: qualunque foto orizzontale, dentro una scatola cosi', diventa una
+ * colonnina presa dal centro.
+ *
+ * PERCHE' NON 'object-fit:contain'. Farebbe vedere tutta la foto, alta 192px
+ * su 940, e i restanti 750 sarebbero fondo vuoto -- con il titolo bianco e il
+ * modulo di ricerca appoggiati sopra il niente. Si risolve "la foto e'
+ * tagliata" creando "la foto e' un francobollo".
+ *
+ * PERCHE' NON UN RITAGLIO VERTICALE FATTO DAL SERVER. Supabase Storage sa
+ * ritagliare ('?width=&height=&resize=cover', come le miniature del menu) ma
+ * ritaglia SEMPRE DAL CENTRO: non ha un parametro per dire dove sta il
+ * soggetto. Chiedergli un 3:4 significa cuocere dentro al file lo stesso
+ * taglio sbagliato che abbiamo adesso, e per giunta senza piu' potervi
+ * rimediare dal CSS. Serve per far pesare meno il file -- e infatti la prima
+ * foto ci passa -- non per decidere l'inquadratura.
+ *
+ * COSA SI FA INVECE: si smette di far allungare la scatola. La foto sta in
+ * cima all'hero in un QUADRATO largo quanto lo schermo, e sotto continua il
+ * fondo scuro. Con rapporto 1:1 la fetta visibile passa
+ *
+ *     da 16,6% a 49%  (foto del vino, 2,03:1)
+ *     da 22,5% a 67%  (Siena, Chianti, Cinque Terre, 1,5:1)
+ *     da 19,0% a 56%  (Firenze e Pisa, 1,78:1)
+ *
+ * cioe' TRE VOLTE tanto, e vale su tutte e sei, non solo sulla prima. Quello
+ * che ancora manca ai lati lo recupera 'object-position', che ogni foto porta
+ * con se' (page.tsx): e' li' che si tiene dentro la torre di Pisa.
+ *
+ * LA VELOCITA' NON PEGGIORA: e' sempre lo stesso file, lo stesso indirizzo
+ * del 'preload'. Cambia quanti pixel il browser ne dipinge, non quanti ne
+ * scarica. Semmai migliora, perche' l'elemento cronometrato diventa piu'
+ * piccolo. E non si sposta niente: la scatola resta 'position:absolute', come
+ * prima, quindi zero CLS. */
+@media (max-width:760px){
+  /* il fondo sotto il quadrato. E' il colore in cui muore la velatura qui
+     sotto, cosi' il bordo inferiore della foto non si vede: non c'e' una
+     riga dove finisce l'immagine e comincia il colore, c'e' una sfumatura
+     che arriva esattamente a questo valore. */
+  .hm-hero-bg{ background:#0A0F15; }
+
+  /* 'inset:0 0 auto 0' scioglie il basso: l'altezza torna a dipendere dalla
+     larghezza. 'max-height:70vh' non serve ai telefoni (a 390px il quadrato
+     e' 390, ben sotto) ma a una finestra stretta e bassa -- un telefono
+     coricato, un browser rimpicciolito -- dove un quadrato da 760 sarebbe
+     piu' alto dell'hero intero e la sfumatura non farebbe in tempo a
+     chiudersi. */
+  .hm-hero-bg .hm-hero-foto{
+    inset:0 0 auto 0; height:auto; aspect-ratio:1/1; max-height:70vh;
+  }
+
+  /* LA VELATURA SEGUE LA FOTO, e cambia direzione.
+     Quella del desktop e' orizzontale, scura a sinistra dove sta il testo e
+     leggera a destra per non spegnere l'immagine. Sul telefono il testo e'
+     largo quanto lo schermo: una sfumatura da sinistra a destra lascia
+     l'ultima parola di ogni riga sul chiaro. Qui e' verticale, e l'ultimo
+     stop e' il colore pieno del fondo -- e' lei a saldare la foto al buio.
+     Stessa scatola della foto, stesso 'max-height': se una si accorcia
+     devono accorciarsi tutte e due insieme. */
+  .hm-hero-bg::after{
+    inset:0 0 auto 0; height:auto; aspect-ratio:1/1; max-height:70vh;
+    background:linear-gradient(180deg,
+      rgba(10,15,21,.58) 0%,
+      rgba(10,15,21,.26) 34%,
+      rgba(10,15,21,.68) 76%,
+      #0A0F15 100%);
+  }
 }
 
 /* ============================================================

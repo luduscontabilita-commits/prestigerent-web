@@ -29,7 +29,25 @@ const OGNI = 7000;
 /* `alt` vale solo per la prima. Le altre cinque escono con `alt=""`: sono
  * decorazione, e far annunciare a un lettore di schermo sei paesaggi uno
  * dopo l'altro non aiuta nessuno. */
-export function HeroFoto({ foto, alt }: { foto: string[]; alt: string }) {
+/* OGNI FOTO PORTA CON SE' IL SUO PUNTO DI FUOCO.
+ *
+ * Non e' una stringa in piu' per gusto: da quando su telefono la scatola
+ * della foto e' quadrata (home.css), un'immagine orizzontale ci entra
+ * tagliata di meta' larghezza, e "meta' presa dal centro" e' il taglio
+ * sbagliato per la torre di Pisa, per la chiesa di Siena e per le Cinque
+ * Terre -- il soggetto sta da una parte. Il valore e' misurato foto per
+ * foto e sta scritto accanto all'indirizzo, in page.tsx, dove si vede
+ * insieme a quale foto e'.
+ *
+ * `ripiego` c'e' solo sulla prima, ed e' l'originale su Storage: quella
+ * passa da /render/image/ per pesare un terzo, e se un giorno la
+ * trasformazione delle immagini venisse spenta sul progetto l'indirizzo
+ * risponderebbe in errore. Con il ripiego l'hero torna pesante; senza,
+ * resterebbe bianco. E' lo stesso patto del menu (`miniatura` in
+ * src/lib/menu.ts). */
+export type FotoHero = { src: string; fuoco: string; ripiego?: string };
+
+export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
   /* `viva` non e' solo "l'animazione e' accesa": e' anche l'interruttore che
    * MONTA le foto dalla seconda in poi. Prima di quel momento nel documento
    * c'e' una sola immagine, quindi il browser non ha alternative su cui
@@ -93,7 +111,7 @@ export function HeroFoto({ foto, alt }: { foto: string[]; alt: string }) {
 
   return (
     <div className={viva ? 'hm-hero-bg viva' : 'hm-hero-bg'}>
-      {foto.map((src, n) => {
+      {foto.map((f, n) => {
         if (n > 0 && !viva) return null;
 
         /* LA PILA, NON LO SCAMBIO.
@@ -123,7 +141,11 @@ export function HeroFoto({ foto, alt }: { foto: string[]; alt: string }) {
            passa la pagina: e' l'unica cosa che il foglio di stile non puo'
            sapere da solo. Nessuna misura, nessun ridisegno -- solo l'ordine
            in cui la scheda grafica sovrappone livelli che ha gia' pronti. */
-        const pila = { zIndex: quante - passi };
+        /* `objectPosition` sta accanto allo `z-index` per lo stesso motivo:
+           non e' grafica del foglio di stile, e' un dato di QUESTA foto. Non
+           costa niente -- il browser sposta il ritaglio di un'immagine che ha
+           gia', senza rimisurare la pagina. */
+        const pila = { zIndex: quante - passi, objectPosition: f.fuoco };
 
         /* La prima esce gia' dal server con la classe `on` addosso: senza
            JavaScript, e nel mezzo secondo prima dell'idratazione, l'hero e'
@@ -131,16 +153,32 @@ export function HeroFoto({ foto, alt }: { foto: string[]; alt: string }) {
         if (n === 0) {
           return (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} className={classe} style={pila} src={src} alt={alt} fetchPriority="high" />
+            <img
+              key={f.src}
+              className={classe}
+              style={pila}
+              src={f.src}
+              alt={alt}
+              fetchPriority="high"
+              onError={(e) => {
+                /* una volta sola: si toglie il gestore prima di cambiare
+                   indirizzo, altrimenti un ripiego che a sua volta fallisce
+                   rimetterebbe se stesso all'infinito. */
+                if (!f.ripiego) return;
+                const img = e.currentTarget;
+                img.onerror = null;
+                img.src = f.ripiego;
+              }}
+            />
           );
         }
         return (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            key={src}
+            key={f.src}
             className={classe}
             style={pila}
-            src={src}
+            src={f.src}
             alt=""
             loading="lazy"
             decoding="async"

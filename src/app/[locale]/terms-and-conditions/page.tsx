@@ -36,7 +36,7 @@ import '@/styles/legale.css';
  *     del titolare, non una svista da correggere di nascosto.
  */
 
-const AGGIORNATA = '[[DA COMPLETARE: data di entrata in vigore]]';
+const AGGIORNATA = '27 August 2026';
 
 export async function generateMetadata({
   params,
@@ -84,17 +84,12 @@ export default async function TerminiCondizioni({
           <br />
           Registered office: Via della Saggina 98, 50145 Florence, Italy.
           <br />
-          VAT number 05745220482 &middot; Florence Register of Companies, REA no. FI 571489
-          <br />
-          Share capital <mark>[[DA COMPLETARE: capitale sociale]]</mark>
-          <br />
-          Tour operator licence <mark>[[DA COMPLETARE: estremi dell&rsquo;autorizzazione /
-          SCIA e Comune o Citta&rsquo; Metropolitana che l&rsquo;ha rilasciata]]</mark>
+          VAT number IT05745220482 &middot; Florence Register of Companies, REA no. FI 571489
           <br />
           Telephone <a href="tel:+39055286059">+39 055 286059</a> &middot; Email{' '}
           <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>
           <br />
-          Certified email (PEC): <mark>[[DA COMPLETARE: indirizzo PEC]]</mark>
+          Certified email (PEC): prestigerent@pec.it
         </p>
 
         <h2>Prices</h2>
@@ -199,18 +194,7 @@ export default async function TerminiCondizioni({
           to the Company.
         </p>
 
-        {/* [[DA COMPLETARE: DECISIONE DEL TITOLARE — la clausola qui sotto e' del 2020.
-            Va tolta, o riscritta come "eventuali obblighi sanitari in vigore il giorno del
-            servizio". Lasciata com'e' dice al cliente che il sito non si aggiorna dal 2020,
-            ed e' lo stesso motivo per cui dal footer e' gia' sparita la riga sul Covid. */}
-        <h2>Facial masks</h2>
-        <p>
-          <mark>[[DA COMPLETARE: clausola obsoleta, da confermare o rimuovere]]</mark> Actually, and until
-          new advice, the use of a facial mask is mandatory; guests must bring their own
-          masks. The Company reserves the right to refuse travel to any person without facial
-          mask. In these circumstances no refund will be issued, and no compensation will be
-          paid.
-        </p>
+        
 
         <h2>Accessibility &mdash; walking difficulties &mdash; wheelchair/scooter users</h2>
         <p>
@@ -391,11 +375,6 @@ export default async function TerminiCondizioni({
           detailing the complaint as fully as possible, within and no later than 10 business
           days after the date of the tour. We will endeavour to rectify these matters
           immediately but may take further action if necessary.
-        </p>
-        <p>
-          <mark>[[DA COMPLETARE: se il titolare aderisce a un organismo ADR per le controversie
-          con i consumatori, va nominato qui con il suo sito. NOTA: NON va messo il link
-          alla piattaforma ODR europea, che ha cessato di funzionare il 20 luglio 2025.]]</mark>
         </p>
 
         <h2>Compliments and reviews</h2>

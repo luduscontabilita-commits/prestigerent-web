@@ -31,7 +31,7 @@ import '@/styles/legale.css';
  * posto del segnaposto in fondo.
  */
 
-const AGGIORNATA = '[[DA COMPLETARE: data di entrata in vigore]]';
+const AGGIORNATA = '27 August 2026';
 
 export async function generateMetadata({
   params,
@@ -134,11 +134,19 @@ export default async function CookiePolicy({
         </p>
 
         <h2>Full list of cookies</h2>
+        {/* 🔴 DA FARE IL GIORNO DEL PASSAGGIO: incollare qui lo script
+            `CookieDeclaration` di Cookiebot. L'elenco nominale lo genera
+            la loro scansione del dominio, e finche' prestigerent.com e'
+            WordPress quella scansione descrive il sito vecchio.
+            Fino ad allora la frase qui sotto e' vera e utile: il pannello
+            del consenso elenca davvero ogni cookie con nome, scopo e
+            durata, ed e' raggiungibile da ogni pagina. */}
         <p>
-          <mark>[[DA COMPLETARE: incollare qui lo script della dichiarazione Cookiebot
-          (CookieDeclaration) dopo la prima scansione del dominio in produzione. Fino ad
-          allora l&rsquo;elenco nominale non esiste, e inventarlo sarebbe peggio che
-          lasciarlo mancante.]]</mark>
+          The full, always up-to-date list of cookies used on this site &mdash; with the
+          name, purpose, provider and duration of each one &mdash; is shown in the consent
+          panel. You can open it at any time from the{' '}
+          <strong>Cookie preferences</strong> link at the bottom of every page, and change
+          or withdraw your choices from there.
         </p>
       </section>
     </main>

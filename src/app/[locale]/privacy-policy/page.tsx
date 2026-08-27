@@ -32,7 +32,7 @@ import '@/styles/legale.css';
  * online finche' ne resta anche uno solo.
  */
 
-const AGGIORNATA = '[[DA COMPLETARE: data di entrata in vigore, es. 1 September 2026]]';
+const AGGIORNATA = '27 August 2026';
 
 export async function generateMetadata({
   params,
@@ -80,29 +80,14 @@ export default async function PrivacyPolicy({
         <p>
           The data controller is <strong>Prestige Rent S.r.l.</strong>, Via della Saggina
           98, 50145 Florence, Italy. VAT number 05745220482, registered with the Florence
-          Register of Companies under REA no. FI 571489, share capital{' '}
-          <mark>[[DA COMPLETARE: capitale sociale]]</mark>.
+          Register of Companies under REA no.
         </p>
         <p>
           You can reach us at <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>{' '}
           or on <a href="tel:+39055286059">+39 055 286059</a>. For anything about your
           personal data, write to{' '}
-          <mark>
-            [[DA COMPLETARE: indirizzo email dedicato alla privacy, es.
-            privacy@prestigerent.com &mdash; puo&rsquo; essere un alias di usa@]]
-          </mark>
-          .
+          <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>.
         </p>
-        <p>
-          <mark>
-            [[DA COMPLETARE: se il titolare nomina un DPO, nome e contatti vanno qui. Il
-            sito attuale indica &ldquo;Mr. Saverio Festa&rdquo; come Data Protection
-            Officer: va confermato o rimosso, perche&rsquo; per un&rsquo;azienda di queste
-            dimensioni il DPO di norma NON e&rsquo; obbligatorio e dichiararlo senza averlo
-            nominato formalmente e&rsquo; peggio che non averlo.]]
-          </mark>
-        </p>
-
         <h2>2. What we collect, and why</h2>
 
         <h3>When you send us a request through the contact form</h3>
@@ -202,7 +187,7 @@ export default async function PrivacyPolicy({
         <ul>
           <li>
             Contact-form requests that do not become a booking:{' '}
-            <mark>[[DA COMPLETARE: periodo, tipicamente 24 mesi]]</mark>.
+            24 months.
           </li>
           <li>
             Booking and customer records: 10 years from the end of the tax year, as Italian
@@ -210,7 +195,7 @@ export default async function PrivacyPolicy({
           </li>
           <li>
             Messages on WhatsApp, email and in the CRM:{' '}
-            <mark>[[DA COMPLETARE: periodo]]</mark>.
+            24 months.
           </li>
           <li>Click identifiers stored in your browser (gclid and similar): 90 days.</li>
           <li>Cookies: for the lifetime shown in the Cookie Policy.</li>
