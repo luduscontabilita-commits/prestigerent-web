@@ -50,7 +50,7 @@ export function ContactSection({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="pr-team-photo"
-          src="https://prestigerent.com/lp/img/team-prestige-rent.webp"
+          src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/team-prestige-rent.webp"
           width={170}
           height={170}
           loading="lazy"

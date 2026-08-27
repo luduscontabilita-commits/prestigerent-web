@@ -42,7 +42,7 @@ body{
 }
 
 /* LOGO — timbro + testo in HTML.
-   In produzione: src = https://prestigerent.com/wp-content/uploads/2022/05/fav-prestigerent-m.png */
+   In produzione: src = https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2022/05/fav-prestigerent-m.png */
 .logo{
   display:inline-flex;
   align-items:center;
@@ -172,7 +172,7 @@ body{
 .stars-img{ display:inline-flex; gap:2px; }
 .stars-img .star{
   width:17px; height:17px;
-  background:url("https://prestigerent.com/lp/img/star-green.png") center/contain no-repeat;
+  background:url("https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/star-green.png") center/contain no-repeat;
 }
 .t-icon{ width:20px; height:20px; color:var(--orange); flex-shrink:0; }
 

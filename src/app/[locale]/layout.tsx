@@ -45,8 +45,8 @@ export async function generateMetadata({
     /* Il marchio tondo, lo stesso delle landing e dell'intestazione: e' il
        segno con cui si riconosce la scheda fra venti aperte. */
     icons: {
-      icon: 'https://prestigerent.com/lp/img/logo-prestige.png',
-      apple: 'https://prestigerent.com/lp/img/logo-prestige.png',
+      icon: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png',
+      apple: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png',
     },
     openGraph: ogDiBase(isLocale(locale) ? locale : DEFAULT_LOCALE),
     twitter: TWITTER,

@@ -191,17 +191,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * misura stanno a 3,9:1 e 8,3:1. */
   const FOTO = [
     /* wine-experience-in-tuscany -- e' la foto della home di oggi */
-    'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-scaled.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2025/07/Tuscany_wine_experience-scaled.jpg',
     /* private-tour-siena-and-san-gimignano -- Siena */
-    'https://prestigerent.com/wp-content/uploads/2021/09/Sam-Domenico-Church-Siena.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Sam-Domenico-Church-Siena.jpg',
     /* private-tour-to-chianti-wineries -- il Chianti e il vino */
-    'https://prestigerent.com/wp-content/uploads/2021/09/PVT-6.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/PVT-6.jpg',
     /* florence-and-pisa-from-livorno-tour -- Firenze */
-    'https://prestigerent.com/wp-content/uploads/2021/09/firenze-cattedrale.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/firenze-cattedrale.jpg',
     /* private-tour-pisa-from-florence -- Pisa */
-    'https://prestigerent.com/wp-content/uploads/2021/03/pisa-torre.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/03/pisa-torre.jpg',
     /* tour-to-cinque-terre-from-la-spezia -- le Cinque Terre */
-    'https://prestigerent.com/wp-content/uploads/2021/09/Cinque-Terre9.jpg',
+    'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Cinque-Terre9.jpg',
   ];
 
   /* SI CHIEDE LA FOTO PRIMA DI AVER LETTO LA PAGINA.
@@ -407,7 +407,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             ].map(([file, nome, pax, tipo]) => (
               <figure key={file}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`https://prestigerent.com/wp-content/uploads/2021/09/${file}`} alt={nome} loading="lazy" />
+                <img src={`https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/${file}`} alt={nome} loading="lazy" />
                 <em>{tipo}</em>
                 <b>{nome}</b>
                 <span>{pax}</span>
@@ -415,7 +415,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             ))}
             <figure>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="photo" src="https://prestigerent.com/lp/img/Piazzale-Montelungo-minibuses-2022.webp" alt="Prestige Rent 25-seat minibuses in Florence" loading="lazy" />
+              <img className="photo" src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/Piazzale-Montelungo-minibuses-2022.webp" alt="Prestige Rent 25-seat minibuses in Florence" loading="lazy" />
               <em>Minibus</em>
               <b>25-seat coach</b>
               <span>Eleven in our fleet</span>

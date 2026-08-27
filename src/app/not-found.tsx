@@ -55,7 +55,7 @@ export default function NonTrovata() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="nf-logo"
-          src="https://prestigerent.com/lp/img/logo-prestige.png"
+          src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png"
           alt="Prestige Rent"
           width={72}
           height={72}

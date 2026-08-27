@@ -70,7 +70,7 @@ export function Header({
         <a className="hd-logo" href={p('/')}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://prestigerent.com/lp/img/logo-prestige.png"
+            src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png"
             alt="Prestige Rent"
             width={40}
             height={40}

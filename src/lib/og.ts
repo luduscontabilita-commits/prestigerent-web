@@ -41,7 +41,7 @@ import { getLocale, LOCALES } from '@/lib/locales';
  * per la scheda grande, e con il rapporto 2,03:1 che sta vicino
  * all'1,91:1 richiesto -- quindi non viene ritagliata. */
 export const FOTO_RIPIEGO =
-  'https://prestigerent.com/wp-content/uploads/2025/07/Tuscany_wine_experience-1536x757.jpg';
+  'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2025/07/Tuscany_wine_experience-1536x757.jpg';
 export const FOTO_RIPIEGO_W = 1536;
 export const FOTO_RIPIEGO_H = 757;
 

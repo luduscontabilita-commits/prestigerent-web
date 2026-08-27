@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/conversioni/notturno?giorni=3",
+      "schedule": "20 3 * * *"
+    }
+  ]
+}

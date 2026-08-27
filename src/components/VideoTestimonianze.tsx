@@ -19,7 +19,7 @@
  * l'unica cosa che conta in una testimonianza. Il formato "storia" e' anche
  * il motivo per cui risultano credibili invece che promozionali.
  */
-const BASE = 'https://prestigerent.com/lp/video';
+const BASE = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/video';
 
 type Clip = {
   /* nome del file senza estensione: mp4 e poster jpg condividono lo stesso */

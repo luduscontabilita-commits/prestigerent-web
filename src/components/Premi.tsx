@@ -15,7 +15,7 @@
  * dal database mentre l'immagine resta quella emessa da loro.
  */
 
-const BASE = 'https://prestigerent.com/lp/img/';
+const BASE = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/';
 
 export function Premi({ nota }: { nota?: string | null }) {
   return (
