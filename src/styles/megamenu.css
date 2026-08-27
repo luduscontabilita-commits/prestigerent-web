@@ -1,0 +1,228 @@
+/* LA VETRINA DEL MEGA MENU.
+ *
+ * Sta in un file suo e non in landing.css: landing.css e' la grafica della
+ * landing di Siena, collaudata su traffico a pagamento, e non si riscrive
+ * per un menu. Va caricata DOPO home.css, che e' dove vivono tutte le
+ * regole `.hd-*`: qui si aggiunge la fila di foto in cima al pannello,
+ * niente di quello che c'era prima viene toccato.
+ *
+ * Ogni selettore e' agganciato a `.hd-mega-in` per un motivo preciso:
+ * home.css ha `.hd-mega-in a{ display:block; padding:8px 0; font-size:...;
+ * color:... }`, che altrimenti vincerebbe su una classe sola e
+ * trasformerebbe i riquadri in righe di elenco. Con `.hd-mega-in .hd-card`
+ * la specificita' e' piu' alta e non serve un solo `!important`.
+ *
+ * L'IMPAGINATO E' QUELLO DEL SITO VECCHIO, ed e' voluto:
+ *   riga in cima   -> titolo del pannello a sinistra, "ALL DESTINATIONS →"
+ *                     a destra
+ *   sotto          -> i riquadri, foto piena e titolo sovrapposto in basso
+ *                     a sinistra su una sfumatura scura
+ *   sotto ancora   -> gli elenchi di link, che sono la parte che leggono i
+ *                     motori di ricerca e che nessuna foto sostituisce
+ */
+
+/* ── la riga in cima al pannello ────────────────────────────────────── */
+.hd-mega-in .hd-mega-top {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.hd-mega-in .hd-mega-tit {
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+  min-width: 0;
+}
+.hd-mega-in .hd-tutte {
+  flex: none;
+  padding: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--orange);
+  white-space: nowrap;
+}
+.hd-mega-in .hd-tutte:hover {
+  padding-left: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── la fila di riquadri ────────────────────────────────────────────── */
+/* `auto-fit` e non un numero fisso di colonne: i pannelli hanno da tre a
+   sei riquadri, e con le tracce vuote che si richiudono da sole tre foto
+   larghe riempiono la riga invece di lasciare due buchi a destra. Sopra i
+   190px per riquadro non si scende: sotto, il titolo sovrapposto va a
+   capo tre volte e non si legge piu'. */
+.hd-mega-in .hd-vetrina {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+.hd-mega-in .hd-card {
+  position: relative;
+  display: block;
+  padding: 0;
+  aspect-ratio: 3 / 2;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--ph);
+  isolation: isolate;
+}
+.hd-mega-in .hd-card:hover {
+  padding-left: 0;
+  color: inherit;
+}
+
+/* il posto della foto esiste anche quando la foto non c'e' ancora: il
+   pannello non deve saltare quando le immagini arrivano */
+.hd-mega-in .hd-card-f {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--ph);
+}
+.hd-mega-in .hd-card-f img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.32s ease;
+}
+.hd-mega-in .hd-card:hover .hd-card-f img,
+.hd-mega-in .hd-card:focus-visible .hd-card-f img {
+  transform: scale(1.06);
+}
+
+/* LA SFUMATURA. Senza, il titolo bianco sparisce sulle foto chiare (il
+   duomo di Milano, la piazza di Siena a mezzogiorno). Parte trasparente
+   in alto: non e' un velo su tutta la foto, e' ombra solo dove c'e' da
+   leggere. */
+.hd-mega-in .hd-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(8, 14, 20, 0.86) 0%,
+    rgba(8, 14, 20, 0.44) 40%,
+    rgba(8, 14, 20, 0) 72%
+  );
+  pointer-events: none;
+}
+
+.hd-mega-in .hd-card-t {
+  position: absolute;
+  z-index: 2;
+  inset-inline-start: 13px;
+  inset-inline-end: 13px;
+  bottom: 11px;
+  display: block;
+}
+.hd-mega-in .hd-card-t b {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.24;
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+}
+/* Il punteggio in giallo e non in arancione: sopra una foto l'arancione
+   del marchio si confonde con i tetti e i tramonti, che in questo
+   catalogo sono meta' delle immagini. */
+.hd-mega-in .hd-card-t em {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffc861;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+
+.hd-mega-in .hd-card:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* ── telefono e tablet: la stessa vetrina, trascinabile col dito ─────
+   Sotto i 1280px il <nav> e' gia' un pannello a scomparsa che si apre col
+   tocco (home.css): qui dentro una griglia di sei foto in colonna sarebbe
+   uno schermo e mezzo di scorrimento prima di arrivare ai link. Diventa
+   una striscia: due riquadri e mezzo visibili, si capisce subito che ce
+   ne sono altri, e lo scatto dello scorrimento li allinea uno per volta.
+   La striscia sborda fino ai bordi dello schermo apposta -- se si fermasse
+   dentro il margine sembrerebbe finita. */
+@media (max-width: 1280px) {
+  /* il pannello aperto contiene ora anche le foto: con il vecchio tetto di
+     1400px il fondo degli elenchi restava tagliato */
+  .hd-mega.is-open {
+    max-height: 2400px;
+  }
+
+  .hd-mega-in .hd-mega-top {
+    margin: 4px 0 12px;
+    padding-bottom: 10px;
+  }
+  .hd-mega-in .hd-mega-tit {
+    font-size: 0.94rem;
+  }
+
+  .hd-mega-in .hd-vetrina {
+    display: flex;
+    gap: 10px;
+    margin: 0 -18px 18px -30px;
+    padding: 0 18px 6px 30px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .hd-mega-in .hd-vetrina::-webkit-scrollbar {
+    display: none;
+  }
+  .hd-mega-in .hd-card {
+    flex: 0 0 62%;
+    scroll-snap-align: start;
+  }
+  /* col dito non c'e' `hover`: l'ingrandimento non scatterebbe mai e
+     resterebbe solo il costo di tenere il livello composito acceso */
+  .hd-mega-in .hd-card:hover .hd-card-f img {
+    transform: none;
+  }
+}
+@media (max-width: 560px) {
+  .hd-mega-in .hd-card {
+    flex-basis: 74%;
+  }
+}
+
+/* ── chi ha chiesto di non muovere niente ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hd-mega,
+  .hd-nav,
+  .hd-mega-in .hd-card-f img,
+  .hd-mega-in a {
+    transition: none !important;
+  }
+  .hd-mega-in .hd-card:hover .hd-card-f img,
+  .hd-mega-in .hd-card:focus-visible .hd-card-f img {
+    transform: none;
+  }
+  .hd-mega-in .hd-vetrina {
+    scroll-behavior: auto;
+  }
+}

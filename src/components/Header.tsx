@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DEFAULT_LOCALE, LOCALES, PIU_LINGUE, getLocale } from '@/lib/locales';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { SEZIONI } from '@/lib/menu';
+import { MINI_H, MINI_L, SEZIONI, miniatura } from '@/lib/menu';
 import type { VotoTour } from '@/lib/recensioni';
 
 /* L'INTESTAZIONE.
@@ -22,14 +22,40 @@ import type { VotoTour } from '@/lib/recensioni';
  * delle crociere, per tratta i transfer -- e i piu' prenotati portano
  * accanto il punteggio vero.
  *
+ * ── LA VETRINA ──────────────────────────────────────────────────────────
+ * In cima al pannello torna la fila di riquadri fotografici del mega menu
+ * di WordPress: titolo del pannello a sinistra, "All destinations →" a
+ * destra, e sotto le foto col nome sovrapposto in basso a sinistra. Le
+ * foto sono le copertine vere dei tour, lette da Supabase (vedi `vetrina`
+ * in src/lib/menu.ts); i riquadri per le categorie senza tour non esistono
+ * proprio.
+ *
  * IL PUNTEGGIO NEL MENU quasi nessuno lo fa, e funziona: "4,9 su 12.694
  * recensioni" convince prima ancora che si clicchi, e lo legge anche chi
- * il menu lo apre solo per curiosita'.
+ * il menu lo apre solo per curiosita'. Sui riquadri compare solo se il
+ * riquadro porta a QUEL tour e le recensioni sono almeno tre: "5,0 su 1
+ * recensione" non convince nessuno e fa sembrare finto anche il resto.
  *
  * Il pannello sta SEMPRE nell'HTML e si nasconde col CSS. Montarlo solo
  * all'apertura significherebbe che i suoi link non esistono per chi
  * scansiona la pagina, e i collegamenti interni sono meta' del
  * posizionamento. Verifica: curl -A "OAI-SearchBot" e cerca hd-col-t.
+ *
+ * ── LE FOTO NON DEVONO GAREGGIARE CON LA PRIMA IMMAGINE DELLA PAGINA ────
+ * `loading="lazy"` da solo non basta: il pannello chiuso e' nascosto con
+ * `visibility`, quindi ha comunque un'area nello schermo e il browser le
+ * scarica subito, in mezzo alla foto grande della home. Per questo l'`img`
+ * NON viene disegnata finche' la sezione non e' stata aperta almeno una
+ * volta (`viste`). Chi ha un mouse le riceve prima, quando il browser non
+ * ha piu' niente da fare: `load` + `requestIdleCallback`, e mai con la
+ * modalita' risparmio dati accesa. Su telefono si caricano al tocco.
+ *
+ * ── APRIRE E CHIUDERE ───────────────────────────────────────────────────
+ * Col mouse: `pointerenter` filtrato su `pointerType === 'mouse'`, cosi'
+ * il tocco non fa finta di essere un passaggio del mouse. Da tastiera: il
+ * pannello si apre col fuoco sulla voce e col tasto accanto (Invio o
+ * Spazio), e si chiude quando il fuoco esce dalla sezione. Esc chiude e
+ * riporta il fuoco sulla voce. Un clic fuori dall'intestazione chiude.
  *
  * Niente carrello ne' cuore ne' account: incassa Regiondo, e un'icona che
  * non fa niente e' solo rumore. Al loro posto le lingue e WhatsApp sempre
@@ -37,35 +63,109 @@ import type { VotoTour } from '@/lib/recensioni';
  * della casa e va dove l'occhio cade, non in fondo alla pagina.
  */
 
+/** minimo di recensioni per mostrare il punteggio: sotto, imbarazza */
+const MIN_RECENSIONI = 3;
+
 export function Header({
   locale,
   voti = {},
   foto = {},
-  nomi = {},
 }: {
   locale: string;
   voti?: Record<string, VotoTour>;
   foto?: Record<string, string>;
-  nomi?: Record<string, string>;
 }) {
   /* quale sezione e' aperta: il nome, oppure null. Una sola alla volta --
      due pannelli aperti insieme coprirebbero la pagina. */
   const [aperta, setAperta] = useState<string | null>(null);
   const [lingue, setLingue] = useState(false);
   const [mobile, setMobile] = useState(false);
+  /* le sezioni gia' aperte almeno una volta: solo per quelle si disegnano
+     le `img`. Non e' lo stato dell'apertura, e' una memoria che non torna
+     mai indietro. */
+  const [viste, setViste] = useState<string[]>([]);
+
+  const barra = useRef<HTMLElement>(null);
 
   const p = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
   const info = getLocale(locale);
 
-  const chiudi = () => {
+  const apri = useCallback((nome: string | null) => {
+    setAperta(nome);
+    if (nome) setViste((v) => (v.includes(nome) ? v : [...v, nome]));
+  }, []);
+
+  const chiudi = useCallback(() => {
     setAperta(null);
     setLingue(false);
+  }, []);
+
+  /* ESC E CLIC FUORI.
+     Il velo grigio copre gia' la pagina sotto la barra, ma non la barra
+     stessa ne' il resto dell'intestazione: chi clicca sul logo di fianco
+     al menu aperto si aspetta comunque che si chiuda. E Esc deve
+     funzionare anche quando il fuoco e' dentro il pannello. */
+  useEffect(() => {
+    if (!aperta && !lingue && !mobile) return;
+
+    const tasto = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      /* il fuoco torna sulla voce che aveva aperto il pannello: chi
+         naviga da tastiera altrimenti riparte dall'inizio della pagina */
+      const voce = barra.current?.querySelector<HTMLElement>('.hd-top.is-on');
+      chiudi();
+      setMobile(false);
+      voce?.focus();
+    };
+    const fuori = (e: PointerEvent) => {
+      if (barra.current && !barra.current.contains(e.target as Node)) {
+        chiudi();
+        setMobile(false);
+      }
+    };
+
+    document.addEventListener('keydown', tasto);
+    document.addEventListener('pointerdown', fuori);
+    return () => {
+      document.removeEventListener('keydown', tasto);
+      document.removeEventListener('pointerdown', fuori);
+    };
+  }, [aperta, lingue, mobile, chiudi]);
+
+  /* LE FOTO, QUANDO NON DANNO FASTIDIO A NESSUNO.
+     Solo per chi ha un mouse (li' il menu si apre passandoci sopra, e
+     mezzo secondo di riquadri grigi si nota); solo dopo `load`, cioe'
+     quando la foto grande della pagina e' gia' arrivata; solo se il
+     browser dice di avere tempo libero; mai in risparmio dati. */
+  useEffect(() => {
+    const rete = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (rete?.saveData) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    const tutte = () => setViste(SEZIONI.map((s) => s.testo));
+    const quandoPuoi = () => {
+      const w = window as Window & {
+        requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      };
+      if (w.requestIdleCallback) w.requestIdleCallback(tutte, { timeout: 4000 });
+      else window.setTimeout(tutte, 1500);
+    };
+
+    if (document.readyState === 'complete') {
+      quandoPuoi();
+      return;
+    }
+    window.addEventListener('load', quandoPuoi, { once: true });
+    return () => window.removeEventListener('load', quandoPuoi);
+  }, []);
+
+  const punteggio = (slug?: string) => {
+    const q = slug ? voti[slug] : undefined;
+    return q && q.quante >= MIN_RECENSIONI ? q : undefined;
   };
 
-  const punteggio = (slug?: string) => (slug ? voti[slug] : undefined);
-
   return (
-    <header className="hd">
+    <header className="hd" ref={barra}>
       <div className="hd-in">
         <a className="hd-logo" href={p('/')}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -81,83 +181,109 @@ export function Header({
           </span>
         </a>
 
-        <nav className={'hd-nav' + (mobile ? ' is-mob' : '')} aria-label="Main">
+        <nav className={'hd-nav' + (mobile ? ' is-mob' : '')} id="hd-nav" aria-label="Main">
           <a className="hd-top hd-plain" href={p('/')}>
             Home
           </a>
 
-          {SEZIONI.map((s) => (
-            <div
-              className="hd-item"
-              key={s.testo}
-              onMouseEnter={() => setAperta(s.testo)}
-              onMouseLeave={() => setAperta(null)}
-            >
-              {/* LINK, non bottone: si deve poter andare alla categoria
-                  intera senza aprire niente. La freccia apre il pannello
-                  anche da tastiera e su schermi che non hanno il mouse. */}
-              <a className={'hd-top' + (aperta === s.testo ? ' is-on' : '')} href={p(s.href)}>
-                {s.testo}
-              </a>
-              <button
-                type="button"
-                className="hd-freccia"
-                aria-expanded={aperta === s.testo}
-                aria-label={`Open ${s.testo}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setAperta(aperta === s.testo ? null : s.testo);
+          {SEZIONI.map((s) => {
+            const id = 'mega-' + s.href.replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+            const on = aperta === s.testo;
+            return (
+              <div
+                className="hd-item"
+                key={s.testo}
+                /* SOLO IL MOUSE APRE PASSANDOCI SOPRA. Su un telefono il
+                   primo tocco genera un finto `mouseenter`: il pannello si
+                   apriva e si richiudeva da solo, e il link sotto partiva
+                   comunque. `pointerType` toglie l'ambiguita'. */
+                onPointerEnter={(e) => {
+                  if (e.pointerType === 'mouse') apri(s.testo);
+                }}
+                onPointerLeave={(e) => {
+                  if (e.pointerType !== 'mouse') return;
+                  /* se il fuoco e' dentro il pannello lo sta usando la
+                     tastiera: il mouse che se ne va non deve chiuderlo */
+                  if (e.currentTarget.contains(document.activeElement)) return;
+                  setAperta((a) => (a === s.testo ? null : a));
+                }}
+                onBlur={(e) => {
+                  if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                  setAperta((a) => (a === s.testo ? null : a));
                 }}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
+                {/* LINK, non bottone: si deve poter andare alla categoria
+                    intera senza aprire niente. Il fuoco da tastiera apre il
+                    pannello, cosi' chi arriva col Tab vede subito cosa c'e'
+                    dentro senza doverlo indovinare. */}
+                <a
+                  className={'hd-top' + (on ? ' is-on' : '')}
+                  href={p(s.href)}
+                  onFocus={() => apri(s.testo)}
+                >
+                  {s.testo}
+                </a>
+                <button
+                  type="button"
+                  className="hd-freccia"
+                  aria-expanded={on}
+                  aria-controls={id}
+                  aria-label={`${on ? 'Close' : 'Open'} ${s.testo}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (on) setAperta(null);
+                    else apri(s.testo);
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
 
-              <div className={'hd-mega' + (aperta === s.testo ? ' is-open' : '')}>
-                <div className="hd-mega-in">
-                  {s.gruppi.map((g) => (
-                    <div className="hd-col" key={g.titolo}>
-                      <p className="hd-col-t">{g.titolo}</p>
-                      {g.voci.map((v) => {
-                        const q = punteggio(v.slug);
-                        return (
-                          <a key={v.href + v.testo} href={p(v.href)}>
-                            {v.testo}
-                            {v.nota && <em>{v.nota}</em>}
-                            {q && (
-                              <em className="hd-voto">
-                                ★ {q.voto.toFixed(1)} &middot; {q.quante.toLocaleString('en-US')} reviews
-                              </em>
-                            )}
-                          </a>
-                        );
-                      })}
+                <div className={'hd-mega' + (on ? ' is-open' : '')} id={id}>
+                  <div className="hd-mega-in">
+                    {/* la riga in cima: titolo a sinistra, "tutto" a
+                        destra. E' l'impaginato del menu di WordPress, ed
+                        e' la parte che si riconosce a colpo d'occhio. */}
+                    <div className="hd-mega-top">
+                      <p className="hd-mega-tit">{s.pannello}</p>
+                      <a className="hd-tutte" href={p(s.href)}>
+                        {s.tutti} <span aria-hidden="true">&rarr;</span>
+                      </a>
                     </div>
-                  ))}
 
-                  {/* LA COLONNA DEI PIU' PRENOTATI, con la foto e il
-                      punteggio vero -- come nel menu di WordPress, che
-                      accanto agli elenchi metteva i tour in evidenza con
-                      l'immagine. La foto e' quella di copertina del tour,
-                      presa dai nostri dati: non serve copiarla dal
-                      vecchio sito. */}
-                  {s.evidenza && s.evidenza.length > 0 && (
-                    <div className="hd-col hd-evid">
-                      <p className="hd-col-t">Most booked</p>
-                      {s.evidenza.map((slug) => {
-                        const q = voti[slug];
-                        const f = foto[slug];
-                        const nome = nomi[slug] ?? slug.replace(/-/g, ' ');
+                    <div className="hd-vetrina">
+                      {s.vetrina.map((r) => {
+                        const q = punteggio(r.tour);
+                        const f = foto[r.tour];
                         return (
-                          <a className="hd-ev" key={slug} href={p(`/tour/${slug}/`)}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            {f && <img src={f} alt="" loading="lazy" decoding="async" />}
-                            <span>
-                              <b>{nome}</b>
+                          <a className="hd-card" key={r.href} href={p(r.href)}>
+                            <span className="hd-card-f">
+                              {viste.includes(s.testo) && f && (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={miniatura(f)}
+                                  alt={r.alt}
+                                  width={MINI_L}
+                                  height={MINI_H}
+                                  loading="lazy"
+                                  decoding="async"
+                                  onError={(e) => {
+                                    /* la trasformazione delle immagini e'
+                                       spenta o in errore: si ripiega
+                                       sull'originale, una volta sola */
+                                    const img = e.currentTarget;
+                                    if (img.src !== f) img.src = f;
+                                  }}
+                                />
+                              )}
+                            </span>
+                            <span className="hd-card-t">
+                              <b>{r.testo}</b>
                               {q && (
-                                <em className="hd-voto">
-                                  ★ {q.voto.toFixed(1)} &middot; {q.quante.toLocaleString('en-US')} reviews
+                                <em>
+                                  ★ {q.voto.toFixed(1)} &middot;{' '}
+                                  {q.quante.toLocaleString('en-US')} reviews
                                 </em>
                               )}
                             </span>
@@ -165,29 +291,50 @@ export function Header({
                         );
                       })}
                     </div>
-                  )}
 
-                  <div className="hd-col hd-tutti">
-                    <a className="hd-tutto" href={p(s.href)}>
-                      See all {s.testo.toLowerCase()} &rarr;
-                    </a>
-                    {/* Chi apre il menu e non trova quello che cerca
-                        altrimenti chiude la scheda. Qui ha un'alternativa
-                        che costa un messaggio. */}
-                    <a
-                      className="hd-aiuto"
-                      href="https://wa.me/393338424047"
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      Not sure which one? <b>Ask us on WhatsApp</b> &mdash; we answer
-                      ourselves, not a call centre.
-                    </a>
+                    {s.gruppi.map((g) => (
+                      <div className="hd-col" key={g.titolo}>
+                        <p className="hd-col-t">{g.titolo}</p>
+                        {g.voci.map((v) => {
+                          const q = punteggio(v.slug);
+                          return (
+                            <a key={v.href + v.testo} href={p(v.href)}>
+                              {v.testo}
+                              {v.nota && <em>{v.nota}</em>}
+                              {q && (
+                                <em className="hd-voto">
+                                  ★ {q.voto.toFixed(1)} &middot;{' '}
+                                  {q.quante.toLocaleString('en-US')} reviews
+                                </em>
+                              )}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ))}
+
+                    <div className="hd-col hd-tutti">
+                      <a className="hd-tutto" href={p(s.href)}>
+                        See all {s.testo.toLowerCase()} &rarr;
+                      </a>
+                      {/* Chi apre il menu e non trova quello che cerca
+                          altrimenti chiude la scheda. Qui ha un'alternativa
+                          che costa un messaggio. */}
+                      <a
+                        className="hd-aiuto"
+                        href="https://wa.me/393338424047"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        Not sure which one? <b>Ask us on WhatsApp</b> &mdash; we answer
+                        ourselves, not a call centre.
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {/* visibili solo su telefono: sul desktop stanno gia' a destra */}
           <a className="hd-top hd-plain hd-solo-mob" href={p('/about-us/')}>
             About us
@@ -248,6 +395,7 @@ export function Header({
             className="hd-burger"
             aria-label="Menu"
             aria-expanded={mobile}
+            aria-controls="hd-nav"
             onClick={() => setMobile(!mobile)}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
@@ -261,8 +409,9 @@ export function Header({
           Ne avevo scritto uno separato e il risultato erano 162 link
           nell'intestazione -- il doppio degli 84 di WordPress che avevo
           criticato tre righe piu' su. Su telefono si riusa lo STESSO
-          markup: `.hd-nav` diventa un pannello verticale e i pannelli si
-          aprono in linea. Un solo link per destinazione, sempre. */}
+          markup: `.hd-nav` diventa un pannello verticale, i pannelli si
+          aprono in linea e la vetrina diventa una striscia che si
+          trascina col dito. Un solo link per destinazione, sempre. */}
       {(aperta || lingue) && <button className="hd-veil" aria-label="Close menu" onClick={chiudi} />}
     </header>
   );

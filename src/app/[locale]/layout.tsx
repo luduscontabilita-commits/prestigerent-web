@@ -9,14 +9,16 @@ import { votiPerTour } from '@/lib/recensioni';
 import { ultimePrenotazioni } from '@/lib/riprova';
 import { ProvaSociale } from '@/components/ProvaSociale';
 import { supabase } from '@/lib/supabase';
-import { SEZIONI } from '@/lib/menu';
-import { testo } from '@/lib/prosa';
+import { SLUG_MENU } from '@/lib/menu';
 import { Footer } from '@/components/Footer';
 import { Consenso } from '@/components/Consenso';
 import { Tracciamento } from '@/components/Tracciamento';
 import '@/styles/landing.css';
 import '@/styles/home.css';
 import '@/styles/theme.css';
+/* dopo home.css: aggiunge la vetrina fotografica del mega menu senza
+   riscrivere una riga di quello che c'era. Vedi src/styles/megamenu.css */
+import '@/styles/megamenu.css';
 
 /* 🔴 ERA UN OGGETTO FISSO, ORA E' UNA FUNZIONE: SERVE LA LINGUA.
  *
@@ -74,29 +76,33 @@ export default async function LocaleLayout({
   const info = getLocale(locale);
   /* I punteggi per il menu: una lettura sola, non una per voce.
      Il menu sta su ogni pagina del sito. */
-  const inRilievo = SEZIONI.flatMap((s) => s.evidenza ?? []);
   const avvisi = await ultimePrenotazioni(25);
   const [voti, schede] = await Promise.all([
     votiPerTour(),
     supabase
       .from('tours')
       .select('slug, tour_content(locale, blocks)')
-      .in('slug', inRilievo.length ? inRilievo : ['-']),
+      .in('slug', SLUG_MENU.length ? SLUG_MENU : ['-']),
   ]);
 
-  /* Foto e nome dei tour in evidenza nel menu: si leggono qui, una volta,
-     e non dentro il componente -- il menu e' su ogni pagina del sito. */
+  /* LE COPERTINE DELLA VETRINA DEL MENU.
+     Si leggono qui, una volta per pagina, e non dentro il componente: il
+     menu sta su tutte le pagine del sito e una query per riquadro
+     sarebbero ventidue letture per aprire una tendina.
+
+     Solo la PRIMA immagine di ogni tour: dalla seconda in poi
+     `tour_content.images` contiene i riempitivi condivisi (le Mercedes,
+     le foto della degustazione), identici su decine di tour. Il ritaglio
+     e la ricompressione li fa `miniatura()` in src/lib/menu.ts. */
   const foto: Record<string, string> = {};
-  const nomi: Record<string, string> = {};
   for (const r of (schede.data ?? []) as unknown as {
     slug: string;
     tour_content?: { locale: string; blocks: Record<string, unknown> }[];
   }[]) {
     const c = r.tour_content?.find((x) => x.locale === locale) ?? r.tour_content?.[0];
-    const b = (c?.blocks ?? {}) as { name?: string; gallery?: { src: string }[]; images?: string[] };
+    const b = (c?.blocks ?? {}) as { gallery?: { src: string }[]; images?: string[] };
     const src = b.gallery?.[0]?.src ?? b.images?.[0];
     if (src) foto[r.slug] = src;
-    if (b.name) nomi[r.slug] = testo(b.name);
   }
 
   /* dir="rtl" sull'arabo non e' un dettaglio: ribalta l'intero impaginato,
@@ -177,7 +183,7 @@ export default async function LocaleLayout({
             prestigerent-web.vercel.app resta spento apposta, per non
             sporcare i dati delle campagne. Non e' un bug da "sistemare". */}
         <Tracciamento />
-        <Header locale={locale} voti={voti} foto={foto} nomi={nomi} />
+        <Header locale={locale} voti={voti} foto={foto} />
         {children}
         <Footer locale={locale} />
         {/* I riquadri delle prenotazioni vere. Le righe passano cosi' come
