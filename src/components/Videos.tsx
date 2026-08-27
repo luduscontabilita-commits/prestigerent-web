@@ -1,14 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
-
-export type Video = {
-  src: string;
-  poster: string;
-  alt?: string;
-  label?: string;
-  caption?: string;
-};
+import type { MouseEvent } from 'react';
+import type { Video } from '@/lib/video';
+import { useFilm } from './useFilm';
 
 /* La striscia dei video, con il markup della landing (.film-vids /
  * .slide-vid).
@@ -16,24 +10,23 @@ export type Video = {
  * `preload="none"` piu' il poster: finche' nessuno preme play non si scarica
  * un byte di video. Non e' un dettaglio -- questi filmati pesano fra 3 e 12
  * MB l'uno, e sei di essi caricati in automatico affosserebbero la pagina
- * proprio sul primo impatto.
+ * proprio sul primo impatto. Il poster e' un .jpg da poche decine di KB e si
+ * vede una faccia lo stesso.
  *
- * `data-noloop` sulla landing: qui non si clona e non si scorre da soli. Un
- * clone sarebbe lo stesso filmato due volte, e lo scorrimento automatico
- * porterebbe via il video mentre si cerca di premere play.
+ * QUI NON SI SCORRE DA SOLI, e non e' una dimenticanza: `auto` resta false.
+ * Lo scorrimento automatico porterebbe via il filmato mentre si cerca di
+ * premere play, e i poster non si clonano perche' un clone sarebbe lo
+ * stesso filmato due volte nella striscia. Sulla landing lo stesso pezzo di
+ * codice lo dice con `data-noloop`, che si tiene per non staccarsi dal
+ * markup di partenza.
  *
  * Alla pressione di play si fermano gli altri: due audio insieme nella stessa
  * striscia sono solo fastidio.
  */
 export function Videos({ video }: { video: Video[] }) {
-  const box = useRef<HTMLDivElement>(null);
+  const { proprieta, scorri } = useFilm({ auto: false });
 
-  const scorri = (verso: 1 | -1) => {
-    const el = box.current;
-    if (el) el.scrollBy({ left: verso * el.clientWidth * 0.8, behavior: 'smooth' });
-  };
-
-  const play = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const play = (e: MouseEvent<HTMLButtonElement>) => {
     const fig = e.currentTarget.closest('figure');
     const v = fig?.querySelector('video');
     if (!v) return;
@@ -56,10 +49,23 @@ export function Videos({ video }: { video: Video[] }) {
       </div>
 
       <div className="film-wrap">
-        <div className="film film-vids" id="filmVids" data-noloop ref={box} aria-label="Video gallery">
+        <div
+          className="film film-vids"
+          id="filmVids"
+          data-noloop
+          {...proprieta}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Video gallery"
+        >
           <div className="film-track">
-            {video.map((v) => (
-              <figure className="slide slide-vid" key={v.src}>
+            {video.map((v, i) => (
+              <figure
+                className="slide slide-vid"
+                key={v.src}
+                aria-roledescription="slide"
+                aria-label={`${i + 1} of ${video.length}`}
+              >
                 <video controls preload="none" playsInline poster={v.poster} aria-label={v.alt || v.caption || ''}>
                   <source src={v.src} type="video/mp4" />
                   Your browser cannot play this video.

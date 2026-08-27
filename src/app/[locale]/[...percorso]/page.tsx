@@ -177,7 +177,10 @@ export default async function Categoria_({
                   <strong>{nome}</strong>
                   {q && (
                     <span className="ct-voto">
-                      ★ {q.voto.toFixed(1)} <i>{q.quante.toLocaleString('en-US')} reviews</i>
+                      ★ {q.voto.toFixed(1)}{' '}
+                      <i>
+                        {q.quante.toLocaleString('en-US')} reviews {q.dove}
+                      </i>
                     </span>
                   )}
                   {pr != null && (

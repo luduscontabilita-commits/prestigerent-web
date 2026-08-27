@@ -28,6 +28,11 @@ export type SchedaTour = {
    * della pagina senza un solo segnale di fiducia. */
   voto: number | null;
   quante: number | null;
+  /* Su quale piattaforma sta quel conteggio, preposizione compresa. Senza,
+     il numero e' solo da credere sulla parola: vedi `votiPerTour` in
+     src/lib/recensioni.ts, che e' dove prima si sommavano le piattaforme
+     e usciva un totale che nessuna di loro conferma. */
+  dove: string | null;
   /* Quante prenotazioni ha preso OGGI. Si mostra solo sopra una soglia
    * (vedi SOGLIA_OGGI): "1 booked today" fa piu' danno del silenzio. */
   oggi: number | null;
@@ -239,7 +244,7 @@ export function HomeTours({
                         </span>
                         <b>{t.voto.toFixed(1)}</b>
                         <span className="hm-revs">
-                          {t.quante.toLocaleString('en-US')} reviews
+                          {t.quante.toLocaleString('en-US')} reviews {t.dove}
                         </span>
                       </div>
                     )}

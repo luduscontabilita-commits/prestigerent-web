@@ -1385,3 +1385,50 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
   .mr-invia{ transition:none; }
   .mr-invia:hover:not(:disabled){ transform:none; }
 }
+
+/* ============================================================
+   IL COMANDO DELLO SCORRIMENTO AUTOMATICO DELLA STRISCIA FOTO.
+   Sta qui e non in landing.css: quello e' la grafica ereditata dalla
+   landing, gia' collaudata su traffico a pagamento, e la landing questo
+   pulsante non ce l'ha. Li' il carosello riparte da solo dopo 3,2 secondi
+   e non c'e' modo di dirgli di smettere; qui chi tocca comanda, e allora
+   serve anche il modo di rimetterlo in moto.
+   ============================================================ */
+.film-auto{
+  position:absolute;
+  right:18px; bottom:16px;
+  width:38px; height:38px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.92);
+  color:var(--ink);
+  box-shadow:0 6px 18px rgba(20,30,40,.18);
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  z-index:3;
+  transition:background .15s ease, transform .15s ease;
+}
+.film-auto:hover{ background:var(--card); transform:scale(1.06); }
+.film-auto svg{ width:15px; height:15px; }
+/* Il contorno di messa a fuoco NON si toglie: e' l'unico modo che ha chi
+   naviga da tastiera per sapere dove si trova. */
+.film-auto:focus-visible,
+.film-btn:focus-visible,
+.film:focus-visible{ outline:3px solid var(--orange); outline-offset:3px; }
+@media (prefers-reduced-motion: reduce){
+  .film-auto{ transition:none; }
+  .film-auto:hover{ transform:none; }
+}
+
+/* Lo stato dello scorrimento, scritto per chi non vede il pulsante.
+   Non e' `display:none` ne' `visibility:hidden`: quelli tolgono
+   l'elemento anche ai lettori di schermo, che e' l'esatto contrario di
+   quello che serve. Si rimpicciolisce a un pixel e si ritaglia via. */
+.film-stato{
+  position:absolute;
+  width:1px; height:1px;
+  margin:-1px; padding:0; border:0;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap;
+}

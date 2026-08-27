@@ -158,11 +158,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       ore: p?.ore ?? null,
       partenza: partenzaDa(r.slug),
       maxOspiti: maxOspiti(r.kind),
-      /* Gli stessi voti che il menu mostra da sempre. `votiPerTour` fa gia'
-         da se' la media pesata fra le piattaforme e scarta chi ha meno di
-         tre recensioni, quindi qui non c'e' nessuna soglia da rifare. */
+      /* Gli stessi voti che il menu mostra. `votiPerTour` sceglie gia' da
+         se' la piattaforma piu' forte di quel tour e scarta chi ha meno di
+         tre recensioni, quindi qui non c'e' nessuna soglia da rifare --
+         e nemmeno nessuna somma: il numero e' di UNA piattaforma, e
+         `dove` dice quale, perche' si possa andare a controllarlo. */
       voto: voti[r.slug]?.voto ?? null,
       quante: voti[r.slug]?.quante ?? null,
+      dove: voti[r.slug]?.dove ?? null,
       oggi: perSlug.get(r.slug)?.oggi ?? null,
     };
   });

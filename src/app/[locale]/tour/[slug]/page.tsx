@@ -6,7 +6,8 @@ import { getLocale, isLocale, LOCALES, DEFAULT_LOCALE, regiondoLocale } from '@/
 import { RegiondoWidget } from '@/components/RegiondoWidget';
 import { InfoTabs } from '@/components/InfoTabs';
 import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
-import { Videos, type Video } from '@/components/Videos';
+import { Videos } from '@/components/Videos';
+import { videoDi } from '@/lib/video';
 import { StickyBook } from '@/components/StickyBook';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
@@ -61,9 +62,11 @@ type Contenuto = {
      il tratto sotto la parola chiave. Quando c'e' vince sul nome del
      prodotto WordPress, che dice cos'e' ma non perche' sceglierlo. */
   titolo_html?: string;
-  /* I filmati girati su quel tour. Non si mettono dove non appartengono:
-     un video di Siena su un transfer per Milano e' una promessa sbagliata. */
-  videos?: Video[];
+  /* `videos` NON STA PIU' QUI. Era un elenco JSON ricopiato per intero su
+     ogni tour che lo mostra, e con quattro copie era gia' andata storta:
+     sulle due giornate in cantina era finita la lista di Siena. Adesso i
+     filmati stanno nel catalogo `video_clip` e si agganciano ai tour per
+     tema -- vedi `src/lib/video.ts` e la migrazione 20260827. */
   /* Solo dove le foto sono state scelte a mano, con etichetta e
      sottotitolo: una didascalia scritta vende, un nome di file no. */
   gallery?: Foto[];
@@ -205,7 +208,14 @@ export default async function TourPage({
   /* Dipende dalle fonti d'azienda, quindi non puo' stare nel Promise.all
      sopra. Le prende da `fiducia`: nessuna query in piu'. */
   const iPunteggi = await punteggiDi(slug, fiducia.fonti);
-  const [quante, laDisp] = await Promise.all([prenotazioniDi(slug), disponibilitaDi(slug)]);
+  const [quante, laDisp, video] = await Promise.all([
+    prenotazioniDi(slug),
+    disponibilitaDi(slug),
+    /* I filmati di QUESTO tour, presi dal catalogo. Torna un elenco vuoto
+       per la maggior parte dei tour, ed e' voluto: la sezione non si
+       mostra affatto invece di riciclare i filmati di un'altra giornata. */
+    videoDi(slug),
+  ]);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
   const foto = contenuto.images ?? [];
@@ -232,7 +242,6 @@ export default async function TourPage({
      c'era la striscia): usarlo da solo faceva sparire le foto su desktop.
      La striscia si costruisce sempre -- con le didascalie dove sono state
      scritte a mano, con le sole foto altrimenti. */
-  const video = contenuto.videos ?? [];
   const striscia: Foto[] =
     contenuto.gallery?.length
       ? contenuto.gallery

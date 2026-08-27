@@ -210,30 +210,77 @@ export async function inEvidenza(quante = 6, lingua: string = RIPIEGO): Promise<
  * Il menu e' sulla pagina di tutti: non puo' fare una richiesta per ogni
  * voce. Una sola lettura, poi ogni voce pesca dalla mappa.
  *
- * Il conteggio somma le piattaforme INDIPENDENTI. Viator dichiara
+ * 🔴 QUI C'ERA UNA SOMMA, ED E' STATO UN ERRORE.
+ *
+ * Fino a ieri questa funzione sommava le piattaforme indipendenti e ne
+ * faceva la media pesata. L'aritmetica era giusta -- Viator dichiara
  * "recensioni e punteggi totali da Viator e Tripadvisor", quindi il suo
- * numero comprende gia' Tripadvisor e sommarli conterebbe due volte le
- * stesse recensioni; GetYourGuide invece e' separato e si somma davvero.
- * Il voto e' la media pesata sul numero, non la media delle medie.
+ * numero comprende gia' Tripadvisor e non si somma, GetYourGuide invece e'
+ * separato e si somma davvero -- e il risultato era comunque un numero che
+ * NON ESISTE DA NESSUNA PARTE.
+ *
+ * Wine Experience in Tuscany: 8.241 su Viator + 4.453 su GetYourGuide + 206
+ * su Regiondo, e il menu stampava "4,9 su 12.900 recensioni". Un cliente
+ * che apre Viator per controllare trova 8.241. Tripadvisor, come azienda,
+ * ne dichiara 7.142. Dodicimilanovecento non lo conferma nessuno.
+ *
+ * E il danno non finisce sul numero sbagliato: un conteggio che non torna
+ * e' il motivo per cui da li' in poi non si crede piu' nemmeno al prezzo.
+ * Un badge di prova sociale ha un solo lavoro, farsi verificare.
+ *
+ * Adesso vince LA PIATTAFORMA PIU' FORTE DI QUEL TOUR, una sola, e si dice
+ * quale: "4,9 su 8.241 recensioni su Viator" e' un numero che chi vuole
+ * controllare ritrova identico. Si perde qualche migliaio di recensioni
+ * dichiarate e si guadagna l'unica cosa che quel riquadro deve fare.
+ *
+ * Il voto non e' piu' una media di medie ne' una media pesata: e' il voto
+ * di quella piattaforma, che e' l'unico coerente con il numero accanto.
  */
-export type VotoTour = { voto: number; quante: number };
+export type VotoTour = {
+  voto: number;
+  quante: number;
+  /** dove sta quel numero, preposizione compresa: "on Viator" */
+  dove: string;
+};
+
+/* SOTTO LE TRE RECENSIONI NON SI MOSTRA NIENTE.
+   "5,0 su 1 recensione" e' vero e sembra inventato: e' l'effetto opposto a
+   quello che serve. Stessa soglia di `punteggiDi`. */
+const MINIMO_RECENSIONI = 3;
+
+/* Le cinque piattaforme sono un insieme chiuso: `valutazioni_tour.fonte` ha
+   una chiave esterna su `fonti_recensioni.fonte`, non ne arrivano altre.
+   Qui stanno i nomi corti con la preposizione gia' dentro, perche' su
+   Regiondo "on guests who booked direct" non si puo' leggere. Se un giorno
+   ne comparisse una nuova si ripiega sul nome grezzo, che e' brutto ma non
+   e' falso. */
+const DOVE: Record<string, string> = {
+  viator: 'on Viator',
+  getyourguide: 'on GetYourGuide',
+  tripadvisor: 'on Tripadvisor',
+  google: 'on Google',
+  regiondo: 'from direct bookings',
+};
 
 export async function votiPerTour(): Promise<Record<string, VotoTour>> {
+  /* ordinate qui e non in memoria: cosi' la prima riga di ogni tour e'
+     gia' quella che vince, e a parita' di recensioni vince sempre la
+     stessa piattaforma invece di dipendere da come tornano le righe */
   const { data } = await supabase
     .from('valutazioni_tour')
-    .select('tour_slug,fonte,voto,quante');
-
-  const somma: Record<string, { peso: number; n: number }> = {};
-  for (const r of data ?? []) {
-    if (r.voto == null || r.quante == null || r.quante < 3) continue;
-    const s = (somma[r.tour_slug] ??= { peso: 0, n: 0 });
-    s.peso += Number(r.voto) * r.quante;
-    s.n += r.quante;
-  }
+    .select('tour_slug,fonte,voto,quante')
+    .order('quante', { ascending: false })
+    .order('fonte', { ascending: true });
 
   const out: Record<string, VotoTour> = {};
-  for (const [slug, s] of Object.entries(somma)) {
-    if (s.n > 0) out[slug] = { voto: Math.round((s.peso / s.n) * 10) / 10, quante: s.n };
+  for (const r of data ?? []) {
+    if (r.voto == null || r.quante == null || r.quante < MINIMO_RECENSIONI) continue;
+    if (out[r.tour_slug]) continue;
+    out[r.tour_slug] = {
+      voto: Math.round(Number(r.voto) * 10) / 10,
+      quante: r.quante,
+      dove: DOVE[r.fonte] ?? `on ${r.fonte}`,
+    };
   }
   return out;
 }

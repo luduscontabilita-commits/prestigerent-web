@@ -30,11 +30,19 @@ import type { VotoTour } from '@/lib/recensioni';
  * in src/lib/menu.ts); i riquadri per le categorie senza tour non esistono
  * proprio.
  *
- * IL PUNTEGGIO NEL MENU quasi nessuno lo fa, e funziona: "4,9 su 12.694
- * recensioni" convince prima ancora che si clicchi, e lo legge anche chi
- * il menu lo apre solo per curiosita'. Sui riquadri compare solo se il
+ * IL PUNTEGGIO NEL MENU quasi nessuno lo fa, e funziona: "4,9 su 8.241
+ * recensioni su Viator" convince prima ancora che si clicchi, e lo legge
+ * anche chi il menu lo apre solo per curiosita'. Compare solo se il
  * riquadro porta a QUEL tour e le recensioni sono almeno tre: "5,0 su 1
  * recensione" non convince nessuno e fa sembrare finto anche il resto.
+ *
+ * 🔴 E DICE SEMPRE DOVE STA QUEL NUMERO. Prima il menu stampava la somma
+ * delle piattaforme -- "4,9 su 12.900 recensioni" per Wine Experience --
+ * cioe' un totale che su Viator, su GetYourGuide e su Tripadvisor non si
+ * ritrova da nessuna parte. Adesso e' il conteggio di una piattaforma
+ * sola, la piu' forte di quel tour, col suo nome accanto: chi va a
+ * controllare trova lo stesso numero. Vedi `votiPerTour` in
+ * src/lib/recensioni.ts, che e' dove stava la somma.
  *
  * Il pannello sta SEMPRE nell'HTML e si nasconde col CSS. Montarlo solo
  * all'apertura significherebbe che i suoi link non esistono per chi
@@ -65,6 +73,22 @@ import type { VotoTour } from '@/lib/recensioni';
 
 /** minimo di recensioni per mostrare il punteggio: sotto, imbarazza */
 const MIN_RECENSIONI = 3;
+
+/* SUL RIQUADRO FOTOGRAFICO LA SOGLIA E' MOLTO PIU' ALTA, e non e' una
+ * seconda opinione sullo stesso problema: e' un vincolo di spazio.
+ *
+ * Sopra una foto il posto per scrivere e' la fascia scura in basso, e ce
+ * n'e' per un titolo e una riga. Se quella riga la occupa "5,0 su 4
+ * recensioni", il titolo -- che e' la cosa su cui si clicca -- va a capo e
+ * si stringe per fare posto a un numero che non convince nessuno. Sotto le
+ * cento recensioni il badge sul riquadro non paga il suo spazio e sparisce;
+ * nell'elenco di link qui sotto, dove una riga in piu' non toglie niente a
+ * nessuno, resta la soglia di tre.
+ *
+ * Oggi passano solo i due tour di punta -- Wine Experience e Siena in
+ * piccolo gruppo -- che sono anche gli unici con un numero grosso da
+ * mostrare. */
+const MIN_VETRINA = 50;
 
 export function Header({
   locale,
@@ -254,7 +278,23 @@ export function Header({
 
                     <div className="hd-vetrina">
                       {s.vetrina.map((r) => {
-                        const q = punteggio(r.tour);
+                        /* NON chiamarla `p`: in questo componente `p` e' gia'
+                           la funzione che mette il prefisso della lingua
+                           davanti agli indirizzi, e due righe piu' sotto
+                           serve proprio quella. */
+                        const voto = punteggio(r.tour);
+                        /* 🔴 IL PUNTEGGIO E' DEL TOUR, NON DELLA CATEGORIA.
+                           Meta' dei riquadri porta a una pagina di categoria
+                           e prende la foto da un tour dentro quella
+                           categoria: stampargli accanto il voto di quel tour
+                           vorrebbe dire attribuire a "Direct transfers from
+                           Florence" le recensioni del transfer dall'aeroporto.
+                           E' lo stesso errore delle piattaforme sommate, in
+                           piccolo. Il badge compare solo se il riquadro porta
+                           esattamente alla pagina di quel tour. */
+                        const suoTour = r.href === `/tour/${r.tour}/`;
+                        const q =
+                          suoTour && voto && voto.quante >= MIN_VETRINA ? voto : undefined;
                         const f = foto[r.tour];
                         return (
                           <a className="hd-card" key={r.href} href={p(r.href)}>
@@ -281,9 +321,18 @@ export function Header({
                             <span className="hd-card-t">
                               <b>{r.testo}</b>
                               {q && (
+                                /* "reviews" resta, ma solo per chi ascolta:
+                                   sopra una foto quella parola vale due
+                                   righe di titolo, e fra la stella e "on
+                                   Viator" nessuno che guarda si chiede di
+                                   cosa siano 8.241. Chi usa un lettore di
+                                   schermo invece sentirebbe "quattro virgola
+                                   nove, ottomiladuecentoquarantuno, su
+                                   Viator" e resterebbe senza il sostantivo. */
                                 <em>
                                   ★ {q.voto.toFixed(1)} &middot;{' '}
-                                  {q.quante.toLocaleString('en-US')} reviews
+                                  {q.quante.toLocaleString('en-US')}
+                                  <span className="hd-solo-voce"> reviews</span> {q.dove}
                                 </em>
                               )}
                             </span>
@@ -304,7 +353,7 @@ export function Header({
                               {q && (
                                 <em className="hd-voto">
                                   ★ {q.voto.toFixed(1)} &middot;{' '}
-                                  {q.quante.toLocaleString('en-US')} reviews
+                                  {q.quante.toLocaleString('en-US')} reviews {q.dove}
                                 </em>
                               )}
                             </a>

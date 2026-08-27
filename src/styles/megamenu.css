@@ -35,7 +35,7 @@
 }
 .hd-mega-in .hd-mega-tit {
   margin: 0;
-  font-size: 1.06rem;
+  font-size: 1.2rem;
   font-weight: 800;
   line-height: 1.2;
   color: var(--ink);
@@ -125,9 +125,11 @@
   z-index: 1;
   background: linear-gradient(
     to top,
-    rgba(8, 14, 20, 0.86) 0%,
-    rgba(8, 14, 20, 0.44) 40%,
-    rgba(8, 14, 20, 0) 72%
+    rgba(6, 11, 16, 0.97) 0%,
+    rgba(6, 11, 16, 0.92) 34%,
+    rgba(6, 11, 16, 0.7) 55%,
+    rgba(6, 11, 16, 0.28) 76%,
+    rgba(6, 11, 16, 0) 94%
   );
   pointer-events: none;
 }
@@ -140,30 +142,84 @@
   bottom: 11px;
   display: block;
 }
+/* IL TITOLO E' LA COSA SU CUI SI CLICCA, e va letto per primo dopo
+   l'intestazione del pannello: 0,9rem sopra una foto grande metteva la
+   gerarchia al contrario -- l'immagine gridava e la scritta sussurrava.
+
+   NIENTE `text-shadow`. A 0,9rem un'ombra sfocata non si distingue; a
+   questo corpo si vede, e sporca le lettere invece di staccarle. Il
+   contrasto lo fa la sfumatura qui sopra, che e' stata alzata e resa piu'
+   densa apposta: sotto il testo il fondo e' scuro al 90% e passa, sulle
+   foto chiare come il duomo di Milano o Piazza del Campo a mezzogiorno,
+   quanto su quelle scure delle botti.
+
+   Due righe e non piu' di due: il riquadro e' alto due terzi della sua
+   larghezza, e un titolo di tre righe piu' la riga delle recensioni
+   coprirebbe piu' di meta' foto. I titoli lunghi sono stati accorciati nei
+   dati (vedi `vetrina` in src/lib/menu.ts) -- il taglio qui e' la rete di
+   sicurezza per il giorno che qualcuno ne scriva uno lungo. */
 .hd-mega-in .hd-card-t b {
-  display: block;
-  font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 1.02rem;
   font-weight: 800;
-  line-height: 1.24;
+  line-height: 1.22;
   color: #fff;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
 }
 /* Il punteggio in giallo e non in arancione: sopra una foto l'arancione
    del marchio si confonde con i tetti e i tramonti, che in questo
    catalogo sono meta' delle immagini. */
+/* Piu' piccola del titolo, come deve essere, ma non piu' da strizzare gli
+   occhi: 0,72rem sopra una foto erano undici pixel e mezzo. Il giallo e non
+   l'arancione del marchio perche' sopra una foto l'arancione si confonde
+   con i tetti e i tramonti, che in questo catalogo sono meta' delle
+   immagini. Anche qui niente ombra: la sfumatura basta. */
 .hd-mega-in .hd-card-t em {
   display: block;
-  margin-top: 4px;
+  margin-top: 5px;
   font-style: normal;
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  color: #ffc861;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+  color: #ffd27a;
 }
 
 .hd-mega-in .hd-card:focus-visible {
   outline: 3px solid var(--orange);
   outline-offset: 2px;
+}
+
+/* c'e' per i lettori di schermo e non per gli occhi: niente `display:none`
+   ne' `visibility:hidden`, che lo toglierebbero anche a loro */
+.hd-mega-in .hd-solo-voce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── l'occhiello sopra ogni elenco ──────────────────────────────────────
+   Era 0,66rem con 1,2px di spaziatura fra le lettere. In maiuscolo la
+   spaziatura serve -- le maiuscole attaccate si leggono peggio -- ma a
+   quel corpo diventa il problema invece della cura: allarga una riga gia'
+   corta finche' non va a capo, e intanto le lettere restano piccole.
+
+   Quindi il contrario di quello che verrebbe da fare: il carattere sale,
+   la spaziatura scende. La riga occupa meno di prima ed e' piu' leggibile.
+   `text-wrap: balance` e' l'ultima rete -- se una riga proprio deve
+   spezzarsi, si spezza in due meta' simili invece di lasciare una parola
+   sola in fondo. */
+.hd-mega-in .hd-col-t {
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  text-wrap: balance;
 }
 
 /* ── telefono e tablet: la stessa vetrina, trascinabile col dito ─────
@@ -242,11 +298,30 @@
   .hd-mega-in .hd-card:hover .hd-card-f img {
     transform: none;
   }
+  /* nella striscia il riquadro occupa piu' di meta' schermo: il titolo
+     puo' salire ancora un poco senza rubare la foto */
+  .hd-mega-in .hd-card-t b {
+    font-size: 1.06rem;
+  }
+  .hd-mega-in .hd-card-t em {
+    font-size: 0.84rem;
+  }
 }
 @media (max-width: 560px) {
   .hd-mega-in .hd-card {
     width: 70%;
     max-width: 240px;
+  }
+  .hd-mega-in .hd-mega-tit {
+    font-size: 1.02rem;
+  }
+  /* a 320px il riquadro e' alto 127px: due righe di titolo piu' la riga
+     delle recensioni devono starci senza mangiarsi la foto */
+  .hd-mega-in .hd-card-t b {
+    font-size: 1rem;
+  }
+  .hd-mega-in .hd-card-t em {
+    font-size: 0.79rem;
   }
 }
 

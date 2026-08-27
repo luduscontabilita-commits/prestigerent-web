@@ -88,7 +88,11 @@ export const SEZIONI: Sezione[] = [
         alt: 'Oak barrels in the cellar of a Tuscan winery',
       },
       {
-        testo: 'Siena, San Gimignano & the Tuscan countryside',
+        /* accorciato: il nome per esteso e' quarantaquattro caratteri e
+           sopra una foto diventava tre righe che coprivano mezza immagine.
+           Il nome intero resta nell'elenco qui sotto e sulla pagina del
+           tour, dove c'e' lo spazio per leggerlo. */
+        testo: 'Siena & San Gimignano',
         href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
         tour: 'small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence',
         alt: 'The Torre del Mangia and Palazzo Pubblico seen from Piazza del Campo',
@@ -102,7 +106,13 @@ export const SEZIONI: Sezione[] = [
     ],
     gruppi: [
       {
-        titolo: 'Our three small-group days',
+        /* niente trattino: in maiuscolo e spaziato, "SMALL-GROUP" su uno
+           schermo da 320px andava a capo dopo il trattino e lasciava
+           "GROUP DAYS" da sola sulla riga dopo -- si legge come un errore
+           di stampa. Senza trattino, se proprio deve andare a capo va a
+           capo su uno spazio. E' anche piu' coerente col resto del sito,
+           dove la voce di menu e' "Small Group Tours". */
+        titolo: 'Our three small group days',
         voci: [
           {
             testo: 'Siena & San Gimignano with winery lunch',
