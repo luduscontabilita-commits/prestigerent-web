@@ -2,6 +2,7 @@
 
 import { useFilm } from './useFilm';
 import { foto as ottimizza, fotoSet } from '@/lib/foto';
+import { testo } from '@/lib/prosa';
 
 export type Foto = { src: string; alt?: string; label?: string; caption?: string };
 
@@ -42,14 +43,36 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
   const cicla = foto.length >= 3;
   const diapositive = cicla ? [...foto, ...foto] : foto;
 
+  /* 🔴 L'`alt` E' TESTO, NON MARKUP.
+   *
+   * Le descrizioni arrivano da WordPress con le entita' gia' dentro
+   * ("Ducati Museum &amp; Factory"). Passandole cosi' com'erano, React le
+   * rimarcava e in pagina finiva `alt="... &amp;amp; Factory"`: HTML
+   * sbagliato -- l'attributo alt non contiene markup, quindi la seconda
+   * codifica non la disfa nessuno -- e un lettore di schermo che si sente
+   * dire "amp" in mezzo al nome. Su una scheda tour sono SEDICI immagini
+   * con lo stesso alt (mosaico del telefono piu' striscia del desktop),
+   * quindi il difetto si sente sedici volte di fila.
+   *
+   * `testo()` e' la stessa funzione che le schede tour usano gia' per i
+   * titoli: decodifica e basta, non tocca il resto. */
+  const descrizione = (f: Foto) => testo(f.alt || f.caption || '');
+
   return (
     <>
       {/* MOBILE: il mosaico che il CSS trasforma in carosello a swipe */}
-      <div className="hero-gallery" aria-label="Tour photos">
+      {/* `role="group"` non e' decorazione: su un <div> nudo l'`aria-label`
+          viene semplicemente BUTTATO VIA -- un nome si puo' dare solo a un
+          elemento che ha un ruolo che lo prevede, e il div generico non ne
+          ha nessuno. Cosi' com'era, "Tour photos" non lo sentiva nessuno e
+          la galleria si annunciava come una fila di immagini sciolte.
+          `group` e' lo stesso ruolo che la striscia desktop usa gia' due
+          blocchi piu' sotto, e non cambia un pixel. */}
+      <div className="hero-gallery" role="group" aria-label="Tour photos">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="g-hero" src={ottimizza(foto[0].src, 1200)}
              srcSet={fotoSet(foto[0].src, [640, 828, 1200])} sizes="(max-width: 700px) 88vw, 460px"
-             alt={foto[0].alt || ''} loading="eager" fetchPriority="high" decoding="async" />
+             alt={descrizione(foto[0])} loading="eager" fetchPriority="high" decoding="async" />
         {foto.slice(1, 13).reduce<Foto[][]>((cols, f, i) => {
           if (i % 2 === 0) cols.push([]);
           cols[cols.length - 1].push(f);
@@ -60,14 +83,17 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img key={f.src} src={ottimizza(f.src, 640)} srcSet={fotoSet(f.src, [640, 828, 1200])}
                    sizes="(max-width: 700px) 88vw, 460px"
-                   alt={f.alt || ''} loading="lazy" decoding="async" />
+                   alt={descrizione(f)} loading="lazy" decoding="async" />
             ))}
           </div>
         ))}
       </div>
 
       {/* DESKTOP: la striscia a tutta larghezza, come sulla landing */}
-      <div className="film-section hero-film" aria-label="Tour photo highlights">
+      {/* Stesso motivo di sopra: <div> senza ruolo, `aria-label` ignorato.
+          In Videos.tsx la stessa classe sta su un <section>, che un nome
+          lo regge da solo; qui e' un div e il ruolo va detto. */}
+      <div className="film-section hero-film" role="group" aria-label="Tour photo highlights">
         <div className="film-wrap">
           <div
             className="film"
@@ -106,7 +132,7 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
                       src={ottimizza(f.src, i === 0 ? 1200 : 828)}
                       srcSet={fotoSet(f.src, [640, 828, 1200])}
                       sizes="(max-width: 700px) 88vw, 460px"
-                      alt={clone ? '' : f.alt || f.caption || ''}
+                      alt={clone ? '' : descrizione(f)}
                       loading={i === 0 ? 'eager' : 'lazy'}
                       fetchPriority={i === 0 ? 'high' : undefined}
                       decoding="async"

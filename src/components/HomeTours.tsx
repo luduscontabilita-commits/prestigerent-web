@@ -250,7 +250,18 @@ export function HomeTours({
                         src={foto(t.foto, 640)}
                         srcSet={fotoSet(t.foto, [640, 828, 1200])}
                         sizes="(max-width: 700px) 92vw, (max-width: 1180px) 46vw, 380px"
-                        alt={t.nome}
+                        /* 🔴 `testo()` anche qui, non solo nel titolo.
+                           I nomi arrivano da WordPress gia' con le
+                           entita' dentro ("Siena, San Gimignano &amp;
+                           the Tuscan countryside"). Il titolo li' sotto
+                           passava per `testo()` e usciva giusto; l'alt
+                           prendeva il nome crudo, React lo rimarcava, e
+                           in pagina finiva `&amp;amp;`. Chi usa un
+                           lettore di schermo si sentiva leggere "amp"
+                           in mezzo al nome del tour, e il doppio escape
+                           e' comunque HTML sbagliato: l'alt e' testo,
+                           non markup. */
+                        alt={testo(t.nome)}
                         loading="lazy"
                         decoding="async"
                       />

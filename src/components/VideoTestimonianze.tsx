@@ -79,19 +79,32 @@ export function VideoTestimonianze({
       <div className="vt-grid">
         {scelte.map((c) => (
           <figure className="vt-item" key={c.nome}>
-            {/* preload="none" non e' opzionale: quattro filmati da diversi MB
-              * l'uno scaricati in automatico si mangerebbero la banda del
-              * telefono prima ancora che qualcuno decida di guardarli, e la
-              * home e' proprio dove arriva il traffico a pagamento. Con il
-              * poster al posto del primo fotogramma si vede comunque una
-              * faccia; il video parte solo se lo si chiede. */}
+            {/* IL LETTORE VIDEO SENZA NOME.
+              * Il <figcaption> qui sotto descrive la FIGURA, non il
+              * comando: un lettore di schermo che arriva sui controlli
+              * annunciava "video, pulsante riproduci" e nient'altro, e
+              * con quattro riquadri identici in griglia non c'era modo di
+              * sapere quale si stava per far partire. La didascalia c'e'
+              * gia' scritta: si usa anche come nome del lettore. E'
+              * ripetuta due volte, ed e' voluto -- meglio sentirla due
+              * volte che avere un comando anonimo.
+              *
+              * `preload="none"` non e' opzionale: quattro filmati da
+              * diversi MB l'uno scaricati in automatico si mangerebbero
+              * la banda del telefono prima ancora che qualcuno decida di
+              * guardarli, e la home e' proprio dove arriva il traffico a
+              * pagamento. Con il poster al posto del primo fotogramma si
+              * vede comunque una faccia; il video parte solo se lo si
+              * chiede. */}
             <video
               controls
               preload="none"
               playsInline
+              aria-label={c.didascalia}
               poster={c.poster ? `${BASE}/${c.nome}.jpg` : undefined}
             >
               <source src={`${BASE}/${c.nome}.mp4`} type="video/mp4" />
+              Your browser cannot play this video.
             </video>
             <figcaption className="vt-cap">{c.didascalia}</figcaption>
           </figure>

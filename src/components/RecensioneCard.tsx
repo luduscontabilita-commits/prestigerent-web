@@ -47,7 +47,15 @@ export function RecensioneCard({ r }: { r: Recensione }) {
         {/* l'iniziale al posto della foto: da' un volto alla riga e rende
             la scheda piu' simile a una recensione vera che a una citazione */}
         <span className="rv-avatar" aria-hidden="true">{r.autore.trim()[0]}</span>
-        <span className="rv-stars" aria-label={`${r.voto} out of 5`}>{STELLE(r.voto)}</span>
+        {/* `role="img"` non e' pignoleria: senza un ruolo che preveda un
+            nome, su uno <span> nudo l'`aria-label` viene ignorato e resta
+            solo il contenuto, cioe' cinque caratteri "★" e "☆" letti uno
+            per uno. Il voto -- la sola cosa che quelle stelle vogliono
+            dire -- non arrivava. Con `img` il lettore di schermo annuncia
+            "5 out of 5, immagine" e smette di sillabare i simboli. In
+            pagina non cambia niente: le stelle restano disegnate come
+            prima. */}
+        <span className="rv-stars" role="img" aria-label={`${r.voto} out of 5`}>{STELLE(r.voto)}</span>
         <span className={'rv-src rv-src-' + r.fonte}>{NOMI[r.fonte] ?? r.fonte}</span>
       </div>
 

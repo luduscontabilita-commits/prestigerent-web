@@ -60,10 +60,36 @@ export function RichiestaModale({ locale }: { locale: string }) {
 
   const chiudi = useCallback(() => setAperto(false), []);
 
+  /* 🔴 UN CLIC A VUOTO NON PUO' CANCELLARE QUELLO CHE SI E' SCRITTO.
+   *
+   * Il popup si chiude anche cliccando lo sfondo, ed e' giusto: e' il
+   * gesto che tutti si aspettano da un popup. Il guaio e' cosa succedeva
+   * dopo -- chiudendo, il modulo veniva SMONTATO (sta dentro un
+   * `{aperto && ...}`), e con lui sparivano nome, email, date e il
+   * messaggio lungo che uno aveva appena finito di scrivere. Nessuna
+   * conferma, nessun modo di tornare indietro. E lo sfondo si colpisce
+   * per sbaglio di continuo: si sbaglia la mira sul calendario, si
+   * seleziona del testo nel messaggio e si rilascia il mouse un
+   * centimetro fuori dal riquadro.
+   *
+   * Quindi: a modulo vuoto lo sfondo chiude come prima -- chi ha aperto
+   * per sbaglio non deve andare a cercare la ✕. Appena si e' scritto
+   * qualcosa, invece, lo sfondo non chiude piu': restano la ✕ e Esc, che
+   * sono gesti espliciti, mentre un clic fuori non lo e'.
+   *
+   * Il "si e' scritto qualcosa" si legge dall'evento `input`, che sale
+   * fino a qui da qualunque campo (React lo delega, quindi basta
+   * ascoltarlo sul contenitore). Non e' uno stato ma un ref: cambiarlo
+   * non deve ridisegnare il modulo mentre uno ci sta scrivendo dentro. */
+  const scritto = useRef(false);
+
   useEffect(() => {
     const apri = (e: Event) => {
       const chiesto = (e as CustomEvent<{ servizio?: string }>).detail?.servizio;
       setServizio(chiesto || servizioDellaPagina());
+      /* il modulo che si apre e' sempre nuovo e vuoto: quello che si era
+         scritto in una sessione precedente non c'e' piu' */
+      scritto.current = false;
       setAperto(true);
     };
     window.addEventListener('pr-richiesta-apri', apri);
@@ -97,9 +123,19 @@ export function RichiestaModale({ locale }: { locale: string }) {
       className="qr-dlg"
       aria-labelledby="qr-tit"
       /* il click sullo sfondo chiude: il bersaglio e' il <dialog> stesso
-         solo quando si colpisce l'area fuori dal riquadro */
+         solo quando si colpisce l'area fuori dal riquadro. Ma se dentro
+         c'e' del lavoro -- vedi il commento su `scritto` -- non si butta
+         via per un clic sbagliato: chiude la ✕, chiude Esc. */
       onClick={(e) => {
-        if (e.target === rif.current) chiudi();
+        if (e.target !== rif.current) return;
+        /* A invio riuscito il modulo lascia il posto al riquadro di
+           conferma: li' non c'e' piu' niente da perdere, e anzi tenere
+           aperto un popup che dice solo "grazie" e' una porta chiusa in
+           faccia. Si guarda il riquadro perche' `scritto` resta acceso
+           anche dopo l'invio -- l'input c'e' stato davvero. */
+        const inviato = !!rif.current?.querySelector('.mr-fatto');
+        if (scritto.current && !inviato) return;
+        chiudi();
       }}
       onClose={chiudi}
     >
@@ -125,7 +161,14 @@ export function RichiestaModale({ locale }: { locale: string }) {
             cambia, altrimenti chi apre il popup su un secondo tour si
             ritroverebbe il nome del primo, perche' `defaultValue` non
             aggiorna un campo gia' disegnato. */}
-        <div className="qr-corpo">
+        <div
+          className="qr-corpo"
+          /* l'`input` di qualunque campo sale fin qui: e' il segnale che
+             dentro c'e' del lavoro da non buttare via (vedi `scritto`) */
+          onInput={() => {
+            scritto.current = true;
+          }}
+        >
           {aperto && (
             <ModuloRichiesta key={servizio ?? '-'} locale={locale} tour={servizio} />
           )}

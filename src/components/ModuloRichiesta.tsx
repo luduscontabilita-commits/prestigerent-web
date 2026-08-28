@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { testiModulo, type CodiceErrore } from '@/lib/testi';
 import { DEFAULT_LOCALE } from '@/lib/locales';
 
@@ -53,6 +53,24 @@ export function ModuloRichiesta({ locale, tour }: Props) {
   const [stato, setStato] = useState<Stato>('fermo');
   const [errore, setErrore] = useState<CodiceErrore | null>(null);
   const [campoRotto, setCampoRotto] = useState<string | null>(null);
+
+  /* 🔴 QUESTO MODULO STA IN PAGINA DUE VOLTE, E GLI `id` NO.
+   *
+   * Il componente e' uno solo ma viene disegnato due volte su ogni
+   * pagina: una in fondo (ContactSection) e una dentro il popup
+   * (RichiestaModale). Finche' gli `id` erano scritti a mano -- c'era
+   * `id="mr-azienda"` -- in pagina ce n'erano due identici: HTML non
+   * valido, e soprattutto il `<label for="mr-azienda">` del popup
+   * puntava all'input del modulo di fondo pagina, perche' il browser
+   * risolve `for` sul PRIMO id che trova. Cioe' l'etichetta accendeva il
+   * campo sbagliato, e un lettore di schermo leggeva un'etichetta che
+   * appartiene a un altro modulo.
+   *
+   * `useId()` da' un prefisso diverso a ogni istanza, uguale sul server e
+   * nel browser (un contatore nostro o `Math.random()` no: darebbero due
+   * valori diversi e React scarterebbe l'HTML servito). Ogni id che nasce
+   * qui dentro parte da questo prefisso. */
+  const uid = useId();
 
   /* 🔴 IL "GRAZIE" DEVE FINIRE SOTTO GLI OCCHI.
    *
@@ -281,8 +299,8 @@ export function ModuloRichiesta({ locale, tour }: Props) {
           `autoComplete="off"` evita che un gestore di password lo riempia
           da solo e trasformi un cliente vero in uno spammer. */}
       <div className="mr-esca" aria-hidden="true">
-        <label htmlFor="mr-azienda">Company</label>
-        <input id="mr-azienda" name="azienda" type="text" tabIndex={-1} autoComplete="off" />
+        <label htmlFor={`${uid}azienda`}>Company</label>
+        <input id={`${uid}azienda`} name="azienda" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       {errore && (

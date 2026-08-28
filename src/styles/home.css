@@ -1060,20 +1060,33 @@ a.ps-in:hover .ps-testo b{ color:var(--orange); }
    capo -- con un nome di tour lungo e "for 12 guests" dentro un riquadro
    da 390px una riga sola non basta, e troncare proprio la parte che deve
    rassicurare sarebbe il modo peggiore di risparmiare spazio. */
+/* Le opacita' di questa riga si MOLTIPLICANO: .75 sull'em piu' .75 su
+   .ps-fonte qui sotto facevano .56, cioe' "· verified booking" usciva a
+   3,1:1 in caratteri da 0,72rem. Ed e' proprio la parte che deve
+   rassicurare: se non si legge, il riquadro afferma un dato e non dice
+   piu' da dove viene. I due valori salgono quel tanto che basta (5,9:1 la
+   riga, 5,3:1 la fonte) senza toccare la gerarchia -- il numero di
+   persone resta l'unico a --ink pieno. */
 .ps-testo em{
   display:block; margin-top:3px; font-style:normal;
-  font-size:.72rem; font-weight:700; color:var(--ink-soft); opacity:.75;
+  font-size:.72rem; font-weight:700; color:var(--ink-soft); opacity:.9;
   line-height:1.5;
 }
 /* Il numero di persone e' l'unico dato concreto della riga: "for 4 guests"
    e' una prenotazione con dentro qualcuno, "verified booking" e'
    un'etichetta. Sta un gradino sopra il resto, non allo stesso livello. */
 .ps-ospiti{ color:var(--ink); }
-.ps-fonte{ opacity:.75; }
+.ps-fonte{ opacity:.95; }
+/* La ✕ e' un comando, non un ornamento: a .5 stava a 2,6:1, sotto anche
+   il 3:1 che si chiede a un elemento di comando. Ed e' l'unico modo di
+   far smettere il riquadro a chi lo trova fastidioso -- un pulsante per
+   dire basta che non si vede e' il difetto peggiore che possa avere. Il
+   passaggio del mouse continua a portarlo a 1 e in arancione, quindi
+   l'effetto resta quello di prima. */
 .ps-x{
   flex:none; align-self:flex-start; background:none; border:0; cursor:pointer;
   padding:8px 11px 8px 4px; font-size:1.1rem; line-height:1;
-  color:var(--ink-soft); opacity:.5;
+  color:var(--ink-soft); opacity:.85;
 }
 .ps-x:hover{ opacity:1; color:var(--orange); }
 @media (max-width:760px){ .ps{ display:none; } }
@@ -1451,9 +1464,14 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 /* "facoltativo" accanto all'etichetta, non sotto: dice prima di
    cominciare che si puo' saltare, ed e' il motivo per cui il modulo non
    spaventa nonostante abbia sette caselle. */
+/* L'opacita' era .7 e su --ink-soft dava 3,6:1 su fondo bianco, sotto il
+   4,5:1 che serve a un testo di 0,72rem. E' l'unica parola dell'etichetta
+   che dice se il campo si puo' saltare: sbiadirla fino a non leggerla e'
+   il contrario di quello che deve fare. A .85 resta chiaramente il
+   secondo livello dell'etichetta e arriva a 5,1:1. */
 .mr-campo > span > i{
   font-style:normal; font-weight:700; letter-spacing:.04em;
-  text-transform:none; opacity:.7;
+  text-transform:none; opacity:.85;
 }
 
 .mr-campo input,
@@ -1464,8 +1482,15 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
   transition:border-color .18s ease, box-shadow .18s ease;
 }
 .mr-campo textarea{ resize:vertical; min-height:96px; line-height:1.55; }
+/* IL SEGNAPOSTO E' TESTO, e le regole del contrasto valgono anche per lui.
+   A .62 su --ink-soft veniva 2,9:1 su bianco e 3,8:1 in tema scuro: sotto
+   la soglia in tutti e due. E qui i segnaposto non sono decorazione --
+   sono "e.g. Jane Smith" e la data di esempio, cioe' l'unica cosa che
+   dice in che FORMA va scritto il campo. A .8 il segnaposto resta
+   distinguibile dal testo battuto (che e' --ink pieno) e passa: 4,6:1 sul
+   chiaro, 5,4:1 sullo scuro. */
 .mr-campo input::placeholder,
-.mr-campo textarea::placeholder{ color:var(--ink-soft); opacity:.62; }
+.mr-campo textarea::placeholder{ color:var(--ink-soft); opacity:.8; }
 
 .mr-campo input:focus,
 .mr-campo textarea:focus{
@@ -1533,9 +1558,47 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
 .mr-fatto b{ display:block; font-size:1.06rem; font-weight:800; color:var(--ink); line-height:1.3; }
 .mr-fatto p{ margin:6px 0 0; font-size:.95rem; font-weight:500; line-height:1.6; color:var(--ink-soft); }
 
+/* 🔴 IL PULSANTE WHATSAPP DELLA CONFERMA, che qui non c'era.
+ *
+ * `ModuloRichiesta.tsx` scrive `class="mr-fatto-wa"` da sempre, ma la
+ * regola non era mai stata scritta -- ne' qui ne' in produzione. Il
+ * risultato: dopo l'invio non c'era nessun pulsante, solo una riga di
+ * testo azzurra da link, e accanto l'icona di WhatsApp gonfiata a 26px
+ * e colorata di --teal dalla regola `.mr-fatto svg` qui sopra, che pero'
+ * e' pensata per la spunta grande della conferma. Cioe' proprio il punto
+ * in cui chi ha appena scritto e' piu' disposto a mandare un messaggio
+ * subito era quello meno riconoscibile della pagina.
+ *
+ * E' fatto come `.qr-apri`: bordo e niente riempimento, stesso raggio.
+ * SECONDARIO apposta -- la richiesta e' gia' partita, questo e' il "e se
+ * ho fretta", non un secondo invio da fare. L'arancione del marchio, non
+ * il verde di WhatsApp: sul sito l'arancione vuol dire "si preme", e un
+ * verde nuovo qui sarebbe l'unico di tutta la pagina. */
+.mr-fatto-wa{
+  display:inline-flex; align-items:center; gap:8px;
+  margin-top:13px; padding:10px 16px;
+  border:1.5px solid var(--orange); border-radius:11px;
+  background:transparent; color:var(--orange);
+  font-size:.92rem; font-weight:800; line-height:1;
+  text-decoration:none; white-space:nowrap;
+  transition:background .18s ease, color .18s ease;
+}
+.mr-fatto-wa:hover{ background:var(--orange); color:#fff; }
+.mr-fatto-wa:focus-visible{ outline:2px solid var(--orange); outline-offset:2px; }
+/* L'icona sta DENTRO il pulsante, e senza questa riga se la prende
+   `.mr-fatto svg`: 26px verde teal accanto a un testo da 0.92rem. Qui
+   torna alla misura con cui e' scritta nel markup (18px) e prende il
+   colore del pulsante, cosi' segue anche l'inversione al passaggio del
+   mouse invece di restare teal su fondo arancione. */
+.mr-fatto-wa svg{
+  width:18px; height:18px; flex:0 0 18px;
+  color:inherit; margin-top:0;
+}
+
 @media (prefers-reduced-motion: reduce){
   .mr-invia{ transition:none; }
   .mr-invia:hover:not(:disabled){ transform:none; }
+  .mr-fatto-wa{ transition:none; }
 }
 
 /* ============================================================
