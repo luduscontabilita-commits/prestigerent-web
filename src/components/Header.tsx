@@ -72,8 +72,19 @@ import type { VotoTour } from '@/lib/recensioni';
  * della casa e va dove l'occhio cade, non in fondo alla pagina.
  */
 
-/** minimo di recensioni per mostrare il punteggio: sotto, imbarazza */
-const MIN_RECENSIONI = 3;
+/** MINIMO DI RECENSIONI PER MOSTRARE IL PUNTEGGIO NEL MENU.
+ *
+ * Era 3, e tre non convincono nessuno: sotto "Florence airport" compariva
+ * "★ 5.0 · 3 reviews from direct bookings", che invece di rassicurare
+ * dice a chi legge che quel servizio non lo prende quasi nessuno. Un
+ * numero piccolo esposto e' peggio di nessun numero.
+ *
+ * Venti non e' una cifra scelta a caso: guardando come sono distribuite
+ * le valutazioni, diciassette tour ne hanno fra 3 e 19, nessuno ne ha fra
+ * 20 e 49, e sette ne hanno oltre cinquanta. C'e' un vuoto netto in
+ * mezzo, e la soglia sta li': taglia via tutti i casi imbarazzanti senza
+ * togliere un solo numero di quelli che valgono. */
+const MIN_RECENSIONI = 20;
 
 /* SUL RIQUADRO FOTOGRAFICO LA SOGLIA E' MOLTO PIU' ALTA, e non e' una
  * seconda opinione sullo stesso problema: e' un vincolo di spazio.
