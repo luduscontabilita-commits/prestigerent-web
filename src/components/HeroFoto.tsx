@@ -162,8 +162,8 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
                  in WebP, che sulla stessa foto pesa un terzo del JPG. E'
                  l'immagine che decide il tempo di caricamento percepito:
                  vale la pena servirla bene, non solo prima. */
-              src={ottimizza(f.src, 1920, 78)}
-              srcSet={fotoSet(f.src, [828, 1200, 1920], 78)}
+              src={ottimizza(f.src, 1920)}
+              srcSet={fotoSet(f.src, [828, 1200, 1920])}
               sizes="100vw"
               alt={alt}
               fetchPriority="high"
@@ -190,8 +190,8 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
             key={f.src}
             className={classe}
             style={pila}
-            src={ottimizza(f.src, 1200, 74)}
-            srcSet={fotoSet(f.src, [828, 1200, 1920], 74)}
+            src={ottimizza(f.src, 1200)}
+            srcSet={fotoSet(f.src, [828, 1200, 1920])}
             sizes="100vw"
             alt=""
             loading="lazy"

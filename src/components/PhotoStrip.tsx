@@ -47,8 +47,8 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
       {/* MOBILE: il mosaico che il CSS trasforma in carosello a swipe */}
       <div className="hero-gallery" aria-label="Tour photos">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="g-hero" src={ottimizza(foto[0].src, 1200, 78)}
-             srcSet={fotoSet(foto[0].src, [640, 828, 1200], 78)} sizes="100vw"
+        <img className="g-hero" src={ottimizza(foto[0].src, 1200)}
+             srcSet={fotoSet(foto[0].src, [640, 828, 1200])} sizes="100vw"
              alt={foto[0].alt || ''} loading="eager" fetchPriority="high" decoding="async" />
         {foto.slice(1, 13).reduce<Foto[][]>((cols, f, i) => {
           if (i % 2 === 0) cols.push([]);
@@ -58,7 +58,7 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
           <div className="g-col" key={i}>
             {col.map((f) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={f.src} src={ottimizza(f.src, 640)} srcSet={fotoSet(f.src, [400, 640, 828])}
+              <img key={f.src} src={ottimizza(f.src, 640)} srcSet={fotoSet(f.src, [640, 828, 1200])}
                    sizes="(max-width: 700px) 48vw, 320px"
                    alt={f.alt || ''} loading="lazy" decoding="async" />
             ))}
@@ -103,8 +103,8 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
                       /* La striscia e' alta poco piu' di 300px: chiedere
                          l'originale a piena risoluzione era il grosso dei
                          megabyte della home. */
-                      src={ottimizza(f.src, i === 0 ? 1200 : 828, i === 0 ? 78 : 74)}
-                      srcSet={fotoSet(f.src, [640, 828, 1200], i === 0 ? 78 : 74)}
+                      src={ottimizza(f.src, i === 0 ? 1200 : 828)}
+                      srcSet={fotoSet(f.src, [640, 828, 1200])}
                       sizes="(max-width: 700px) 88vw, 460px"
                       alt={clone ? '' : f.alt || f.caption || ''}
                       loading={i === 0 ? 'eager' : 'lazy'}

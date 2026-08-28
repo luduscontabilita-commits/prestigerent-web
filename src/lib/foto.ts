@@ -30,9 +30,21 @@
  * per ogni schermo si andrebbe nelle migliaia.
  */
 
-/** Le uniche larghezze che si chiedono. Coprono telefono, tablet, schermo
- *  grande e schermi a doppia densita' senza moltiplicarsi. */
-const MISURE = [400, 640, 828, 1200, 1920] as const;
+/* 🔴 LE MISURE NON SI INVENTANO.
+ *
+ * L'ottimizzatore di Vercel accetta SOLO le larghezze e le qualita' che
+ * conosce, e a tutto il resto risponde 400. Non e' scritto da nessuna
+ * parte in modo evidente e si scopre rompendo le immagini in produzione:
+ * la prima versione di questo file chiedeva `w=400` e `q=74`, e tredici
+ * foto della home sono uscite bianche.
+ *
+ * Queste sono le `deviceSizes` predefinite di Next, cioe' le uniche
+ * ammesse finche' `next.config.ts` non ne dichiara altre. */
+const MISURE = [640, 750, 828, 1080, 1200, 1920] as const;
+
+/** L'unica qualita' ammessa dal profilo predefinito. Chiederne un'altra
+ *  -- anche 74, anche 78 -- fa rispondere 400. */
+const QUALITA = 75;
 
 /** Gli host che `next.config.ts` autorizza: fuori da questi l'ottimizzatore
  *  risponde 400, quindi l'indirizzo si lascia com'e'. */
@@ -44,6 +56,11 @@ const AMMESSI = [
 
 function ottimizzabile(url: string): boolean {
   if (!url || url.startsWith('data:')) return false;
+  /* Alcune foto arrivano gia' dal ridimensionatore di Supabase
+     (`/storage/v1/render/image/...`): sono gia' servite della misura
+     giusta, e farle passare da un secondo ottimizzatore e' lavoro
+     doppio per lo stesso risultato. */
+  if (url.includes('/render/image/')) return false;
   if (url.startsWith('/')) return true;
   try {
     return AMMESSI.includes(new URL(url).hostname);
@@ -57,12 +74,12 @@ function ottimizzabile(url: string): boolean {
  * Se la foto non e' ottimizzabile torna l'indirizzo originale, cosi' il
  * chiamante non deve mai chiedersi se puo' usarla.
  */
-export function foto(url: string | null | undefined, larghezza = 828, qualita = 74): string {
+export function foto(url: string | null | undefined, larghezza = 828): string {
   if (!url || !ottimizzabile(url)) return url ?? '';
   /* si sale alla misura fissa piu' vicina: chiedere 700 quando esistono
      640 e 828 creerebbe una terza trasformazione per niente */
   const w = MISURE.find((m) => m >= larghezza) ?? MISURE[MISURE.length - 1];
-  return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=${qualita}`;
+  return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=${QUALITA}`;
 }
 
 /**
@@ -73,9 +90,8 @@ export function foto(url: string | null | undefined, larghezza = 828, qualita = 
  */
 export function fotoSet(
   url: string | null | undefined,
-  larghezze: readonly number[] = [400, 640, 828, 1200],
-  qualita = 74
+  larghezze: readonly number[] = [640, 828, 1200]
 ): string | undefined {
   if (!url || !ottimizzabile(url)) return undefined;
-  return larghezze.map((w) => `${foto(url, w, qualita)} ${w}w`).join(', ');
+  return larghezze.map((w) => `${foto(url, w)} ${w}w`).join(', ');
 }

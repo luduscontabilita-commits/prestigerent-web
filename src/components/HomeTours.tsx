@@ -248,7 +248,7 @@ export function HomeTours({
                            mostrarne 61. `sizes` dice al browser quanto sara'
                            larga davvero, altrimenti prende la piu' grande. */
                         src={foto(t.foto, 640)}
-                        srcSet={fotoSet(t.foto, [400, 640, 828])}
+                        srcSet={fotoSet(t.foto, [640, 828, 1200])}
                         sizes="(max-width: 700px) 92vw, (max-width: 1180px) 46vw, 380px"
                         alt={t.nome}
                         loading="lazy"
