@@ -66,6 +66,100 @@ export function postaConfigurata() {
   return conf() != null;
 }
 
+/* ── LA CONFERMA A CHI HA SCRITTO ──────────────────────────────────────
+ *
+ * Non e' cortesia: evita la richiesta doppia. Chi scrive dagli Stati
+ * Uniti alle due di notte ora italiana non sa se il modulo ha
+ * funzionato, e senza una riga di conferma meta' riscrive il giorno dopo
+ * -- o va su Viator, dove la conferma arriva sempre.
+ *
+ * SOLO TESTO, e non e' pigrizia. Una conferma vestita da newsletter
+ * finisce nello spam proprio nel momento in cui non ci si puo'
+ * permettere che sparisca; e il testo semplice si vede uguale su ogni
+ * programma di posta, orologio compreso, senza caratteri che si rompono.
+ *
+ * NESSUNA PROMESSA DI ORARIO. Non "entro due ore": se poi si risponde in
+ * sei, l'avete promesso voi. "Di solito in poche ore" e' vero e non
+ * impegna.
+ *
+ * SI PUO' RISPONDERE: il `replyTo` e' la casella dell'ufficio, quindi se
+ * il cliente risponde a questa email finisce dove qualcuno la legge.
+ *
+ * Se fallisce non succede niente di grave -- la richiesta e' salvata e
+ * l'ufficio gia' avvisato -- ma si scrive nei log, perche' una conferma
+ * che non arriva produce la stessa richiesta due volte.
+ */
+export async function confermaAlCliente(r: RichiestaDaAvvisare) {
+  const c = conf();
+  if (!c) return { ok: false, errore: 'posta non configurata' };
+
+  const nomeBreve = r.nome.trim().split(' ')[0];
+  const righe: string[] = [
+    `Hello ${nomeBreve},`,
+    '',
+    r.tour
+      ? `we have received your request about ${r.tour}.`
+      : 'we have received your request.',
+    'A real person from our office in Florence will get back to you,',
+    'usually within a few hours.',
+    '',
+    'In a hurry? Write to us on WhatsApp: +39 333 842 4047',
+  ];
+
+  if (r.messaggio && r.messaggio.trim()) {
+    righe.push('', 'This is what you sent us:', '', r.messaggio.trim());
+  }
+
+  /* LA FIRMA. I dati sono quelli veri della scheda azienda, gli stessi
+     del piede del sito e dei dati strutturati: telefono dell'ufficio,
+     WhatsApp, indirizzo, partita IVA e licenza. La licenza non e'
+     pedanteria -- e' cio' che distingue un operatore autorizzato da un
+     intermediario, ed e' la prima cosa che guarda un cliente che ha
+     appena scritto a uno sconosciuto lasciandogli il suo numero. */
+  righe.push(
+    '',
+    '--',
+    'Prestige Rent S.R.L. - Tours & Transfers in Italy since 2002',
+    'Via Della Saggina 98, 50145 Florence, Italy',
+    '',
+    'Office     +39 055 286059',
+    'WhatsApp   +39 333 842 4047',
+    'Email      usa@prestigerent.com',
+    'Web        https://prestigerent.com',
+    '',
+    'VAT IT05745220482 - Tuscany Region licensed travel agency and tour operator',
+    'Emergency contacts are on your confirmation voucher, answered 24/7.'
+  );
+
+  try {
+    const t = nodemailer.createTransport({
+      host: c.host,
+      port: c.porta,
+      secure: c.porta === 465,
+      requireTLS: c.porta !== 465,
+      auth: { user: c.user, pass: c.pass },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+    await t.sendMail({
+      from: `Prestige Rent <${c.user}>`,
+      to: r.email,
+      replyTo: c.a,
+      subject: r.tour
+        ? `We received your request - ${r.tour}`
+        : 'We received your request - Prestige Rent',
+      text: righe.join('\n'),
+      /* dichiarato a mano: senza, un accento o un trattino lungo scritto
+         dal cliente arriva come un punto interrogativo dentro un rombo */
+      textEncoding: 'quoted-printable',
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, errore: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
   const c = conf();
   if (!c) return { ok: false, errore: 'posta non configurata' };
@@ -107,73 +201,6 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       socketTimeout: 15000,
     });
 
-    /* ── L'EMAIL COME LA LEGGE CHI RISPONDE ────────────────────────────
-     *
-     * Prima era un elenco separato da trattini: ci si trovava dentro, ma
-     * bisognava leggerlo tutto per capire di cosa si trattava. Chi
-     * risponde ne apre venti al giorno dal telefono e deve capire in tre
-     * secondi CHI e' e COSA vuole.
-     *
-     * DELIBERATAMENTE SENZA GRAFICA: niente fasce colorate, niente
-     * pulsanti, niente immagini. Un'email interna vestita da newsletter
-     * insospettisce i filtri -- e questa parte da un indirizzo aziendale
-     * e arriva a se stesso, che e' gia' un percorso su cui i filtri sono
-     * severi. Qui c'e' solo tipografia: grassetto, grigi, un filetto.
-     * Si legge in tre secondi e non somiglia a una pubblicita'.
-     *
-     * Stile in linea e non in <style>: meta' dei programmi di posta
-     * butta via il foglio di stile, e Outlook non conosce flex.
-     *
-     * `text` resta e non e' un residuo: e' quello che leggono le
-     * anteprime, gli orologi e chi ha le immagini spente. */
-    const esc = (x: string) =>
-      x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-    const riga = (etichetta: string, valore: string | null) =>
-      valore
-        ? '<tr><td style="padding:4px 16px 4px 0;color:#777;font-size:13px;' +
-          'white-space:nowrap;vertical-align:top">' + etichetta + '</td>' +
-          '<td style="padding:4px 0;color:#111;font-size:14px">' + esc(valore) + '</td></tr>'
-        : '';
-
-    const html =
-      '<!doctype html><html><body style="margin:0;padding:20px;background:#ffffff;' +
-      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;" +
-      'color:#111;font-size:15px;line-height:1.6">' +
-      '<div style="max-width:560px">' +
-
-      '<div style="font-size:17px;font-weight:700">' + esc(r.nome) + '</div>' +
-      '<div style="margin-top:3px;color:#555;font-size:14px">' +
-      '<a href="mailto:' + esc(r.email) + '" style="color:#111">' + esc(r.email) + '</a>' +
-      (r.telefono
-        ? ' &middot; <a href="tel:' + esc(r.telefono.replace(/\s/g, '')) +
-          '" style="color:#111">' + esc(r.telefono) + '</a>'
-        : '') +
-      '</div>' +
-
-      (r.messaggio && r.messaggio.trim()
-        ? '<div style="margin-top:16px;padding-left:14px;border-left:2px solid #ddd;' +
-          'white-space:pre-wrap">' + esc(r.messaggio.trim()) + '</div>'
-        : '<div style="margin-top:16px;color:#777;font-style:italic">Nessun messaggio scritto.</div>') +
-
-      '<table cellpadding="0" cellspacing="0" style="margin-top:18px;border-collapse:collapse">' +
-      riga('Servizio', r.tour ?? null) +
-      riga('Data', r.quando ?? null) +
-      riga('Persone', r.persone != null ? String(r.persone) : null) +
-      riga('Lingua', r.lingua) +
-      riga('Comunicazioni', r.marketing ? 'acconsente' : 'non acconsente') +
-      '</table>' +
-
-      '<div style="margin-top:20px;padding-top:12px;border-top:1px solid #eee;' +
-      'color:#999;font-size:12px">' +
-      'Rispondendo a questa email scrivi direttamente a ' + esc(r.nome) + '.' +
-      (r.pagina
-        ? '<br>Richiesta inviata da prestigerent.com' + esc(r.pagina)
-        : '') +
-      '</div>' +
-
-      '</div></body></html>';
-
     await t.sendMail({
       from: `Sito Prestige Rent <${c.user}>`,
       to: c.a,
@@ -183,7 +210,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       replyTo: `${r.nome} <${r.email}>`,
       subject: oggetto,
       text: righe.join('\n'),
-      html,
+      textEncoding: 'quoted-printable',
     });
     return { ok: true };
   } catch (e) {

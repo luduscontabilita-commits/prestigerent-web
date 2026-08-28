@@ -103,8 +103,28 @@ gtag('set','url_passthrough',true);
       riapri:riapri
     };
   }
+  /* META NON ASCOLTA IL CONSENT MODE DI GOOGLE.
+   *
+   * I tag Google si governano da soli: basta 'gtag('consent','update')' e
+   * si comportano di conseguenza. Il pixel di Meta no -- e' codice suo,
+   * e l'unico modo di fermarlo e' dirglielo nella sua lingua.
+   *
+   * Senza questa chiamata il pixel scriveva '_fbp' sul dispositivo di
+   * chiunque, anche di chi aveva appena premuto "Refuse". Misurato dal
+   * vivo con un browser pulito e un indirizzo italiano: cookie deposto,
+   * e la richiesta a 'signals/config' che porta a Meta l'IP e l'URL della
+   * pagina. Le landing questa riga ce l'avevano da sempre
+   * ('lp/js/consenso.js', 'apriGliAltri'); il sito nuovo no. */
+  function avvisaMeta(marketing){
+    try{
+      var f=window.fbq;
+      if(typeof f==='function'){ f('consent', marketing ? 'grant' : 'revoke'); }
+    }catch(e){}
+  }
+
   function applica(s){
     var mk=s.mk?'granted':'denied';
+    avvisaMeta(!!s.mk);
     gtag('consent','update',{
       ad_storage:mk, ad_user_data:mk, ad_personalization:mk,
       analytics_storage:s.an?'granted':'denied',
@@ -185,9 +205,54 @@ gtag('set','url_passthrough',true);
     setTimeout(function(){try{d.focus();}catch(e){}},60);
   }
 
+  /* RITIRARE IL CONSENSO DEVE RITIRARLO DAVVERO.
+   *
+   * Prima questa funzione cancellava il cookie della scelta e riapriva la
+   * finestra, e basta. Tutto il resto restava dov'era: 'google_tag_data'
+   * continuava a dire 'granted' su tutte le voci, il pixel di Meta non
+   * veniva avvisato, e gli identificatori gia' posati -- '_fbp',
+   * '_gcl_au', '_ga' -- restavano sul dispositivo. Misurato dal vivo:
+   * dopo aver premuto "Cookie preferences" i quattro cookie erano ancora
+   * tutti li'.
+   *
+   * Un consenso ritirato che lascia gli identificatori dov'erano non e'
+   * ritirato: e' solo una finestra che si riapre. Qui si fanno le tre
+   * cose in ordine -- si richiude Google, si avvisa Meta, si spazza via
+   * quello che era stato scritto -- e solo dopo si torna a chiedere. */
+  function spazza(){
+    var da=['_ga','_gcl_au','_gcl_aw','_gcl_gb','_fbp','_fbc','_clck','_clsk'];
+    var host=location.hostname.replace(/^www\./,'');
+    var domini=['', '.'+host, host];
+    try{
+      /* anche i '_ga_XXXX' di Analytics, che hanno il nome variabile */
+      document.cookie.split(';').forEach(function(c){
+        var n=c.split('=')[0].trim();
+        if(n.indexOf('_ga_')===0 || n.indexOf('_uetsid')===0) da.push(n);
+      });
+    }catch(e){}
+    da.forEach(function(n){
+      domini.forEach(function(d){
+        try{
+          document.cookie = n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'+
+            (d ? ';domain='+d : '');
+        }catch(e){}
+      });
+    });
+  }
+
   function riapri(){
+    try{
+      gtag('consent','update',{
+        ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied',
+        analytics_storage:'denied', functionality_storage:'denied',
+        personalization_storage:'denied', security_storage:'granted'
+      });
+    }catch(e){}
+    avvisaMeta(false);
+    spazza();
     document.cookie=NOME+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.prestigerent.com';
     stato(null);
+    try{ window.dispatchEvent(new CustomEvent('pr-consenso')); }catch(e){}
     mostra();
   }
 

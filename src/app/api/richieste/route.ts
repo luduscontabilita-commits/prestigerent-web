@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { ghlConfigurato, contattoDaRichiesta } from '@/lib/ghl';
-import { postaConfigurata, avvisaRichiesta } from '@/lib/posta';
+import { postaConfigurata, avvisaRichiesta, confermaAlCliente } from '@/lib/posta';
 import type { CodiceErrore } from '@/lib/testi';
 
 /* LA RICHIESTA DI CONTATTO CHE ARRIVA DAL MODULO.
@@ -354,6 +354,26 @@ export async function POST(req: NextRequest) {
         marketing,
       });
       if (!esito.ok) console.error('[richieste] email:', esito.errore);
+
+      /* LA CONFERMA A CHI HA SCRITTO, dopo l'avviso all'ufficio e mai
+         prima. L'ordine conta: se il server di posta regge un solo
+         messaggio, che sia quello che fa lavorare qualcuno.
+         Un errore qui non tocca niente -- la richiesta e' gia' salva e
+         l'ufficio gia' avvisato -- ma si scrive nei log, perche' una
+         conferma che non arriva produce la stessa richiesta due volte. */
+      const eco = await confermaAlCliente({
+        nome,
+        email,
+        telefono: telefono || null,
+        tour,
+        quando,
+        persone,
+        messaggio: messaggio || null,
+        pagina,
+        lingua,
+        marketing,
+      });
+      if (!eco.ok) console.error('[richieste] conferma al cliente:', eco.errore);
     } catch (e) {
       console.error('[richieste] posta non raggiungibile:', e);
     }
