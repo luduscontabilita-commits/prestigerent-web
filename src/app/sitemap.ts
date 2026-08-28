@@ -72,6 +72,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
       alternates: alternative('/about-us/'),
     },
+
+    {
+      url: percorso(DEFAULT_LOCALE, '/contact-us/'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      alternates: alternative('/contact-us/'),
+    },
   ];
 
   /* Le trentacinque pagine di categoria di WordPress. Erano nel menu e

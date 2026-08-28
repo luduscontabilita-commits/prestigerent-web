@@ -149,7 +149,10 @@ const nextConfig: NextConfig = {
          disdetta, conferma e pagamento sono nelle schede tour e nella
          fascia di fiducia, che stanno anche su /about-us/. */
       { source: '/faqs/', destination: '/about-us/', permanent: true },
-      { source: '/contact-us/', destination: '/about-us/', permanent: true },
+      /* /contact-us/ NON e' piu' un redirect: la pagina esiste, sta in
+         src/app/[locale]/contact-us/page.tsx. Chi cerca "prestige rent
+         contact" ha gia' deciso di scrivere, e mandarlo su /about-us/
+         lo faceva ripartire da capo. */
       { source: '/reviews/', destination: '/about-us/', permanent: true },
       { source: '/security/', destination: '/about-us/', permanent: true },
 

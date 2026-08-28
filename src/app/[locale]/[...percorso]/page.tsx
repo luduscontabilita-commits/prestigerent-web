@@ -251,7 +251,12 @@ export default async function Categoria_({
       )}
 
       <Premi />
-      <ContactSection locale={locale} />
+      {/* Il titolo della categoria entra nel modulo come se fosse il nome
+          di un tour: cosi' l'oggetto dell'email dice "Cinque Terre" o
+          "Wine & food" invece di un generico "Richiesta dal sito", e chi
+          risponde sa gia' di cosa si parla senza aprire il messaggio.
+          Sul sito vecchio funzionava cosi' ed e' comodo. */}
+      <ContactSection locale={locale} tour={cat.titolo} />
     </main>
   );
 }

@@ -14,6 +14,9 @@ import { Premi } from '@/components/Premi';
 import { fonti, inEvidenza, votiPerTour } from '@/lib/recensioni';
 import { riprova, tuttiIConteggi } from '@/lib/riprova';
 import { VideoTestimonianze } from '@/components/VideoTestimonianze';
+import { Servizi } from '@/components/Servizi';
+import { Esperienza } from '@/components/Esperienza';
+import { Perche } from '@/components/Perche';
 import { metaDi } from '@/lib/seo';
 import { ogDiPagina } from '@/lib/og';
 import { grafo, hreflangDi, organization, sitoWeb } from '@/lib/schema';
@@ -484,6 +487,15 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </section>
 
+      {/* I SEI SERVIZI, ripresi dalla home vecchia.
+          Qui e non piu' in basso: chi arriva da una ricerca stretta
+          ("transfer per il porto di Livorno") non sa che questa azienda
+          fa anche i piccoli gruppi e il vino, e dopo la lista dei tour
+          e' il primo momento in cui la domanda "cos'altro fanno" se la
+          pone davvero. Sono anche le sei pagine con piu' storia su
+          Google dopo la home, e da qui la ricevono. */}
+      <Servizi locale={locale} />
+
       <section className="pr-sec">
         <div className="pr-wrap wide">
           <div className="hm-band">
@@ -563,6 +575,26 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           quanto costano. Un ospite che parla in camera, girato col suo
           telefono, non si falsifica -- e prepara chi legge a credere alle
           righe che vengono subito dopo. */}
+      {/* IL VIDEO ISTITUZIONALE. E' l'unico punto della home dove i
+          mezzi e i posti si vedono in movimento, e prepara le facce che
+          arrivano subito dopo. L'iframe non c'e' finche' non si clicca:
+          vedi la nota dentro il componente. */}
+      <Esperienza />
+
+      {/* LE CINQUE PROMESSE. Le recensioni dicono che il tour e' bello;
+          questo blocco risponde alle domande che uno si fa prima di
+          lasciare la carta -- e se cambia il volo, chi mi risponde di
+          domenica, siete voi o rivendete. Nel passaggio da WordPress era
+          sparito ed era l'unico posto dove quelle risposte c'erano. */}
+      <Perche
+        voto={d.voto}
+        totale={d.totale}
+        posizione={az?.classifica_posizione}
+        su={az?.classifica_su}
+        categoria={az?.classifica_categoria}
+        anni={d.anni}
+      />
+
       <VideoTestimonianze />
 
       {/* Il totale arriva da `riprova()` e non si ricalcola dentro il
