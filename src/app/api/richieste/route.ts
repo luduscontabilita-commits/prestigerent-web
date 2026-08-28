@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, after, type NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { ghlConfigurato, contattoDaRichiesta } from '@/lib/ghl';
@@ -310,74 +310,97 @@ export async function POST(req: NextRequest) {
      o no, e chi lanciava una campagna da li' non aveva modo di
      distinguerli. Ora viaggia come etichetta `marketing-si` /
      `marketing-no`. */
-  if (ghlConfigurato()) {
-    try {
-      const esito = await contattoDaRichiesta({
-        nome,
-        email,
-        telefono: telefono || null,
-        tour,
-        quando,
-        persone,
-        lingua,
-        pagina,
-        messaggio: messaggio || null,
-        marketing,
-      });
-      if (!esito.ok) console.error('[richieste] GHL:', esito.errore);
-    } catch (e) {
-      console.error('[richieste] GHL non raggiungibile:', e);
+  /* 🔴 TUTTO QUESTO SUCCEDE DOPO CHE IL VISITATORE HA GIA' AVUTO
+   *    LA SUA RISPOSTA.
+   *
+   * Prima era atteso: la richiesta restava aperta finche' non avevano
+   * finito GoHighLevel e le due email. Misurato il 28/08/2026: **9,3
+   * secondi**, di cui 8,8 dopo che la riga era gia' salvata. Il limite
+   * di Vercel e' dieci: bastava un rallentamento di Microsoft o di GHL
+   * perche' la funzione venisse uccisa e il visitatore leggesse
+   * "non siamo riusciti a salvare" -- mentre la richiesta era salva,
+   * l'ufficio avvisato e la conferma partita. Chi riprovava creava un
+   * doppione, chi non riprovava era perso.
+   *
+   * `after()` fa continuare questo blocco quando la risposta e' gia'
+   * partita. Il visitatore vede "grazie" appena il dato e' al sicuro --
+   * mezzo secondo -- e avvisi ed email arrivano con i loro tempi, che a
+   * nessuno interessano.
+   *
+   * L'ordine qui dentro conta ancora: prima il CRM, poi l'avviso
+   * all'ufficio, per ultima la conferma al cliente. Se il server di
+   * posta regge un solo messaggio, che sia quello che fa lavorare
+   * qualcuno. */
+  after(async () => {
+    if (ghlConfigurato()) {
+      try {
+        const esito = await contattoDaRichiesta({
+          nome,
+          email,
+          telefono: telefono || null,
+          tour,
+          quando,
+          persone,
+          lingua,
+          pagina,
+          messaggio: messaggio || null,
+          marketing,
+        });
+        if (!esito.ok) console.error('[richieste] GHL:', esito.errore);
+      } catch (e) {
+        console.error('[richieste] GHL non raggiungibile:', e);
+      }
     }
-  }
 
-  /* ── L'AVVISO PER EMAIL ──────────────────────────────────────────
-     E' l'unica cosa che fa arrivare la richiesta a una persona senza
-     che quella persona debba ricordarsi di andare a guardare da
-     qualche parte. Il CRM e la tabella sono archivi; questa e' la
-     notizia.
+    /* ── L'AVVISO PER EMAIL ──────────────────────────────────────────
+       E' l'unica cosa che fa arrivare la richiesta a una persona senza
+       che quella persona debba ricordarsi di andare a guardare da
+       qualche parte. Il CRM e la tabella sono archivi; questa e' la
+       notizia.
 
-     Dopo la scrittura e dopo GHL, e senza far fallire la risposta: se
-     il server di posta e' giu' il visitatore vede comunque "grazie" e
-     il dato resta salvato. E' l'avviso che manca, non la richiesta. */
-  if (postaConfigurata()) {
-    try {
-      const esito = await avvisaRichiesta({
-        nome,
-        email,
-        telefono: telefono || null,
-        tour,
-        quando,
-        persone,
-        messaggio: messaggio || null,
-        pagina,
-        lingua,
-        marketing,
-      });
-      if (!esito.ok) console.error('[richieste] email:', esito.errore);
+       Dopo la scrittura e dopo GHL, e senza far fallire la risposta: se
+       il server di posta e' giu' il visitatore vede comunque "grazie" e
+       il dato resta salvato. E' l'avviso che manca, non la richiesta. */
+    if (postaConfigurata()) {
+      try {
+        const esito = await avvisaRichiesta({
+          nome,
+          email,
+          telefono: telefono || null,
+          tour,
+          quando,
+          persone,
+          messaggio: messaggio || null,
+          pagina,
+          lingua,
+          marketing,
+        });
+        if (!esito.ok) console.error('[richieste] email:', esito.errore);
 
-      /* LA CONFERMA A CHI HA SCRITTO, dopo l'avviso all'ufficio e mai
-         prima. L'ordine conta: se il server di posta regge un solo
-         messaggio, che sia quello che fa lavorare qualcuno.
-         Un errore qui non tocca niente -- la richiesta e' gia' salva e
-         l'ufficio gia' avvisato -- ma si scrive nei log, perche' una
-         conferma che non arriva produce la stessa richiesta due volte. */
-      const eco = await confermaAlCliente({
-        nome,
-        email,
-        telefono: telefono || null,
-        tour,
-        quando,
-        persone,
-        messaggio: messaggio || null,
-        pagina,
-        lingua,
-        marketing,
-      });
-      if (!eco.ok) console.error('[richieste] conferma al cliente:', eco.errore);
-    } catch (e) {
-      console.error('[richieste] posta non raggiungibile:', e);
+        /* LA CONFERMA A CHI HA SCRITTO, dopo l'avviso all'ufficio e mai
+           prima. L'ordine conta: se il server di posta regge un solo
+           messaggio, che sia quello che fa lavorare qualcuno.
+           Un errore qui non tocca niente -- la richiesta e' gia' salva e
+           l'ufficio gia' avvisato -- ma si scrive nei log, perche' una
+           conferma che non arriva produce la stessa richiesta due volte. */
+        const eco = await confermaAlCliente({
+          nome,
+          email,
+          telefono: telefono || null,
+          tour,
+          quando,
+          persone,
+          messaggio: messaggio || null,
+          pagina,
+          lingua,
+          marketing,
+        });
+        if (!eco.ok) console.error('[richieste] conferma al cliente:', eco.errore);
+      } catch (e) {
+        console.error('[richieste] posta non raggiungibile:', e);
+      }
     }
-  }
+  });
 
   return NextResponse.json({ ok: true });
 }

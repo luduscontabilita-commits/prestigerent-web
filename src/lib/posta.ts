@@ -62,6 +62,36 @@ function conf() {
   return { host, user, pass, a, porta: Number(process.env.SMTP_PORT ?? 465) };
 }
 
+/* UNA CONNESSIONE SOLA, RIUSATA.
+ *
+ * Le due email -- l'avviso all'ufficio e la conferma al cliente -- prima
+ * aprivano ognuna la propria connessione a Microsoft, con handshake TLS
+ * e accesso da capo. Sono circa tre secondi buttati per il solo fatto di
+ * presentarsi due volte allo stesso portiere.
+ *
+ * `pool: true` tiene la connessione aperta e la riusa: la seconda email
+ * parte sulla stessa. Il trasporto vive quanto la funzione, che su
+ * Vercel dura poco -- non e' un oggetto da tenere per sempre, e infatti
+ * non lo si conserva fra una richiesta e l'altra. */
+let trasporto: nodemailer.Transporter | null = null;
+
+function apri(c: { host: string; porta: number; user: string; pass: string }) {
+  if (trasporto) return trasporto;
+  trasporto = nodemailer.createTransport({
+    host: c.host,
+    port: c.porta,
+    secure: c.porta === 465,
+    requireTLS: c.porta !== 465,
+    auth: { user: c.user, pass: c.pass },
+    pool: true,
+    maxConnections: 1,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  });
+  return trasporto;
+}
+
 export function postaConfigurata() {
   return conf() != null;
 }
@@ -132,16 +162,7 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   );
 
   try {
-    const t = nodemailer.createTransport({
-      host: c.host,
-      port: c.porta,
-      secure: c.porta === 465,
-      requireTLS: c.porta !== 465,
-      auth: { user: c.user, pass: c.pass },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
-    });
+    const t = apri(c);
     await t.sendMail({
       from: `Prestige Rent <${c.user}>`,
       to: r.email,
@@ -186,20 +207,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
   ].filter(Boolean);
 
   try {
-    const t = nodemailer.createTransport({
-      host: c.host,
-      port: c.porta,
-      /* 465 e' cifrato dall'inizio; 587 -- quello di Microsoft -- parte in
-         chiaro e si cifra subito dopo con STARTTLS. `requireTLS` fa
-         fallire l'invio se quel passaggio non riesce, invece di mandare
-         una password in chiaro. */
-      secure: c.porta === 465,
-      requireTLS: c.porta !== 465,
-      auth: { user: c.user, pass: c.pass },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
-    });
+    const t = apri(c);
 
     await t.sendMail({
       from: `Sito Prestige Rent <${c.user}>`,

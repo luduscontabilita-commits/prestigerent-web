@@ -30,6 +30,38 @@ function conf() {
   return { token, location };
 }
 
+/* IL NUMERO IN FORMA INTERNAZIONALE, PRIMA CHE CI PENSI GHL.
+ *
+ * GoHighLevel normalizza il telefono sul paese della location -- l'Italia
+ * -- e antepone +39 a qualunque numero non gia' internazionale. Su un
+ * pubblico per la maggior parte americano significa storpiarlo: il
+ * 28/08/2026 e' arrivata una richiesta con `19415868282`, un numero della
+ * Florida, ed e' entrato in GHL come `+3919415868282`. Chi apriva la
+ * scheda per rispondere su WhatsApp non raggiungeva nessuno.
+ *
+ * Qui si mette il `+` PRIMA di mandarlo, ma solo quando il paese si legge
+ * dal numero e non si indovina:
+ *
+ *   1. gia' con il `+`     -> non si tocca
+ *   2. comincia per `00`   -> e' il modo europeo di scrivere il `+`
+ *   3. undici cifre da `1` -> Nord America: e' l'unico piano di
+ *                             numerazione con questa forma (1 + 3 di
+ *                             zona + 7), quindi non e' ambiguo
+ *
+ * Negli altri casi si lascia il numero com'e' e decide GHL: un italiano
+ * di nove o dieci cifre lo interpreta bene. E comunque nella nota il
+ * numero finisce sempre scritto come l'ha digitato il visitatore.
+ *
+ * Non si indovina oltre: sbagliare prefisso e' peggio che non metterlo,
+ * perche' un numero sbagliato sembra giusto. */
+function numeroInternazionale(grezzo: string): string {
+  const n = grezzo.replace(/[^\d+]/g, '');
+  if (n.startsWith('+')) return n;
+  if (n.startsWith('00')) return '+' + n.slice(2);
+  if (/^1\d{10}$/.test(n)) return '+' + n;
+  return grezzo;
+}
+
 export function ghlConfigurato() {
   return conf() !== null;
 }
@@ -137,7 +169,7 @@ export async function contattoDaPrenotazione(p: ContattoDaPrenotazione) {
       { key: CAMPI.ordine, field_value: p.riferimento },
     ],
   };
-  if (p.telefono) corpo.phone = p.telefono;
+  if (p.telefono) corpo.phone = numeroInternazionale(p.telefono);
   if (p.email && !finta) corpo.email = p.email;
 
   const r = await chiamaGhl('/contacts/upsert', { metodo: 'POST', corpo });
@@ -221,10 +253,12 @@ export async function contattoDaRichiesta(p: ContattoDaRichiesta) {
       { key: CAMPI.ordine, field_value: p.pagina ?? '' },
     ],
   };
-  /* Qui il telefono e' quello che ha scritto il visitatore e puo' essere
-     qualunque cosa: si manda solo se c'e', e GHL lo normalizza da se'.
-     Se non gli piace rifiuta il campo, non il contatto. */
-  if (p.telefono) corpo.phone = p.telefono;
+  if (p.telefono) {
+    corpo.phone = numeroInternazionale(p.telefono);
+    /* Il paese si dichiara solo quando il numero l'ha gia' detto: senza,
+       GHL riapplica il suo (Italia) e rimette il +39 davanti. */
+    if (String(corpo.phone).startsWith('+1')) corpo.country = 'US';
+  }
 
   const r = await chiamaGhl<{ contact?: { id?: string } }>('/contacts/upsert', {
     metodo: 'POST',
