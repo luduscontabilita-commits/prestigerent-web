@@ -259,12 +259,47 @@ gtag('set','url_passthrough',true);
   function decidi(passato){
     var r=googleDice();
     if(r===true){ mostra(); return; }
-    if(r===false) return;
+    if(r===false){
+      /* 🔴 FUORI ZONA IL PIXEL VA RIAPERTO, ALTRIMENTI RESTA CHIUSO
+         PER SEMPRE.
+         Google qui non nega: il visitatore e' fuori dai 32 paesi che
+         chiedono il consenso, quindi vale il default globale, che
+         concede, e la finestra non si mostra. Ma il pixel di Meta parte
+         REVOCATO dal tag in GTM, e senza questa riga nessuno lo riapre
+         piu': si perde il pixel su tutti gli americani, che sono il 62%
+         del traffico. Le landing questa riga ce l'hanno da sempre
+         ('lp/js/consenso.js', ramo 'r===false'); riscrivendo il consenso
+         per il sito nuovo era andata persa. */
+      avvisaMeta(true);
+      return;
+    }
     if(passato>=ATTESA){ if(ripiego()) mostra(); return; }
     setTimeout(function(){decidi(passato+PASSO);},PASSO);
   }
 
-  function avvia(){ if(!leggi()) decidi(0); }
+  /* 🔴 CHI HA GIA' ACCETTATO IN UNA VISITA PRECEDENTE.
+   *
+   * 'applica(gia)' gira in 'beforeInteractive', cioe' PRIMA che GTM
+   * crei 'fbq': 'avvisaMeta' non trova la funzione ed esce in silenzio,
+   * e nessuno riprova piu'. Risultato: chi torna sul sito avendo gia'
+   * detto di si' resta con il pixel revocato.
+   *
+   * Qui si riprova appena 'fbq' compare. Poche prove ravvicinate e poi
+   * si smette: se GTM non c'e' (fuori produzione, o bloccato da
+   * un'estensione) non c'e' niente da avvisare, e insistere sarebbe un
+   * timer che gira a vuoto per sempre. */
+  function riprovaMeta(scelta, quante){
+    if(typeof window.fbq==='function'){ avvisaMeta(scelta); return; }
+    if(quante<=0) return;
+    setTimeout(function(){ riprovaMeta(scelta, quante-1); }, 400);
+  }
+
+  function avvia(){
+    var g=leggi();
+    if(!g){ decidi(0); return; }
+    /* la scelta c'era gia': si riapre Meta quando sara' possibile */
+    riprovaMeta(!!g.mk, 12);
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',avvia);
   else avvia();
 })();
