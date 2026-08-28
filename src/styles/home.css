@@ -2126,3 +2126,14 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
 @media (prefers-reduced-motion: reduce){
   .qr-apri{ transition:none; }
 }
+
+/* Il "Quick Request" in cima era un <a> ed e' diventato un <button>,
+   perche' adesso apre il popup invece di saltare a un'altra pagina.
+   Il browser ai <button> mette font, bordo e sfondo suoi: qui si
+   tolgono, cosi' le regole di .hd-quick continuano a valere e in pagina
+   non cambia niente di visibile. */
+button.hd-quick,
+button.hd-top{
+  font:inherit; border:0; background:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}

@@ -4,6 +4,7 @@ import { DEFAULT_LOCALE, getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { ogDiBase, TWITTER } from '@/lib/og';
 import { SITE } from '@/lib/schema';
 import { NoindexBadge } from '@/components/NoindexBadge';
+import { RichiestaModale } from '@/components/RichiestaModale';
 import { Header } from '@/components/Header';
 import { votiPerTour } from '@/lib/recensioni';
 import { ultimePrenotazioni } from '@/lib/riprova';
@@ -193,6 +194,12 @@ export default async function LocaleLayout({
             proprio a quello -- il link deve restare nella lingua che si
             sta leggendo. */}
         <ProvaSociale avvisi={avvisi} locale={locale} />
+        {/* IL POPUP DELLE RICHIESTE, una volta sola per tutto il sito.
+            Sta qui e non nelle pagine perche' lo apre il "Quick Request"
+            in cima, che e' in ogni pagina: se vivesse dentro le schede
+            tour, dalla home o da una categoria non ci sarebbe niente da
+            aprire. Chi lo apre lancia un evento, non tocca questo nodo. */}
+        <RichiestaModale locale={locale} />
         <NoindexBadge />
       </body>
     </html>

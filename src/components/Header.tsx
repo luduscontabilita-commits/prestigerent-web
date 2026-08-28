@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BottoneRichiesta } from '@/components/RichiestaModale';
 import { DEFAULT_LOCALE, LOCALES, PIU_LINGUE, getLocale } from '@/lib/locales';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { MINI_H, MINI_L, SEZIONI, miniatura } from '@/lib/menu';
@@ -388,15 +389,16 @@ export function Header({
           <a className="hd-top hd-plain hd-solo-mob" href={p('/about-us/')}>
             About us
           </a>
-          <a className="hd-top hd-plain hd-solo-mob" href={p('/#contact')}>
+          {/* 🔴 Era `href="/#contact"`, cioe' un salto alla HOME: chi lo
+              premeva dalla scheda di un tour perdeva la pagina che stava
+              leggendo. Ora apre il popup dove si e', come su WordPress. */}
+          <BottoneRichiesta className="hd-top hd-plain hd-solo-mob">
             Quick Request
-          </a>
+          </BottoneRichiesta>
         </nav>
 
         <div className="hd-right">
-          <a className="hd-quick" href={p('/#contact')}>
-            Quick Request
-          </a>
+          <BottoneRichiesta className="hd-quick">Quick Request</BottoneRichiesta>
 
           <ThemeToggle />
 

@@ -9,7 +9,8 @@ import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { Videos } from '@/components/Videos';
 import { videoDi } from '@/lib/video';
 import { StickyBook } from '@/components/StickyBook';
-import { RichiestaModale } from '@/components/RichiestaModale';
+import { BottoneRichiesta } from '@/components/RichiestaModale';
+import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
@@ -616,7 +617,7 @@ export default async function TourPage({
             prima ("veniamo da Livorno", "siamo in sei con un passeggino")
             e senza una risposta non prenotano. Su WordPress il "Quick
             Request" stava esattamente qui, nella colonna di destra. */}
-        <RichiestaModale locale={locale} servizio={nome} />
+        <BottoneRichiesta servizio={nome} etichetta={testiModulo(locale).pulsanteRapido} />
       </aside>
 
       <div className="pg-main-b">
