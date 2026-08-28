@@ -14,30 +14,24 @@ import nodemailer from 'nodemailer';
  * Un modulo che accetta, ringrazia e non avvisa e' peggio di un modulo
  * rotto: rotto se ne accorge qualcuno.
  *
- * ── DA DOVE PARTE ───────────────────────────────────────────────────
- * Da una casella dedicata, `sito@prestigerent.com`, creata apposta.
- * Non da `usa@prestigerent.com`: per usare quella servirebbe la sua
- * password, e cambiarla romperebbe il client di posta di chi la legge
- * tutti i giorni.
+ * ── DA DOVE PARTE, E PERCHE' NON DALL'HOSTING ───────────────────────
+ * Da `usa@prestigerent.com` attraverso Microsoft 365, cioe' la stessa
+ * casella e lo stesso server da cui si risponde. Mittente e destinatario
+ * coincidono: la consegna e' interna e non attraversa niente.
  *
- * ── DOVE ARRIVA, E PERCHE' NON A usa@ ───────────────────────────────
- * 🔴 Il server dell'hosting NON riesce a mandare email a nessun
- * indirizzo @prestigerent.com. Misurato: `550 No Such User Here`.
+ * La prima strada era l'SMTP dell'hosting, e non funziona: quel server
+ * risponde `550 No Such User Here` a qualunque indirizzo
+ * @prestigerent.com. Il motivo e' una configurazione che non torna --
+ * gli MX del dominio puntano a Microsoft
+ * (`prestigerent-com.mail.protection.outlook.com`), ma cPanel e'
+ * impostato come se la posta fosse sua, ha una casella sola e un
+ * indirizzo predefinito che fallisce.
  *
- * Il motivo e' una configurazione che non torna: gli MX del dominio
- * puntano a Microsoft 365 (`prestigerent-com.mail.protection.outlook.com`),
- * ma cPanel e' impostato come se la posta fosse locale, ha una sola
- * casella e un indirizzo predefinito che fallisce. Quindi ogni email che
- * quel server prova a mandare a un indirizzo del dominio rimbalza.
- * Probabilmente e' anche il motivo per cui le notifiche dei moduli di
- * WordPress non sono mai arrivate a nessuno.
- *
- * Sistemarlo vuol dire cambiare l'instradamento della posta sull'hosting:
- * si fa, ma non di corsa e non senza avvisare chi la usa. Nel frattempo
- * la destinazione e' una variabile d'ambiente (`RICHIESTE_A`): il giorno
- * che la posta e' a posto si cambia li', senza toccare una riga.
- *
- * Verso l'esterno invece funziona: provato, l'email arriva.
+ * Vale la pena saperlo perche' spiega un'altra cosa: quel server non ha
+ * MAI potuto avvisare nessuno. Probabilmente e' il motivo per cui le
+ * notifiche dei moduli di WordPress non sono mai arrivate in tutti
+ * questi anni. La configurazione dell'hosting resta da sistemare, ma
+ * adesso non e' piu' sulla strada di niente.
  *
  * ── SE FALLISCE, LA RICHIESTA NON SI PERDE ──────────────────────────
  * Questa funzione viene chiamata DOPO che la riga e' gia' su Supabase, e
@@ -101,12 +95,13 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
     const t = nodemailer.createTransport({
       host: c.host,
       port: c.porta,
+      /* 465 e' cifrato dall'inizio; 587 -- quello di Microsoft -- parte in
+         chiaro e si cifra subito dopo con STARTTLS. `requireTLS` fa
+         fallire l'invio se quel passaggio non riesce, invece di mandare
+         una password in chiaro. */
       secure: c.porta === 465,
+      requireTLS: c.porta !== 465,
       auth: { user: c.user, pass: c.pass },
-      /* Il certificato del server di posta e' intestato all'hosting, non
-         al dominio: rifiutarlo vorrebbe dire non mandare mai niente. La
-         connessione resta cifrata, non e' verificato il nome. */
-      tls: { rejectUnauthorized: false },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
