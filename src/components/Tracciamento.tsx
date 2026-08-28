@@ -176,7 +176,13 @@ export function Tracciamento() {
        quindi in prova il gclid non viene salvato. Su un dominio che non
        riceve clic dalle campagne non manca a nessuno. */
     const applicaConsenso = () => {
-      const cb = window.Cookiebot;
+      /* Prima leggeva `window.Cookiebot`, che dal 21 agosto non esiste
+         piu': l'abbonamento e' scaduto, il dominio e' stato deautorizzato
+         e lo script risponde solo un errore. Risultato: questa funzione
+         usciva sempre alla prima riga e il gclid non veniva mai salvato,
+         su nessun visitatore. Adesso il consenso lo gestisce
+         `Consenso.tsx` da se' ed espone `window.prConsenso`. */
+      const cb = window.prConsenso;
       if (!cb?.consent || cb.hasResponse === false) return;
       try {
         if (cb.consent.marketing) {
@@ -194,13 +200,11 @@ export function Tracciamento() {
        ogni cambio di idea. `CookiebotOnLoad` copre anche il caso in cui
        il banner non venga mostrato affatto. */
     applicaConsenso();
-    window.addEventListener('CookiebotOnAccept', applicaConsenso);
-    window.addEventListener('CookiebotOnDecline', applicaConsenso);
-    window.addEventListener('CookiebotOnLoad', applicaConsenso);
+    /* Un evento solo, emesso da `Consenso.tsx` a ogni scelta. Prima erano
+       tre di Cookiebot, e nessuno dei tre sarebbe mai piu' arrivato. */
+    window.addEventListener('pr-consenso', applicaConsenso);
     return () => {
-      window.removeEventListener('CookiebotOnAccept', applicaConsenso);
-      window.removeEventListener('CookiebotOnDecline', applicaConsenso);
-      window.removeEventListener('CookiebotOnLoad', applicaConsenso);
+      window.removeEventListener('pr-consenso', applicaConsenso);
     };
   }, []);
 

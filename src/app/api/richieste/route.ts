@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { ghlConfigurato, contattoDaRichiesta } from '@/lib/ghl';
+import { postaConfigurata, avvisaRichiesta } from '@/lib/posta';
 import type { CodiceErrore } from '@/lib/testi';
 
 /* LA RICHIESTA DI CONTATTO CHE ARRIVA DAL MODULO.
@@ -300,6 +301,35 @@ export async function POST(req: NextRequest) {
       if (!esito.ok) console.error('[richieste] GHL:', esito.errore);
     } catch (e) {
       console.error('[richieste] GHL non raggiungibile:', e);
+    }
+  }
+
+  /* ── L'AVVISO PER EMAIL ──────────────────────────────────────────
+     E' l'unica cosa che fa arrivare la richiesta a una persona senza
+     che quella persona debba ricordarsi di andare a guardare da
+     qualche parte. Il CRM e la tabella sono archivi; questa e' la
+     notizia.
+
+     Dopo la scrittura e dopo GHL, e senza far fallire la risposta: se
+     il server di posta e' giu' il visitatore vede comunque "grazie" e
+     il dato resta salvato. E' l'avviso che manca, non la richiesta. */
+  if (postaConfigurata()) {
+    try {
+      const esito = await avvisaRichiesta({
+        nome,
+        email,
+        telefono: telefono || null,
+        tour,
+        quando,
+        persone,
+        messaggio: messaggio || null,
+        pagina,
+        lingua,
+        marketing,
+      });
+      if (!esito.ok) console.error('[richieste] email:', esito.errore);
+    } catch (e) {
+      console.error('[richieste] posta non raggiungibile:', e);
     }
   }
 

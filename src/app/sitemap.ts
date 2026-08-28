@@ -75,8 +75,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   /* Le trentacinque pagine di categoria di WordPress. Erano nel menu e
-     nell'indice di Google da anni, e sul sito nuovo non esistevano. */
+     nell'indice di Google da anni, e sul sito nuovo non esistevano.
+
+     🔴 MA QUELLE VUOTE NON SI DICHIARANO.
+
+     Nove di queste categorie non hanno nemmeno un tour dentro -- sei lo
+     sono anche su WordPress (Palermo, Messina, Taormina, Salerno,
+     Amalfi/Positano, transfer diretti da Napoli), e la pagina mostra "We
+     are still adding the pages for this section".
+
+     La PAGINA deve restare: quelle URL esistono da anni e toglierle
+     vorrebbe dire nove 404. Ma dichiararle nella sitemap e' un'altra cosa:
+     e' chiedere a Google di indicizzare nove pagine senza contenuto, cioe'
+     esattamente quello che Google chiama "thin content" e che non pesa
+     solo su quelle nove -- abbassa la fiducia sul dominio intero.
+
+     Chi ha il link ci arriva e trova la pagina. Google non ci viene
+     mandato. Il giorno che la categoria si riempie, torna nella sitemap da
+     sola, senza che nessuno debba ricordarsene. */
+  const { data: appartenenze } = await supabase
+    .from('tour_categorie')
+    .select('categorie');
+  const piene = new Set<string>();
+  for (const r of (appartenenze ?? []) as { categorie: string[] | null }[]) {
+    for (const c of r.categorie ?? []) piene.add(c);
+  }
+
   for (const c of CATEGORIE) {
+    /* "Tours of Italy" non e' una categoria WooCommerce ma una pagina che
+       raccoglie: non ha un `cat` da cercare, e va tenuta. */
+    if (c.cat && !piene.has(c.cat)) continue;
     voci.push({
       url: percorso(DEFAULT_LOCALE, c.path),
       changeFrequency: 'weekly',
