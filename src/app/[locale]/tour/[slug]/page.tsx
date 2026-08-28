@@ -9,6 +9,7 @@ import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { Videos } from '@/components/Videos';
 import { videoDi } from '@/lib/video';
 import { StickyBook } from '@/components/StickyBook';
+import { RichiestaModale } from '@/components/RichiestaModale';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { Premi } from '@/components/Premi';
@@ -609,6 +610,13 @@ export default async function TourPage({
 
       <aside className="pg-rail" id="prRail" aria-label="Book this tour">
         <div className="pg-rail-in" id="bookform">{calendario}</div>
+        {/* SOTTO IL CALENDARIO, non al posto suo.
+            Chi ha la data e il numero di persone prenota da solo; questo
+            e' per l'altra meta' -- quelli che devono chiedere una cosa
+            prima ("veniamo da Livorno", "siamo in sei con un passeggino")
+            e senza una risposta non prenotano. Su WordPress il "Quick
+            Request" stava esattamente qui, nella colonna di destra. */}
+        <RichiestaModale locale={locale} servizio={nome} />
       </aside>
 
       <div className="pg-main-b">

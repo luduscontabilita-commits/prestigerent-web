@@ -67,6 +67,11 @@ export type TestiModulo = {
   invia: string;
   inviando: string;
 
+  /* il popup "Quick request" della scheda tour: il pulsante che lo apre
+     e la croce che lo chiude. Vedi `RichiestaModale.tsx`. */
+  pulsanteRapido: string;
+  chiudi: string;
+
   /* L'INFORMATIVA, AL POSTO DELLA RASSICURAZIONE.
    *
    * Qui c'era un campo solo, `privacy`, e diceva:
@@ -136,7 +141,7 @@ const EN: TestiModulo = {
   nome: 'Your name',
   email: 'Email',
   telefono: 'Phone or WhatsApp',
-  tour: 'Tour you are interested in',
+  tour: 'Service you are interested in',
   quando: 'Preferred date',
   persone: 'How many of you',
   messaggio: 'What should we know?',
@@ -144,13 +149,15 @@ const EN: TestiModulo = {
   nomeEs: 'Jane Miller',
   emailEs: 'jane@example.com',
   telefonoEs: '+1 555 0100',
-  tourEs: 'Siena & San Gimignano, or tell us',
+  tourEs: 'Siena & San Gimignano, a transfer, or tell us',
   messaggioEs:
     'Pick-up from our hotel in Florence, a wheelchair to fit in the boot, back by 6pm…',
 
   facoltativo: 'optional',
   invia: 'Send my request',
   inviando: 'Sending…',
+  pulsanteRapido: 'Quick request',
+  chiudi: 'Close',
 
   informativa:
     'We use your name and contact details to answer this request and prepare your quote. ' +
@@ -191,7 +198,7 @@ const DE: TestiModulo = {
   nome: 'Ihr Name',
   email: 'E-Mail',
   telefono: 'Telefon oder WhatsApp',
-  tour: 'Tour, die Sie interessiert',
+  tour: 'Leistung, die Sie interessiert',
   quando: 'Wunschtermin',
   persone: 'Wie viele Personen',
   messaggio: 'Was sollten wir wissen?',
@@ -199,13 +206,15 @@ const DE: TestiModulo = {
   nomeEs: 'Anna Müller',
   emailEs: 'anna@example.com',
   telefonoEs: '+49 151 0100',
-  tourEs: 'Siena & San Gimignano — oder beschreiben Sie es uns',
+  tourEs: 'Siena & San Gimignano, ein Transfer — oder beschreiben Sie es uns',
   messaggioEs:
     'Abholung an unserem Hotel in Florenz, ein Rollstuhl muss in den Kofferraum, zurück bis 18 Uhr…',
 
   facoltativo: 'optional',
   invia: 'Anfrage senden',
   inviando: 'Wird gesendet…',
+  pulsanteRapido: 'Schnellanfrage',
+  chiudi: 'Schliessen',
 
   informativa:
     'Wir verwenden Ihren Namen und Ihre Kontaktdaten, um diese Anfrage zu beantworten und ' +
@@ -246,7 +255,7 @@ const IT: TestiModulo = {
   nome: 'Il suo nome',
   email: 'Email',
   telefono: 'Telefono o WhatsApp',
-  tour: 'Tour che le interessa',
+  tour: 'Servizio che le interessa',
   quando: 'Data desiderata',
   persone: 'Quante persone',
   messaggio: 'Cosa dobbiamo sapere?',
@@ -254,13 +263,15 @@ const IT: TestiModulo = {
   nomeEs: 'Giulia Rossi',
   emailEs: 'giulia@example.com',
   telefonoEs: '+39 333 0100',
-  tourEs: 'Siena e San Gimignano, oppure ce lo dica lei',
+  tourEs: 'Siena e San Gimignano, un transfer, oppure ce lo dica lei',
   messaggioEs:
     'Ritiro al nostro hotel a Firenze, una carrozzina da caricare nel bagagliaio, rientro entro le 18…',
 
   facoltativo: 'facoltativo',
   invia: 'Invia la richiesta',
   inviando: 'Invio in corso…',
+  pulsanteRapido: 'Richiesta rapida',
+  chiudi: 'Chiudi',
 
   informativa:
     'Usiamo il suo nome e i suoi recapiti per rispondere a questa richiesta e preparare il ' +
