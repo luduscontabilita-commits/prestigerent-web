@@ -1,6 +1,12 @@
+'use client';
+
 import Script from 'next/script';
 
 /* IL CONSENSO. SCRITTO IN CASA, SENZA ABBONAMENTI.
+ *
+ * (`'use client'` serve a `RiapriPreferenze`, che ha un `onClick`: senza,
+ *  la compilazione si ferma con "Event handlers cannot be passed to
+ *  Client Component props". Riscrivendo il file l'avevo persa.)
  *
  * ── PERCHE' NON PIU' COOKIEBOT ──────────────────────────────────────
  * Questo file caricava Cookiebot, e il commento diceva che era "la
