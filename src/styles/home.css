@@ -665,6 +665,14 @@
   font-size:.8rem; color:rgba(255,255,255,.6);
 }
 .ft-social{ display:flex; gap:16px; }
+/* I circuiti di pagamento: una riga sola, sottomessa. Deve farsi
+   leggere da chi la cerca, non rubare l'occhio a chi non la cerca. */
+/* La barra in fondo ha lo sfondo scuro del footer, non quello della
+   pagina: `--ink-soft` qui sarebbe testo scuro su scuro. Il colore e' lo
+   stesso di `.ft-bottom`, appena piu' spento. */
+.ft-pay{ font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px; }
+@media (max-width:640px){ .ft-pay{ display:block; margin-top:10px; } }
+
 .ft-social a{ color:rgba(255,255,255,.75); text-decoration:none; font-weight:700; }
 .ft-social a:hover{ color:#fff; }
 

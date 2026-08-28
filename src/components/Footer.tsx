@@ -48,8 +48,29 @@ const PARTENZE = [
 /* La pagina che sul sito attuale NON esiste: /about-us/ rimanda ai
    mezzi. E' il buco che il baseline aveva trovato -- 87 pagine di
    prodotto e zero di identita'. */
+/* ── LE VOCI DEL FOOTER VECCHIO CHE PORTANO ANCORA DA QUALCHE PARTE ──
+ *
+ * Il footer di WordPress ne aveva dieci: Faq's, Contact Us, Meeting Point,
+ * Quick Request, Our Vehicles, Reviews, Security, Affiliate Program,
+ * Covid-19, Payment.
+ *
+ * Sul sito nuovo sette di quelle **finiscono tutte su /about-us/** (sono i
+ * redirect che evitano i 404 sulle URL vecchie). Rimetterle tutte darebbe
+ * un menu di dieci voci che vanno tutte nello stesso posto -- che per
+ * l'indicizzazione vale MENO di quattro voci che vanno in quattro posti
+ * diversi: Google conta le destinazioni, non le righe.
+ *
+ * Restano quelle con una destinazione propria. `Meeting point` sta ancora
+ * sul vecchio hosting e ci resta (e' la pagina che il cliente apre il
+ * giorno del tour); `Payment` e' il link Stripe, esterno e vivo. */
 const AZIENDA = [
   ['About us', '/about-us/'],
+  ['Meeting point', '/mp/'],
+];
+
+/* Fuori dal sito: non passano da `p()` perche' non hanno una lingua. */
+const AZIENDA_FUORI = [
+  ['Payment', 'https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ'],
 ];
 
 const PIU_PRENOTATI = [
@@ -59,9 +80,15 @@ const PIU_PRENOTATI = [
   ['Private Chianti & wineries', '/tour/private-tour-to-chianti-wineries/'],
 ];
 
+/* Instagram e TikTok c'erano nel footer di WordPress e qui erano sparite.
+   Non e' una svista da poco: sono i due canali dove un tour operator si fa
+   vedere, e il pubblico americano ci arriva prima che dal sito. Gli
+   indirizzi sono quelli veri del footer vecchio. */
 const SOCIAL = [
   ['Tripadvisor', 'https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html'],
+  ['Instagram', 'https://www.instagram.com/prestigerentitaly'],
   ['Facebook', 'https://www.facebook.com/prestigerent/'],
+  ['TikTok', 'https://www.tiktok.com/@prestigerentitaly'],
   ['GetYourGuide', 'https://www.getyourguide.com/prestige-rent-tours-in-italy-s8058/'],
 ];
 
@@ -128,6 +155,11 @@ export async function Footer({ locale }: { locale: string }) {
           {AZIENDA.map(([t, h]) => (
             <a key={h} href={p(h)} style={{ marginTop: 10 }}>{t}</a>
           ))}
+          {AZIENDA_FUORI.map(([t, h]) => (
+            <a key={h} href={h} target="_blank" rel="noopener" style={{ marginTop: 10 }}>
+              {t}
+            </a>
+          ))}
         </div>
       </div>
 
@@ -187,6 +219,16 @@ export async function Footer({ locale }: { locale: string }) {
           {SOCIAL.map(([t, h]) => (
             <a key={h} href={h} target="_blank" rel="noopener">{t}</a>
           ))}
+        </span>
+        {/* I circuiti di pagamento c'erano nel footer di WordPress e qui
+            mancavano. Sono scritti, non disegnati: i loghi ufficiali hanno
+            regole d'uso proprie e un logo rifatto male fa sembrare finto
+            anche un pagamento vero. Il nome basta a fare quello che quella
+            riga deve fare -- dire a chi non ci conosce che i soldi non
+            passano da noi. */}
+        <span className="ft-pay">
+          Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
+          PayPal &middot; American Express
         </span>
       </div>
 
