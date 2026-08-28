@@ -270,18 +270,19 @@ export async function POST(req: NextRequest) {
      salvata: se GHL e' spento o risponde male, il visitatore non ne deve
      sapere niente e il dato non si perde.
 
-     🔴 QUELLO CHE ANCORA MANCA. La spunta `marketing` viene registrata
-     qui in tabella, ma NON viaggia fino a GHL: `contattoDaRichiesta()`
-     costruisce da se' i `tags` e non sa niente di questo campo. Vuol
-     dire che il contatto entra nel CRM identico che abbia detto si' o
-     no, e chi lancia una campagna da li' non ha modo di distinguerli.
-     Il consenso registrato e poi ignorato dove conta e' peggio del
-     consenso non chiesto, perche' sembra a posto.
+     Fino al 28 agosto qui mancavano due cose, e il modulo funzionava lo
+     stesso -- che e' il modo peggiore in cui una cosa puo' essere rotta.
 
-     Serve una riga in `src/lib/ghl.ts` -- aggiungere `marketing` a
-     `ContattoDaRichiesta` e spingere un tag `marketing-si` /
-     `marketing-no` dentro `tags` -- e poi passarlo qui sotto. Quel file
-     e' in mano ad altri in questo momento e non e' stato toccato. */
+     Il MESSAGGIO si salvava in tabella e non arrivava al CRM: chi
+     risponde vedeva comparire un nome senza sapere cosa avesse chiesto.
+     Ora va come nota sul contatto, che e' dove si guarda prima di
+     rispondere.
+
+     Il CONSENSO al marketing si registrava e poi veniva ignorato proprio
+     dove conta: il contatto entrava nel CRM identico che avesse detto si'
+     o no, e chi lanciava una campagna da li' non aveva modo di
+     distinguerli. Ora viaggia come etichetta `marketing-si` /
+     `marketing-no`. */
   if (ghlConfigurato()) {
     try {
       const esito = await contattoDaRichiesta({
@@ -293,6 +294,8 @@ export async function POST(req: NextRequest) {
         persone,
         lingua,
         pagina,
+        messaggio: messaggio || null,
+        marketing,
       });
       if (!esito.ok) console.error('[richieste] GHL:', esito.errore);
     } catch (e) {

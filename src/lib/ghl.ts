@@ -156,6 +156,20 @@ export type ContattoDaRichiesta = {
   lingua: string;
   /** la pagina che ha prodotto la richiesta */
   pagina: string | null;
+  /** 🔴 QUELLO CHE IL CLIENTE HA SCRITTO.
+   *
+   * Mancava, e il modulo funzionava lo stesso: la riga si salvava, il
+   * contatto arrivava nel CRM, l'utente leggeva "you will hear from a
+   * real person". Solo che chi risponde vedeva comparire un nome senza
+   * sapere cosa avesse chiesto -- e la domanda vera ("siamo in sei, una
+   * carrozzina, dobbiamo rientrare per le 18") restava in una tabella
+   * che nessuno apre.
+   *
+   * Non va in un campo personalizzato ma in una NOTA sul contatto: e' il
+   * posto dove guarda chi sta per rispondere, ed e' lungo quanto serve. */
+  messaggio: string | null;
+  /** ha spuntato il consenso a ricevere comunicazioni? */
+  marketing?: boolean;
 };
 
 /* LA RICHIESTA DAL MODULO, PORTATA DOVE SI RISPONDE.
@@ -186,7 +200,16 @@ export async function contattoDaRichiesta(p: ContattoDaRichiesta) {
     firstName: p.nome,
     email: p.email,
     source: 'Sito — modulo richiesta',
-    tags: ['richiesta-sito', `lingua-${p.lingua}`],
+    /* Il consenso viaggia come etichetta, o resta una spunta registrata e
+       poi ignorata proprio dove serve: chi lancia una campagna da GHL non
+       aveva modo di distinguere chi aveva detto si' da chi aveva detto no.
+       Un consenso raccolto e non rispettato e' peggio di non chiederlo,
+       perche' sembra a posto. */
+    tags: [
+      'richiesta-sito',
+      `lingua-${p.lingua}`,
+      p.marketing ? 'marketing-si' : 'marketing-no',
+    ],
     customFields: [
       /* Le stesse chiavi delle prenotazioni: se un domani la stessa
          persona prenota davvero, GHL la riconosce dall'email e i campi
@@ -203,6 +226,38 @@ export async function contattoDaRichiesta(p: ContattoDaRichiesta) {
      Se non gli piace rifiuta il campo, non il contatto. */
   if (p.telefono) corpo.phone = p.telefono;
 
-  const r = await chiamaGhl('/contacts/upsert', { metodo: 'POST', corpo });
+  const r = await chiamaGhl<{ contact?: { id?: string } }>('/contacts/upsert', {
+    metodo: 'POST',
+    corpo,
+  });
+
+  /* ── LA DOMANDA DEL CLIENTE, DOVE LA SI LEGGE ──────────────────────
+   *
+   * Il contatto porta tour, data e numero di persone. Ma quello che una
+   * persona ha scritto di suo -- la carrozzina, il volo alle sei, la
+   * cena di anniversario -- non entra in un campo: e' testo libero, ed e'
+   * la ragione per cui ha scritto invece di prenotare da solo.
+   *
+   * Va come nota sul contatto, perche' e' li' che guarda chi apre la
+   * scheda per rispondere. Best effort e dopo l'upsert: se fallisce, il
+   * contatto resta comunque creato -- meglio un contatto senza nota che
+   * nessun contatto. */
+  const id = r.dati?.contact?.id;
+  if (r.ok && id && p.messaggio && p.messaggio.trim()) {
+    const righe = [
+      p.messaggio.trim(),
+      '',
+      '— dal modulo del sito' + (p.pagina ? ` (${p.pagina})` : ''),
+      p.tour ? `tour: ${p.tour}` : null,
+      p.quando ? `data desiderata: ${p.quando}` : null,
+      p.persone != null ? `persone: ${p.persone}` : null,
+    ].filter(Boolean);
+    const n = await chiamaGhl(`/contacts/${id}/notes`, {
+      metodo: 'POST',
+      corpo: { body: righe.join('\n') },
+    });
+    if (!n.ok) console.error('[ghl] nota non salvata:', n.errore);
+  }
+
   return { ok: r.ok, errore: r.errore, dati: r.dati };
 }
