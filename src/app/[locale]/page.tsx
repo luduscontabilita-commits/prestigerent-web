@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom';
+import { foto as ottimizza } from '@/lib/foto';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
@@ -320,7 +321,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
    * richieste ad alta priorita' in partenza insieme si rubano la banda a
    * vicenda e la prima -- l'unica che viene cronometrata -- arriverebbe
    * dopo, non prima. Le altre se le prende `HeroFoto` a pagina caricata. */
-  ReactDOM.preload(FOTO[0].src, { as: 'image', fetchPriority: 'high' });
+  /* 🔴 IL PRELOAD DEVE CHIEDERE ESATTAMENTE CIO' CHE POI SI USA.
+   *
+   * `HeroFoto` ora serve la foto attraverso l'ottimizzatore, quindi
+   * prenotare qui l'indirizzo originale voleva dire scaricarla DUE volte:
+   * 314 KB in anticipo che non vengono usati, piu' quella vera. Un
+   * preload che punta altrove non e' una precedenza, e' un raddoppio. */
+  ReactDOM.preload(ottimizza(FOTO[0].src, 1920), { as: 'image', fetchPriority: 'high' });
 
   return (
     <main>

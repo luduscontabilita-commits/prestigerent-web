@@ -243,11 +243,28 @@ export async function contattoDaRichiesta(p: ContattoDaRichiesta) {
    * contatto resta comunque creato -- meglio un contatto senza nota che
    * nessun contatto. */
   const id = r.dati?.contact?.id;
-  if (r.ok && id && p.messaggio && p.messaggio.trim()) {
+  /* 🔴 IL NUMERO SI SCRIVE SEMPRE, ANCHE SENZA MESSAGGIO.
+   *
+   * GoHighLevel normalizza il telefono sul paese della location, che e'
+   * l'Italia, e antepone +39 a qualunque numero non gia' in forma
+   * internazionale. Su un pubblico per la maggior parte americano
+   * significa storpiarlo: il 28/08/2026 e' arrivata una richiesta vera
+   * con `19415868282` -- un +1 941 586 8282 della Florida -- e in GHL e'
+   * diventato `+3919415868282`, un numero che non esiste. Chi apre la
+   * scheda per rispondere su WhatsApp non raggiunge nessuno.
+   *
+   * Il campo `phone` si continua a mandare, perche' e' quello che rende
+   * il numero cliccabile e a volte GHL indovina. Ma qui sotto finisce
+   * SEMPRE il numero esattamente come l'ha scritto il visitatore, in
+   * chiaro, dentro la nota: cosi' chi risponde ha il dato vero sotto gli
+   * occhi anche quando la normalizzazione ha sbagliato. */
+  const haMessaggio = !!(p.messaggio && p.messaggio.trim());
+  if (r.ok && id && (haMessaggio || p.telefono)) {
     const righe = [
-      p.messaggio.trim(),
+      haMessaggio ? p.messaggio!.trim() : '(nessun messaggio scritto)',
       '',
       '— dal modulo del sito' + (p.pagina ? ` (${p.pagina})` : ''),
+      p.telefono ? `telefono COME SCRITTO DAL CLIENTE: ${p.telefono}` : null,
       p.tour ? `tour: ${p.tour}` : null,
       p.quando ? `data desiderata: ${p.quando}` : null,
       p.persone != null ? `persone: ${p.persone}` : null,

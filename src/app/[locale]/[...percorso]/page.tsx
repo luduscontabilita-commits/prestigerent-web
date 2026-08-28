@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { foto as ottimizza, fotoSet } from '@/lib/foto';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
@@ -192,7 +193,20 @@ export default async function Categoria_({
               <a className="ct-card" key={r.slug} href={p(`/tour/${r.slug}/`)}>
                 <div className="ct-img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {foto && <img src={foto} alt={nome} loading="lazy" decoding="async" />}
+                  {foto && (
+                    <img
+                      /* Le 35 pagine di categoria scaricavano 2,36 MB di
+                         foto a piena risoluzione per mostrarle dentro
+                         schede larghe 380 pixel: era il pezzo piu' pesante
+                         rimasto in tutto il sito. */
+                      src={ottimizza(foto, 640)}
+                      srcSet={fotoSet(foto, [640, 828, 1200])}
+                      sizes="(max-width: 700px) 92vw, (max-width: 1180px) 46vw, 380px"
+                      alt={nome}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
                   <h3 className={classeTitolo('ct-nome', nome)}>{nome}</h3>
                 </div>
                 <div className="ct-body">
