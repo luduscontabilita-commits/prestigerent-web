@@ -2234,3 +2234,18 @@ button.hd-top{
   font:inherit; border:0; background:none; cursor:pointer;
   -webkit-appearance:none; appearance:none;
 }
+
+/* La fascia dei numeri di emergenza sulla pagina contatti. Sta staccata
+   dalle tre vie di contatto ordinarie perche' risponde a una domanda
+   diversa: non "come vi scrivo", ma "sono in mezzo a un viaggio e ho un
+   problema adesso". */
+.cu-urgenza{
+  margin:22px 0 0; padding:16px 20px;
+  background:var(--card); border:1px solid var(--line);
+  border-left:3px solid var(--orange,#FF7D1F); border-radius:0 10px 10px 0;
+}
+.cu-urgenza p{ margin:0; line-height:1.6; }
+.cu-urgenza p + p{ margin-top:8px; }
+.cu-urgenza a{ color:var(--ink); font-weight:800; text-decoration:none;
+  border-bottom:2px solid var(--orange,#FF7D1F); }
+.cu-urgenza a:hover{ color:var(--orange,#FF7D1F); }

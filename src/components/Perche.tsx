@@ -107,9 +107,16 @@ export function Perche({ voto, totale, posizione, su, categoria, anni }: Props) 
           </p>
           {posizione && su && categoria && (
             <p>
+              {/* 🔴 NIENTE " in Florence" SCRITTO A MANO IN CODA.
+                  `classifica_categoria` vale gia' "Transportation companies
+                  in Florence": aggiungerne un altro produceva "#2 of 248
+                  transportation companies in florence in Florence" sulla
+                  home. La citta' sta nel dato, non nel markup -- e si
+                  abbassa solo l'iniziale, cosi' la frase scorre senza
+                  spegnere la maiuscola di Florence. */}
               On Tripadvisor we are ranked #{posizione} of {su}{' '}
-              {categoria.toLowerCase()} in Florence, and we hold the
-              Travelers&rsquo; Choice award.
+              {categoria.charAt(0).toLowerCase() + categoria.slice(1)}, and we
+              hold the Travelers&rsquo; Choice award.
             </p>
           )}
           <p>

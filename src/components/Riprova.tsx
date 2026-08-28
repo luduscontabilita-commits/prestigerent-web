@@ -20,7 +20,17 @@ export function FasciaFiducia({ dati, compatta }: { dati: Dati; compatta?: boole
   if (classifica)
     voci.push({
       n: `#${dati.azienda?.classifica_posizione}`,
-      t: `of ${azienda?.classifica_su} ${azienda?.classifica_categoria?.toLowerCase()}`,
+      /* Si abbassa SOLO l'iniziale, non tutta la stringa: con
+         `toLowerCase()` la fascia scriveva "of 248 transportation
+         companies in florence", con Firenze in minuscolo dentro un dato
+         che serve proprio a farsi verificare. Il nome della citta' sta
+         nel campo del database e va lasciato com'e'. */
+      t: `of ${azienda?.classifica_su} ${
+        azienda?.classifica_categoria
+          ? azienda.classifica_categoria.charAt(0).toLowerCase() +
+            azienda.classifica_categoria.slice(1)
+          : ''
+      }`.trim(),
     });
   if (azienda?.mezzi_minibus)
     voci.push({ n: `${azienda.mezzi_minibus}`, t: 'minibuses we own, plus our Mercedes cars' });

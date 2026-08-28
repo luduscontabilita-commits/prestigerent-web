@@ -117,6 +117,28 @@ export default async function Contatti({
             </a>
           </div>
 
+          {/* 🔴 I DUE NUMERI DI EMERGENZA E GLI ORARI.
+              Stavano sul /contact-us/ di WordPress e nel passaggio erano
+              spariti: restava la promessa "24/7" nella descrizione e
+              nessun numero da chiamare. Sono i numeri che il cliente cerca
+              quando il volo e' in ritardo o non trova l'autista -- cioe'
+              nell'unico momento in cui una pagina contatti serve davvero.
+              Il secondo e' quello che il vecchio sito indicava come
+              riserva: due numeri perche' uno puo' essere occupato. */}
+          <div className="cu-urgenza">
+            <p className="cu-eti">While you are travelling</p>
+            <p>
+              Our emergency line answers <strong>24/7</strong>, all year:{' '}
+              <a href="tel:+393338424047">+39 333 842 4047</a> &middot;{' '}
+              <a href="tel:+393339995929">+39 333 999 5929</a>
+            </p>
+            <p className="cu-nota">
+              The office answers Monday to Sunday, 8:00&ndash;20:00 Florence time
+              (CET). Outside those hours use the emergency numbers above, or
+              WhatsApp.
+            </p>
+          </div>
+
           {/* L'indirizzo per esteso, con i dati che rendono l'azienda
               verificabile: sono gli stessi del piede e dei dati
               strutturati, e non si scrivono in due posti diversi. */}
