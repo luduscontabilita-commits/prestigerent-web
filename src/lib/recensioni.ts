@@ -9,6 +9,22 @@ export type Fonte = {
   distintivo: string | null;
   /* vero quando il numero e' di QUESTO tour, non dell'azienda */
   suQuestoTour?: boolean;
+  /* 🔴 ENTRA NEL TOTALE D'AZIENDA?
+   *
+   * Non tutte le piattaforme si possono sommare. Viator dichiara
+   * "recensioni e punteggi totali da Viator e Tripadvisor": il suo numero
+   * COMPRENDE gia' quelle di Tripadvisor, e sommarlo conterebbe due volte
+   * le stesse persone.
+   *
+   * Prima questa distinzione viveva dentro `riprova()`, e il componente
+   * che scriveva la frase non la conosceva: il risultato era "12.563
+   * verified reviews on Tripadvisor" venti pixel sopra una scheda
+   * Tripadvisor che diceva 7.142. Due numeri diversi per la stessa cosa,
+   * nella stessa schermata.
+   *
+   * Adesso la porta il dato stesso: chi somma e chi scrive la frase
+   * leggono lo stesso campo, e non possono piu' discordare. */
+  nelTotale?: boolean;
 };
 
 export type Recensione = {
@@ -24,15 +40,73 @@ export type Recensione = {
   url_fonte: string | null;
 };
 
+/* CHI SI SOMMA E CHI NO.
+ *
+ * Tre bacini davvero separati: Tripadvisor (tutta l'azienda), GetYourGuide
+ * e Regiondo (chi ha prenotato dal sito). Viator resta fuori dal totale
+ * perche' il suo numero comprende gia' Tripadvisor -- si mostra, non si
+ * somma. Google e' fuori finche' non ha un voto verificato. */
+const NEL_TOTALE = new Set(['tripadvisor', 'getyourguide', 'regiondo']);
+
+/* Sotto le tre recensioni una media non vuol dire niente: un tour con due
+ * voti a cinque stelle farebbe 5,0 e sballerebbe tutto. */
+const MINIME = 3;
+
 /* Le piattaforme con un numero VERIFICATO. Quelle ancora da controllare
  * hanno voto_medio o quante a null e non si mostrano: una fila di loghi con
- * i numeri mancanti fa piu' danno che non averla. */
+ * i numeri mancanti fa piu' danno che non averla.
+ *
+ * ── PERCHE' SI GUARDA ANCHE `valutazioni_tour` ───────────────────────
+ * Viator e GetYourGuide **non hanno un voto d'azienda**: valutano il
+ * prodotto, non il fornitore. In `fonti_recensioni` le loro righe erano
+ * quindi vuote, e restavano nascoste. Il risultato era una fila di badge
+ * con dentro una scheda sola, larga novecento pixel, in mezzo a un deserto
+ * bianco -- e una frase che diceva "12.563 recensioni su Tripadvisor"
+ * mentre la scheda Tripadvisor ne dichiarava 7.142.
+ *
+ * I numeri veri c'erano gia', sparsi nelle valutazioni dei singoli tour.
+ * Qui si aggregano: media PESATA sul numero di recensioni, perche' 4,9 su
+ * 8.241 e 4,9 su 486 non contano uguale.
+ *
+ * Cosi' il dato non invecchia: si aggiunge un tour con le sue valutazioni
+ * e il totale d'azienda si aggiorna da solo, senza che nessuno debba
+ * ricordarsi di aggiornare una riga a mano. */
 export async function fonti(): Promise<Fonte[]> {
-  const { data } = await supabase
-    .from('fonti_recensioni')
-    .select('fonte,etichetta,voto_medio,quante,url,distintivo')
-    .order('ordine');
-  return (data ?? []).filter((f) => f.voto_medio != null && f.quante != null) as Fonte[];
+  const [{ data }, { data: perTour }] = await Promise.all([
+    supabase
+      .from('fonti_recensioni')
+      .select('fonte,etichetta,voto_medio,quante,url,distintivo')
+      .order('ordine'),
+    supabase.from('valutazioni_tour').select('fonte,voto,quante'),
+  ]);
+
+  /* La somma pesata per piattaforma, dai voti dei singoli tour. */
+  const somma = new Map<string, { peso: number; quante: number }>();
+  for (const v of perTour ?? []) {
+    if (v.voto == null || v.quante == null || v.quante < MINIME) continue;
+    const s = somma.get(v.fonte) ?? { peso: 0, quante: 0 };
+    s.peso += Number(v.voto) * Number(v.quante);
+    s.quante += Number(v.quante);
+    somma.set(v.fonte, s);
+  }
+
+  return (data ?? [])
+    .map((f) => {
+      /* Il dato d'azienda vince sempre, quando c'e': e' verificato a mano.
+         L'aggregato serve solo a riempire i buchi. */
+      if (f.voto_medio != null && f.quante != null) {
+        return { ...f, nelTotale: NEL_TOTALE.has(f.fonte) } as Fonte;
+      }
+      const s = somma.get(f.fonte);
+      if (!s || !s.quante) return null;
+      return {
+        ...f,
+        voto_medio: Math.round((s.peso / s.quante) * 10) / 10,
+        quante: s.quante,
+        nelTotale: NEL_TOTALE.has(f.fonte),
+      } as Fonte;
+    })
+    .filter((f): f is Fonte => f != null);
 }
 
 /* I punteggi della singola pagina tour.

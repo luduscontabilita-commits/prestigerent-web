@@ -79,10 +79,23 @@ export function Recensioni({
 }) {
   if (!recensioni.length && !fonti.length) return null;
 
-  const totale = totaleDato ?? fonti.reduce((s, f) => s + (f.quante ?? 0), 0);
+  /* 🔴 SI NOMINANO SOLO LE PIATTAFORME CHE STANNO NEL TOTALE.
+   *
+   * Non tutte quelle che si vedono ci entrano: Viator si mostra ma non si
+   * somma, perche' il suo numero comprende gia' Tripadvisor. Prima questa
+   * frase elencava tutte le schede visibili, e diceva il falso -- "12.563
+   * recensioni su Tripadvisor" venti pixel sopra una scheda Tripadvisor
+   * che ne dichiarava 7.142.
+   *
+   * Il numero e l'elenco devono venire dallo stesso insieme, o uno dei due
+   * mente. */
+  const contate = fonti.filter((f) => f.nelTotale);
+  const perNome = contate.length ? contate : fonti;
+
+  const totale = totaleDato ?? perNome.reduce((s, f) => s + (f.quante ?? 0), 0);
   /* "Viator & Tripadvisor and GetYourGuide" suonerebbe male: l'ultimo si
      unisce con "and", gli altri con la virgola. */
-  const etichette = fonti.map((f) => f.etichetta);
+  const etichette = perNome.map((f) => f.etichetta);
   const nomi =
     etichette.length > 1
       ? etichette.slice(0, -1).join(', ') + ' and ' + etichette[etichette.length - 1]

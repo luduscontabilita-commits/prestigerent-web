@@ -49,10 +49,9 @@ export type Riprova = {
 };
 
 export async function riprova(): Promise<Riprova> {
-  const [{ data }, elenco, { data: perTour }] = await Promise.all([
+  const [{ data }, elenco] = await Promise.all([
     supabase.from('azienda').select('*').eq('id', 1).maybeSingle(),
     fonti(),
-    supabase.from('valutazioni_tour').select('fonte,voto,quante'),
   ]);
 
   const a = (data ?? null) as Azienda | null;
@@ -68,22 +67,22 @@ export async function riprova(): Promise<Riprova> {
    * persone -- ed e' il genere di errore che si nota, perche' i numeri
    * si assomigliano troppo.
    *
-   * Restano tre bacini davvero separati: Tripadvisor (tutta l'azienda),
-   * GetYourGuide e Regiondo (chi ha prenotato dal sito). Sommati fanno
-   * 12.590, quasi il doppio di quello che mostravamo. */
-  const INDIPENDENTI = new Set(['getyourguide', 'regiondo']);
-  const altre = (perTour ?? []).filter(
-    (v) => INDIPENDENTI.has(v.fonte) && v.voto != null && v.quante != null && v.quante >= 3
-  );
+   * ── PERCHE' QUESTO CONTO NON STA PIU' QUI ─────────────────────────
+   * Prima questa funzione rileggeva `valutazioni_tour` per conto suo e
+   * decideva da sola chi sommare, mentre `fonti()` decideva da sola chi
+   * mostrare. Due elenchi diversi, nessuno dei due al corrente
+   * dell'altro: la pagina scriveva "12.563 recensioni su Tripadvisor"
+   * sopra una scheda Tripadvisor che ne dichiarava 7.142.
+   *
+   * Adesso la regola sta in un posto solo -- `nelTotale` su ogni fonte --
+   * e qui si sommano quelle marcate. Chi mostra e chi somma leggono lo
+   * stesso campo, quindi non possono piu' raccontare cose diverse. */
+  const sommabili = elenco.filter((f) => f.nelTotale);
 
-  const totale =
-    elenco.reduce((s, f) => s + (f.quante ?? 0), 0) +
-    altre.reduce((s, v) => s + (v.quante as number), 0);
+  const totale = sommabili.reduce((s, f) => s + (f.quante ?? 0), 0);
   /* La media e' pesata sul numero: 4,9 su 7.142 e 5,0 su 509 non
      contano uguale. */
-  const peso =
-    elenco.reduce((s, f) => s + (f.voto_medio ?? 0) * (f.quante ?? 0), 0) +
-    altre.reduce((s, v) => s + Number(v.voto) * (v.quante as number), 0);
+  const peso = sommabili.reduce((s, f) => s + (f.voto_medio ?? 0) * (f.quante ?? 0), 0);
   const voto = totale > 0 ? peso / totale : null;
 
   return {

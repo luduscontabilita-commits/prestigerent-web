@@ -702,10 +702,28 @@
    riconoscono senza leggere il nome. Niente riproduzioni dei loghi
    ufficiali -- un logo rifatto male fa sembrare finto anche un dato vero.
    Qui lavorano il colore e la tipografia, che non si possono sbagliare. */
+/* 🔴 `auto-fit` E LA SCHEDA LARGA NOVECENTO PIXEL.
+   Con `repeat(auto-fit, minmax(210px,1fr))` e una sola fonte visibile, la
+   colonna unica si allargava a tutti i 940px: una scheda enorme col
+   contenuto raggomitolato al centro, in mezzo a un deserto bianco. Era
+   quello che si vedeva finche' Viator, GetYourGuide e Regiondo restavano
+   nascosti per un dato mancante.
+   `auto-fill` invece tiene le colonne larghe quanto servono e lascia
+   vuoti i posti liberi; il `max-width` con `fit-content` stringe la fila
+   attorno a quello che c'e' davvero, e la centra. Con una fonte sola la
+   scheda resta della sua misura, con quattro si riempie la riga. */
 .rv-badges{
   display:grid; gap:14px; margin-bottom:30px;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  max-width:940px; margin-left:auto; margin-right:auto;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  width:fit-content; max-width:940px;
+  margin-left:auto; margin-right:auto;
+}
+@media (min-width:641px){
+  /* fino a quattro schede stanno in riga: oltre, si va a capo da sole */
+  .rv-badges{ grid-template-columns:repeat(auto-fill,minmax(210px,232px)); }
+}
+@media (max-width:640px){
+  .rv-badges{ width:auto; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
 }
 .rv-badge{
   position:relative; display:flex; flex-direction:column; align-items:center;
