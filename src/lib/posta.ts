@@ -107,6 +107,73 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       socketTimeout: 15000,
     });
 
+    /* ── L'EMAIL COME LA LEGGE CHI RISPONDE ────────────────────────────
+     *
+     * Prima era un elenco separato da trattini: ci si trovava dentro, ma
+     * bisognava leggerlo tutto per capire di cosa si trattava. Chi
+     * risponde ne apre venti al giorno dal telefono e deve capire in tre
+     * secondi CHI e' e COSA vuole.
+     *
+     * DELIBERATAMENTE SENZA GRAFICA: niente fasce colorate, niente
+     * pulsanti, niente immagini. Un'email interna vestita da newsletter
+     * insospettisce i filtri -- e questa parte da un indirizzo aziendale
+     * e arriva a se stesso, che e' gia' un percorso su cui i filtri sono
+     * severi. Qui c'e' solo tipografia: grassetto, grigi, un filetto.
+     * Si legge in tre secondi e non somiglia a una pubblicita'.
+     *
+     * Stile in linea e non in <style>: meta' dei programmi di posta
+     * butta via il foglio di stile, e Outlook non conosce flex.
+     *
+     * `text` resta e non e' un residuo: e' quello che leggono le
+     * anteprime, gli orologi e chi ha le immagini spente. */
+    const esc = (x: string) =>
+      x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const riga = (etichetta: string, valore: string | null) =>
+      valore
+        ? '<tr><td style="padding:4px 16px 4px 0;color:#777;font-size:13px;' +
+          'white-space:nowrap;vertical-align:top">' + etichetta + '</td>' +
+          '<td style="padding:4px 0;color:#111;font-size:14px">' + esc(valore) + '</td></tr>'
+        : '';
+
+    const html =
+      '<!doctype html><html><body style="margin:0;padding:20px;background:#ffffff;' +
+      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;" +
+      'color:#111;font-size:15px;line-height:1.6">' +
+      '<div style="max-width:560px">' +
+
+      '<div style="font-size:17px;font-weight:700">' + esc(r.nome) + '</div>' +
+      '<div style="margin-top:3px;color:#555;font-size:14px">' +
+      '<a href="mailto:' + esc(r.email) + '" style="color:#111">' + esc(r.email) + '</a>' +
+      (r.telefono
+        ? ' &middot; <a href="tel:' + esc(r.telefono.replace(/\s/g, '')) +
+          '" style="color:#111">' + esc(r.telefono) + '</a>'
+        : '') +
+      '</div>' +
+
+      (r.messaggio && r.messaggio.trim()
+        ? '<div style="margin-top:16px;padding-left:14px;border-left:2px solid #ddd;' +
+          'white-space:pre-wrap">' + esc(r.messaggio.trim()) + '</div>'
+        : '<div style="margin-top:16px;color:#777;font-style:italic">Nessun messaggio scritto.</div>') +
+
+      '<table cellpadding="0" cellspacing="0" style="margin-top:18px;border-collapse:collapse">' +
+      riga('Servizio', r.tour ?? null) +
+      riga('Data', r.quando ?? null) +
+      riga('Persone', r.persone != null ? String(r.persone) : null) +
+      riga('Lingua', r.lingua) +
+      riga('Comunicazioni', r.marketing ? 'acconsente' : 'non acconsente') +
+      '</table>' +
+
+      '<div style="margin-top:20px;padding-top:12px;border-top:1px solid #eee;' +
+      'color:#999;font-size:12px">' +
+      'Rispondendo a questa email scrivi direttamente a ' + esc(r.nome) + '.' +
+      (r.pagina
+        ? '<br>Richiesta inviata da prestigerent.com' + esc(r.pagina)
+        : '') +
+      '</div>' +
+
+      '</div></body></html>';
+
     await t.sendMail({
       from: `Sito Prestige Rent <${c.user}>`,
       to: c.a,
@@ -116,6 +183,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       replyTo: `${r.nome} <${r.email}>`,
       subject: oggetto,
       text: righe.join('\n'),
+      html,
     });
     return { ok: true };
   } catch (e) {

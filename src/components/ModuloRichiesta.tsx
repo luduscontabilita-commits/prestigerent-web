@@ -54,6 +54,31 @@ export function ModuloRichiesta({ locale, tour }: Props) {
   const [errore, setErrore] = useState<CodiceErrore | null>(null);
   const [campoRotto, setCampoRotto] = useState<string | null>(null);
 
+  /* 🔴 IL "GRAZIE" DEVE FINIRE SOTTO GLI OCCHI.
+   *
+   * Su telefono il modulo e' lungo: quando si preme invia si e' in fondo,
+   * e il riquadro di conferma nasce IN CIMA al modulo -- cioe' fuori
+   * schermo. Chi ha appena scritto vede la pagina che si accorcia e
+   * nient'altro: non sa se e' partito, e nel dubbio rimanda. Provato dal
+   * vivo su un telefono vero.
+   *
+   * Si porta il riquadro in vista appena esiste. `block:'center'` e non
+   * `'start'` perche' sopra c'e' l'intestazione fissa, che mangerebbe le
+   * prime righe. */
+  const ilGrazie = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (stato !== 'fatto') return;
+    const n = ilGrazie.current;
+    if (!n) return;
+    try {
+      n.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch {
+      /* i browser vecchi non conoscono le opzioni: meglio uno scatto
+         secco che nessuno scorrimento */
+      n.scrollIntoView();
+    }
+  }, [stato]);
+
   /* L'ISTANTE IN CUI IL MODULO E' COMPARSO.
    *
    * In un ref e non in uno stato: cambiarlo non deve ridisegnare niente.
@@ -152,7 +177,7 @@ export function ModuloRichiesta({ locale, tour }: Props) {
      richieste identiche a chi risponde. */
   if (stato === 'fatto') {
     return (
-      <div className="mr-fatto" role="status">
+      <div className="mr-fatto" role="status" ref={ilGrazie}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M20 6 9 17l-5-5" />
@@ -160,6 +185,21 @@ export function ModuloRichiesta({ locale, tour }: Props) {
         <div>
           <b>{t.fattoTitolo}</b>
           <p>{t.fattoTesto}</p>
+          {/* IL PULSANTE, non il link dentro la frase.
+              Chi ha appena scritto e ha fretta non aspetta un'email: qui
+              e' il punto in cui e' piu' disposto a scrivere subito, e un
+              collegamento in mezzo al testo non si vede. */}
+          <a
+            className="mr-fatto-wa"
+            href="https://wa.me/393338424047"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25" />
+            </svg>
+            {t.fattoWhatsapp}
+          </a>
         </div>
       </div>
     );

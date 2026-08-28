@@ -107,6 +107,8 @@ export type TestiModulo = {
   /* la risposta dopo l'invio */
   fattoTitolo: string;
   fattoTesto: string;
+  /** il pulsante nel riquadro di conferma: chi ha fretta non aspetta l'email */
+  fattoWhatsapp: string;
 
   /* GLI ERRORI. Ognuno dice cosa fare, non cosa e' successo: "Manca la
      chiocciola" e' inutile, "Controlla l'indirizzo: manca la chiocciola"
@@ -170,6 +172,7 @@ const EN: TestiModulo = {
     '(Optional — you can unsubscribe at any time.)',
 
   fattoTitolo: 'Got it — thank you.',
+  fattoWhatsapp: 'Message us on WhatsApp',
   fattoTesto:
     'Your request is with our team in Florence. You will hear from a real person, usually within a few hours. In a hurry? Message us on WhatsApp.',
 
@@ -227,6 +230,7 @@ const DE: TestiModulo = {
     'senden. (Freiwillig — jederzeit abbestellbar.)',
 
   fattoTitolo: 'Angekommen — vielen Dank.',
+  fattoWhatsapp: 'Schreiben Sie uns auf WhatsApp',
   fattoTesto:
     'Ihre Anfrage liegt bei unserem Team in Florenz. Ein echter Mensch meldet sich, meist innerhalb weniger Stunden. Eilig? Schreiben Sie uns auf WhatsApp.',
 
@@ -284,6 +288,7 @@ const IT: TestiModulo = {
     '(Facoltativo — può disiscriversi in qualsiasi momento.)',
 
   fattoTitolo: 'Ricevuta, grazie.',
+  fattoWhatsapp: 'Scrivici su WhatsApp',
   fattoTesto:
     'La sua richiesta è arrivata al nostro team a Firenze. Le risponderà una persona vera, di solito in poche ore. Ha fretta? Ci scriva su WhatsApp.',
 
