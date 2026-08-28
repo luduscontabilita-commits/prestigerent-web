@@ -29,11 +29,34 @@ function quando(d: string | null) {
   return `${MESI[Number(m) - 1]} ${a}`;
 }
 
+/* 🔴 "REGIONDO" NON DICE NIENTE A NESSUNO.
+ *
+ * Regiondo non era in questo elenco, quindi il codice ripiegava sul nome
+ * grezzo della fonte e in pagina compariva il bollino "REGIONDO". Chi
+ * legge non sa cosa sia -- e' il gestionale con cui si incassa, non una
+ * piattaforma di recensioni -- e un marchio sconosciuto accanto a una
+ * recensione fa l'opposto del suo mestiere: invece di garantirla, apre
+ * una domanda.
+ *
+ * Non si toglie la recensione, si dice cosa e': 488 dei 494 testi in
+ * pagina arrivano da li'. Tolti quelli, 36 tour su 37 resterebbero senza
+ * una parola di nessuno -- sarebbe il taglio piu' caro del sito.
+ *
+ * E "Verified booking" e' una garanzia PIU' FORTE di un marchio: su
+ * Regiondo puo' scrivere solo chi ha prenotato e viaggiato davvero,
+ * mentre su Tripadvisor scrive chiunque. La cosa vera era anche la piu'
+ * utile da dire.
+ *
+ * Diverso il caso dei NUMERI: la' le dirette restano fuori (vedi
+ * `DA_MOSTRARE` in `recensioni.ts`), perche' "8 reviews" e' debole
+ * qualunque sia l'etichetta. Un conto e' contarle, un conto e' leggerle:
+ * chi legge una recensione buona non si chiede quante ce ne siano. */
 const NOMI: Record<string, string> = {
   tripadvisor: 'Tripadvisor',
   google: 'Google',
   viator: 'Viator',
   getyourguide: 'GetYourGuide',
+  regiondo: 'Verified booking',
 };
 
 export function RecensioneCard({ r }: { r: Recensione }) {

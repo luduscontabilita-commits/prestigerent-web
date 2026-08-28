@@ -865,6 +865,9 @@ html[data-theme="dark"] .rv-b-award{ color:#0B0F13; }
 .rv-src-google      { background:#E8F0FE; color:#1A56C4; }
 .rv-src-viator      { background:#E9E6FB; color:#3B2E9B; }
 .rv-src-getyourguide{ background:#FFF0E4; color:#B34700; }
+/* "Verified booking" non e' un marchio: niente colore di piattaforma, il
+   grigio neutro. Deve leggersi come una garanzia, non come un logo. */
+.rv-src-regiondo    { background:var(--ph); color:var(--ink-soft); letter-spacing:.3px; }
 html[data-theme="dark"] .rv-src-tripadvisor { background:#12321F; color:#63D69A; }
 html[data-theme="dark"] .rv-src-google      { background:#152441; color:#7FAAF5; }
 html[data-theme="dark"] .rv-src-viator      { background:#211C46; color:#A99CF3; }
