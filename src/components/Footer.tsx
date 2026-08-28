@@ -211,7 +211,7 @@ export async function Footer({ locale }: { locale: string }) {
           indovina in un secondo -- ma non deve rubare spazio a niente. */}
 
 
-      <a className="ft-admin" href="/admin/">Staff</a>
+      <a className="ft-admin" href="/admin/entra/">Staff</a>
 
 
       <div className="ft-bottom">

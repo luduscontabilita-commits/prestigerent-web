@@ -79,6 +79,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
       alternates: alternative('/contact-us/'),
     },
+
+    /* Le pagine legali: sono raggiungibili dal piede di ogni pagina, non
+       hanno noindex e Google le indicizza comunque. Dichiararle costa una
+       riga e toglie l'incoerenza fra cio' che il sito espone e cio' che
+       dichiara di esporre. */
+    ...['/privacy-policy/', '/cookie-policy/', '/terms-and-conditions/'].map((p) => ({
+      url: percorso(DEFAULT_LOCALE, p),
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
+      alternates: alternative(p),
+    })),
   ];
 
   /* Le trentacinque pagine di categoria di WordPress. Erano nel menu e
@@ -111,7 +122,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const c of CATEGORIE) {
     /* "Tours of Italy" non e' una categoria WooCommerce ma una pagina che
        raccoglie: non ha un `cat` da cercare, e va tenuta. */
-    if (c.cat && !piene.has(c.cat)) continue;
+    /* 🔴 `/tours-of-italy/` NON E' UNA CATEGORIA VUOTA.
+       La guardia qui sotto scarta le voci il cui `cat` non ha tour, e il
+       commento sopra diceva che "Tours of Italy non ha un `cat` da
+       cercare, e va tenuta". Il commento descriveva un dato che il dato
+       non ha: in `categorie.ts` quella voce IL `cat` CE L'HA
+       (`tours-of-italy`), e nessuna categoria WooCommerce si chiama
+       cosi'. Risultato: la guardia la scartava, e la pagina indice che
+       elenca tutti e 86 i tour -- linkata dal menu di ogni pagina, e
+       destinazione di due redirect -- restava fuori dalla sitemap. */
+    if (c.path !== '/tours-of-italy/' && c.cat && !piene.has(c.cat)) continue;
     voci.push({
       url: percorso(DEFAULT_LOCALE, c.path),
       changeFrequency: 'weekly',

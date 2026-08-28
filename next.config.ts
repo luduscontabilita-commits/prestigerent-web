@@ -205,6 +205,9 @@ const nextConfig: NextConfig = {
       { source: '/sitemap_index.xml', destination: '/sitemap.xml', permanent: true },
       { source: '/page-sitemap.xml', destination: '/sitemap.xml', permanent: true },
       { source: '/product-sitemap.xml', destination: '/sitemap.xml', permanent: true },
+      /* La quarta figlia di Yoast, dimenticata: elencava le 30 pagine di
+         categoria e Search Console la conosce. */
+      { source: '/product_cat-sitemap.xml', destination: '/sitemap.xml', permanent: true },
     ];
   },
 

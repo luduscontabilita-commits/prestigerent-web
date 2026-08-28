@@ -42,6 +42,22 @@ function daiParams(percorso: string[]) {
   return '/' + percorso.join('/') + '/';
 }
 
+/* Quanti tour ci sono davvero dentro una categoria.
+ *
+ * Serve solo a decidere se la pagina va nell'indice: e' la stessa lettura
+ * che la pagina fa piu' sotto per riempirsi, e Next mette in cache la
+ * richiesta, quindi non e' un giro in piu' verso il database.
+ * `tours-of-italy` non e' una categoria WooCommerce -- e' l'indice
+ * generale, e li' dentro ci sono tutti -- quindi non si conta. */
+async function quantiTour(cat: string): Promise<number> {
+  if (cat === 'tours-of-italy') return 1;
+  const { data } = await supabase
+    .from('tour_categorie')
+    .select('tour_slug')
+    .contains('categorie', [cat]);
+  return (data ?? []).length;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -56,9 +72,27 @@ export async function generateMetadata({
      30 pagine su 35 SENZA description e 5 con un paragrafo intero al
      posto del meta, uno da 1.267 caratteri dove Google ne legge 155. */
   const m = await metaDi(c.path, 'en');
+
+  /* 🔴 UNA CATEGORIA SENZA TOUR NON VA NELL'INDICE.
+   *
+   * Nove pagine -- i porti siciliani, Salerno, Amalfi, i transfer da
+   * Napoli, Venezia -- rispondono 200 e mostrano "We are still adding the
+   * pages for this section". Erano gia' state tolte dalla sitemap, ma
+   * togliere una pagina dalla sitemap NON la toglie dall'indice: Google
+   * ci arriva dai link interni, e il menu le linka da tutte e 114 le
+   * pagine del sito. Trova pagine vuote, e le pagine vuote pesano sul
+   * giudizio di tutto il dominio, non solo sul loro.
+   *
+   * Il conteggio si fa qui e non si indovina: la stessa lettura che
+   * riempie la pagina piu' sotto. Il giorno in cui la categoria si
+   * riempie, il noindex sparisce da solo -- che e' il motivo per cui non
+   * si e' scritto un elenco di URL a mano. */
+  const quanti = c.cat ? await quantiTour(c.cat) : 1;
+
   return {
     title: m?.title ?? `${c.titolo} — Prestige Rent`,
     description: m?.description ?? c.intro.slice(0, 155),
+    ...(quanti === 0 ? { robots: { index: false, follow: true } } : {}),
     alternates: hreflangDi(
       (l) => (l === DEFAULT_LOCALE ? c.path : `/${l}${c.path}`),
       locale
