@@ -78,9 +78,15 @@ export default async function PrivacyPolicy({
       <section className="lg-body">
         <h2>1. Who we are</h2>
         <p>
+          {/* Il numero REA mancava e la frase finiva a meta': "registered
+              with the Florence Register of Companies under REA no." e basta.
+              Su una privacy policy una frase troncata e' peggio di un
+              refuso -- e' la pagina in cui il lettore cerca precisione. Il
+              numero c'era gia' nel footer di ogni pagina: FI 571489. */}
           The data controller is <strong>Prestige Rent S.r.l.</strong>, Via della Saggina
-          98, 50145 Florence, Italy. VAT number 05745220482, registered with the Florence
-          Register of Companies under REA no.
+          98, 50145 Florence, Italy. VAT number IT05745220482, registered with the Florence
+          Register of Companies under REA no. FI 571489. Certified email (PEC):{' '}
+          <a href="mailto:prestigerent@pec.it">prestigerent@pec.it</a>.
         </p>
         <p>
           You can reach us at <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>{' '}

@@ -210,9 +210,15 @@ export async function Footer({ locale }: { locale: string }) {
        * farle arrivare dalla stessa fonte. */}
       <div className="ft-legale">
         <p className="ft-dati">
+          {/* "· share capital" restava li' senza il valore, su tutte e 123 le
+              pagine: una frase legale che finisce a meta' fa dubitare di
+              tutte le altre. Il capitale sociale non e' obbligatorio in
+              questa riga -- lo sono partita IVA, sede e REA, che ci sono --
+              quindi si toglie invece di lasciarla monca. Quando il numero
+              arriva si rimette, con il numero. */}
           <strong>Prestige Rent S.r.l.</strong> &mdash; Via della Saggina 98, 50145
-          Florence, Italy &middot; VAT no. 05745220482 &middot; Florence Register of
-          Companies, REA no. FI 571489 &middot; share capital
+          Florence, Italy &middot; VAT no. IT05745220482 &middot; Florence Register of
+          Companies, REA no. FI 571489
         </p>
         <p className="ft-legali">
           <a href={p('/privacy-policy/')}>Privacy Policy</a>

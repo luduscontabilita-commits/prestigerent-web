@@ -61,7 +61,24 @@ export function Urgenza({
      sarebbe una bugia, e infatti `posti_prima` e' nullo. Sotto i 12
      posti si dice il numero; sopra si dice solo la data, perche' "27
      posti rimasti" non mette fretta a nessuno. */
-  if (disp?.prima_libera) {
+  /* 🔴 UNA DATA GIA' PASSATA NON SI SCRIVE.
+   *
+   * `prima_libera` viene calcolato dal pulsante in /admin/numeri/ e nessun
+   * lavoro notturno lo aggiorna: invecchia da solo, un giorno alla volta.
+   * Il 28 agosto trentaquattro pagine su ottantasei annunciavano "Next
+   * departure Thursday 27 August" -- il giorno prima. Fra queste il tour
+   * di punta.
+   *
+   * E' il tipo di errore che non rompe niente e costa tutto: chi legge una
+   * data passata non pensa "il dato e' vecchio", pensa che il sito non sia
+   * curato, e da li' dubita anche del prezzo e della disponibilita'.
+   *
+   * Finche' non c'e' un aggiornamento automatico, la riga sparisce invece
+   * di mentire: un'informazione in meno non si nota, una sbagliata si'. */
+  const scaduta =
+    disp?.prima_libera != null && disp.prima_libera < new Date().toISOString().slice(0, 10);
+
+  if (disp?.prima_libera && !scaduta) {
     const pochi = disp.posti_prima != null && disp.posti_prima <= 12;
     righe.push({
       icona: pochi ? '⚠️' : '📅',
