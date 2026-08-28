@@ -317,20 +317,41 @@ export default async function TourPage({
   const suQuestoTour = iPunteggi.filter(
     (f) => f.suQuestoTour && f.voto_medio != null && f.quante != null
   );
-  const recDaPiattaforme = suQuestoTour.reduce((s, f) => s + f.quante!, 0);
+  /* 🔴 NON SI SOMMANO LE PIATTAFORME. SI PRENDE LA PIU' GRANDE.
+   *
+   * Sommandole, la pagina del tour vino dichiarava 12.900 recensioni --
+   * Viator 8.241 + GetYourGuide 4.453 + dirette 206 -- mentre la stessa
+   * pagina, venti centimetri piu' su, scriveva 12.563 come totale di
+   * TUTTA l'azienda. Un singolo prodotto con piu' recensioni dell'azienda
+   * intera: chi lo nota smette di credere a entrambi i numeri.
+   *
+   * Il motivo e' che i due conti partono da basi diverse. Il totale
+   * d'azienda usa Tripadvisor (7.142); la pagina del tour usa Viator
+   * (8.241), che pero' dichiara "recensioni e punteggi totali da Viator e
+   * Tripadvisor" -- comprende gia' le stesse persone.
+   *
+   * Quindi si prende la piattaforma con piu' recensioni e si usa il SUO
+   * voto e il SUO numero. Tre ragioni:
+   *  1. non conta due volte nessuno, qualunque sia la sovrapposizione;
+   *  2. e' un numero che sta scritto nella pagina, carattere per
+   *     carattere, dentro il suo riquadro -- e Google esige che il voto
+   *     nei dati strutturati sia visibile a chi legge, pena la
+   *     penalizzazione manuale su tutto il dominio;
+   *  3. non puo' mai superare il totale d'azienda, perche' e' una parte
+   *     di quello.
+   *
+   * Si perde qualche recensione dichiarata. Si guadagna un numero che
+   * regge se qualcuno lo controlla, che e' l'unica cosa per cui i numeri
+   * servono. */
+  const piuGrande = suQuestoTour.reduce<(typeof suQuestoTour)[number] | null>(
+    (max, f) => (max == null || f.quante! > max.quante! ? f : max),
+    null
+  );
   const voto =
     tour.rating != null && tour.reviews_count != null
       ? { valore: tour.rating, quante: tour.reviews_count }
-      : recDaPiattaforme > 0
-        ? {
-            valore:
-              Math.round(
-                (suQuestoTour.reduce((s, f) => s + f.voto_medio! * f.quante!, 0) /
-                  recDaPiattaforme) *
-                  10
-              ) / 10,
-            quante: recDaPiattaforme,
-          }
+      : piuGrande
+        ? { valore: piuGrande.voto_medio!, quante: piuGrande.quante! }
         : null;
 
   const calendario = (
