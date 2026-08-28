@@ -167,6 +167,17 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
        riferito a QUESTA giornata pesa piu' di uno riferito a tutta la
        ditta. */
     suQuestoTour: true,
+    /* NON si filtra con `NEL_TOTALE` qui, e va spiegato perche' sembra
+       un errore e non lo e'.
+       `NEL_TOTALE` serve al totale D'AZIENDA, dove il numero di Viator
+       (etichettato "Viator & Tripadvisor") comprende gia' quello di
+       Tripadvisor e sommarli sarebbe contare due volte le stesse
+       recensioni. Sulle valutazioni del SINGOLO tour quel problema non
+       esiste: sono righe distinte per piattaforma -- Viator 8.241,
+       GetYourGuide 4.453, Regiondo 206 su `wine-experience-in-tuscany`,
+       verificato a database -- e nessuna comprende le altre.
+       Applicare `NEL_TOTALE` qui toglierebbe Viator, che su quasi tutte
+       le schede e' la fonte con piu' recensioni. */
   }));
 
   /* Quali badge d'azienda si tengono accanto a quelli del prodotto.

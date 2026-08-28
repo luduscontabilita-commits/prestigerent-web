@@ -93,9 +93,16 @@ export function Perche({ voto, totale, posizione, su, categoria, anni }: Props) 
       corpo: (
         <>
           <p>
+            {/* 🔴 QUI NON SI NOMINA VIATOR, e non e' una dimenticanza.
+                Il totale d'azienda somma Tripadvisor, GetYourGuide e chi ha
+                prenotato con noi: Viator ne resta FUORI, perche' il suo
+                numero comprende gia' quello di Tripadvisor e sommarli
+                vorrebbe dire contare due volte le stesse recensioni.
+                Elencare una piattaforma che non e' nella somma e' il modo
+                piu' rapido di far sembrare inventato un numero vero. */}
             We love what we do, and so do our guests: {totale.toLocaleString('en-US')}{' '}
-            verified reviews across Tripadvisor, Viator, GetYourGuide and guests
-            who booked with us directly
+            verified reviews across Tripadvisor, GetYourGuide and guests who
+            booked with us directly
             {voto ? `, ${voto.toFixed(1)} out of 5 on average` : ''}.
           </p>
           {posizione && su && categoria && (
