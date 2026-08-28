@@ -79,7 +79,13 @@ export function ModuloRichiesta({ locale, tour }: Props) {
     setCampoRotto(null);
 
     try {
-      const risposta = await fetch('/api/richieste', {
+      /* La barra finale non e' un dettaglio: senza, Vercel risponde
+         308 e la richiesta va fatta due volte. Con il POST funziona lo
+         stesso -- il 308 conserva metodo e corpo, a differenza del 301 --
+         ma sono due viaggi invece di uno su ogni singolo invio, e basta
+         un browser che tratti male il redirect perche' diventi un modulo
+         che non parte. Misurato in produzione il 28/08/2026. */
+      const risposta = await fetch('/api/richieste/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
