@@ -220,6 +220,57 @@ export const SEZIONI: Sezione[] = [
   },
 
   {
+    /* 🔴 IL VINO, RIMESSO NEL MENU IL 28/08/2026.
+       Su WordPress "Wine and Food Experiences" era una voce principale
+       accanto a Small Group e Private. Il giorno prima del passaggio era
+       stata sostituita da un redirect, perche' i suoi tour stanno anche
+       in altre categorie: vero sui prodotti, sbagliato sul menu. E'
+       l'85% del fatturato, e chi cerca "wine tour" deve trovare la
+       parola dove la cerca -- in cima, non dentro "Destinations". */
+    testo: 'Wine & Food',
+    href: '/wine-and-food-experiences/',
+    pannello: 'Wine and food experiences in Tuscany',
+    tutti: 'All wine experiences',
+    vetrina: [
+      {
+        testo: 'Wine Experience',
+        href: '/tour/wine-experience-in-tuscany/',
+        tour: 'wine-experience-in-tuscany',
+        alt: 'Barrels lined up in a Tuscan cellar',
+      },
+      {
+        testo: 'Wine & Food Experience',
+        href: '/tour/wine-food-experience-in-tuscany/',
+        tour: 'wine-food-experience-in-tuscany',
+        alt: 'A table laid for lunch among the vines',
+      },
+      {
+        testo: 'Siena & San Gimignano',
+        href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
+        tour: 'small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence',
+        alt: 'The towers of San Gimignano over the Tuscan hills',
+      },
+    ],
+    gruppi: [
+      {
+        titolo: 'In a small group',
+        voci: [
+          { testo: 'Wine Experience, half day', href: '/tour/wine-experience-in-tuscany/', slug: 'wine-experience-in-tuscany' },
+          { testo: 'Wine & Food, full day', href: '/tour/wine-food-experience-in-tuscany/', slug: 'wine-food-experience-in-tuscany' },
+          { testo: 'Siena & San Gimignano with winery lunch', href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/' },
+        ],
+      },
+      {
+        titolo: 'Private, your party only',
+        voci: [
+          { testo: 'Chianti & wineries', href: '/tour/private-tour-to-chianti-wineries/' },
+          { testo: 'Chianti, half day', href: '/tour/private-half-day-tour-of-chianti/' },
+          { testo: 'Montalcino & Brunello', href: '/tour/montalcino-brunello-wine-tour/' },
+        ],
+      },
+    ],
+  },
+  {
     testo: 'Cruise Port Tours',
     href: '/cruise-port-tours/',
     pannello: 'Shore excursions from the Italian cruise ports',

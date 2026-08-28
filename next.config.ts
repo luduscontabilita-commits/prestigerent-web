@@ -109,17 +109,13 @@ const nextConfig: NextConfig = {
          che nessuno capisca perche'.
          ──────────────────────────────────────────────────────────────── */
 
-      /* IL VINO, CHE E' L'85% DEL FATTURATO.
-         `wine-and-food-experiences` e' una categoria WooCommerce vera con
-         dentro 7 tour, ma non e' fra le 35 di src/lib/categorie.ts.
-         Controllato uno per uno su `tour_categorie`: tutti e 7 (Wine
-         Experience, Wine & Food, Chianti privato, Montalcino, il mezzo
-         giorno in Chianti e le due Siena-San Gimignano) stanno anche in
-         `florence-tuscany`. Quindi /destinations/florence-tuscany/ e'
-         l'unica pagina esistente che li contiene TUTTI. Le alternative
-         perdevano pezzi: /small-group-tours/ ne ha solo 4 dei 7, e la
-         home non e' una pagina di categoria. */
-      { source: '/wine-and-food-experiences/', destination: '/destinations/florence-tuscany/', permanent: true },
+      /* 🔴 QUI C'ERA UN REDIRECT DA /wine-and-food-experiences/ VERSO
+         /destinations/florence-tuscany/, ed e' stato tolto il 28/08/2026.
+         La categoria esiste di nuovo (src/lib/categorie.ts): era una voce
+         principale del menu di WordPress con una pagina sua, e mandarla
+         altrove faceva sparire dal sito la parola con cui questa azienda
+         viene cercata. Un redirect messo per semplificare non deve
+         cancellare la categoria che vale l'85% del fatturato. */
 
       /* `other-tours` su WordPress ha dentro un tour solo (Tarquinia da
          Civitavecchia): e' il raccoglitore di cio' che non sta altrove.

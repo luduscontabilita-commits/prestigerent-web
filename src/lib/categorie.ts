@@ -59,6 +59,23 @@ export const CATEGORIE: Categoria[] = [
       'Your party only, your own driver, your own hours. We collect you where you are staying — in Florence or anywhere in Italy — and the day is built around what you want to see.',
   },
   {
+    /* 🔴 RIMESSA IL 28/08/2026, DOPO AVERLA TOLTA PER SBAGLIO.
+       Il giorno prima del passaggio questa categoria era stata sostituita
+       da un redirect verso /destinations/florence-tuscany/, con il
+       ragionamento che i suoi sette tour stanno tutti anche li'. Sui
+       prodotti e' vero; sul resto no. Era una delle voci principali del
+       menu di WordPress, con una pagina sua, un testo suo e anni di
+       posizionamento -- ed e' la categoria dell'85% del fatturato.
+       Mandare "wine and food experiences" su una pagina che si chiama
+       "Florence & Tuscany" vuol dire far sparire dal sito la parola con
+       cui questa azienda viene cercata. */
+    path: '/wine-and-food-experiences/',
+    cat: 'wine-and-food-experiences',
+    titolo: 'Wine and food experiences in Tuscany',
+    intro:
+      'The days people come to Tuscany for: family estates in the Chianti hills, cellars you walk into, tastings of wine and olive oil, and lunch where the wine is made. Our own vehicles, our own guides, no intermediaries.',
+  },
+  {
     path: '/cruise-port-tours/',
     cat: 'cruise-port-tours',
     titolo: 'Shore excursions from the Italian cruise ports',
