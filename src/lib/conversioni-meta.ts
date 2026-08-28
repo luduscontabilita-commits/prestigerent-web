@@ -30,7 +30,8 @@ import type { EsitoCaricamento } from '@/lib/conversioni-google';
  * senza potersene accorgere -- da Meta non si cancella niente.
  *
  * ── LA DEDUPLICA COL PIXEL ──────────────────────────────────────────
- * `event_id` = numero d'ordine di Regiondo. Meta usa la coppia
+ * `event_id` = `booking-` + numero d'ordine di Regiondo, la stessa
+ * stringa che il tag del pixel costruisce. Meta usa la coppia
  * (`event_name`, `event_id`) per capire che l'evento del browser e
  * quello del server sono la stessa vendita.
  *
@@ -145,8 +146,26 @@ export async function caricaSuMeta(righe: Conversione[], prova: boolean): Promis
       return {
         event_name: 'Purchase',
         event_time: Math.floor(r.quando.getTime() / 1000),
-        /* La chiave della deduplica col pixel: stesso numero d'ordine. */
-        event_id: r.ordine,
+        /* 🔴 LA CHIAVE DELLA DEDUPLICA, E IL PREFISSO NON E' UN VEZZO.
+         *
+         * Meta scarta il doppione confrontando la coppia (event_name,
+         * event_id) fra il pixel e questa chiamata. Devono essere
+         * IDENTICHE carattere per carattere: "12345" e "booking-12345"
+         * sono due eventi diversi, e la stessa vendita finisce contata
+         * due volte -- il ROAS raddoppia, e le campagne vengono
+         * ottimizzate su un guadagno che non esiste.
+         *
+         * Il tag del pixel in GTM ("Meta - Purchase Regiondo") manda
+         * `eventID: 'booking-' + transaction_id`. Quel prefisso e' il
+         * riferimento: si allinea QUESTO lato, non quello, perche' il
+         * codice si pubblica in due minuti mentre GTM va versionato e
+         * pubblicato a mano -- e finche' i due non combaciano ogni notte
+         * che passa e' un giorno di dati sporchi.
+         *
+         * Non si e' mai visto il danno solo perche' il pixel era chiuso
+         * al 62% del traffico e questo caricamento girava senza
+         * `davvero=1`, cioe' a vuoto. Adesso partono tutti e due. */
+        event_id: `booking-${r.ordine}`,
         /* La vendita nasce su un sito, anche se il pagamento si conclude
            sul dominio di Regiondo. Meta segnalera' una qualita'
            dell'abbinamento piu' bassa perche' mancano indirizzo IP e
