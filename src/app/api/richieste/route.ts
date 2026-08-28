@@ -261,6 +261,24 @@ export async function POST(req: NextRequest) {
   const marketing = corpo.marketing === true;
   const consensoIl = new Date().toISOString();
 
+  /* ── L'IDENTIFICATIVO DEL CLIC ────────────────────────────────────
+     Arriva dal browser come `g-<gclid>` o `f-<fbclid>` (vedi
+     `src/lib/clic.ts`) e serve a una cosa sola: dire a Google Ads QUALE
+     annuncio ha prodotto questa richiesta, invece di farglielo cercare
+     per somiglianza sull'email.
+
+     Si valida la forma qui e non a valle: e' un campo che arriva dal
+     browser e finisce dentro una chiamata alle API di Google, e un
+     valore lungo o strano la fa rifiutare tutta -- il lotto intero,
+     non la singola riga. Fuori dalla forma attesa si scarta e si va
+     avanti: una richiesta senza clic vale comunque, una richiesta
+     rifiutata no.
+
+     Il consenso non si ricontrolla: chi non l'ha dato non ha il valore
+     salvato, quindi qui arriva vuoto da se'. */
+  const clicGrezzo = pulisci(corpo.sub_id, 512);
+  const sub_id = /^[gf]-[\w.-]{10,500}$/.test(clicGrezzo) ? clicGrezzo : null;
+
   /* ── LA SCRITTURA ────────────────────────────────────────────────── */
   const { error } = await supabase.from('richieste').insert({
     nome,
@@ -274,6 +292,7 @@ export async function POST(req: NextRequest) {
     pagina,
     marketing,
     consenso_il: consensoIl,
+    sub_id,
     /* Esplicito, anche se e' il default: la policy pubblica accetta solo
        'nuova', e vederlo scritto qui spiega perche'. */
     stato: 'nuova',

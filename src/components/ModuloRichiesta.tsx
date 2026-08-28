@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { testiModulo, type CodiceErrore } from '@/lib/testi';
 import { DEFAULT_LOCALE } from '@/lib/locales';
+import { identificativoClic } from '@/lib/clic';
 
 /* IL MODULO DI RICHIESTA RAPIDA.
  *
@@ -153,6 +154,10 @@ export function ModuloRichiesta({ locale, tour }: Props) {
              errore che dice "riprova" che un'esca disinnescata. */
           compilato: apertoIl.current ? Date.now() - apertoIl.current : 0,
           lingua: locale,
+          /* Il clic che ha portato qui, se c'e'. Serve al caricamento
+             notturno per dire a Google QUALE annuncio ha prodotto questa
+             richiesta, invece di farglielo cercare per somiglianza. */
+          sub_id: identificativoClic(),
           /* Solo il percorso, senza dominio e senza i parametri delle
              campagne: in tabella serve sapere QUALE PAGINA ha prodotto la
              richiesta, non ricostruire la sessione di chi l'ha scritta. */
