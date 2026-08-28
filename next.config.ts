@@ -127,6 +127,18 @@ const nextConfig: NextConfig = {
          pagina che mostra tutto il catalogo. */
       { source: '/other-tours/', destination: '/tours-of-italy/', permanent: true },
 
+      /* IL VECCHIO PERMALINK DI WOOCOMMERCE.
+         Fino a oggi le categorie vivevano a due indirizzi: la forma
+         pulita (`/cruise-port-tours/`) e quella con il prefisso
+         (`/categoria-prodotto/cruise-port-tours/`). WordPress rimandava
+         la seconda alla prima con un 301 suo, e nella sitemap di Yoast
+         ci sono ancora TRENTA di quegli indirizzi -- che Google conosce.
+         Quel redirect vive dentro WordPress: il giorno che lo si spegne
+         sparisce, e quelle trenta diventano altrettanti 404 su URL che
+         Google ha in indice da anni. Qui si rifa' la stessa cosa, una
+         regola per tutte, cosi' non dipende piu' da lui. */
+      { source: '/categoria-prodotto/:path*', destination: '/:path*', permanent: true },
+
       /* Il singolare girava su materiali stampati prima che WordPress lo
          correggesse con un suo 301: qui si rifa' la stessa cosa, perche'
          quel 301 muore insieme a WordPress. */
