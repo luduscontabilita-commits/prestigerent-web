@@ -47,11 +47,12 @@ export const dynamic = 'force-dynamic';
    e nessuno li scrive in due. */
 const MINIMO_MS = 3_000;
 
-/* Il tetto in alto e' largo apposta: restare due ore sulla stessa pagina
-   succede davvero -- uno apre il modulo, va a cena, torna e lo compila.
-   Oltre le ventiquattro ore il valore non e' piu' un tempo reale, e' un
-   numero inventato da chi chiama la rotta a mano: si rifiuta. */
-const MASSIMO_MS = 24 * 60 * 60 * 1_000;
+/* 🔴 IL TETTO IN ALTO NON C'E' PIU', ed e' stato tolto apposta.
+   Rifiutava chi lasciava una scheda aperta piu' di ventiquattro ore --
+   che e' un essere umano distratto, non uno script -- e lo rifiutava
+   col messaggio "e' stato troppo veloce, riprovi", che riprovando dava
+   di nuovo lo stesso errore. Una richiesta vera persa in silenzio, e
+   in cambio nessuna difesa: nessun bot compila un modulo lentamente. */
 
 /* Cinque richieste all'ora dallo stesso indirizzo. Una famiglia che
    chiede tre preventivi diversi ci sta comodamente dentro; uno script
@@ -142,12 +143,37 @@ export async function POST(req: NextRequest) {
      Chi ci cade riceve un `ok:true`. Non e' cortesia: dirgli "sei un
      bot" gli fa provare la variante successiva finche' non passa. */
   if (pulisci(corpo.azienda, 200)) {
+    /* Si logga, e non e' pedanteria: `autoComplete="off"` NON basta a
+       tenere lontano il riempimento automatico di Chrome, che su un
+       campo etichettato "Company" ci scrive volentieri il nome
+       dell'azienda di chi sta compilando. Se succede, quella persona
+       legge "grazie" e la sua richiesta non esiste da nessuna parte.
+       Senza questa riga non c'e' modo di accorgersene; con questa,
+       basta guardare i log di Vercel per sapere se l'esca sta
+       scattando su qualcuno di vero e quanto spesso. */
+    console.error('[richieste] esca piena — richiesta scartata');
     return NextResponse.json({ ok: true });
   }
 
   /* ── 2. IL TEMPO ─────────────────────────────────────────────────── */
   const impiegato = Number(corpo.compilato);
-  if (!Number.isFinite(impiegato) || impiegato < MINIMO_MS || impiegato > MASSIMO_MS) {
+
+  /* 🔴 UN MODULO APERTO DA TROPPO TEMPO NON E' UN BOT: E' L'OPPOSTO.
+   *
+   * Prima qui si rifiutava anche chi impiegava PIU' del massimo, con lo
+   * stesso codice `troppo_veloce` -- cioe' con il messaggio "e' stato
+   * veloce, ricontrolli i campi e riprovi". Ma `apertoIl` si fissa quando
+   * il modulo compare e non si azzera mai, e il modulo in fondo alla
+   * pagina compare al caricamento: bastava lasciare una scheda aperta
+   * tutta la notte perche' l'invio fosse rifiutato per sempre, con un
+   * messaggio che suggerisce di riprovare -- e riprovando si riceve
+   * identico l'errore, senza nessun modo di capire che bisogna
+   * ricaricare la pagina.
+   *
+   * Si perdeva una richiesta vera, e la si perdeva in silenzio. I bot
+   * sono veloci, mai lenti: il tetto massimo non difendeva da niente.
+   * Resta la soglia bassa, che e' quella che serve. */
+  if (!Number.isFinite(impiegato) || impiegato < MINIMO_MS) {
     return no('troppo_veloce', 'compilato troppo in fretta', undefined, 429);
   }
 
