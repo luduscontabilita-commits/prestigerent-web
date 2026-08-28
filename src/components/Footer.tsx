@@ -65,6 +65,10 @@ const PARTENZE = [
  * giorno del tour); `Payment` e' il link Stripe, esterno e vivo. */
 const AZIENDA = [
   ['About us', '/about-us/'],
+  /* Le 145 domande. Sul vecchio sito questa voce c'era nel piede di ogni
+     pagina, ed e' li' che la gente la cerca: quando ha una domanda pratica
+     e non sa dove chiederla. */
+  ['FAQs', '/faqs/'],
   ['Meeting point', '/mp/'],
 ];
 

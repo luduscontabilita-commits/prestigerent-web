@@ -80,6 +80,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: alternative('/contact-us/'),
     },
 
+    /* Le 145 domande: e' la pagina con piu' testo del sito e risponde a
+       ricerche che nessun'altra pagina copre. */
+    {
+      url: percorso(DEFAULT_LOCALE, '/faqs/'),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+      alternates: alternative('/faqs/'),
+    },
+
     /* Le pagine legali: sono raggiungibili dal piede di ogni pagina, non
        hanno noindex e Google le indicizza comunque. Dichiararle costa una
        riga e toglie l'incoerenza fra cio' che il sito espone e cio' che

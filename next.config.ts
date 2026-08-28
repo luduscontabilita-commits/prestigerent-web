@@ -161,7 +161,9 @@ const nextConfig: NextConfig = {
          Le FAQ generali non hanno una pagina propria: le risposte su
          disdetta, conferma e pagamento sono nelle schede tour e nella
          fascia di fiducia, che stanno anche su /about-us/. */
-      { source: '/faqs/', destination: '/about-us/', permanent: true },
+      /* 🔴 /faqs/ NON e' piu' un redirect: la pagina esiste, con tutte e
+         145 le domande del vecchio sito. Mandarle su /about-us/ voleva
+         dire far sparire il corpo di contenuto piu' grosso del sito. */
       /* /contact-us/ NON e' piu' un redirect: la pagina esiste, sta in
          src/app/[locale]/contact-us/page.tsx. Chi cerca "prestige rent
          contact" ha gia' deciso di scrivere, e mandarlo su /about-us/
