@@ -113,6 +113,17 @@ export type Raccolto = {
    dall'elenco dello script a mano ed e' rientrato qui: una prenotazione
    rifiutata caricata come conversione insegna alle campagne a cercare
    clienti la cui carta viene rifiutata. */
+/* I domini delle agenzie che prenotano dal sito. Vedi il commento nel
+   setaccio: sono clienti veri per l'azienda, ma non sono conversioni
+   pubblicitarie. Elenco a mano, e va allungato quando ne spunta una. */
+const AGENZIE = new Set([
+  'jaywaytravel.com',
+  'boutiqueescapes.com',
+  'mycompasstours.com',
+  'dialinv.com',
+  'datasourcetech.com',
+]);
+
 const STATI_MORTI = new Set([
   'cancelled',
   'canceled',
@@ -292,6 +303,26 @@ export async function raccogli(
        vendita no. */
     if (numero(b.qty_cancelled) >= numero(b.qty) && numero(b.qty) > 0) {
       conta(scarti, 'posti tutti annullati');
+      continue;
+    }
+
+    /* 🔴 LE AGENZIE NON SONO CLIENTI.
+       Prenotano dal sito, quindi il canale dice "Own Ticketshop" e per
+       tutto il resto del setaccio sono dirette. Ma un'agenzia non ha
+       cliccato nessun annuncio: ha un accordo, e prenota dal sito perche'
+       e' il modo piu' comodo. Contarla come conversione insegna a Google
+       a cercare agenzie, cioe' a spendere per procurare clienti che
+       arrivavano gia' da soli.
+
+       Si riconoscono dal dominio dell'email, che e' aziendale e ricorre:
+       sono sempre le stesse quattro o cinque. L'elenco si allunga a mano
+       quando ne compare una nuova -- indovinare "e' un'azienda quindi e'
+       un'agenzia" scarterebbe anche i viaggi d'affari veri, che sono
+       clienti a tutti gli effetti. */
+    const dominio =
+      (b.email ?? b.contact_data?.email ?? '').trim().toLowerCase().split('@')[1] ?? '';
+    if (dominio && AGENZIE.has(dominio)) {
+      conta(scarti, 'agenzia');
       continue;
     }
 
