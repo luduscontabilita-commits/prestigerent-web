@@ -56,6 +56,13 @@ export default function proxy(req: NextRequest) {
        e sta cercando dove ci si vede. */
     pathname.startsWith('/mp/') ||
     pathname === '/mp' ||
+    /* /guest-albums/ e' la pagina delle foto che l'ospite riceve dopo il
+       tour, con il codice del suo album nell'indirizzo. Senza questa
+       riga diventerebbe /en/guest-albums/ e da li' un 404 -- proprio per
+       chi ha gia' fatto il tour ed e' tornato a casa a cercare le sue
+       foto. */
+    pathname.startsWith('/guest-albums/') ||
+    pathname === '/guest-albums' ||
     /* Le cartelle di WordPress: le foto dei tour (/wp-content/) e jQuery,
        da cui dipendono le landing (/wp-includes/). Quasi tutte finiscono
        gia' in PUBLIC_FILE per via dell'estensione, ma non tutte -- e un

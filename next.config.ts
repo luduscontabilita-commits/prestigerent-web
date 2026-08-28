@@ -127,6 +127,11 @@ const nextConfig: NextConfig = {
          pagina che mostra tutto il catalogo. */
       { source: '/other-tours/', destination: '/tours-of-italy/', permanent: true },
 
+      /* Il singolare girava su materiali stampati prima che WordPress lo
+         correggesse con un suo 301: qui si rifa' la stessa cosa, perche'
+         quel 301 muore insieme a WordPress. */
+      { source: '/guest-album/', destination: '/guest-albums/', permanent: true },
+
       /* Due sottocategorie dei piccoli gruppi con dentro ESATTAMENTE gli
          stessi 4 tour di `small-group-tours` (verificato: le due liste
          coincidono). Erano un livello di menu in piu' che non filtrava
@@ -292,6 +297,22 @@ const nextConfig: NextConfig = {
          cerca l'appuntamento e trova un errore. */
       ...inoltra('/mp', '/mp'),
 
+      /* 🔴 GLI ALBUM DELLE FOTO, CHE NESSUN INVENTARIO AVEVA CENSITO.
+         `/guest-albums/?code=XXXX` e' il link che l'ospite riceve dopo il
+         tour -- sul voucher, per email, sul cartoncino -- per scaricare le
+         foto che la guida gli ha fatto. La pagina esiste su WordPress dal
+         7/10/2024 e contiene una riga sola: lo script di Fotaflo, che
+         legge il `code` dall'indirizzo e mostra l'album.
+         Non era in nessuna sitemap ne' in nessun menu -- si raggiunge solo
+         per link diretto -- e per questo era sfuggita a tutti i controlli
+         del passaggio. Dal momento in cui il dominio e' passato a Vercel
+         quel link dava 404, e a vederlo era solo l'ospite col voucher in
+         mano: nessun avviso, nessun errore in Search Console.
+         DEVE restare su prestigerent.com e non diventare un redirect:
+         Fotaflo serve lo script solo se il referer e' esattamente quel
+         dominio -- misurato, da www o da legacy risponde 401. */
+      ...inoltra('/guest-albums', '/guest-albums'),
+
       /* src/proxy.ts gira prima dei rewrite e mette davanti la lingua
          predefinita a tutto quello che non riconosce: quando la richiesta
          arriva qui non e' piu' /lp/tour.html ma /en/lp/tour.html. I .mp4 e
@@ -304,6 +325,7 @@ const nextConfig: NextConfig = {
          come gia' si fa per /admin e /auth: fatto quello, queste due righe
          diventano inutili e si possono togliere. */
       ...inoltra('/en/mp', '/mp'),
+      ...inoltra('/en/guest-albums', '/guest-albums'),
       ...inoltra('/en/lp', '/lp'),
       ...inoltra('/en/myb', '/myb'),
     ];
