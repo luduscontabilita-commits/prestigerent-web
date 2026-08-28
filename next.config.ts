@@ -310,8 +310,37 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    if (!noindex) return [];
+    /* LE LANDING DELLE CAMPAGNE NON VANNO SU GOOGLE.
+     *
+     * `/lp/*` sono le pagine su cui atterrano gli annunci a pagamento:
+     * `tasting-experience-in-tuscany-lan2.html` e la gemella di Siena e
+     * San Gimignano, servite dal vecchio host attraverso i rewrite.
+     * Dicono le stesse cose delle schede tour con parole quasi uguali, e
+     * finche' restano indicizzabili le due versioni si contendono la
+     * stessa ricerca: Google ne sceglie una e nel dubbio penalizza
+     * entrambe. E' lo stesso difetto che aveva la pagina
+     * `-landing` di WordPress, che il passaggio ha gia' chiuso.
+     *
+     * Il noindex NON tocca gli annunci: Google Ads porta traffico su una
+     * pagina anche se e' esclusa dai risultati non pagati. Sono due cose
+     * diverse e questa e' esattamente la configurazione che si consiglia
+     * per le pagine pubblicitarie.
+     *
+     * Questa regola vale SEMPRE, anche a sito pubblicato -- percio' sta
+     * prima del `return []` di `noindex`. */
+    const soloLanding = [
+      {
+        source: '/lp/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+    ];
+
+    /* Finche' il sito e' in prova, l'intero dominio e' escluso. */
+    if (!noindex) return soloLanding;
     return [
+      ...soloLanding,
       {
         source: '/:path*',
         headers: [
