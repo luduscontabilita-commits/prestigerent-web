@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { foto as ottimizza, fotoSet } from '@/lib/foto';
 
 /* LO SFONDO DELL'HERO CHE CAMBIA DA SOLO.
  *
@@ -157,7 +158,13 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
               key={f.src}
               className={classe}
               style={pila}
-              src={f.src}
+              /* L'hero e' a schermo pieno, quindi si chiede grande -- ma
+                 in WebP, che sulla stessa foto pesa un terzo del JPG. E'
+                 l'immagine che decide il tempo di caricamento percepito:
+                 vale la pena servirla bene, non solo prima. */
+              src={ottimizza(f.src, 1920, 78)}
+              srcSet={fotoSet(f.src, [828, 1200, 1920], 78)}
+              sizes="100vw"
               alt={alt}
               fetchPriority="high"
               onError={(e) => {
@@ -172,7 +179,7 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
                 const img = e.currentTarget;
                 if (!f.ripiego || img.dataset.ripiego === 'si') return;
                 img.dataset.ripiego = 'si';
-                img.src = f.ripiego;
+                img.src = f.ripiego;   /* il ripiego resta l'originale: se l'ottimizzatore e' il problema, passarci di nuovo non aiuta */
               }}
             />
           );
@@ -183,7 +190,9 @@ export function HeroFoto({ foto, alt }: { foto: FotoHero[]; alt: string }) {
             key={f.src}
             className={classe}
             style={pila}
-            src={f.src}
+            src={ottimizza(f.src, 1200, 74)}
+            srcSet={fotoSet(f.src, [828, 1200, 1920], 74)}
+            sizes="100vw"
             alt=""
             loading="lazy"
             decoding="async"

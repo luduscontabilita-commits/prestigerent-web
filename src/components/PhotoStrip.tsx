@@ -1,6 +1,7 @@
 'use client';
 
 import { useFilm } from './useFilm';
+import { foto as ottimizza, fotoSet } from '@/lib/foto';
 
 export type Foto = { src: string; alt?: string; label?: string; caption?: string };
 
@@ -46,7 +47,9 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
       {/* MOBILE: il mosaico che il CSS trasforma in carosello a swipe */}
       <div className="hero-gallery" aria-label="Tour photos">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="g-hero" src={foto[0].src} alt={foto[0].alt || ''} loading="eager" fetchPriority="high" decoding="async" />
+        <img className="g-hero" src={ottimizza(foto[0].src, 1200, 78)}
+             srcSet={fotoSet(foto[0].src, [640, 828, 1200], 78)} sizes="100vw"
+             alt={foto[0].alt || ''} loading="eager" fetchPriority="high" decoding="async" />
         {foto.slice(1, 13).reduce<Foto[][]>((cols, f, i) => {
           if (i % 2 === 0) cols.push([]);
           cols[cols.length - 1].push(f);
@@ -55,7 +58,9 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
           <div className="g-col" key={i}>
             {col.map((f) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={f.src} src={f.src} alt={f.alt || ''} loading="lazy" decoding="async" />
+              <img key={f.src} src={ottimizza(f.src, 640)} srcSet={fotoSet(f.src, [400, 640, 828])}
+                   sizes="(max-width: 700px) 48vw, 320px"
+                   alt={f.alt || ''} loading="lazy" decoding="async" />
             ))}
           </div>
         ))}
@@ -95,7 +100,12 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
                         ha gia' in cache. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={f.src}
+                      /* La striscia e' alta poco piu' di 300px: chiedere
+                         l'originale a piena risoluzione era il grosso dei
+                         megabyte della home. */
+                      src={ottimizza(f.src, i === 0 ? 1200 : 828, i === 0 ? 78 : 74)}
+                      srcSet={fotoSet(f.src, [640, 828, 1200], i === 0 ? 78 : 74)}
+                      sizes="(max-width: 700px) 88vw, 460px"
                       alt={clone ? '' : f.alt || f.caption || ''}
                       loading={i === 0 ? 'eager' : 'lazy'}
                       fetchPriority={i === 0 ? 'high' : undefined}

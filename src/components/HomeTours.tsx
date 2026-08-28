@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { foto, fotoSet } from '@/lib/foto';
 import { testo } from '@/lib/prosa';
 import { classeTitolo } from '@/lib/punti';
 
@@ -241,7 +242,18 @@ export function HomeTours({
                     )}
                     {t.foto && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={t.foto} alt={t.nome} loading="lazy" decoding="async" />
+                      <img
+                        /* Le schede sono larghe al massimo 420px: chiedere
+                           l'originale voleva dire scaricare 232 KB per
+                           mostrarne 61. `sizes` dice al browser quanto sara'
+                           larga davvero, altrimenti prende la piu' grande. */
+                        src={foto(t.foto, 640)}
+                        srcSet={fotoSet(t.foto, [400, 640, 828])}
+                        sizes="(max-width: 700px) 92vw, (max-width: 1180px) 46vw, 380px"
+                        alt={t.nome}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     )}
                     <h3 className={classeTitolo('hm-card-name', testo(t.nome))}>{testo(t.nome)}</h3>
                   </div>
