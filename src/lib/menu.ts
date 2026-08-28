@@ -104,34 +104,33 @@ export const SEZIONI: Sezione[] = [
         alt: 'A table laid for a tasting at a family winery',
       },
     ],
-    gruppi: [
-      {
-        /* niente trattino: in maiuscolo e spaziato, "SMALL-GROUP" su uno
-           schermo da 320px andava a capo dopo il trattino e lasciava
-           "GROUP DAYS" da sola sulla riga dopo -- si legge come un errore
-           di stampa. Senza trattino, se proprio deve andare a capo va a
-           capo su uno spazio. E' anche piu' coerente col resto del sito,
-           dove la voce di menu e' "Small Group Tours". */
-        titolo: 'Our three small group days',
-        voci: [
-          {
-            testo: 'Siena & San Gimignano with winery lunch',
-            href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
-            slug: 'small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence',
-          },
-          {
-            testo: 'Wine Experience in Tuscany',
-            href: '/tour/wine-experience-in-tuscany/',
-            slug: 'wine-experience-in-tuscany',
-          },
-          {
-            testo: 'Wine & Food Experience in Tuscany',
-            href: '/tour/wine-food-experience-in-tuscany/',
-            slug: 'wine-food-experience-in-tuscany',
-          },
-        ],
-      },
-    ],
+    /* NIENTE ELENCO DI LINK SOTTO LE FOTO, in questo pannello e solo in
+       questo: qui la vetrina E' gia' l'elenco.
+
+       Negli altri pannelli i riquadri sono una selezione e l'elenco sotto
+       apre il resto del catalogo -- ventidue tour privati, dieci porti,
+       nove tratte di transfer -- quindi ci sta e serve. Di small group
+       pero' ne facciamo tre: i tre riquadri qui sopra portano esattamente
+       ai tre tour, e la colonna "Our three small group days" li ripeteva
+       uno per uno, stessi indirizzi, subito sotto le loro stesse foto. Il
+       titolare l'ha vista per quello che era -- il menu stampato due
+       volte -- e aveva ragione.
+
+       Era anche disegnata male, e per un motivo preciso: `.hd-mega-in` e'
+       una griglia `repeat(auto-fit, minmax(190px,1fr))` e le tre fasce a
+       tutta larghezza (intestazione, vetrina, riga finale) hanno
+       `grid-column:1/-1`, cioe' stanno dentro TUTTE le colonne. Nessuna
+       colonna e' vuota, quindi `auto-fit` non ne richiude nessuna: le sei
+       tracce restano in piedi anche quando c'e' un gruppo solo, e quel
+       gruppo finiva in una colonnina da 200px incollata a sinistra, col
+       resto del pannello bianco. Non era un CSS da aggiustare: era un
+       blocco che non doveva esserci.
+
+       Togliendo il gruppo non si perde un solo link -- i tre indirizzi
+       sono gli stessi dei riquadri, e restano nel sorgente per chi
+       scansiona -- e il pannello torna tre fasce piene una sotto
+       l'altra. */
+    gruppi: [],
   },
 
   {

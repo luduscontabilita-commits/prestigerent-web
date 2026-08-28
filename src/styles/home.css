@@ -228,7 +228,7 @@
   text-shadow:0 1px 10px rgba(0,0,0,.5);
 }
 .hm-card-body{ padding:13px 15px 15px; display:flex; flex-direction:column; flex:1; }
-.hm-meta{ display:flex; gap:14px; font-size:.8rem; font-weight:700; color:var(--ink-soft); }
+.hm-meta{ display:flex; gap:14px; font-size:.875rem; font-weight:700; color:var(--ink-soft); }
 .hm-hl{ list-style:none; margin:11px 0 0; padding:0; display:grid; gap:6px; }
 .hm-hl li{ font-size:.84rem; font-weight:600; color:var(--ink-soft); padding-inline-start:19px; position:relative; line-height:1.4; }
 .hm-hl li::before{
@@ -1173,18 +1173,27 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 .hm-card-proof{
   display:flex; align-items:baseline; gap:6px;
   margin-top:10px; min-width:0;
-  font-size:.82rem; line-height:1.3;
+  font-size:.9rem; line-height:1.32;
 }
-.hm-card-proof .hm-stars{ flex:none; color:var(--orange); font-size:.86rem; letter-spacing:1px; }
+.hm-card-proof .hm-stars{ flex:none; color:var(--orange); font-size:.94rem; letter-spacing:1px; }
 .hm-card-proof b{ flex:none; color:var(--ink); font-weight:800; }
 /* A 320px il conteggio non ci sta: si accorcia con i puntini e basta.
    Se andasse a capo la scheda crescerebbe di una riga solo per lui, e
    nella griglia si vedrebbe -- le schede accanto resterebbero corte. */
 .hm-card-proof .hm-revs{
   flex:1 1 auto; min-width:0;
-  color:var(--ink-soft); font-size:.76rem; font-weight:600;
+  color:var(--ink-soft); font-size:.86rem; font-weight:600;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
+
+/* 🔴 I TESTI DELLE SCHEDE SONO STATI ALZATI, 28/08/2026.
+   Stavano fra 12,2 e 13,9 pixel: sotto i quattordici un testo di
+   servizio si legge male su schermo grande, e il piu' piccolo di tutti
+   -- 12,2px -- era proprio il CONTEGGIO DELLE RECENSIONI, cioe' la
+   prova sociale. Rimpicciolire il numero che deve convincere e' un
+   controsenso: adesso sta a 13,8. Il prezzo non e' stato toccato,
+   perche' a 24px era gia' la voce piu' forte della scheda e deve
+   restarlo. */
 
 /* Il chip dei molto prenotati: specchia .hm-card-tag, che sta in alto a
    sinistra, e per questo va in alto a destra -- due etichette dallo
@@ -1296,6 +1305,9 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    coprendo, e sparisce solo dopo, quando ormai e' sepolta. Al secondo giro,
    invece, la foto arriva da senza-animazione: li' riparte da capo, ed e'
    giusto cosi'. */
+/* Sul telefono questo stesso zoom ha un `transform-origin` diverso: la foto
+   li' e' un quadrato piu' corto dell'hero, e ingrandendo dal centro
+   sbordava sotto la velatura. Vedi il blocco a max-width:760px in fondo. */
 .hm-hero-bg.viva .hm-hero-foto.on,
 .hm-hero-bg.viva .hm-hero-foto.sotto{ animation:hm-hero-zoom 20s linear forwards; }
 
@@ -1367,8 +1379,30 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
      coricato, un browser rimpicciolito -- dove un quadrato da 760 sarebbe
      piu' alto dell'hero intero e la sfumatura non farebbe in tempo a
      chiudersi. */
+  /* 🔴 E QUI STAVA LA STRISCIA SOTTO LA RIGA DELLE RECENSIONI.
+     Lo zoom (`hm-hero-zoom`, poco sopra) ingrandisce la foto del 6% e per
+     difetto lo fa attorno al CENTRO della sua scatola. Sul desktop non si
+     vede, perche' li' la scatola della foto e' tutto l'hero: quello che
+     esce lo taglia l'`overflow:hidden` di `.hm-hero-bg`, e la velatura sta
+     sopra a tutta l'area visibile. Sul telefono no: la foto e' un QUADRATO
+     in cima, e la velatura e' un quadrato identico -- ma la velatura non e'
+     ingrandita, la foto si'. Scalando dal centro un quadrato da 390px, il
+     bordo inferiore scende di 390 x 0,03 = ~12 pixel PIU' IN BASSO di dove
+     finisce la velatura, e quei dodici pixel di fotografia restano scoperti:
+     una striscia di foto in chiaro, con il taglio netto sopra (dove la
+     velatura muore nel nero pieno) e sotto (dove ricomincia il fondo
+     #0A0F15 di `.hm-hero-bg`). Cadeva proprio all'altezza della riga
+     "4.9 from ... verified reviews" perche' li' arriva il quadrato su uno
+     schermo da 390px, ed essendo l'animazione `forwards` la striscia non se
+     ne andava piu' una volta comparsa.
+     Ancorando lo zoom al bordo BASSO, il fondo della foto non si muove di un
+     pixel e la velatura continua a coprirla esattamente: quello che avanza
+     esce dall'ALTO, dove a tagliarlo c'e' gia' l'`overflow:hidden`. Il
+     movimento resta identico a vedersi -- sono tre millesimi di scala al
+     secondo, nessuno distingue da dove parte l'ingrandimento. */
   .hm-hero-bg .hm-hero-foto{
     inset:0 0 auto 0; height:auto; aspect-ratio:1/1; max-height:70vh;
+    transform-origin:center bottom;
   }
 
   /* LA VELATURA SEGUE LA FOTO, e cambia direzione.
@@ -1653,7 +1687,7 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
   /* Piu' grande della .96rem di prima, e legato alla larghezza della
      scheda: nella colonna stretta delle categorie resta leggibile, su
      tre colonne larghe cresce. */
-  font-size:clamp(1.02rem, 1.15vw + .78rem, 1.24rem);
+  font-size:clamp(1.08rem, 1.15vw + .82rem, 1.3rem);
   font-weight:800; line-height:1.18; letter-spacing:-.015em;
   text-shadow:none;
   /* Con due righe piene, "Private Tour Florence and Pisa from Livorno
@@ -1796,8 +1830,8 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
    pallino dice "compreso", che e' quello che sono. */
 .hm-hl{ list-style:none; margin:0; padding:0; display:grid; gap:7px; }
 .hm-hl li{
-  font-size:.87rem; font-weight:700; color:var(--ink);
-  padding-inline-start:23px; position:relative; line-height:1.35;
+  font-size:.92rem; font-weight:700; color:var(--ink);
+  padding-inline-start:23px; position:relative; line-height:1.38;
 }
 /* La spunta e' un ritaglio nel disco arancione: nessun carattere da
    caricare, nessuna icona, e resta nitida a qualsiasi ingrandimento.
