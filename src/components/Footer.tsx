@@ -156,11 +156,21 @@ export async function Footer({ locale }: { locale: string }) {
           {PIU_PRENOTATI.map(([t, h]) => (
             <a key={h} href={p(h)}>{t}</a>
           ))}
+        </div>
+
+        {/* 🔴 L'AZIENDA IN UNA COLONNA SUA.
+            Prima "About us", "FAQs", "Meeting point" e "Payment" stavano
+            in coda ai tour piu' prenotati, separati solo da un margine:
+            quattro voci che non c'entrano niente con le altre, sotto un
+            titolo che dice "Most booked". Chi cercava le domande
+            frequenti doveva leggere una lista di tour per trovarle. */}
+        <div className="ft-col">
+          <p className="ft-t">Prestige Rent</p>
           {AZIENDA.map(([t, h]) => (
-            <a key={h} href={p(h)} style={{ marginTop: 10 }}>{t}</a>
+            <a key={h} href={p(h)}>{t}</a>
           ))}
           {AZIENDA_FUORI.map(([t, h]) => (
-            <a key={h} href={h} target="_blank" rel="noopener" style={{ marginTop: 10 }}>
+            <a key={h} href={h} target="_blank" rel="noopener">
               {t}
             </a>
           ))}

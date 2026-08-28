@@ -40,11 +40,23 @@ export function ContactSection({
     <section className="pr-sec tight alt" id="contact">
       <div className="pr-wrap">
         <div className="pr-head" style={{ marginBottom: 22 }}>
-          <p className="pr-kicker">Before you book</p>
+          {/* 🔴 NON E' UN INVITO A SCRIVERE INVECE DI PRENOTARE.
+              Prima diceva "Before you book" e "Talk to a real person": a
+              chi era gia' pronto a prenotare suggeriva di fermarsi e
+              scrivere, cioe' di rimandare -- e una richiesta che parte
+              oggi diventa una prenotazione fra due giorni, se diventa
+              prenotazione. Ora la porta si apre solo a chi un dubbio ce
+              l'ha davvero: chi non ce l'ha passa oltre e va al
+              calendario. */}
+          <p className="pr-kicker">Still not sure?</p>
           <h2 className="pr-title">
-            Talk to a <em className="hl place">real person</em>
+            Ask us <em className="hl place">anything</em>
           </h2>
-          <p className="pr-lead">Before you book, or while you travel. We answer.</p>
+          <p className="pr-lead">
+            A date that is not there, a pickup somewhere else, six people and a
+            pushchair &mdash; if something does not fit, tell us and we will
+            work it out. A person answers, usually within a few hours.
+          </p>
         </div>
 
         {/* eslint-disable-next-line @next/next/no-img-element */}

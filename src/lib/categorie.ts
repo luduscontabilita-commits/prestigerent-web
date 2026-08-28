@@ -79,8 +79,14 @@ export const CATEGORIE: Categoria[] = [
     path: '/cruise-port-tours/',
     cat: 'cruise-port-tours',
     titolo: 'Shore excursions from the Italian cruise ports',
+    /* 🔴 LA GARANZIA, RIMESSA IL 28/08/2026.
+       Il vecchio sito non prometteva solo il rientro in tempo: diceva
+       cosa succede se qualcosa va storto, ed e' quello che chiude la
+       vendita a chi ha una nave che riparte senza di lui. Nel passaggio
+       era rimasta la promessa e sparita la garanzia. Testo ripreso dal
+       vecchio sito, parola per parola. */
     intro:
-      'Off the ship, into Italy, back on board in time. We watch your ship, not the clock: if it docks late we adjust, and we guarantee you are back before all aboard.',
+      'Off the ship, into Italy, back on board in time. Book with confidence thanks to our Worry-free policy for cruisers: in the past 25 years none of our clients have missed the boat, and in the very rare case you are dropped off late through our mistake, we arrange and pay for your accommodation, meals and transport to your next port of call. If your ship does not dock at all — weather, a change of itinerary — there is no penalty and no cancellation fee.',
   },
   {
     path: '/transfers/',

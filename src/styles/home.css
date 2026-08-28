@@ -328,6 +328,12 @@
 
 /* ─── la barra delle voci ─────────────────────────────────────────────
    Le voci sono le stesse del sito WordPress: quelle che Google conosce. */
+/* 🔴 NIENTE `overflow:hidden` QUI, per quanto sembri la rete di
+   sicurezza ovvia contro le voci che sbordano: i pannelli delle tendine
+   (`.hd-mega`) sono figli di questo elemento e sono in posizione
+   assoluta sotto la barra. Nascondendo cio' che esce, si nasconderebbero
+   loro -- cioe' meta' del menu. Contro la sovrapposizione ci sono le tre
+   soglie piu' sotto, che stringono le voci prima che si tocchino. */
 .hd-nav{ display:flex; align-items:center; gap:0; margin-left:4px; flex:1 1 auto; min-width:0; }
 /* position:static, NON relative: cosi' il pannello si posiziona rispetto
    alla barra intera e non rispetto alla singola voce. Con `relative` il
@@ -496,6 +502,36 @@
   .hd-wa{ padding:9px 11px; }
 }
 
+/* 🔴 LA BARRA SI STRINGE PRIMA DI ROMPERSI.
+ *
+ * Con l'aggiunta di "Wine & Food" le voci sono diventate sette, e sotto
+ * una certa larghezza non ci stavano piu': "Destinations" finiva SOPRA
+ * "Quick Request", una scritta sull'altra. Non era un caso limite --
+ * succedeva su un portatile normale.
+ *
+ * La causa: le voci hanno `white-space:nowrap` quindi non si accorciano,
+ * e il blocco di destra ha `flex:none` quindi non cede spazio. Quando la
+ * somma supera la larghezza, invece di andare a capo si sovrappongono.
+ *
+ * Qui la barra cede in tre passi, dal meno al piu' doloroso: prima si
+ * stringono le spaziature fra le voci, poi si accorcia il testo, e solo
+ * alla fine sparisce "Quick Request" -- che nel menu del telefono c'e'
+ * comunque, e il cui popup si apre anche dal pulsante nella scheda tour.
+ * L'ultima cosa che se ne va e' WhatsApp, che e' l'argomento della casa. */
+@media (max-width:1439px){
+  .hd-top{ padding-inline:6px; font-size:.83rem; }
+  .hd-nav{ margin-left:0; }
+}
+@media (max-width:1319px){
+  .hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
+  .hd-freccia{ padding-inline:4px 0; }
+}
+@media (max-width:1219px){
+  /* qui il Quick Request smette di starci: resta il popup, che si apre
+     dal menu del telefono e dal pulsante sulle schede tour */
+  .hd-quick{ display:none; }
+}
+
 @media (max-width:1280px){
   /* IL PANNELLO DEL TELEFONO E' LO STESSO MENU, non una copia.
      Il <nav> esce dal flusso, diventa una colonna sotto la barra, e i
@@ -641,8 +677,11 @@
 }
 .ft-in{
   max-width:1180px; margin:0 auto; padding:38px 20px 30px;
-  display:grid; grid-template-columns:1.6fr 1fr 1fr 1.2fr; gap:32px;
+  display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr 1fr; gap:30px;
 }
+/* sotto i 1080 le cinque colonne diventano strette e i titoli dei tour
+   vanno a capo tre volte: meglio due file da tre che una fila illeggibile */
+@media (max-width:1080px){ .ft-in{ grid-template-columns:1.4fr 1fr 1fr; gap:28px; } }
 @media (max-width:900px){ .ft-in{ grid-template-columns:1fr 1fr; gap:26px; } }
 @media (max-width:560px){ .ft-in{ grid-template-columns:1fr; } }
 .ft-col{ display:flex; flex-direction:column; gap:9px; min-width:0; }

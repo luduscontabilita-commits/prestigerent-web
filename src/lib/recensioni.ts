@@ -46,7 +46,28 @@ export type Recensione = {
  * e Regiondo (chi ha prenotato dal sito). Viator resta fuori dal totale
  * perche' il suo numero comprende gia' Tripadvisor -- si mostra, non si
  * somma. Google e' fuori finche' non ha un voto verificato. */
-const NEL_TOTALE = new Set(['tripadvisor', 'getyourguide', 'regiondo']);
+const NEL_TOTALE = new Set(['tripadvisor', 'getyourguide']);
+
+/* 🔴 LE PRENOTAZIONI DIRETTE NON SI MOSTRANO E NON SI CONTANO.
+ *
+ * Sono 482 recensioni vere, raccolte da Regiondo su chi ha prenotato dal
+ * sito. Il problema non e' che siano false: e' che sono POCHE e sparse su
+ * venti tour, e quando un tour non ha altro da mostrare la scheda finisce
+ * per dire "5.0 — 8 reviews from direct bookings". Otto. Su una pagina
+ * che vuole convincere qualcuno a lasciare seicento euro, un numero cosi'
+ * lavora contro: chi legge non pensa "poche recensioni", pensa "poche
+ * prenotazioni". Meglio nessun voto che un voto che sottrae fiducia.
+ *
+ * E c'era anche un secondo effetto, peggiore perche' invisibile: erano
+ * l'UNICA differenza fra i due totali che comparivano sulla stessa
+ * pagina, 12.563 in cima e 12.081 venti centimetri sotto. Entrambi veri,
+ * uno con le dirette e uno senza. Tolte da qui, i due conti partono dalla
+ * stessa base e non possono piu' divergere.
+ *
+ * Il dato resta nel database e resta buono. Se un domani le dirette
+ * diventano migliaia, si rimette 'regiondo' in NEL_TOTALE e in DA_MOSTRARE
+ * e torna tutto, senza toccare altro. */
+const DA_MOSTRARE = (fonte: string) => fonte !== 'regiondo';
 
 /* Sotto le tre recensioni una media non vuol dire niente: un tour con due
  * voti a cinque stelle farebbe 5,0 e sballerebbe tutto. */
@@ -131,7 +152,7 @@ export async function punteggiDi(slug: string, dAzienda: Fonte[]): Promise<Fonte
      soglia da sole. */
   const MINIMO = 3;
   const perTour = (data ?? []).filter(
-    (v) => v.voto != null && v.quante != null && v.quante >= MINIMO
+    (v) => v.voto != null && v.quante != null && v.quante >= MINIMO && DA_MOSTRARE(v.fonte)
   );
   if (!perTour.length) return dAzienda;
 
@@ -360,6 +381,7 @@ export async function votiPerTour(): Promise<Record<string, VotoTour>> {
   const out: Record<string, VotoTour> = {};
   for (const r of data ?? []) {
     if (r.voto == null || r.quante == null || r.quante < MINIMO_RECENSIONI) continue;
+    if (!DA_MOSTRARE(r.fonte)) continue;
     if (out[r.tour_slug]) continue;
     out[r.tour_slug] = {
       voto: Math.round(Number(r.voto) * 10) / 10,
