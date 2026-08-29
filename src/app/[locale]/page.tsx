@@ -7,6 +7,7 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { PrimoAlMondo } from '@/components/PrimoAlMondo';
+import { Destinazioni } from '@/components/Destinazioni';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
 import { puntiScheda } from '@/lib/punti';
@@ -505,6 +506,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <div className="pr-wrap wide" style={{ position: 'relative', zIndex: 3 }}>
         {/* qui atterra la lista, disegnata da Cerca con un portale */}
         <div id="lista-tour" />
+
+        {/* LE DESTINAZIONI SUBITO DOPO I TOUR.
+            Le pastiglie sopra rispondono a "che tipo di giro", queste a
+            "dove sono / dove vado" -- ed e' la domanda che si fa chi non
+            ha ancora deciso niente. Sul sito WordPress erano sulla home
+            con la foto e il nome sopra; qui non esistevano proprio, e le
+            trovava solo chi apriva il menu sapendo gia' di cercarle. */}
+        <Destinazioni
+          tours={tours}
+          p={(path) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`)}
+        />
       </div>
 
       {/* La prova sociale con la FONTE linkata. Un numero senza fonte e' una

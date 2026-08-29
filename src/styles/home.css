@@ -2597,3 +2597,48 @@ button.hd-top{
   .hm-sotto .hm-cta{ width:100%; }
   .hm-sotto .hm-cta a{ flex:1 1 0; justify-content:center; }
 }
+
+/* ─── le destinazioni, con la foto e il nome sopra ───────────────────
+   Come sulla home di WordPress. Quattro colonne su schermo largo, due
+   sul tablet; sul telefono UNA per riga a tutta larghezza, perche' e' li'
+   che la foto fa il suo mestiere -- due riquadri affiancati su 390px
+   sono due francobolli, e un francobollo non fa venire voglia di
+   andare da nessuna parte. */
+.dst-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.dst-tutte{
+  font-size:.84rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--orange); text-decoration:none; white-space:nowrap;
+}
+.dst-tutte:hover{ text-decoration:underline; }
+.dst-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.dst-card{
+  position:relative; display:block; overflow:hidden;
+  border-radius:16px; aspect-ratio:4/3; text-decoration:none;
+  background:var(--ph);
+}
+.dst-card img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform:scale(1.02); transition:transform .5s cubic-bezier(.22,1,.36,1);
+}
+.dst-card:hover img{ transform:scale(1.08); }
+/* La velatura sta solo in basso, dove poggia il nome: coprire tutta la
+   foto per leggere due parole e' lo stesso errore che avevamo nell'hero. */
+.dst-vel{
+  position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(10,15,21,0) 42%, rgba(10,15,21,.72) 100%);
+}
+.dst-nome{
+  position:absolute; left:16px; right:16px; bottom:14px;
+  color:#fff; font-size:1.02rem; font-weight:800; line-height:1.25;
+  text-shadow:0 1px 3px rgba(8,12,17,.6);
+}
+.dst-card:focus-visible{ outline:3px solid var(--orange); outline-offset:3px; }
+@media (max-width:1100px){ .dst-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:760px){
+  .dst-grid{ grid-template-columns:1fr; gap:12px; }
+  .dst-card{ aspect-ratio:16/10; border-radius:14px; }
+  .dst-nome{ font-size:1.08rem; left:14px; right:14px; bottom:12px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .dst-card img, .dst-card:hover img{ transition:none; transform:none; }
+}
