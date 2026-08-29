@@ -287,6 +287,11 @@ export default async function TourPage({
 
   const prezzo = prezzoDi(product?.price, schede);
 
+  /* I fatti si calcolano una volta sola: servono alla barra qui sotto e
+     alla riga del prezzo, che da sola non diceva DA DOVE si parte. */
+  const fatti = fattiDi({ kind: tour.kind, durata: product?.durationLabel, schede });
+  const partenza = fatti.find((f) => f.etichetta === 'Location')?.valore ?? null;
+
   /* 🔴 IL VOTO PER `aggregateRating`, E DA DOVE PUO' VENIRE.
    *
    * Regola non negoziabile di Google: il voto dichiarato nei dati
@@ -427,6 +432,15 @@ export default async function TourPage({
           <p className="hero-dep">
             <b>from &euro;{prezzo.valore.toFixed(0)}</b>
             {product?.durationLabel ? ` · ${product.durationLabel}` : null}
+            {/* 🔴 DA DOVE SI PARTE, nella riga che tutti leggono.
+                "from €89 · 5 hours" non dice la cosa che a un turista
+                interessa quanto il prezzo: se il tour parte dalla citta'
+                in cui dorme. Chi e' a Firenze e legge una scheda che non
+                lo nomina deve andarselo a cercare, e spesso non lo fa.
+                La citta' e' la stessa della barra dei fatti -- calcolata
+                una volta e passata a tutti e due -- quindi non possono
+                dire due cose diverse. */}
+            {partenza ? ` · from ${partenza}` : null}
             {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
@@ -449,9 +463,7 @@ export default async function TourPage({
          * dal testo della scheda TIME / LOCATION. Dove il dato manca la
          * voce sparisce -- vedi la nota in src/lib/fatti.ts su perche' un
          * valore predefinito qui sarebbe pericoloso. */}
-        <BarraFatti
-          fatti={fattiDi({ kind: tour.kind, durata: product?.durationLabel, schede })}
-        />
+        <BarraFatti fatti={fatti} />
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
             solo dove sono davvero sue. */}
