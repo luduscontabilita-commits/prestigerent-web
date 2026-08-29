@@ -80,10 +80,21 @@ const TITOLO: Record<string, string> = {
   other: 'Other tours',
 };
 
-/* Senza filtri non si mostra "tutto": si mostrano i tour scelti a mano in
-   `PRIMI`, cioe' quelli che vendono. Il titolo lo dice, invece di
-   lasciar credere che sia un elenco qualunque tagliato a sei. */
-const TITOLO_CONSIGLIATI = 'Our most booked experiences';
+/* 🔴 LA VETRINA HA UN NOME, NON UNA STATISTICA.
+ *
+ * Diceva "Our most booked experiences": vero, ma e' un dato di fatto sul
+ * passato, e chi legge non e' venuto a sapere cosa hanno comprato gli
+ * altri -- e' venuto a capire cosa fare della sua settimana in Toscana.
+ *
+ * Sono i tre prodotti che fanno l'85% del fatturato piu' i migliori
+ * delle altre famiglie: non un elenco tagliato a dodici, una scelta. Il
+ * titolo lo dice, e il sottotitolo tiene la prova -- "the ones our
+ * guests book most" -- accanto alla promessa, cosi' non e' una vanteria
+ * ma una cosa verificabile. */
+const TITOLO_CONSIGLIATI = 'Our signature Tuscany experiences';
+const OCCHIELLO_CONSIGLIATI = 'Chosen by us';
+const SOTTO_CONSIGLIATI =
+  'The days we would book ourselves — and the ones our guests book most.';
 
 /* 🔴 IL CONTEGGIO E' DEL MESE, NON DEL GIORNO.
  *
@@ -169,7 +180,15 @@ export function HomeTours({
     'private-rome-from-civitavecchia-port',
     'pompeii-vesuvius-from-naples-port',
     'florence-to-rome-with-stop-in-siena',
-    'transfer-airport-to-florence',
+    /* 🔴 QUI C'ERA `transfer-airport-to-florence`, ED E' STATO TOLTO.
+       Un passaggio dall'aeroporto e' un servizio, non un'esperienza: in
+       una vetrina intitolata "le esperienze che consigliamo" tirava giu'
+       tutte le altre, perche' il visitatore legge la fila come un'unica
+       promessa. I transfer restano dove hanno senso -- la pastiglia
+       "Transfer", il menu, le pagine di categoria -- e li' li cerca chi
+       ne ha bisogno davvero.
+       Al suo posto un tour del vino: e' il prodotto della casa. */
+    'montalcino-brunello-wine-tour',
   ];
   const posto = (slug: string) => {
     const i = PRIMI.indexOf(slug);
@@ -198,6 +217,10 @@ export function HomeTours({
   }, [tours, filtro, categoria, luogo, daUrl]);
 
   const haCercato = Boolean(filtro?.da || filtro?.tipo || filtro?.persone || categoria || luogo || daUrl);
+  /* La veste "nobile" vale SOLO per la dodicina scelta a mano. Appena si
+     filtra o si cerca, l'elenco non e' piu' una vetrina ma un risultato,
+     e vestirlo da vetrina sarebbe una promessa che non manteniamo. */
+  const vetrina = !haCercato;
   const mostrati = haCercato
     ? visibili
     : [...visibili].sort((a, b) => posto(a.slug) - posto(b.slug)).slice(0, QUANTI);
@@ -349,7 +372,7 @@ export function HomeTours({
 
   return (
     <>
-      <section className="pr-sec" id="tours">
+      <section className={vetrina ? 'pr-sec hm-nobile' : 'pr-sec'} id="tours">
         <div className="pr-wrap wide">
           <div className="hm-cats">
             <button
@@ -374,6 +397,7 @@ export function HomeTours({
           </div>
 
           <div className="pr-head" style={{ marginBottom: 18 }}>
+            {vetrina && <p className="hm-occhiello">{OCCHIELLO_CONSIGLIATI}</p>}
             <h2 className="pr-title">
               {(() => {
                 const cat = filtro?.tipo || categoria;
@@ -388,12 +412,13 @@ export function HomeTours({
             {/* Il conteggio scende sotto il titolo: era lui il titolo, e
                 un numero grande in cima a una sezione non dice di cosa
                 si tratta. Qui fa il suo mestiere, che e' dare la misura. */}
-            <p className="pr-lead">
-              {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
-              {!(filtro?.tipo || categoria) && !luogo && !daUrl && !filtro?.da
-                ? ' · hand-picked, the ones our guests book most'
-                : ''}
-            </p>
+            {vetrina ? (
+              <p className="pr-lead hm-sotto-nobile">{SOTTO_CONSIGLIATI}</p>
+            ) : (
+              <p className="pr-lead">
+                {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
+              </p>
+            )}
             {dalMenu && (
               <span className="hm-chip">
                 In and around {dalMenu}

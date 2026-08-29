@@ -2861,3 +2861,77 @@ button.hd-top{
 @media (prefers-reduced-motion: reduce){
   .dst-card img, .dst-card:hover img{ transition:none; transform:none; }
 }
+
+/* ══ LA VETRINA: LE ESPERIENZE CONSIGLIATE ══════════════════════════
+ *
+ * La dodicina scelta a mano stava dentro la stessa cornice di un
+ * risultato di ricerca qualunque: stesso fondo, stesso titolo, stesse
+ * schede. Chi arriva sulla home non aveva modo di capire che quella fila
+ * e' la proposta della casa e non un elenco tagliato a dodici.
+ *
+ * La distinzione e' tutta in cose piccole -- un fondo caldo appena
+ * staccato dal bianco, due filetti, un occhiello -- e non in un colore
+ * nuovo. Un blocco che urla non sembra piu' importante, sembra una
+ * reclame: qui il segnale e' che questa sezione ha un'aria diversa,
+ * piu' quieta, non piu' forte.
+ *
+ * Vale solo quando `vetrina` e' vera in HomeTours.tsx, cioe' quando non
+ * si sta filtrando: appena si cerca, la promessa non varrebbe piu'. */
+.hm-nobile{
+  /* Il fondo caldo esce dal contenitore e prende tutta la riga: e'
+     quello che fa leggere il blocco come una fascia e non come un
+     riquadro appoggiato in mezzo alla pagina. */
+  background:
+    linear-gradient(180deg, rgba(110,27,44,.045), rgba(110,27,44,0) 62%),
+    var(--fondo-caldo, #FBF7F1);
+  border-block:1px solid var(--line);
+  padding-block:52px;
+}
+html[data-theme="dark"] .hm-nobile{
+  background:
+    linear-gradient(180deg, rgba(255,154,77,.06), rgba(255,154,77,0) 62%),
+    rgba(255,255,255,.022);
+}
+
+/* L'OCCHIELLO. Due parole sopra il titolo, in colore vino e spaziate:
+   dicono da dove viene la scelta prima ancora che si legga il titolo.
+   Il vino e' il colore della casa e non compete con l'arancio dei
+   pulsanti, che deve restare l'unica cosa su cui si preme. */
+.hm-occhiello{
+  margin:0; font-size:.72rem; font-weight:800; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--wine);
+  display:flex; align-items:center; gap:10px;
+}
+/* Il filetto continua la riga dell'occhiello fin dove c'e' spazio: da
+   solo, un testo cosi' corto sopra un titolo grande sembra un refuso. */
+.hm-occhiello::after{
+  content:""; flex:1; height:1px; max-width:120px;
+  background:linear-gradient(90deg, var(--line), transparent);
+}
+html[data-theme="dark"] .hm-occhiello{ color:var(--orange-hi, #FF9A4D); }
+
+.hm-nobile .pr-title{ margin-top:10px; }
+.hm-sotto-nobile{ max-width:52ch; }
+
+/* LE SCHEDE DELLA VETRINA.
+   Non piu' grandi -- cambiare la misura qui vorrebbe dire due griglie da
+   tenere allineate per sempre -- ma poggiate meglio: bordo appena piu'
+   deciso e un'ombra vera, cosi' si staccano dal fondo caldo invece di
+   sparirci dentro come farebbero con l'ombra di prima, calcolata sul
+   bianco. */
+.hm-nobile .hm-card{
+  border-color:color-mix(in srgb, var(--line) 70%, var(--wine) 30%);
+  box-shadow:0 2px 10px rgba(36,51,63,.06);
+}
+.hm-nobile .hm-card:hover{ box-shadow:0 16px 38px rgba(110,27,44,.16); }
+html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
+
+/* Le frecce prendono il fondo della fascia, altrimenti restano due
+   pastiglie bianche appiccicate sopra un fondo che bianco non e'. */
+.hm-nobile .hm-frec{ background:var(--fondo-caldo, #FBF7F1); }
+.hm-nobile .hm-frec:disabled:hover{ background:var(--fondo-caldo, #FBF7F1); }
+
+@media (max-width: 720px){
+  .hm-nobile{ padding-block:38px; }
+  .hm-occhiello{ font-size:.68rem; letter-spacing:.14em; }
+}
