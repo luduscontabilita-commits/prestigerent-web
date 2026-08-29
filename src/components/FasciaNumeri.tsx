@@ -160,7 +160,14 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
       {n.clienti != null && (
         <div className="fn-cella">
           <b className="fn-num">
-            <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" />
+            {/* 🔴 QUESTO CONTEGGIO DURA PIU' DEGLI ALTRI.
+                Ottocento millisecondi bastano per salire a 4,9 o a 24: si
+                vedono passare tutte le cifre. Per arrivare a 700 no --
+                il numero scatta cosi' in fretta che si legge solo
+                l'arrivo, e l'unico numero della fascia che vale la pena
+                guardare mentre sale e' proprio questo. Due secondi e
+                mezzo: si vede la corsa, e non si aspetta. */}
+            <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" durata={2500} />
           </b>
           <span className="fn-eti">guests driven since {n.anno ?? 2002}</span>
         </div>
