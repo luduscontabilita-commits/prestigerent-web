@@ -39,14 +39,14 @@ import { ripassaNumeri, ripassoConfigurato } from '@/lib/numeri-freschi';
  * Il piano gratuito di Vercel concede un lavoro programmato al giorno, e
  * quello e' occupato dalle conversioni; e comunque "quante prenotazioni
  * oggi" alle 3:20 di notte non significa niente. Quindi l'aggiornamento
- * si aggancia al traffico: se il dato ha piu' di mezz'ora si rilegge
+ * si aggancia al traffico: se il dato ha piu' di un quarto d'ora si rilegge
  * Regiondo DOPO aver risposto, con `after`, cosi' chi ha fatto la
  * richiesta non aspetta un millisecondo in piu'.
  *
  * Non e' una richiesta per visitatore: la risposta sta in cache un minuto
  * sulla rete, quindi questo codice gira al massimo una volta al minuto
- * per quanti visitatori ci siano, e la guardia sulla mezz'ora dentro
- * `ripassaNumeri` lo riduce a due volte l'ora.
+ * per quanti visitatori ci siano, e la guardia dei quindici minuti
+ * dentro `ripassaNumeri` lo riduce a quattro volte l'ora.
  *
  * Se il ripasso fallisce non succede niente di visibile: si continua a
  * servire l'ultimo dato buono. Un riquadro un po' vecchio e' meglio di

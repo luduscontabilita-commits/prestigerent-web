@@ -27,10 +27,26 @@ import { grafo, hreflangDi, organization, sitoWeb } from '@/lib/schema';
 import type { Metadata } from 'next';
 import '@/styles/home.css';
 
-/* La home si rigenera ogni ora: i prezzi arrivano da Regiondo, quindi non
-   possono essere congelati alla compilazione, ma nemmeno richiesti a ogni
-   visita (49 chiamate per visitatore). */
-export const revalidate = 3600;
+/* LA HOME SI RIGENERA OGNI QUINDICI MINUTI.
+ *
+ * Non e' un lavoro programmato e non consuma il cron giornaliero: Next
+ * ricostruisce la pagina quando qualcuno la chiede e la copia in memoria
+ * ha piu' di questo tempo. Chi fa la richiesta riceve subito la copia
+ * vecchia -- non aspetta la ricostruzione -- e il visitatore dopo trova
+ * quella nuova. Senza traffico non si ricostruisce niente, che e'
+ * giusto: non c'e' nessuno a cui mostrarla.
+ *
+ * Era un'ora, ed era troppo per le schede che mostrano "booked this
+ * month": il conteggio si aggiorna ogni quindici minuti (vedi
+ * FRESCO_MINUTI in numeri-freschi.ts) e restava fermo in pagina fino a
+ * quarantacinque minuti dopo essere cambiato. Adesso i due tempi
+ * coincidono e non ha senso scendere sotto: sarebbe ricostruire la
+ * pagina per ridisegnare lo stesso numero.
+ *
+ * I prezzi arrivano da Regiondo, quindi non possono essere congelati
+ * alla compilazione, ma nemmeno chiesti a ogni visita: sono 49 chiamate
+ * per visitatore. */
+export const revalidate = 900;
 
 const PARTENZE = [
   { valore: 'florence', etichetta: 'Florence' },

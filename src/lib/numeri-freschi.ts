@@ -87,8 +87,15 @@ const GIORNI_MESE = 30;
  *  perche' un `total_pages` sballato non si trasformi in cento richieste. */
 const PAGINE_MAX = 12;
 
-/** Sotto questa eta' il dato e' abbastanza fresco e non si tocca. */
-export const FRESCO_MINUTI = 30;
+/** Sotto questa eta' il dato e' abbastanza fresco e non si tocca.
+ *
+ *  Quindici e non trenta perche' la home si rigenera ogni quindici
+ *  minuti: tenere i due tempi uguali evita il caso peggiore in cui il
+ *  numero e' gia' cambiato in banca dati ma la pagina lo ridisegna
+ *  vecchio. Non e' un lavoro programmato -- il ripasso si aggancia al
+ *  traffico -- quindi il cron giornaliero di Vercel resta libero per le
+ *  conversioni. */
+export const FRESCO_MINUTI = 15;
 
 /** Quante righe si tengono: il riquadro ne mostra 25. */
 const RECENTI_TENUTE = 150;
