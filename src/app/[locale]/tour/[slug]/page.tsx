@@ -528,22 +528,131 @@ export default async function TourPage({
           Prima stava in fondo, dopo recensioni e schede informative: ci
           arrivava solo chi aveva gia' deciso, cioe' chi non ne aveva
           bisogno. */}
+      {/* 🔴 IL RIASSUNTO PRIMA DEL RACCONTO.
+       *
+       * Questo blocco stava in quinta posizione, dopo l'itinerario lungo,
+       * i video e le testimonianze. Ma sono sei righe che dicono tutto --
+       * e' il riassunto della giornata -- mentre l'itinerario e' il
+       * racconto: chi arriva sulla pagina vuole prima sapere SE gli
+       * interessa, e solo dopo come funziona.
+       *
+       * Il sito WordPress li metteva in quest'ordine e si leggeva meglio:
+       * barra dei fatti, highlights, itinerario. Qui si torna a quello.
+       */}
+      {punti.length > 0 && (
+        <section className="pr-sec tight" id="highlights">
+          <div className="pr-wrap wide">
+            <div className="pr-head">
+              <h2 className="pr-title">Why you will <em className="hl place">remember it</em></h2>
+            </div>
+            <ul className="hl2-grid">
+              {punti.map((p) => (
+                <li className="hl2-item" key={p}>
+                  <svg className="hl2-ico" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="12" fill="currentColor" />
+                    <path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff"
+                          strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span>{testo(p)}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="pr-tguar">
+              <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h — 100% refund</span>
+              <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
+              {/* 🔴 QUI C'ERA "Best price when you book direct". E' FALSO:
+                  il Wine Experience costa 89 euro qui e 89 su
+                  GetYourGuide, verificato. Chi confronta i prezzi
+                  controlla sempre, e in dieci secondi smette di credere
+                  anche a tutto il resto della pagina.
+                  Al suo posto la cosa vera che un intermediario non puo'
+                  dare: nessun costo di prenotazione aggiunto sopra il
+                  prezzo. */}
+              <span><i aria-hidden="true">🏷️</i><b>No booking fee</b> on top of the price</span>
+            </div>
+          </div>
+        </section>
+      )}
+
       {contenuto.itinerary && (
         <section className="pr-sec" id="itinerary">
           <div className="pr-wrap">
             <div className="pr-head">
               <h2 className="pr-title">The <em className="hl place">itinerary</em></h2>
             </div>
-            {/* L'itinerario si legge tutto, come sul sito attuale: e' gia'
-                spezzato in titoletti, e il ritaglio a 320px lo troncava a
-                meta' di una frase. */}
-            <div
-              className="pr-prose"
-              dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
-            />
+            {/* 🔴 SI APRE, NON SI SCORRE.
+             *
+             * L'itinerario e' il testo piu' lungo della pagina: da solo
+             * sono tre o quattro schermate di telefono, e sta fra il
+             * riassunto e le schede informative. Lasciato aperto obbliga
+             * chi ha gia' capito a scorrere tutto per arrivare a "cosa e'
+             * compreso" -- e chi si stanca di scorrere non arriva al
+             * calendario. Il sito WordPress lo chiudeva con un "Read
+             * more", ed era la scelta giusta.
+             *
+             * Un ritaglio secco a un'altezza fissa, pero', taglia a meta'
+             * di una frase: era il difetto della versione precedente. Qui
+             * il testo sfuma sotto, cosi' si vede che continua, e il
+             * pulsante dice quanto manca senza numeri inventati.
+             *
+             * Niente JavaScript: una casella di spunta nascosta e il CSS.
+             * Funziona anche prima che la pagina sia interattiva, e su un
+             * telefono lento quello e' proprio il momento in cui la gente
+             * prova a premere. */}
+            <div className="pr-lungo">
+              <input
+                type="checkbox"
+                id="itin-tutto"
+                className="pr-lungo-int"
+                aria-label="Show the full itinerary"
+              />
+              <div
+                className="pr-prose"
+                dangerouslySetInnerHTML={{ __html: pulisci(contenuto.itinerary) }}
+              />
+              <label className="pr-lungo-piu" htmlFor="itin-tutto">
+                <span className="apri">Read the full itinerary</span>
+                <span className="chiudi">Show less</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </label>
+            </div>
           </div>
         </section>
       )}
+
+      {/* LE SCHEDE SUBITO DOPO L'ITINERARIO, non in fondo alla pagina.
+       *
+       * Stavano dopo recensioni e premi, cioe' dopo la parte che
+       * convince: ci arrivava solo chi aveva gia' deciso. Ma "cosa e'
+       * compreso", "quanto costa per quante persone" e "dove ci si trova"
+       * sono le domande che uno si fa MENTRE legge l'itinerario, non dopo
+       * essersi convinto -- e se non trova la risposta li' se ne va a
+       * cercarla su Viator.
+       *
+       * L'ordine e' quello del sito WordPress: fatti, riassunto,
+       * racconto, dettagli. Poi la prova -- video, premi, recensioni --
+       * che serve a chi e' rimasto e sta per decidere.
+       */}
+      {Object.keys(schede).length > 0 && (
+        <section className="pr-sec alt" id="info">
+          <div className="pr-wrap wide">
+            <div className="pr-head">
+              <h2 className="pr-title">
+                <em className="hl place">
+                  {tour.kind === 'private' ? 'Private tour' : tour.kind === 'small_group' ? 'Small group tour' : 'This tour'}
+                </em>{' '}
+                &mdash; everything you need to know
+              </h2>
+            </div>
+            <InfoTabs tabs={schede} />
+          </div>
+        </section>
+      )}
+
 
       {video.length > 0 && <Videos video={video} />}
 
@@ -602,50 +711,6 @@ export default async function TourPage({
       </section>
 
       <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
-
-      {punti.length > 0 && (
-        <section className="pr-sec tight" id="highlights">
-          <div className="pr-wrap wide">
-            <div className="pr-head">
-              <h2 className="pr-title">Why you will <em className="hl place">remember it</em></h2>
-            </div>
-            <ul className="hl2-grid">
-              {punti.map((p) => (
-                <li className="hl2-item" key={p}>
-                  <svg className="hl2-ico" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="12" fill="currentColor" />
-                    <path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff"
-                          strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span>{testo(p)}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="pr-tguar">
-              <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h — 100% refund</span>
-              <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
-              <span><i aria-hidden="true">🏷️</i><b>Best price</b> when you book direct</span>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {Object.keys(schede).length > 0 && (
-        <section className="pr-sec alt" id="info">
-          <div className="pr-wrap wide">
-            <div className="pr-head">
-              <h2 className="pr-title">
-                <em className="hl place">
-                  {tour.kind === 'private' ? 'Private tour' : tour.kind === 'small_group' ? 'Small group tour' : 'This tour'}
-                </em>{' '}
-                &mdash; everything you need to know
-              </h2>
-            </div>
-            <InfoTabs tabs={schede} />
-          </div>
-        </section>
-      )}
 
       </div>{/* /.pg-main */}
 

@@ -749,6 +749,38 @@ body{
 .pr-title{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
 .pr-lead{ margin-top:12px; font-size:1.04rem; font-weight:500; color:var(--ink-soft); }
 
+/* ─── il testo lungo che si apre ─────────────────────────────────────
+   L'itinerario chiuso mostra le prime righe e sfuma: si capisce che
+   continua senza che una frase resti tagliata a meta'. Nessun
+   JavaScript -- una casella di spunta nascosta e il fratello successivo
+   -- cosi' funziona anche prima che la pagina diventi interattiva, che
+   su un telefono lento e' proprio quando la gente prova a premere. */
+.pr-lungo{ position:relative; }
+.pr-lungo-int{ position:absolute; opacity:0; width:0; height:0; pointer-events:none; }
+.pr-lungo .pr-prose{
+  max-height:290px; overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 62%,transparent 100%);
+}
+.pr-lungo-int:checked ~ .pr-prose{
+  max-height:none;
+  -webkit-mask-image:none; mask-image:none;
+}
+.pr-lungo-piu{
+  display:inline-flex; align-items:center; gap:6px; margin-top:12px;
+  cursor:pointer; user-select:none;
+  font-size:.92rem; font-weight:800; color:var(--orange);
+}
+.pr-lungo-piu svg{ width:15px; height:15px; transition:transform .18s; }
+.pr-lungo-piu .chiudi{ display:none; }
+.pr-lungo-int:checked ~ .pr-lungo-piu .apri{ display:none; }
+.pr-lungo-int:checked ~ .pr-lungo-piu .chiudi{ display:inline; }
+.pr-lungo-int:checked ~ .pr-lungo-piu svg{ transform:rotate(180deg); }
+/* La casella si comanda anche da tastiera: senza questo il contorno di
+   messa a fuoco non si vedrebbe, perche' la casella e' nascosta. */
+.pr-lungo-int:focus-visible ~ .pr-lungo-piu{ outline:3px solid var(--orange); outline-offset:3px; border-radius:4px; }
+@media (prefers-reduced-motion: reduce){ .pr-lungo-piu svg{ transition:none; } }
+
 /* ─── la barra dei fatti, com'era su WordPress ───────────────────────
    Tre colonne e due righe, non otto righe incolonnate: il primo
    tentativo occupava sei centimetri di scorrimento in piu' prima ancora
