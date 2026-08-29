@@ -788,9 +788,22 @@ body{
    `auto-fit` con un minimo di 240px fa tre colonne sul desktop, due sul
    tablet e una sul telefono, da sola e senza soglie da mantenere. */
 .hero-fatti{
-  display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
-  gap:12px 26px; margin:20px 0 0; padding:18px 0 4px;
+  display:grid; grid-template-columns:1fr;
+  gap:10px 26px; margin:20px 0 0; padding:18px 0 4px;
   border-top:1px solid var(--line);
+}
+/* 🔴 LE COLONNE SI DICHIARANO, NON SI DEDUCONO.
+   Con `auto-fit minmax(240px,1fr)` la barra restava a UNA colonna: la
+   colonna di testo dell'hero non e' larga abbastanza perche' due tracce
+   da 240px ci stiano, quindi il browser faceva la cosa giusta secondo la
+   regola e la cosa sbagliata secondo l'occhio -- otto righe in fila.
+   Con le soglie esplicite e `minmax(0,1fr)` le colonne ci sono davvero:
+   le voci si accorciano invece di rifiutarsi di stare accanto. */
+@media (min-width:600px){
+  .hero-fatti{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+}
+@media (min-width:1000px){
+  .hero-fatti{ grid-template-columns:repeat(3, minmax(0,1fr)); }
 }
 .hero-fatti .hf{ display:flex; align-items:flex-start; gap:9px; min-width:0; }
 /* L'icona e' il vero indice: l'occhio trova "quanto dura" dalla
@@ -805,7 +818,7 @@ body{
 .hero-fatti dt{ display:inline; font-size:.9rem; font-weight:800; color:var(--ink); }
 .hero-fatti dd{ display:inline; margin:0; font-size:.9rem; font-weight:500; color:var(--ink-soft); }
 @media (max-width:560px){
-  .hero-fatti{ grid-template-columns:1fr; gap:9px; padding-top:14px; }
+  .hero-fatti{ gap:9px; padding-top:14px; }
   .hero-fatti dt, .hero-fatti dd{ font-size:.86rem; }
 }
 

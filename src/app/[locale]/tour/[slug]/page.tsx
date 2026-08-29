@@ -561,15 +561,15 @@ export default async function TourPage({
             <div className="pr-tguar">
               <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h — 100% refund</span>
               <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
-              {/* 🔴 QUI C'ERA "Best price when you book direct". E' FALSO:
-                  il Wine Experience costa 89 euro qui e 89 su
-                  GetYourGuide, verificato. Chi confronta i prezzi
-                  controlla sempre, e in dieci secondi smette di credere
-                  anche a tutto il resto della pagina.
-                  Al suo posto la cosa vera che un intermediario non puo'
-                  dare: nessun costo di prenotazione aggiunto sopra il
-                  prezzo. */}
-              <span><i aria-hidden="true">🏷️</i><b>No booking fee</b> on top of the price</span>
+              {/* LA GARANZIA SUL PREZZO.
+                  Non e' "costa meno che su Viator" -- li' costa uguale, e
+                  chi confronta lo verifica in dieci secondi. E' che
+                  nessun canale lo vende a MENO: il prezzo piu' basso e'
+                  questo, e in giro non ci sono solo Viator e
+                  GetYourGuide. Detta cosi' regge al controllo, e in piu'
+                  toglie il dubbio che tratta chi arriva dal confronto:
+                  "se prenoto qui sto pagando di piu'?". */}
+              <span><i aria-hidden="true">🏷️</i><b>Best price guaranteed</b> &mdash; no booking fee</span>
             </div>
           </div>
         </section>
