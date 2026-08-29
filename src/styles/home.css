@@ -13,7 +13,17 @@
    fiducia e due pulsanti. E' l'ordine in cui si legge: chi sono, cosa
    fanno, dove cerco, perche' dovrei fidarmi, cosa faccio adesso. */
 .hm-hero{
-  position:relative; min-height:clamp(560px,64vw,720px);
+  /* 🔴 LO `z-index` QUI E' QUELLO CHE TIENE LA TENDINA SOPRA IL RESTO.
+     Senza, `.hm-hero` non crea un piano proprio: i suoi figli con
+     `z-index` (la tendina della ricerca sta a 5, dentro `.hm-hero-in`)
+     finiscono a confrontarsi con le sezioni SORELLE, e a parita' di
+     numero vince quella che sta piu' avanti nel documento. Risultato
+     misurato: la fascia Tripadvisor -- anche lei a 5, e scritta dopo --
+     copriva l'elenco delle partenze appena si apriva. Con un piano
+     dichiarato qui, tutto quello che sta nell'hero resta sopra
+     qualunque cosa venga dopo, e nessuno deve piu' rincorrere numeri. */
+  position:relative; z-index:10;
+  min-height:clamp(560px,64vw,720px);
   display:flex; flex-direction:column; justify-content:center;
   padding:80px 20px 44px; color:#fff;
   /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
@@ -2515,7 +2525,9 @@ button.hd-top{
    dell'hero. Il colore e' scuro perche' il marchio Tripadvisor e'
    bianco: vedi la nota nel componente. */
 .pam{
-  position:relative; z-index:5;
+  /* z-index basso apposta: deve stare sopra il proprio sfondo e basta.
+     Sopra ci passa l'hero, che ha un piano piu' alto. */
+  position:relative; z-index:1;
   margin-top:-1px;
   background:linear-gradient(180deg, rgba(24,30,42,.72), rgba(24,30,42,.92));
   color:#fff; backdrop-filter:blur(3px);
