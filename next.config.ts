@@ -244,7 +244,10 @@ const nextConfig: NextConfig = {
 
          Un 404 non trasferisce niente. Ogni giorno che resta cosi' e'
          posizionamento che si perde su indirizzi che valgono. */
-      { source: '/product/:path*', destination: '/tour/:path*', permanent: true },
+      /* Con la barra in fondo, come per `/categoria-prodotto/` qui sopra:
+         senza, `trailingSlash` deve rimediare con un secondo 308 e
+         ottantasei indirizzi storici farebbero due salti invece di uno. */
+      { source: '/product/:path*', destination: '/tour/:path*/', permanent: true },
 
       /* LA PAGINAZIONE DI WORDPRESS.
          `/categoria-prodotto/<cat>/page/2/`, `/shop/page/2/` e `/page/2/`

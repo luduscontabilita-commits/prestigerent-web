@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { ultimePrenotazioni, tuttiIConteggi } from '@/lib/riprova';
+import { ripassaNumeri, ripassoConfigurato } from '@/lib/numeri-freschi';
 
 /* LE PRENOTAZIONI VERE, RILETTE MENTRE LA PAGINA E' APERTA.
  *
@@ -29,10 +30,45 @@ import { ultimePrenotazioni, tuttiIConteggi } from '@/lib/riprova';
  * trattato come se fosse gia' pubblico -- perche' lo e'.
  */
 
+/* 🔴 QUESTA ROTTA NON SI LIMITA A LEGGERE: TIENE FRESCO IL DATO.
+ *
+ * `prenotazioni_recenti` si riempiva solo premendo un pulsante in
+ * /admin/numeri/. Il 29 agosto 2026 l'ultima riga era del 25 agosto: il
+ * sito diceva "4 days ago" sotto ogni prenotazione e "0 booked today" su
+ * ogni scheda, mentre Regiondo ne registrava diciassette nella sola notte
+ * prima. Non un numero basso -- un numero fermo.
+ *
+ * Il piano gratuito di Vercel concede un lavoro programmato al giorno, e
+ * quello e' occupato dalle conversioni; e comunque "quante prenotazioni
+ * oggi" alle 3:20 di notte non significa niente. Quindi l'aggiornamento
+ * si aggancia al traffico: se il dato ha piu' di mezz'ora si rilegge
+ * Regiondo DOPO aver risposto, con `after`, cosi' chi ha fatto la
+ * richiesta non aspetta un millisecondo in piu'.
+ *
+ * Non e' una richiesta per visitatore: la risposta sta in cache un minuto
+ * sulla rete, quindi questo codice gira al massimo una volta al minuto
+ * per quanti visitatori ci siano, e la guardia sulla mezz'ora dentro
+ * `ripassaNumeri` lo riduce a due volte l'ora.
+ *
+ * Se il ripasso fallisce non succede niente di visibile: si continua a
+ * servire l'ultimo dato buono. Un riquadro un po' vecchio e' meglio di
+ * una rotta che risponde errore. */
 export const revalidate = 60;
 
 export async function GET() {
   const [avvisi, conteggi] = await Promise.all([ultimePrenotazioni(25), tuttiIConteggi()]);
+
+  if (ripassoConfigurato()) {
+    after(async () => {
+      try {
+        await ripassaNumeri();
+      } catch {
+        /* Regiondo lento o irraggiungibile: si riprova al prossimo giro.
+           Un errore qui non deve comparire da nessuna parte, perche' non
+           ha tolto niente a nessuno. */
+      }
+    });
+  }
 
   return NextResponse.json(
     { avvisi, conteggi },
