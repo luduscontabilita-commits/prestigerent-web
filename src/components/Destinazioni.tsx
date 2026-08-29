@@ -23,12 +23,32 @@ import { foto as ottimizza, fotoSet } from '@/lib/foto';
 
 type Tour = { slug: string; foto: string | null };
 
-const POSTI: { titolo: string; href: string; da: string; alt: string }[] = [
+const MEDIA = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/';
+
+/* 🔴 LA FOTO SI SCEGLIE, NON SI EREDITA.
+ *
+ * Prima ogni destinazione prendeva la PRIMA foto di un tour. Sembra
+ * comodo e produce errori che si vedono da lontano: "Milan & Lake Como"
+ * mostrava il concessionario Lamborghini (la prima foto del tour con
+ * sosta al museo), e "Florence & Tuscany" una cantina buia -- che e' una
+ * bella foto, ma non e' ne' Firenze ne' la Toscana.
+ *
+ * La prima foto di un tour risponde a "com'e' questa esperienza"; una
+ * destinazione deve rispondere a "com'e' questo posto". Sono due domande
+ * diverse, e la seconda non si puo' dedurre dalla prima.
+ *
+ * Percio' `img` indica il file esatto e vince sempre. `da` resta come
+ * ripiego per le destinazioni dove la prima foto del tour va gia' bene.
+ */
+const POSTI: { titolo: string; href: string; da: string; img?: string; alt: string }[] = [
   {
     titolo: 'Florence & Tuscany',
     href: '/destinations/florence-tuscany/',
     da: 'wine-experience-in-tuscany',
-    alt: 'Vineyards and rolling hills in the Chianti countryside',
+    /* la cantina e' bella ma e' un interno: una destinazione si riconosce
+       dal paesaggio, non da una stanza */
+    img: 'wp/2021/09/tuscany-hills-opt.jpg',
+    alt: 'The rolling hills of the Tuscan countryside',
   },
   {
     titolo: 'Rome',
@@ -46,7 +66,10 @@ const POSTI: { titolo: string; href: string; da: string; alt: string }[] = [
     titolo: 'Milan & Lake Como',
     href: '/destinations/milan-como-destinations/',
     da: 'milan-with-stop-at-lamborghini',
-    alt: 'Milan and the lakes, with the motor valley on the way',
+    /* NON la prima foto di quel tour: e' il concessionario Lamborghini,
+       un capannone di vetro che non dice ne' Milano ne' il lago. */
+    img: 'wp/2021/09/milan-city-duomo-opt.jpg',
+    alt: 'The Duomo of Milan',
   },
   {
     titolo: 'Naples & the Amalfi Coast',
@@ -58,7 +81,11 @@ const POSTI: { titolo: string; href: string; da: string; alt: string }[] = [
     titolo: 'From Livorno port',
     href: '/destinations/livorno-port-destinations/',
     da: 'florence-tuscany-from-livorno-port',
-    alt: 'Shore excursions from the Livorno quay',
+    /* La prima foto di quel tour e' la cupola di Firenze, che compare
+       gia' due riquadri sopra: dalla banchina di Livorno si va anche a
+       Pisa, e la torre non si confonde con nient'altro. */
+    img: 'wp/2021/03/pisa-torre.jpg',
+    alt: 'The leaning tower of Pisa, a shore excursion from Livorno',
   },
   {
     titolo: 'From La Spezia port',
@@ -84,7 +111,10 @@ export function Destinazioni({ tours, p }: { tours: Tour[]; p: (path: string) =>
   /* Una destinazione senza foto non si disegna: un riquadro grigio col
      nome sopra sembra un errore di caricamento, e su una home fa piu'
      danno di una destinazione in meno. */
-  const posti = POSTI.map((d) => ({ ...d, src: perSlug.get(d.da) ?? null })).filter(
+  const posti = POSTI.map((d) => ({
+    ...d,
+    src: d.img ? MEDIA + d.img : perSlug.get(d.da) ?? null,
+  })).filter(
     (d): d is typeof d & { src: string } => Boolean(d.src),
   );
   if (posti.length < 4) return null;
