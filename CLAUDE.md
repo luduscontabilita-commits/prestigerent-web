@@ -10,7 +10,17 @@ al posto del WordPress.
 
 **1. Niente in locale: si compila e si pubblica solo su Vercel.**
 Niente `next build`, niente `next dev`, niente localhost, niente `vercel`
-da riga di comando. Si fa `git push` e compila Vercel. Non e' una
+da riga di comando. Si fa `git push` e compila Vercel.
+
+🔴 **A pubblicare e' `.github/workflows/deploy.yml`, NON il collegamento
+nativo fra Vercel e GitHub.** Quel collegamento non c'e': se interroghi
+l'API di Vercel, `link` sul progetto risulta `null`, ed **e' normale**.
+Non concluderne che un push non costruisca niente -- l'errore e' gia'
+stato fatto il 29/08/2026, ed e' costato una mattina di deploy dal CLI
+raddoppiati, piu' l'installazione di un'app GitHub che non serviva.
+Per sapere se un push ha pubblicato si guardano le Actions:
+`https://github.com/luduscontabilita-commits/prestigerent-web/actions`,
+oppure `curl -s https://api.github.com/repos/luduscontabilita-commits/prestigerent-web/actions/runs?per_page=3`. Non e' una
 preferenza: il CLI di Vercel su questa macchina si pianta senza stampare
 una riga e lascia deploy in stato UNKNOWN, e un `next build` locale crea
 `.next` che poi il CLI prova a caricare. Se serve verificare qualcosa, si
