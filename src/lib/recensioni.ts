@@ -112,6 +112,14 @@ export async function fonti(): Promise<Fonte[]> {
   }
 
   return (data ?? [])
+    /* 🔴 LE DIRETTE NON COMPAIONO NEMMENO QUI.
+       Il filtro c'era gia' sulle valutazioni del singolo tour, ma non su
+       questo elenco: risultato, la scheda "Guests who booked direct — 482
+       reviews" continuava a comparire, e quelle 482 finivano dentro il
+       totale sommato sopra le schede. Sono vere ma sono poche, e accanto a
+       ottomila di Viator lavorano contro: chi legge non pensa "poche
+       recensioni", pensa "poche prenotazioni". */
+    .filter((f) => DA_MOSTRARE(f.fonte))
     .map((f) => {
       /* Il dato d'azienda vince sempre, quando c'e': e' verificato a mano.
          L'aggregato serve solo a riempire i buchi. */
