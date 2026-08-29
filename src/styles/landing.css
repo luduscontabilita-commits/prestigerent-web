@@ -941,25 +941,41 @@ body{
 /* ---------- informazioni a schede: una riga di titoli, un pannello per
    volta. Prima erano tre sezioni in fila -- itinerario, orari, dettagli --
    che occupavano quattro schermate per dire cose vicine. ---------- */
+/* 🔴 A SINISTRA, COME SUL SITO VECCHIO. `margin:0 auto` centrava il
+   blocco delle linguette dentro la colonna, e con sei voci il risultato
+   era una fila sbilenca che non si allineava a niente -- ne' al titolo
+   sopra, ne' al testo sotto. Le linguette sono una barra di navigazione:
+   partono dal bordo del testo, come tutto il resto della pagina. */
 .pr-tabs{ display:flex; overflow-x:auto; border-bottom:1px solid var(--line);
-  max-width:900px; margin:0 auto 22px; scrollbar-width:none; }
+  max-width:900px; margin:0 0 22px; scrollbar-width:none; }
 .pr-tabs::-webkit-scrollbar{ display:none; }
 .pr-tab{ font:inherit; cursor:pointer; background:none; border:0; border-bottom:3px solid transparent;
   padding:13px 18px; font-size:.76rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
   color:var(--ink-soft); white-space:nowrap; transition:color .18s ease, border-color .18s ease; }
 .pr-tab:hover{ color:var(--ink); }
 .pr-tab.is-on{ color:var(--orange); border-bottom-color:var(--orange); }
-.pr-tabp{ max-width:900px; margin:0 auto; text-align:left; }
+/* Il pannello si allinea alle linguette: con `margin:0 auto` restava
+   centrato mentre le linguette partivano da sinistra, e i due bordi non
+   coincidevano di una decina di pixel -- abbastanza da far sembrare la
+   pagina storta senza che si capisca perche". */
+.pr-tabp{ max-width:900px; margin:0; text-align:left; }
 .pr-tabp[hidden]{ display:none; }
 /* i corpi arrivano dagli accordion, dove avevano il padding del riquadro */
 .pr-tabp > .pr-acc-body{ padding:0; }
-/* Da telefono le sei schede vanno a capo invece di scorrere di lato:
-   quello che sta oltre il bordo, su un telefono, per la maggior parte
-   delle persone non esiste -- non c'e' modo di sapere che ci sono altre
-   schede se non provando a trascinare. Due righe costano venti pixel. */
+/* 🔴 NIENTE "A CAPO E CENTRATE" SUL TELEFONO.
+   La regola precedente le mandava a capo e le centrava: nascevano due
+   righe disallineate -- tre voci sopra centrate, tre sotto centrate --
+   che non si capiva piu' se fossero linguette o un menu. Restano su una
+   riga sola e si scorrono di lato.
+   Il dubbio che aveva portato all'altra scelta era giusto ("chi sa che
+   ce ne sono altre?"), e si risolve meglio cosi': l'ultima voce resta
+   tagliata a meta' sul bordo, e una voce tagliata e' il segnale che il
+   mondo continua -- e' come funziona ogni carosello. */
 @media (max-width:900px){
-  .pr-tabs{ flex-wrap:wrap; overflow-x:visible; justify-content:center; gap:0 2px; }
-  .pr-tab{ flex:0 0 auto; }
+  .pr-tabs{ flex-wrap:nowrap; overflow-x:auto; justify-content:flex-start;
+    /* lo scatto sulle voci rende lo scorrimento meno casuale */
+    scroll-snap-type:x proximity; }
+  .pr-tab{ flex:0 0 auto; scroll-snap-align:start; }
 }
 @media (max-width:560px){ .pr-tab{ padding:11px 10px; font-size:.68rem; letter-spacing:.04em; } }
 
