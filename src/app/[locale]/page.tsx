@@ -574,10 +574,35 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <div className="pr-wrap wide">
           <div className="hm-proof">
             <div><b>{d.voto?.toFixed(1)}</b><span>average out of 5</span></div>
-            <div><b>{d.totale.toLocaleString('en-US')}</b><span>verified traveller reviews</span></div>
+            {/* 🔴 I CLIENTI, NON LE RECENSIONI.
+                Era l'ultimo conteggio di recensioni rimasto in giro dopo
+                averli tolti da testata, footer e schede tour: "14.005
+                verified traveller reviews", che non coincideva con nessuno
+                degli altri perche' calcolato su un'altra base. Un numero
+                che nessun'altra parte della pagina puo' contraddire vale
+                piu' di uno esatto che ne contraddice altri due. */}
+            {az?.clienti_serviti != null && (
+              <div>
+                <b>{Math.round(az.clienti_serviti / 1000)}k+</b>
+                <span>guests since {az.anno_fondazione ?? 2002}</span>
+              </div>
+            )}
             <div>
               <b>#{az?.classifica_posizione}</b>
-              <span>of {az?.classifica_su} {az?.classifica_categoria?.toLowerCase()}</span>
+              {/* 🔴 SI ABBASSA SOLO L'INIZIALE, NON TUTTA LA STRINGA.
+                  Con `.toLowerCase()` la riga diceva "of 248
+                  transportation companies in florence": il nome della
+                  citta' in minuscolo dentro il dato che serve proprio a
+                  farsi verificare. E' lo stesso errore gia' corretto
+                  nella fascia di fiducia (vedi Riprova.tsx), che qui era
+                  rimasto. */}
+              <span>
+                of {az?.classifica_su}{' '}
+                {az?.classifica_categoria
+                  ? az.classifica_categoria.charAt(0).toLowerCase() +
+                    az.classifica_categoria.slice(1)
+                  : ''}
+              </span>
             </div>
             <div><b>{d.anni}</b><span>years, since {az?.anno_fondazione}</span></div>
           </div>
