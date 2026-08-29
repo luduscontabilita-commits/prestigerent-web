@@ -2599,22 +2599,25 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
   .qr-apri{ transition:none; }
 }
 
-/* Il "Quick Request" in cima era un <a> ed e' diventato un <button>,
-   perche' adesso apre il popup invece di saltare a un'altra pagina.
-   Il browser ai <button> mette font, bordo e sfondo suoi: qui si
-   tolgono, cosi' le regole di .hd-quick continuano a valere e in pagina
-   non cambia niente di visibile. */
-/* 🔴 DUE REGOLE SEPARATE, e non una sola come prima.
-   `button.hd-quick` e' piu' specifico di `.hd-quick`: finche' azzerava
-   anche `border` e `background`, vinceva lui e il bottone arancione
-   restava trasparente. A "Quick Request" si toglie solo cio' che mette
-   il browser (font, cursore, aspetto nativo); sfondo e bordo sono suoi
-   e devono sopravvivere. Per `.hd-top`, che e' e resta una voce di menu
-   senza sfondo, l'azzeramento completo va bene. */
+/* "Quick Request" e' tornato un <a>: adesso porta al modulo in fondo
+   alla pagina invece di aprire un popup. La regola per la versione
+   <button> resta qui sotto perche' la stessa classe la usano ancora i
+   pulsanti che aprono la finestra dalle schede tour -- e perche' se un
+   giorno tornasse un <button> con questa classe, senza queste tre righe
+   il browser gli rimetterebbe font e aspetto suoi.
+   NON si azzerano `border` e `background`: `button.hd-quick` e' piu'
+   specifico di `.hd-quick`, e azzerandoli il bottone arancione diventava
+   trasparente. */
 button.hd-quick{
   font:inherit; cursor:pointer;
   -webkit-appearance:none; appearance:none;
 }
+/* Il salto dalla testata non deve finire sotto la barra fissa: la
+   sezione comincia 86px piu' in basso, che e' l'altezza della barra piu'
+   un dito di respiro. Senza, il titolo "Tell us what your day should
+   look like" resta nascosto e sembra che il pulsante abbia sbagliato
+   punto. */
+#contact{ scroll-margin-top:86px; }
 button.hd-top{
   font:inherit; border:0; background:none; cursor:pointer;
   -webkit-appearance:none; appearance:none;

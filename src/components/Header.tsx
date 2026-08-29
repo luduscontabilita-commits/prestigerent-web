@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BottoneRichiesta } from '@/components/RichiestaModale';
 import { DEFAULT_LOCALE, LOCALES, PIU_LINGUE, getLocale } from '@/lib/locales';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { MINI_H, MINI_L, SEZIONI, miniatura } from '@/lib/menu';
@@ -135,6 +134,49 @@ export function Header({
     setAperta(null);
     setLingue(false);
   }, []);
+
+  /* 🔴 "QUICK REQUEST" PORTA AL MODULO, NON APRE UNA FINESTRA.
+   *
+   * Apriva un popup con dentro lo stesso identico modulo che sta gia' in
+   * fondo a ogni pagina. Due copie della stessa cosa non sono una
+   * comodita': sono due moduli da tenere allineati, e soprattutto un
+   * riquadro che si piazza davanti alla pagina che uno stava leggendo --
+   * col risultato che chi non e' ancora convinto lo chiude, e chi lo
+   * compila non ha piu' sotto gli occhi il tour di cui sta chiedendo.
+   *
+   * Portandolo alla sezione "Tell us what your day should look like" il
+   * modulo arriva NEL contesto: sopra ci sono le prove, sotto le
+   * garanzie, e il tour resta nella pagina.
+   *
+   * Il salto e' morbido a mano e non con `scroll-behavior:smooth`: quella
+   * riga e' spenta apposta in landing.css perche' fa sfarfallare la barra
+   * fissa sui link del calendario. Qui serve solo su questo clic.
+   *
+   * `#contact` c'e' su tutte le pagine pubbliche -- home, tour,
+   * categorie, about, faq, contatti -- quindi il salto non porta mai via
+   * dalla pagina. Se per qualche motivo non ci fosse, il link vale come
+   * link normale e si finisce sulla pagina dei contatti: meglio una
+   * pagina in piu' che un pulsante che non fa niente. */
+  const vaiAlModulo = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      const sez = document.getElementById('contact');
+      if (!sez) return;
+      e.preventDefault();
+      setMobile(false);
+      chiudi();
+      const fermo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      sez.scrollIntoView({ behavior: fermo ? 'auto' : 'smooth', block: 'start' });
+      /* Il fuoco sul primo campo: senza, chi naviga da tastiera arriva
+         alla sezione ma il cursore e' rimasto sul pulsante in testata.
+         `preventScroll` perche' altrimenti il fuoco si porta dietro la
+         pagina e annulla lo scorrimento morbido appena cominciato. */
+      window.setTimeout(() => {
+        sez.querySelector<HTMLInputElement>('input:not([type="checkbox"]), textarea')
+          ?.focus({ preventScroll: true });
+      }, fermo ? 0 : 620);
+    },
+    [chiudi],
+  );
 
   /* ESC E CLIC FUORI.
      Il velo grigio copre gia' la pagina sotto la barra, ma non la barra
@@ -400,12 +442,16 @@ export function Header({
           <a className="hd-top hd-plain hd-solo-mob" href={p('/about-us/')}>
             About us
           </a>
-          {/* 🔴 Era `href="/#contact"`, cioe' un salto alla HOME: chi lo
-              premeva dalla scheda di un tour perdeva la pagina che stava
-              leggendo. Ora apre il popup dove si e', come su WordPress. */}
-          <BottoneRichiesta className="hd-top hd-plain hd-solo-mob">
+          {/* Il salto e' a `#contact`, non a `/#contact`: il secondo
+              riportava alla home e faceva perdere la scheda che si stava
+              leggendo. La sezione c'e' su ogni pagina pubblica. */}
+          <a
+            className="hd-top hd-plain hd-solo-mob"
+            href="#contact"
+            onClick={vaiAlModulo}
+          >
             Quick Request
-          </BottoneRichiesta>
+          </a>
           {/* Il selettore del tema, che in testata sul telefono non ci
               sta: vedi la nota su .hd-tema piu' sopra. */}
           <div className="hd-top hd-plain hd-solo-mob hd-tema-mob">
@@ -414,7 +460,9 @@ export function Header({
         </nav>
 
         <div className="hd-right">
-          <BottoneRichiesta className="hd-quick">Quick Request</BottoneRichiesta>
+          <a className="hd-quick" href="#contact" onClick={vaiAlModulo}>
+            Quick Request
+          </a>
 
           {/* 🔴 SUL TELEFONO IL TEMA SCENDE NEL MENU.
               In testata su 390 pixel ci stanno quattro cose: il marchio
