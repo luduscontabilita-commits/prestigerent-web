@@ -110,32 +110,10 @@ function zona(el: Element): string {
   return 'pagina';
 }
 
-function suProduzione() {
-  if (typeof window === 'undefined') return false;
-  return /(^|\.)prestigerent\.com$/i.test(window.location.hostname);
-}
-
-/* ── L'INTERRUTTORE DI COLLAUDO ──────────────────────────────────────
- *
- * `?prova=1` accende GTM anche fuori produzione, per una visita sola.
- *
- * Serve perche' il widget di Regiondo decide da se' a chi parlare
- * guardando cosa trova in pagina: senza il contenitore GTM non attiva
- * l'adattatore di GTM, e una prenotazione di prova non proverebbe la
- * catena vera -- proverebbe una catena diversa, che in produzione non
- * esistera' mai.
- *
- * Non e' un ripiego da togliere dopo: e' la sola maniera di collaudare
- * una prenotazione senza spegnere il sito vero, e serve allo stesso modo
- * fra sei mesi. Non si ricorda in un cookie apposta -- vale per la
- * singola visita, e chi non mette il parametro non accende niente.
- *
- * In produzione non cambia nulla: li' GTM si carica comunque, e questo
- * ramo non viene nemmeno guardato. */
-function collaudoRichiesto() {
-  if (typeof window === 'undefined') return false;
-  return new URLSearchParams(window.location.search).get('prova') === '1';
-}
+/* La guardia del dominio e quella di collaudo NON sono piu' due funzioni
+   TypeScript: sono dentro lo snippet qui sotto, perche' devono valere nel
+   momento in cui il browser legge l'HTML, non dopo l'idratazione. Il
+   perche' e' spiegato accanto allo snippet. */
 
 export function Tracciamento() {
   /* Il percorso serve a riarmare l'osservatore del calendario a ogni
@@ -300,13 +278,45 @@ export function Tracciamento() {
      peggio dei dati mancanti perche' non si sa quali buttare.
      L'unica eccezione e' `?prova=1`, per collaudare una prenotazione
      vera senza toccare il sito in produzione. */
-  if (typeof window !== 'undefined' && !suProduzione() && !collaudoRichiesto()) {
-    return null;
-  }
+  /* PERCHE' `beforeInteractive` E NON `afterInteractive`.
 
+     Con `afterInteractive` questo snippet non finiva nell'HTML: Next lo
+     inseriva da solo dopo l'idratazione. Funzionava -- le vendite del
+     29/08 sono state misurate cosi' -- ma con due difetti.
+
+     Il primo e' vero: chi apriva e se ne andava prima che React avesse
+     finito di montare la pagina non veniva contato affatto. Su una
+     connessione mobile lenta non e' un caso di scuola.
+
+     Il secondo e' di forma ma costa lo stesso: i controlli automatici di
+     Google Ads leggono l'HTML e non eseguono il JavaScript. Non trovando
+     il contenitore scrivevano "linker conversioni mancante" e "alcune
+     pagine non presentano tag" su pagine che invece il linker ce
+     l'avevano -- e ogni volta partiva la caccia a un guasto che non
+     c'era, con l'offerta di aggiungere un secondo Linker doppione.
+
+     L'ordine col consenso regge: <Consenso /> e' anch'esso
+     `beforeInteractive` ed e' il figlio precedente nel layout, quindi il
+     suo `gtag('consent','default',...)` resta nel dataLayer prima che
+     gtm.js parta. Se si sposta uno dei due, si rompe questo. */
   return (
-    <Script id="gtm" strategy="afterInteractive">
-      {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+    <Script id="gtm" strategy="beforeInteractive">
+      {`(function(w,d,s,l,i){
+/* SOLO SUL DOMINIO VERO.
+   La guardia sta QUI dentro e non in TypeScript perche' lo snippet ora
+   e' stampato nell'HTML: una condizione valutata al momento del build
+   accenderebbe GTM anche sulle anteprime di Vercel, e ogni evento di
+   prova inquinerebbe i dati veri delle campagne. I dati sporchi sono
+   peggio dei dati mancanti: non si sa quali buttare.
+
+   ?prova=1 lo accende comunque, per una visita sola. Non e' un
+   ripiego da togliere: il widget di Regiondo decide a chi parlare
+   guardando cosa trova in pagina, e senza contenitore una prenotazione
+   di collaudo proverebbe una catena diversa da quella che andra' in
+   produzione. Non si ricorda in un cookie apposta. */
+if(!/(^|\.)prestigerent\.com$/i.test(location.hostname) &&
+   new URLSearchParams(location.search).get('prova')!=='1') return;
+w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
 var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
 j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${GTM}');`}
