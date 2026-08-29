@@ -388,7 +388,20 @@ export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
   const fuori: string[] = [];
   const viste = new Set<string>();
   for (const f of fonti) {
-    const corta = accorcia(f);
+    /* 🔴 QUI IL GRASSETTO SI TOGLIE, NON SI TIENE.
+     *
+     * Dal 29/08/2026 i punti forti in banca dati contengono `<strong>`
+     * intorno al titoletto: sulla PAGINA del tour si stampano come HTML
+     * ed e' quello che vogliamo. Sulla schedina della home no -- li' il
+     * testo viene accorciato a poche parole e stampato come testo
+     * semplice, quindi il tag finiva a video: si leggeva letteralmente
+     * "<strong>Intimate Small Group". Peggio ancora, il taglio cadeva in
+     * mezzo al tag e lo lasciava aperto.
+     *
+     * Si toglie PRIMA di accorciare: se si togliesse dopo, il conto dei
+     * caratteri comprenderebbe i tag e le schedine verrebbero piu' corte
+     * di quanto sembra. */
+    const corta = accorcia(f.replace(/<[^>]+>/g, ''));
     if (!corta) continue;
     const k = chiave(corta);
     if (!k || viste.has(k)) continue;

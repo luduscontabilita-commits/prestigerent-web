@@ -751,7 +751,11 @@ export default async function TourPage({
                 immagini: foto,
                 prezzo: prezzo?.valore ?? null,
                 durata: product?.durationLabel ?? null,
-                tappe: punti.slice(0, 8),
+                /* 🔴 SENZA TAG. Questi finiscono nei dati strutturati,
+                   che Google legge come testo: un `<strong>` li' dentro
+                   non diventa grassetto, diventa parte del nome della
+                   tappa. In pagina il grassetto serve, qui no. */
+                tappe: punti.slice(0, 8).map((x) => x.replace(/<[^>]+>/g, '')),
               }),
               /* 🔴 `Product` ACCANTO A `TouristTrip`, non al suo posto.
                *
