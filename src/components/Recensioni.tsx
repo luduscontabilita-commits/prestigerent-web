@@ -115,67 +115,32 @@ export function Recensioni({
             separata, con un suo pubblico, e li' la somma e' vera.
             La riga si costruisce da sola: se un domani si aggiunge una
             fonte, il totale e l'elenco dei nomi si aggiornano insieme. */}
+        {/* 🔴 NIENTE TOTALE QUI, ED E' VOLUTO.
+            Diceva "13.176 verified reviews" mentre venti centimetri sopra
+            la fascia ne dichiarava 12.081: due basi diverse -- una del
+            tour, una dell'azienda -- che pero' chi legge non puo'
+            distinguere, e che quindi si smentiscono a vicenda. I numeri
+            che si dicono sono due e stanno nella fascia; qui restano le
+            recensioni vere, che valgono piu' di qualunque conteggio. */}
         <p className="rv-sub">
-          {totale > 0 ? (
-            <>
-              <b>{totale.toLocaleString('en-US')}</b> verified reviews on{' '}
-              {nomi} &mdash; every one of them public on the platform it came from.
-            </>
-          ) : (
-            <>Every review below is public on the platform it came from.</>
-          )}
+          Every review below is public on the platform it came from.
         </p>
       </div>
 
-      {/* LA FILA DEI BADGE.
-          E' la cosa che convince prima ancora che si legga una riga. Ogni
-          piattaforma ha il suo colore, la sua barra in alto e il suo peso
-          tipografico: si riconoscono a colpo d'occhio, senza leggere.
+      {/* 🔴 LA FILA DEI BADGE E' STATA TOLTA.
+          Erano tre riquadri grandi, uno per piattaforma, ognuno col suo
+          voto e il suo conteggio -- e su una scheda tour finivano sotto
+          quattro medaglioni e sotto la fascia dei numeri: la stessa cosa
+          detta tre volte in una schermata e mezza. Sommati davano un
+          totale che contraddiceva quello della fascia, e uno dei tre
+          diceva "482 reviews" accanto a uno che ne diceva ottomila.
 
-          I numeri sono quelli veri, non arrotondati: "7,142" si legge
-          come un dato, "7,000+" si legge come pubblicita'. Qui si puo'
-          fare, perche' arrivano dal database e si aggiornano da soli.
-
-          Il badge dei premi Viator segue la regola opposta -- porta
-          "12,000+" -- e non e' un'incoerenza: quel numero e' dipinto
-          dentro un file immagine e nessuno lo aggiorna. Un numero esatto
-          scritto dentro una figura e' una cifra che comincia a
-          invecchiare il giorno che la si salva; il "piu'" e' cio' che la
-          tiene vera. Dove il numero e' vivo si scrive esatto, dove e'
-          fermo si scrive con il piu'. */}
-      {fonti.length > 0 && (
-        <div className="rv-badges">
-          {fonti.map((f) => {
-            const dentro = (
-              <>
-                <span className="rv-b-top" aria-hidden="true" />
-                <span className="rv-b-name">{f.etichetta}</span>
-                <span className="rv-b-score">
-                  <b>{f.voto_medio?.toFixed(1)}</b>
-                  <span className="rv-b-of">/5</span>
-                </span>
-                <span className="rv-b-stars" aria-hidden="true">
-                  {STELLE(Math.round(f.voto_medio!))}
-                </span>
-                <span className="rv-b-count">
-                  {f.quante?.toLocaleString('en-US')}{' '}
-                  {f.suQuestoTour ? 'reviews of this tour' : 'reviews'}
-                </span>
-                {f.distintivo && <span className="rv-b-award">{f.distintivo}</span>}
-              </>
-            );
-            const cl = 'rv-badge rv-b-' + f.fonte;
-            return f.url && SI_LINKA.has(f.fonte) ? (
-              <a className={cl} key={f.fonte} href={f.url} target="_blank" rel="noopener nofollow">
-                {dentro}
-                <span className="rv-b-go">Read them on {f.etichetta} &rarr;</span>
-              </a>
-            ) : (
-              <div className={cl} key={f.fonte}>{dentro}</div>
-            );
-          })}
-        </div>
-      )}
+          I numeri ora si dicono una volta sola, nella fascia: quanti
+          clienti e che voto. Qui sotto restano le recensioni vere, che
+          convincono piu' di qualunque cifra. I dati per piattaforma
+          restano in `valutazioni_tour` e servono ai dati strutturati (le
+          stelle nei risultati di Google), che non hanno questo problema
+          perche' nessuno li legge accanto agli altri. */}
 
       {recensioni.length > 0 && (
         <div className="rv-grid">

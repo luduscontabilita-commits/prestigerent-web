@@ -31,6 +31,27 @@ export type Azienda = {
   telefono: string | null;
   email: string | null;
   whatsapp: string | null;
+  /* 🔴 I DUE NUMERI CHE SI DICONO, E BASTA.
+   *
+   * Il sito era arrivato a mostrare, nella stessa schermata di una scheda
+   * tour: quattro medaglioni, una fascia con cinque cifre e tre riquadri
+   * voto -- con dentro due totali diversi (12.081 d'azienda e 13.176 di
+   * quel tour) che sembravano smentirsi. Piu' numeri non convincono di
+   * piu': oltre una certa soglia si controllano fra loro, e chi legge si
+   * ferma al primo che non torna.
+   *
+   * Quindi da qui in avanti se ne dicono DUE: quanti clienti e che voto.
+   * Stanno in tabella e non calcolati, cosi' non possono divergere: nel
+   * momento in cui una media viene ricalcolata in due posti diversi, due
+   * pagine dicono due cose.
+   *
+   * `clienti_serviti` e' una cifra decisa dalla proprieta'. La parte
+   * misurata sono 264.000 persone da aprile 2022 (109.380 prenotazioni
+   * per 2,41 persone di media, contate su Regiondo il 29/08/2026); prima
+   * di quella data Regiondo non ha nulla, e il resto e' ricostruzione
+   * sugli anni dal 2002. Va scritta con il "+" e mai come cifra esatta. */
+  clienti_serviti: number | null;
+  voto_medio: number | null;
 };
 
 export type Riprova = {

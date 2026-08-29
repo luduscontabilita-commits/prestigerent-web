@@ -13,6 +13,7 @@ import { BottoneRichiesta } from '@/components/RichiestaModale';
 import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { FasciaFiducia } from '@/components/Riprova';
 import { Premi } from '@/components/Premi';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
@@ -544,25 +545,26 @@ export default async function TourPage({
        * `compatta` perche' qui la colonna e' stretta (il calendario si
        * prende 400px fissi): con la spaziatura piena le cinque voci
        * andrebbero a capo su tre righe e la fascia diventerebbe un muro. */}
-      {/* 🔴 QUI STAVA IL TOTALE D'AZIENDA, ED E' STATO TOLTO.
+      {/* I DUE NUMERI, UNA VOLTA SOLA SU TUTTA LA PAGINA.
        *
-       * Sulla stessa schermata comparivano due totali con basi diverse:
-       * "12.081 verified reviews" (azienda: Tripadvisor + GetYourGuide) e
-       * subito sotto "13.176 verified reviews" (questo tour: Viator +
-       * GetYourGuide). Il tour aveva piu' recensioni dell'azienda intera.
+       * Qui prima c'era una fascia con cinque cifre, fra cui "12.081
+       * verified reviews"; venti centimetri sotto i riquadri delle
+       * recensioni ne dichiaravano 13.176, cioe' questo tour ne aveva piu'
+       * dell'azienda intera. Nessuno dei due era falso -- il numero di
+       * Viator comprende gia' Tripadvisor, quindi su un prodotto molto
+       * venduto supera davvero il conteggio d'azienda -- ma questo chi
+       * legge non lo puo' sapere: due cifre che si smentiscono nello
+       * stesso colpo d'occhio fanno pensare che una sia inventata, e il
+       * dubbio si estende al prezzo.
        *
-       * Nessuno dei due era falso -- il numero di Viator comprende gia'
-       * Tripadvisor, quindi su un prodotto molto venduto supera davvero il
-       * conteggio d'azienda -- ma questo non lo puo' sapere chi legge. Due
-       * cifre che si smentiscono nello stesso colpo d'occhio non fanno
-       * pensare "basi diverse": fanno pensare che una sia inventata, e il
-       * dubbio si estende a tutto il resto della pagina, prezzo compreso.
-       *
-       * Su una scheda tour vince il numero DEL TOUR: e' piu' pertinente e
-       * converte di piu'. Il totale d'azienda resta dov'e' suo, sulla home
-       * e su "chi siamo", dove non ha niente accanto che lo contraddica.
-       *
-       * ⚠️ Non rimettere qui `FasciaFiducia`: il difetto torna identico. */}
+       * Ora i numeri che la pagina dice sono due, stanno solo qui, e sotto
+       * non c'e' piu' niente che li possa contraddire: i riquadri per
+       * piattaforma sono stati tolti da `Recensioni`. */}
+      <section className="pr-sec tight" aria-label="Why guests trust Prestige Rent">
+        <div className="pr-wrap wide">
+          <FasciaFiducia dati={fiducia} compatta />
+        </div>
+      </section>
 
       <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
 
