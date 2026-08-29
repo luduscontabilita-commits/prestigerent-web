@@ -536,13 +536,15 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </div>
             <div><b>{d.anni}</b><span>years, since {az?.anno_fondazione}</span></div>
           </div>
-          <p className="hm-proof-src">
-            Travelers&rsquo; Choice 2026 ·{' '}
-            <a href="https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html"
-               target="_blank" rel="noopener">
-              verified on Tripadvisor
-            </a>, August 2026
-          </p>
+          {/* 🔴 QUI C'ERA "Travelers' Choice 2026 · verified on Tripadvisor,
+              August 2026". Tolta il 29/08/2026.
+              La tesi era giusta -- dire da dove viene un numero lo rende
+              verificabile -- ma la riga faceva l'opposto: una data
+              scritta a mano invecchia da sola, e fra tre mesi "August
+              2026" avrebbe detto al lettore che il dato e' vecchio,
+              proprio sotto i numeri che devono convincerlo. I premi
+              stanno gia' due sezioni piu' su, con i marchi emessi dalle
+              piattaforme, che sono la prova vera. */}
         </div>
       </section>
 

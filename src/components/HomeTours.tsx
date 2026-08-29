@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { foto, fotoSet } from '@/lib/foto';
 import { testo } from '@/lib/prosa';
 import { classeTitolo } from '@/lib/punti';
@@ -193,11 +193,65 @@ export function HomeTours({
     ? visibili
     : [...visibili].sort((a, b) => posto(a.slug) - posto(b.slug)).slice(0, QUANTI);
 
+  /* 🔴 LE FRECCE, PERCHE' COL MOUSE NON SI SCORRE DI LATO.
+   *
+   * La fila dei tour scorre in orizzontale. Su un telefono si trascina
+   * col dito e su un portatile col trackpad, ma con un mouse normale --
+   * che e' come guarda il sito meta' del traffico da computer -- non
+   * c'e' nessun gesto: la rotella scorre la PAGINA, non la fila. Senza
+   * frecce, su quegli schermi i tour oltre il quarto non li vede
+   * nessuno, e non c'e' nemmeno modo di sapere che esistono.
+   *
+   * Le frecce si spengono ai due capi invece di sparire: un pulsante che
+   * compare e scompare mentre si scorre fa saltare l'occhio, e per
+   * giunta sposta il dito nel momento in cui uno sta premendo. */
+  const fila = useRef<HTMLDivElement>(null);
+  const [aiCapi, setAiCapi] = useState({ inizio: true, fine: false });
+
+  const misuraCapi = useCallback(() => {
+    const el = fila.current;
+    if (!el) return;
+    const massimo = el.scrollWidth - el.clientWidth;
+    setAiCapi({
+      inizio: el.scrollLeft <= 4,
+      /* Non `>= massimo`: con lo zoom del browser le larghezze diventano
+         frazionarie e l'ultima freccia non si spegneva mai. */
+      fine: massimo <= 4 || el.scrollLeft >= massimo - 4,
+    });
+  }, []);
+
+  const scorri = useCallback((verso: 1 | -1) => {
+    const el = fila.current;
+    if (!el) return;
+    const scheda = el.querySelector<HTMLElement>('.hm-card');
+    /* Un passo = una scheda intera piu' lo spazio fra due. A "l'80% della
+       finestra" si finiva sempre con una scheda tagliata a meta'. */
+    const passo = scheda ? scheda.getBoundingClientRect().width + 20 : el.clientWidth * 0.8;
+    el.scrollBy({ left: verso * passo, behavior: 'smooth' });
+  }, []);
+
   const conteggi = useMemo(() => {
     const m = new Map<string, number>();
     for (const t of tours) m.set(t.kind, (m.get(t.kind) ?? 0) + 1);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   }, [tours]);
+
+  useEffect(() => {
+    misuraCapi();
+    const el = fila.current;
+    if (!el) return;
+    el.addEventListener('scroll', misuraCapi, { passive: true });
+    window.addEventListener('resize', misuraCapi);
+    /* Le schede cambiano larghezza quando arrivano le foto: senza questo
+       le frecce restavano spente su una fila che si era allungata. */
+    const ro = new ResizeObserver(misuraCapi);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', misuraCapi);
+      window.removeEventListener('resize', misuraCapi);
+      ro.disconnect();
+    };
+  }, [misuraCapi]);
 
   return (
     <>
@@ -269,7 +323,20 @@ export function HomeTours({
               and we will build the day around you.
             </p>
           ) : (
-            <div className="hm-grid">
+            <div className="hm-fila">
+              <button
+                type="button"
+                className="hm-frec hm-frec-sx"
+                onClick={() => scorri(-1)}
+                disabled={aiCapi.inizio}
+                aria-label="Previous tours"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m15 6-6 6 6 6" />
+                </svg>
+              </button>
+              <div className="hm-grid" ref={fila}>
               {mostrati.map((t) => (
                 <a className="hm-card" href={t.href} key={t.slug}>
                   <div className="hm-card-img">
@@ -369,6 +436,19 @@ export function HomeTours({
                   </div>
                 </a>
               ))}
+              </div>
+              <button
+                type="button"
+                className="hm-frec hm-frec-dx"
+                onClick={() => scorri(1)}
+                disabled={aiCapi.fine}
+                aria-label="More tours"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6"
+                     strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
+              </button>
             </div>
           )}
 
