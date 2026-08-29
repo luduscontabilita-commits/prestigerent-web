@@ -553,7 +553,10 @@ export default async function TourPage({
                     <path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff"
                           strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <span>{testo(p)}</span>
+                  {/* Il titoletto in grassetto arriva dal database ed e'
+                      gia' ripulito da `ripulisciPunti`, che lascia
+                      passare solo <strong>. Vedi la nota li'. */}
+                  <span dangerouslySetInnerHTML={{ __html: p }} />
                 </li>
               ))}
             </ul>

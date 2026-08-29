@@ -410,12 +410,39 @@ export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
  *    prima, la seconda resta sola e suona strana. Si toglie l'occhiello e
  *    resta l'informazione, che e' buona: "Free cancellation up to 24 hrs".
  */
+/* 🔴 IL GRASSETTO SOPRAVVIVE, TUTTO IL RESTO NO.
+ *
+ * I punti forti tornano dal database con `<strong>` dentro: e' il
+ * titoletto di ogni riga, ripreso dal sito WordPress il 29/08/2026
+ * (l'importazione l'aveva buttato via, e le righe erano diventate un
+ * muro di testo tutto uguale).
+ *
+ * Qui si tiene SOLO quel tag. Non e' pignoleria: questi punti finiscono
+ * in pagina con `dangerouslySetInnerHTML`, quindi qualunque altro tag
+ * arrivasse dal database verrebbe eseguito dal browser. Il database lo
+ * scriviamo noi, ma la regola deve valere anche il giorno che ci scrive
+ * qualcun altro.
+ */
+function soloGrassetto(html: string): string {
+  return html
+    .replace(/<\s*(strong|b)\s*>/gi, '')
+    .replace(/<\s*\/\s*(strong|b)\s*>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(//g, '<strong>')
+    .replace(//g, '</strong>');
+}
+
 export function ripulisciPunti(punti: string[]): string[] {
   return punti
     .filter((p) => !COVID.test(p))
     .filter((p) => !/^(read more|leggi (tutto|di piu))/i.test(p.trim()))
-    .map((p) => testo(p).replace(/^safe for (health|money)\s*!\s*/i, ''))
-    .map((p) => (p ? p.charAt(0).toUpperCase() + p.slice(1) : p))
+    /* `testo()` scioglie le entita' ma non tocca i tag, quindi si puo'
+       chiamare prima: e' `soloGrassetto` a decidere cosa resta. */
+    .map((p) => soloGrassetto(testo(p)).replace(/^safe for (health|money)\s*!\s*/i, ''))
+    /* La maiuscola va sulla prima LETTERA, non sul primo carattere: con
+       il grassetto in testa il primo carattere e' "<", e la riga restava
+       minuscola. */
+    .map((p) => p.replace(/^(\s*(?:<strong>)?\s*)([a-z])/, (_, pre, c) => pre + c.toUpperCase()))
     .filter(Boolean);
 }
 
