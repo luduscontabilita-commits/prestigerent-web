@@ -59,6 +59,32 @@ const nextConfig: NextConfig = {
      tenere. */
   async redirects() {
     return [
+      /* ════════════════════════════════════════════════════════════════
+         IL SITO RISPONDE A DUE INDIRIZZI DIVERSI: SE NE CHIUDE UNO.
+         ════════════════════════════════════════════════════════════════
+
+         Ogni progetto Vercel ha, oltre al dominio vero, un indirizzo
+         tecnico -- qui `prestigerent-web.vercel.app`. Non e' un ambiente
+         di prova: e' LA STESSA identica produzione, servita con un altro
+         nome. Verificato, rispondeva 200 con `Allow: /` nel robots.
+
+         Sono 124 pagine duplicate. C'e' gia' il `<link rel="canonical">`
+         che indica prestigerent.com, ma il canonical e' un consiglio che
+         Google puo' ignorare: la forma che non si discute e' il 308.
+
+         🔴 QUESTA REGOLA TOCCA SOLO QUELL'HOST. `has` confronta il nome
+         per intero: su prestigerent.com e www.prestigerent.com non si
+         attiva mai, e non c'e' modo che il sito rimandi a se' stesso.
+         Le anteprime di Vercel (nomi tipo `prestigerent-web-abc123...`)
+         restano raggiungibili: hanno un altro nome, e Vercel ci mette da
+         solo il noindex. */
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'prestigerent-web.vercel.app' }],
+        destination: 'https://prestigerent.com/:path*',
+        permanent: true,
+      },
+
       {
         source: '/tour/siena-san-gimignano-the-tuscan-countryside-landing/',
         destination:

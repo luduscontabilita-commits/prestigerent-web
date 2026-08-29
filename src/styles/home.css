@@ -488,49 +488,40 @@
 /* voci che compaiono solo nel pannello del telefono */
 .hd-solo-mob{ display:none !important; }
 
-/* Fra 1280 e 1440 le voci ci stanno ma appena appena: si tolgono prima
-   il sottotitolo del logo e poi la parola "English", che si capisce lo
-   stesso dal mappamondo. E' meglio togliere due dettagli che far
-   scomparire WhatsApp fuori dallo schermo. */
-@media (max-width:1440px){
-  .hd-logo small{ display:none; }
-  .hd-lang > button span.lg{ display:none; }
-}
-@media (max-width:1340px){
-  .hd-quick{ padding:9px 11px; font-size:.78rem; }
-  .hd-wa span{ display:none; }
-  .hd-wa{ padding:9px 11px; }
-}
+/* 🔴 LA BARRA E' LARGA 1280 E BASTA, QUALUNQUE SIA LA FINESTRA.
+ *
+ * `.hd-in` ha `max-width:1280px`. Da 1280 in su la finestra cresce ma la
+ * barra NO: lo spazio per le voci resta identico a 2560 come a 1281.
+ *
+ * Qui stava il difetto. Le regole che stringevano le voci erano agganciate
+ * alla larghezza della FINESTRA (1440, 1340, 1319): sopra i 1280 non si
+ * attivavano mai, e le sette voci a grandezza piena in 1280px non ci
+ * stanno -- "Destinations" finiva SOPRA "Quick Request". Piu' grande era
+ * lo schermo, meno la barra si stringeva: esattamente al contrario.
+ * Misurato: servono ~1360px, ce ne sono 1280.
+ *
+ * Percio' la versione stretta non e' piu' un'eccezione per gli schermi
+ * piccoli, e' lo stato normale del desktop. Le voci hanno
+ * `white-space:nowrap` e il blocco di destra ha `flex:none`: quando la
+ * somma supera la larghezza nessuno dei due cede, e si sovrappongono.
+ *
+ * ⚠️ NON rimettere qui una soglia `max-width` sopra i 1280: sarebbe cieca
+ * per costruzione. L'unica soglia che ha senso e' quella del menu a
+ * panino piu' sotto, dove la barra torna a dipendere dalla finestra. */
+.hd-logo small{ display:none; }
+.hd-lang > button span.lg{ display:none; }
+.hd-nav{ margin-left:0; }
+.hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
+.hd-freccia{ padding-inline:4px 0; }
+.hd-quick{ padding:9px 11px; font-size:.78rem; }
 
-/* 🔴 LA BARRA SI STRINGE PRIMA DI ROMPERSI.
- *
- * Con l'aggiunta di "Wine & Food" le voci sono diventate sette, e sotto
- * una certa larghezza non ci stavano piu': "Destinations" finiva SOPRA
- * "Quick Request", una scritta sull'altra. Non era un caso limite --
- * succedeva su un portatile normale.
- *
- * La causa: le voci hanno `white-space:nowrap` quindi non si accorciano,
- * e il blocco di destra ha `flex:none` quindi non cede spazio. Quando la
- * somma supera la larghezza, invece di andare a capo si sovrappongono.
- *
- * Qui la barra cede in tre passi, dal meno al piu' doloroso: prima si
- * stringono le spaziature fra le voci, poi si accorcia il testo, e solo
- * alla fine sparisce "Quick Request" -- che nel menu del telefono c'e'
- * comunque, e il cui popup si apre anche dal pulsante nella scheda tour.
- * L'ultima cosa che se ne va e' WhatsApp, che e' l'argomento della casa. */
-@media (max-width:1439px){
-  .hd-top{ padding-inline:6px; font-size:.83rem; }
-  .hd-nav{ margin-left:0; }
-}
-@media (max-width:1319px){
-  .hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
-  .hd-freccia{ padding-inline:4px 0; }
-}
-@media (max-width:1219px){
-  /* qui il Quick Request smette di starci: resta il popup, che si apre
-     dal menu del telefono e dal pulsante sulle schede tour */
-  .hd-quick{ display:none; }
-}
+/* La rete di sicurezza, se un giorno si aggiunge un'ottava voce: il
+   blocco di destra sta su un piano piu' alto e con lo sfondo pieno,
+   cosi' nel caso peggiore le voci gli finiscono DIETRO invece che
+   sopra. Una scritta che si accorcia si legge, due scritte una
+   sull'altra no. Non usa `overflow:hidden` sulla barra perche'
+   nasconderebbe i pannelli delle tendine (vedi il commento su .hd-nav). */
+.hd-right{ position:relative; z-index:2; background:var(--card); }
 
 @media (max-width:1280px){
   /* IL PANNELLO DEL TELEFONO E' LO STESSO MENU, non una copia.
