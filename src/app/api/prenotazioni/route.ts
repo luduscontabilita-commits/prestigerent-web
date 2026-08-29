@@ -17,12 +17,10 @@ import { ripassaNumeri, ripassoConfigurato } from '@/lib/numeri-freschi';
  * dipendono ne' dall'URL ne' da chi guarda, quindi la risposta si mette
  * in cache davanti al database e il database ne vede una sola.
  *
- * `revalidate` da solo non basta: in App Router una Route Handler e'
- * dinamica di default e quell'export viene ignorato se la rotta non
- * viene resa statica. Il `Cache-Control` esplicito e' quello che regge
- * davvero il colpo sulla CDN, e lo `stale-while-revalidate` fa sì che
- * il minuto in cui la cache scade non diventi un'attesa per chi capita
- * proprio li'.
+ * Il `Cache-Control` esplicito e' quello che regge il colpo sulla CDN, e
+ * lo `stale-while-revalidate` fa sì che il minuto in cui la cache scade
+ * non diventi un'attesa per chi capita proprio li'. `revalidate` NON va
+ * rimesso: rende la rotta statica e la disinnesca (vedi sotto).
  *
  * ── COSA NON C'E' DENTRO ────────────────────────────────────────────
  * Nessun cognome, nessun riferimento di prenotazione. Quello che esce
@@ -53,7 +51,27 @@ import { ripassaNumeri, ripassoConfigurato } from '@/lib/numeri-freschi';
  * Se il ripasso fallisce non succede niente di visibile: si continua a
  * servire l'ultimo dato buono. Un riquadro un po' vecchio e' meglio di
  * una rotta che risponde errore. */
-export const revalidate = 60;
+/* 🔴 `force-dynamic`, E NON `revalidate = 60`.
+ *
+ * Con `revalidate` Next classificava questa rotta come STATICA: la
+ * eseguiva una volta durante `next build` e poi serviva quella risposta.
+ * Due conseguenze, tutte e due invisibili guardando il sito.
+ *
+ * La prima: `after()` non gira in fase di build, quindi il ripasso da
+ * Regiondo non e' MAI partito da solo. Il 29/08/2026 alle 21:30 la
+ * tabella dei conteggi era ferma alle 09:20 del mattino: il sito ha
+ * raccontato per tutto il giorno i numeri della colazione. E' lo stesso
+ * guasto che questo file dichiara di aver risolto qualche riga piu'
+ * sopra -- la cura c'era, non partiva.
+ *
+ * La seconda: l'intestazione `Cache-Control` scritta qui sotto veniva
+ * buttata via e sostituita da `max-age=0, must-revalidate`.
+ *
+ * Dinamica non vuol dire una lettura per visitatore: e' il
+ * `Cache-Control` esplicito a tenere la risposta un minuto sulla CDN, e
+ * quello adesso arriva davvero. Il database ne vede una al minuto come
+ * prima, ma il codice gira. */
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const [avvisi, conteggi] = await Promise.all([ultimePrenotazioni(25), tuttiIConteggi()]);
