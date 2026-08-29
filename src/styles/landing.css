@@ -595,16 +595,52 @@ body{
    che e' lo STESSO componente carosello della sezione #photos (.film-section):
    immagini della stessa altezza, a tutta larghezza, drag + frecce + drift,
    niente scroll orizzontale "a scatti" col mouse. */
-.hero-film{ display:none; }                       /* nascosto su mobile */
+/* 🔴 UNA STRISCIA SOLA, E SCORRE ANCHE SUL TELEFONO.
+ *
+ * Prima erano due gallerie diverse: su desktop la striscia che scorre da
+ * sola, su telefono un carosello a scatti che si muoveva solo se lo si
+ * spingeva col dito. Ma il telefono e' dove arriva la maggior parte del
+ * traffico -- cioe' la versione che si muove da sola non la vedeva quasi
+ * nessuno, ed era proprio quella che fa guardare le foto a chi non
+ * avrebbe scorso.
+ *
+ * Ora la striscia e' una e vale ovunque. Lo scatto per foto
+ * (`scroll-snap-type: x mandatory`) qui NON c'e' apposta: combatterebbe
+ * contro lo scorrimento automatico, tirando indietro la striscia a ogni
+ * fotogramma. Al suo posto c'e' la pausa col dito, gestita in useFilm.
+ *
+ * Il mosaico non si nasconde: non si disegna proprio (vedi PhotoStrip).
+ * Nasconderlo col CSS avrebbe lasciato dodici immagini da scaricare per
+ * niente -- e la prima di quelle e' marcata `fetchPriority="high"`, cioe'
+ * avrebbe rubato la banda proprio alla foto che si vede. */
+.hero-film{
+  display:block;
+  padding:0;
+  margin-top:18px;
+  width:100vw;                                    /* full-bleed come #photos */
+  margin-left:calc(50% - 50vw);
+}
 @media (min-width:761px){
-  .hero-gallery{ display:none; }                  /* su desktop niente mosaico */
-  .hero-film{
-    display:block;
-    padding:0;
-    margin-top:26px;
-    width:100vw;                                  /* full-bleed come #photos */
-    margin-left:calc(50% - 50vw);
+  .hero-film{ margin-top:26px; }
+}
+
+/* Sul telefono le diapositive sono piu' strette e piu' basse: a 78vw e
+   320px di altezza minima una foto sola riempiva quasi tutto lo schermo e
+   dello scorrimento non si capiva niente. A 82vw con il formato 4:3 se ne
+   vede una intera piu' l'inizio della successiva -- che e' il segnale che
+   dice "ce ne sono altre" senza scrivere niente. */
+@media (max-width:760px){
+  .film-track{ gap:10px; padding:0 14px; }
+  .slide{
+    width:82vw;
+    height:auto;
+    aspect-ratio:4/3;
+    border-radius:14px;
   }
+  /* L'ingrandimento al passaggio del dito non esiste: su un touch
+     `:hover` resta appiccicato dopo il tocco e la foto rimane ingrandita
+     storta finche' non se ne tocca un'altra. */
+  .slide:hover img{ transform:scale(1.01); }
 }
 
 @media (max-width:760px){

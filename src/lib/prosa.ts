@@ -77,7 +77,12 @@ export function faqDa(html: string): Domanda[] {
     const p = paragrafi[i];
     const m = p.match(/^<p>\s*<(?:strong|b)>([\s\S]*?)<\/(?:strong|b)>\s*([?？:\u2026]?|\.\.\.)\s*(?:<br\s*\/?>)?([\s\S]*)<\/p>$/i);
     if (!m) continue;
-    const q = (m[1] + (m[2] || '')).replace(/<[^>]+>/g, '').trim();
+    /* 🔴 LA DOMANDA SI STAMPA COME TESTO, quindi le entita' vanno
+       sciolte qui. La risposta no: quella finisce in `dangerouslySet...`
+       ed e' il browser a interpretarla. Senza questa riga in pagina si
+       leggeva `Is this a &#8220;Big Bus&#8221; tour?` -- perche' React
+       stampa le entita' alla lettera invece di renderle. */
+    const q = testo((m[1] + (m[2] || '')).replace(/<[^>]+>/g, '').trim());
 
     /* 🔴 LA RISPOSTA CONTINUA NEI PARAGRAFI SUCCESSIVI.
      *
@@ -150,14 +155,28 @@ const ENTITA: Record<string, string> = {
   '&lt;': '<', '&gt;': '>', '&nbsp;': ' ',
   '&#8217;': '’', '&#8216;': '‘',
   '&#8211;': '–', '&#8212;': '—', '&#8230;': '…',
+  /* Le virgolette curve: WordPress le scrive sia col nome sia col numero,
+     e nelle FAQ di wine-experience arrivavano come `&#8220;Big Bus&#8221;`
+     -- che in pagina si leggeva alla lettera. */
+  '&#8220;': '“', '&#8221;': '”',
+  '&ldquo;': '“', '&rdquo;': '”', '&lsquo;': '‘', '&rsquo;': '’',
+  '&ndash;': '–', '&mdash;': '—', '&hellip;': '…',
+  '&eacute;': 'é', '&egrave;': 'è', '&agrave;': 'à',
+  '&ograve;': 'ò', '&ugrave;': 'ù', '&deg;': '°', '&euro;': '€',
 };
 
 export function testo(s: string | undefined | null): string {
   if (!s) return '';
   let out = s;
   for (const [e, c] of Object.entries(ENTITA)) out = out.split(e).join(c);
-  // qualunque altra entita' numerica rimasta
-  out = out.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+  /* Qualunque altra entita' numerica rimasta, decimale o esadecimale.
+     `fromCodePoint` e non `fromCharCode`: sopra il 65535 -- le emoji, e
+     qualche simbolo -- `fromCharCode` restituisce il carattere sbagliato
+     invece di dire che non ce la fa. */
+  const daCodice = (n: number) =>
+    Number.isFinite(n) && n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : '';
+  out = out.replace(/&#[xX]([0-9a-fA-F]+);/g, (_, n) => daCodice(parseInt(n, 16)));
+  out = out.replace(/&#(\d+);/g, (_, n) => daCodice(Number(n)));
   return out.replace(/\s+/g, ' ').trim();
 }
 

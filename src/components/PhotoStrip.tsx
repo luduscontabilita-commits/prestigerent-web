@@ -9,19 +9,22 @@ export type Foto = { src: string; alt?: string; label?: string; caption?: string
 /* La striscia foto, con il markup ESATTO della landing (.film-wrap / .film /
  * .film-track / .slide), non una mia versione.
  *
- * Su mobile la landing usa `.hero-gallery` (mosaico che diventa carosello a
- * swipe con scroll-snap) e nasconde `.film`; sopra i 760px fa l'opposto. Si
- * rendono entrambe, come fa lei: e' il CSS a scegliere.
+ * LO SCORRIMENTO AUTOMATICO, OVUNQUE. Fino al 29 agosto 2026 la striscia
+ * scorreva da sola solo su desktop, e sul telefono c'era un mosaico che si
+ * muoveva unicamente se lo si spingeva col dito. Ma il telefono e' dove
+ * arriva la maggior parte del traffico: la versione che si muove da sola
+ * non la vedeva quasi nessuno, ed e' proprio quella che fa guardare le foto
+ * a chi non avrebbe scorso.
  *
- * LO SCORRIMENTO AUTOMATICO. Sulla landing scorre da sola SOLO la striscia
- * desktop -- il commento in landing.css lo dice ("drag + frecce + drift") --
- * mentre su telefono resta il carosello a swipe con lo scatto sulle foto.
- * Qui si fa la stessa cosa, e non e' solo fedelta': su mobile
- * `scroll-snap-type:x mandatory` combatterebbe contro lo scorrimento
- * automatico foto per foto, e sarebbe batteria bruciata per un effetto
- * peggiore. La striscia desktop e' dentro `.hero-film`, che su telefono e'
- * `display:none`: l'IntersectionObserver dentro `useFilm` non la vede mai e
- * il ciclo di animazione li' non parte proprio.
+ * Ora la striscia e' una sola e vale ovunque. Due conseguenze da conoscere:
+ *   - niente `scroll-snap-type: x mandatory`, che tirerebbe indietro la
+ *     striscia a ogni fotogramma combattendo contro lo scorrimento;
+ *   - il dito METTE IN PAUSA e non spegne. Col mouse "chi tocca comanda"
+ *     e' giusto, perche' trascinare e' deliberato; col dito no, visto che
+ *     per scorrere la pagina il dito passa sopra le foto per forza. La
+ *     distinzione sta in `useFilm`.
+ *
+ * Si ferma anche col passaggio del mouse: e' `sopra` dentro `useFilm`.
  *
  * I CLONI. Per scorrere all'infinito senza mai arrivare al capolinea le
  * diapositive si scrivono due volte, la seconda con `aria-hidden`. Sulla
@@ -60,34 +63,14 @@ export function PhotoStrip({ foto }: { foto: Foto[] }) {
 
   return (
     <>
-      {/* MOBILE: il mosaico che il CSS trasforma in carosello a swipe */}
-      {/* `role="group"` non e' decorazione: su un <div> nudo l'`aria-label`
-          viene semplicemente BUTTATO VIA -- un nome si puo' dare solo a un
-          elemento che ha un ruolo che lo prevede, e il div generico non ne
-          ha nessuno. Cosi' com'era, "Tour photos" non lo sentiva nessuno e
-          la galleria si annunciava come una fila di immagini sciolte.
-          `group` e' lo stesso ruolo che la striscia desktop usa gia' due
-          blocchi piu' sotto, e non cambia un pixel. */}
-      <div className="hero-gallery" role="group" aria-label="Tour photos">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="g-hero" src={ottimizza(foto[0].src, 1200)}
-             srcSet={fotoSet(foto[0].src, [640, 828, 1200])} sizes="(max-width: 700px) 88vw, 460px"
-             alt={descrizione(foto[0])} loading="eager" fetchPriority="high" decoding="async" />
-        {foto.slice(1, 13).reduce<Foto[][]>((cols, f, i) => {
-          if (i % 2 === 0) cols.push([]);
-          cols[cols.length - 1].push(f);
-          return cols;
-        }, []).map((col, i) => (
-          <div className="g-col" key={i}>
-            {col.map((f) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={f.src} src={ottimizza(f.src, 640)} srcSet={fotoSet(f.src, [640, 828, 1200])}
-                   sizes="(max-width: 700px) 88vw, 460px"
-                   alt={descrizione(f)} loading="lazy" decoding="async" />
-            ))}
-          </div>
-        ))}
-      </div>
+      {/* 🔴 IL MOSAICO DEL TELEFONO NON C'E' PIU'.
+          Erano due gallerie per lo stesso scopo: la striscia che scorre da
+          sola su desktop, e su telefono un carosello a scatti che si
+          muoveva solo col dito. Ora la striscia vale ovunque (vedi la nota
+          in landing.css), e il mosaico e' stato tolto dal MARKUP e non
+          solo nascosto col CSS: erano dodici immagini scaricate per
+          niente, e la prima portava `fetchPriority="high"` -- cioe'
+          rubava la banda proprio alla foto che si vede davvero. */}
 
       {/* DESKTOP: la striscia a tutta larghezza, come sulla landing */}
       {/* Stesso motivo di sopra: <div> senza ruolo, `aria-label` ignorato.

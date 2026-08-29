@@ -52,6 +52,21 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
   const [fermo, setFermo] = useState(false);
   const [sopra, setSopra] = useState(false);
   const [nascosta, setNascosta] = useState(false);
+  /* 🔴 IL DITO METTE IN PAUSA, NON SPEGNE.
+   *
+   * Col mouse "chi tocca comanda" e' giusto: trascinare una striscia e'
+   * un gesto deliberato, e chi lo fa vuole guardarsi le foto con calma.
+   * Col dito no. Su un telefono la striscia occupa mezzo schermo, e per
+   * scorrere la PAGINA il dito ci passa sopra per forza: con lo stesso
+   * trattamento del mouse, il primo scorrimento verticale spegneva lo
+   * scorrimento automatico per sempre, su una pagina che l'utente non
+   * aveva ancora nemmeno cominciato a leggere.
+   *
+   * Quindi il tocco sospende per qualche secondo e poi riparte da solo.
+   * Chi vuole fermarla davvero ha il pulsante, che invece resta
+   * definitivo. */
+  const [toccata, setToccata] = useState(false);
+  const orologioTocco = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* la larghezza di un giro completo, cioe' quanto misura il blocco delle
      diapositive originali. Si rimisura da sola quando le immagini
@@ -121,7 +136,8 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
 
   /* ---- lo scorrimento ---- */
   const scorreDaSola =
-    auto && originali > 0 && inVista && !motoRidotto && !fermo && !sopra && !nascosta;
+    auto && originali > 0 && inVista && !motoRidotto && !fermo && !sopra &&
+    !toccata && !nascosta;
 
   useEffect(() => {
     const el = box.current;
@@ -140,8 +156,23 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
   }, [scorreDaSola, velocita]);
 
   /* ---- comandi a mano ---- */
-  /* Chi tocca comanda: qualunque interazione ferma lo scorrimento. */
+  /* Chi tocca comanda: col mouse, un'interazione ferma lo scorrimento e
+     non riparte da sola. */
   const prendiIlComando = useCallback(() => setFermo(true), []);
+
+  /** La pausa del dito: sospende e riparte da sola. Vedi la nota su
+   *  `toccata` piu' sopra. */
+  const sospendiPerTocco = useCallback(() => {
+    setToccata(true);
+    if (orologioTocco.current) clearTimeout(orologioTocco.current);
+    orologioTocco.current = setTimeout(() => setToccata(false), 3500);
+  }, []);
+
+  /* L'orologio va spento con il componente: senza, un cambio di pagina
+     durante la pausa lascerebbe un setState su un componente smontato. */
+  useEffect(() => () => {
+    if (orologioTocco.current) clearTimeout(orologioTocco.current);
+  }, []);
 
   const scorri = useCallback((verso: 1 | -1) => {
     const el = box.current;
@@ -162,7 +193,8 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
   const partenzaScroll = useRef(0);
 
   const onPointerDown = useCallback((e: EventoPuntatore<HTMLDivElement>) => {
-    prendiIlComando();
+    if (e.pointerType === 'mouse') prendiIlComando();
+    else sospendiPerTocco();
     /* Un <video controls> deve ricevere il proprio clic. Qui sotto si
        chiama preventDefault e si cattura il puntatore: fatto sopra un
        video, il play non partirebbe mai. */
@@ -175,7 +207,7 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
     partenzaScroll.current = e.currentTarget.scrollLeft;
     e.currentTarget.classList.add('dragging');
     e.currentTarget.setPointerCapture(e.pointerId);
-  }, [prendiIlComando]);
+  }, [prendiIlComando, sospendiPerTocco]);
 
   const onPointerMove = useCallback((e: EventoPuntatore<HTMLDivElement>) => {
     if (!trascino.current) return;
@@ -209,7 +241,7 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
     onPointerMove,
     onPointerUp: finisciTrascino,
     onPointerCancel: finisciTrascino,
-    onTouchStart: prendiIlComando,
+    onTouchStart: sospendiPerTocco,
     onKeyDown,
   };
 
