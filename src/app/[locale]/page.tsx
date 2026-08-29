@@ -423,10 +423,22 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               arriva da un annuncio -- e' vero? posso disdire? chi mi
               porta? -- prima che cominci a scorrere. */}
           <div className="hm-badges">
-            {d.voto != null && (
+            {/* 🔴 UN NUMERO SOLO, E QUELLO DEI CLIENTI.
+                Qui c'era "4.9 from 14,005 verified reviews": il terzo
+                conteggio di recensioni del sito, diverso dagli altri due
+                perche' calcolato su un'altra base. Tre cifre che parlano
+                della stessa cosa e non coincidono non convincono, si
+                smentiscono -- ed e' lo stesso motivo per cui e' uscito
+                dal footer e dalle schede tour.
+                Il voto resta, il conteggio diventa quello dei clienti:
+                e' l'unico che nessun'altra parte della pagina puo'
+                contraddire. Viene da `azienda.clienti_serviti`, quindi
+                si cambia in un posto solo. */}
+            {az?.clienti_serviti != null && (
               <span>
-                <i>⭐</i> <b>{d.voto.toFixed(1)}</b> from{' '}
-                {d.totale.toLocaleString('en-US')} verified reviews
+                <i>⭐</i> <b>{Number(az.voto_medio ?? 4.9).toFixed(1)}</b> from{' '}
+                {Math.round(az.clienti_serviti / 1000)}k+ guests since{' '}
+                {az.anno_fondazione ?? 2002}
               </span>
             )}
             <span><i>🏆</i> Viator Experience Award &amp; Travelers&rsquo; Choice</span>

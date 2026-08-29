@@ -32,7 +32,11 @@ import { Scelta } from '@/components/Scelta';
 export type Partenza = { valore: string; etichetta: string };
 
 const TIPI = [
-  { valore: '', etichetta: 'Any kind of tour' },
+  /* "Any kind of tour" descriveva il filtro, non l'offerta: la voce
+     predefinita di un menu e' la prima cosa che si legge, e li' diceva
+     "una qualunque". "Our tours" dice la stessa cosa e intanto ricorda
+     di chi sono. */
+  { valore: '', etichetta: 'Our tours' },
   { valore: 'small_group', etichetta: 'Small group day tours' },
   { valore: 'private', etichetta: 'Private tours' },
   { valore: 'cruise', etichetta: 'Cruise port tours' },
