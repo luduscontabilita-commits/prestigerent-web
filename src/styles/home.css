@@ -1663,8 +1663,23 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
      esce dall'ALTO, dove a tagliarlo c'e' gia' l'`overflow:hidden`. Il
      movimento resta identico a vedersi -- sono tre millesimi di scala al
      secondo, nessuno distingue da dove parte l'ingrandimento. */
+  /* 🔴 LA FOTO RIEMPIE L'HERO, NON E' PIU' UN QUADRATO IN CIMA.
+   *
+   * Il quadrato ancorato in alto aveva una logica: meno pixel da
+   * dipingere, e sotto il fondo scuro in cui la velatura andava a morire.
+   * Funzionava finche' l'hero era alto QUANTO il quadrato -- cioe' per
+   * caso, perche' l'altezza gliela dava il testo.
+   *
+   * Dal momento in cui l'hero ha un'altezza propria (66vh, per far vedere
+   * la fotografia) quel fondo e' diventato una fascia nera alta duecento
+   * pixel fra la foto e il riconoscimento Tripadvisor: si vedeva che
+   * l'immagine finiva a meta' strada.
+   *
+   * Ora la foto copre tutto, come sul desktop. Il ritaglio lo governa
+   * `object-position`, che ogni foto porta con se' da page.tsx: e' li'
+   * che si tiene dentro l'inquadratura il soggetto giusto. */
   .hm-hero-bg .hm-hero-foto{
-    inset:0 0 auto 0; height:auto; aspect-ratio:1/1; max-height:70vh;
+    inset:0; height:100%; aspect-ratio:auto; max-height:none;
     transform-origin:center bottom;
   }
 
@@ -1676,13 +1691,24 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
      stop e' il colore pieno del fondo -- e' lei a saldare la foto al buio.
      Stessa scatola della foto, stesso 'max-height': se una si accorcia
      devono accorciarsi tutte e due insieme. */
+  /* La velatura segue la foto: se copre un quadrato mentre la foto copre
+     tutto, sotto resta una fascia di fotografia in chiaro col testo
+     sopra. Stessa scatola, sempre. */
   .hm-hero-bg::after{
-    inset:0 0 auto 0; height:auto; aspect-ratio:1/1; max-height:70vh;
+    inset:0; height:100%; aspect-ratio:auto; max-height:none;
+    /* 🔴 NON FINISCE PIU' NEL NERO PIENO.
+       L'ultimo stop era `#0A0F15` opaco: serviva a saldare il bordo
+       basso del quadrato al fondo, cosi' non si vedeva dove finiva la
+       fotografia. Ora la fotografia non finisce piu' -- copre tutto -- e
+       quel nero coprirebbe il terzo inferiore dell'immagine.
+       Resta scuro quel tanto che basta a reggere la fascia Tripadvisor
+       che ci si appoggia sopra, e la parte alta si alleggerisce come sul
+       desktop: il testo se lo difende con la propria ombra. */
     background:linear-gradient(180deg,
-      rgba(10,15,21,.58) 0%,
-      rgba(10,15,21,.26) 34%,
-      rgba(10,15,21,.68) 76%,
-      #0A0F15 100%);
+      rgba(10,15,21,.42) 0%,
+      rgba(10,15,21,.12) 38%,
+      rgba(10,15,21,.30) 74%,
+      rgba(10,15,21,.62) 100%);
   }
 }
 
