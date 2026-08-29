@@ -320,6 +320,39 @@
 .hm-cat b{ color:var(--orange); font-weight:800; }
 
 /* ---------- schede tour ---------- */
+/* ─── la fila dei tour e le sue frecce ───────────────────────────────
+   Il contenitore serve solo ad ancorare le due frecce ai lati della
+   fila: senza, sarebbero due pulsanti nudi sopra e sotto -- che e'
+   esattamente com'erano finche' questo blocco non e' esistito. */
+.hm-fila{ position:relative; }
+.hm-frec{
+  position:absolute; top:38%; transform:translateY(-50%); z-index:3;
+  width:42px; height:42px; border-radius:50%; cursor:pointer;
+  display:grid; place-items:center;
+  background:var(--card); color:var(--ink);
+  border:1px solid var(--line);
+  box-shadow:0 2px 6px rgba(16,24,32,.10), 0 10px 26px rgba(16,24,32,.16);
+  transition:background .15s, color .15s, opacity .18s, box-shadow .15s;
+}
+/* In cima al 38% e non al 50%: piu' in basso finivano sul testo della
+   scheda, dove coprono il prezzo e il voto. All'altezza della foto non
+   coprono niente che si legga. */
+.hm-frec svg{ width:19px; height:19px; }
+.hm-frec-sx{ left:-14px; }
+.hm-frec-dx{ right:-14px; }
+.hm-frec:hover{ background:var(--orange); color:#fff; border-color:var(--orange); }
+.hm-frec:focus-visible{ outline:3px solid var(--orange); outline-offset:2px; }
+/* Spenta ai capi, non nascosta: un pulsante che sparisce mentre si
+   scorre fa saltare l'occhio, e sposta il dito nel momento in cui uno
+   sta premendo. */
+.hm-frec:disabled{ opacity:.32; cursor:default; box-shadow:none; }
+.hm-frec:disabled:hover{ background:var(--card); color:var(--ink); border-color:var(--line); }
+/* Sul telefono non servono: li' si trascina col dito, ed e' il gesto che
+   tutti conoscono. Due pastiglie sopra le foto ruberebbero spazio a
+   quello che devono far vedere. */
+@media (max-width:760px){ .hm-frec{ display:none; } }
+@media (prefers-reduced-motion: reduce){ .hm-frec{ transition:none; } }
+
 /* 🔴 I TOUR SCORRONO DI LATO, NON SI IMPILANO.
  *
  * Era una griglia: tre colonne, due sul tablet, UNA sul telefono. E una

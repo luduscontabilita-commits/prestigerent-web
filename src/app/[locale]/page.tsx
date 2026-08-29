@@ -7,6 +7,7 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { PrimoAlMondo } from '@/components/PrimoAlMondo';
+import { Conta } from '@/components/Conta';
 import { Destinazioni } from '@/components/Destinazioni';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
@@ -580,8 +581,16 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           posto falso. */}
       <section className="pr-sec tight" id="proof">
         <div className="pr-wrap wide">
+          {/* I numeri salgono quando la fascia entra nell'inquadratura.
+              Il valore finale e' nell'HTML fin dall'inizio: l'animazione
+              parte dopo il montaggio e solo se qualcuno la guarda. Vedi
+              la nota in Conta.tsx su perche' NON si parte da zero nel
+              markup. */}
           <div className="hm-proof">
-            <div><b>{d.voto?.toFixed(1)}</b><span>average out of 5</span></div>
+            <div>
+              <b>{d.voto != null ? <Conta a={d.voto} decimali={1} /> : null}</b>
+              <span>average out of 5</span>
+            </div>
             {/* 🔴 I CLIENTI, NON LE RECENSIONI.
                 Era l'ultimo conteggio di recensioni rimasto in giro dopo
                 averli tolti da testata, footer e schede tour: "14.005
@@ -591,12 +600,16 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 piu' di uno esatto che ne contraddice altri due. */}
             {az?.clienti_serviti != null && (
               <div>
-                <b>{Math.round(az.clienti_serviti / 1000)}k+</b>
+                <b><Conta a={Math.round(az.clienti_serviti / 1000)} suffisso="k+" /></b>
                 <span>guests since {az.anno_fondazione ?? 2002}</span>
               </div>
             )}
             <div>
-              <b>#{az?.classifica_posizione}</b>
+              <b>
+                {az?.classifica_posizione != null ? (
+                  <Conta a={az.classifica_posizione} prefisso="#" />
+                ) : null}
+              </b>
               {/* 🔴 SI ABBASSA SOLO L'INIZIALE, NON TUTTA LA STRINGA.
                   Con `.toLowerCase()` la riga diceva "of 248
                   transportation companies in florence": il nome della
@@ -612,7 +625,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                   : ''}
               </span>
             </div>
-            <div><b>{d.anni}</b><span>years, since {az?.anno_fondazione}</span></div>
+            <div>
+              <b>{d.anni != null ? <Conta a={d.anni} /> : null}</b>
+              <span>years, since {az?.anno_fondazione}</span>
+            </div>
           </div>
           {/* 🔴 QUI C'ERA "Travelers' Choice 2026 · verified on Tripadvisor,
               August 2026". Tolta il 29/08/2026.
