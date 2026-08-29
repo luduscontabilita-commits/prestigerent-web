@@ -252,9 +252,51 @@
 .hm-cat b{ color:var(--orange); font-weight:800; }
 
 /* ---------- schede tour ---------- */
-.hm-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-@media (max-width:980px){ .hm-grid{ grid-template-columns:repeat(2,1fr); } }
-@media (max-width:620px){ .hm-grid{ grid-template-columns:1fr; } }
+/* 🔴 I TOUR SCORRONO DI LATO, NON SI IMPILANO.
+ *
+ * Era una griglia: tre colonne, due sul tablet, UNA sul telefono. E una
+ * scheda per riga, su un telefono, vuol dire che la home diventa una
+ * colonna infinita -- e la seconda categoria non la raggiunge nessuno.
+ * Sul sito WordPress i tour scorrevano di lato, ed e' il motivo per cui
+ * ci stavano piu' sezioni nella stessa altezza.
+ *
+ * Le schede restano quelle rifatte, col testo in piu': cambia solo che
+ * hanno una larghezza propria invece di prendersi la colonna.
+ *
+ * Perche' scorre anche sul desktop: se cambiasse forma a seconda dello
+ * schermo, la stessa pagina si userebbe in due modi diversi -- e chi
+ * arriva dal telefono e poi torna dal computer non ritrova quello che
+ * aveva imparato. Su schermo largo se ne vedono quattro e mezza, che e'
+ * la stessa cosa che faceva la griglia.
+ *
+ * L'ultima scheda resta tagliata sul bordo apposta: e' l'unico segnale
+ * che dice "ce ne sono altre" senza scrivere niente. */
+.hm-grid{
+  display:flex; gap:20px;
+  overflow-x:auto; overflow-y:visible;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  /* il respiro sotto serve all'ombra delle schede, che senza verrebbe
+     tagliata dal bordo dello scorrimento */
+  padding-bottom:6px;
+}
+.hm-grid::-webkit-scrollbar{ display:none; }
+.hm-grid > .hm-card{
+  flex:0 0 clamp(272px, 30%, 344px);
+  scroll-snap-align:start;
+}
+/* Sul telefono la fila esce dai margini e arriva ai bordi: dentro il
+   padding della pagina si vedrebbe una scheda e uno spiraglio, e lo
+   spiraglio e' proprio il segnale che serve. */
+@media (max-width:760px){
+  .hm-grid{
+    gap:12px;
+    margin-inline:-20px; padding-inline:20px;
+    scroll-padding-left:20px;
+  }
+  .hm-grid > .hm-card{ flex:0 0 min(80vw, 320px); }
+}
 
 .hm-card{
   display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line);
