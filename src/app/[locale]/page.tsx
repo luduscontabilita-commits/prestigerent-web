@@ -187,7 +187,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       voto: voti[r.slug]?.voto ?? null,
       quante: voti[r.slug]?.quante ?? null,
       dove: voti[r.slug]?.dove ?? null,
-      oggi: perSlug.get(r.slug)?.oggi ?? null,
+      /* IL MESE, NON IL GIORNO. Il conteggio di oggi e' vero ma
+         fotografa un'ora sola: alle nove del mattino quasi ogni tour e'
+         a zero e la scheda tace, proprio mentre la si guarda. Trenta
+         giorni dicono la stessa cosa senza dipendere dall'orario. */
+      mese: perSlug.get(r.slug)?.ultimi_30 ?? null,
     };
   });
 

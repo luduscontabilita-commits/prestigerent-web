@@ -48,9 +48,10 @@ export type SchedaTour = {
      src/lib/recensioni.ts, che e' dove prima si sommavano le piattaforme
      e usciva un totale che nessuna di loro conferma. */
   dove: string | null;
-  /* Quante prenotazioni ha preso OGGI. Si mostra solo sopra una soglia
-   * (vedi SOGLIA_OGGI): "1 booked today" fa piu' danno del silenzio. */
-  oggi: number | null;
+  /* Quante prenotazioni ha preso NEGLI ULTIMI TRENTA GIORNI. Si mostra
+   * solo sopra una soglia (vedi SOGLIA_MESE): un numero basso detto ad
+   * alta voce lavora contro chi lo dice. */
+  mese: number | null;
 };
 
 const ETICHETTA: Record<string, string> = {
@@ -84,13 +85,21 @@ const TITOLO: Record<string, string> = {
    lasciar credere che sia un elenco qualunque tagliato a sei. */
 const TITOLO_CONSIGLIATI = 'Our most booked experiences';
 
-/* SOTTO QUESTA SOGLIA IL NUMERO NON SI SCRIVE.
+/* 🔴 IL CONTEGGIO E' DEL MESE, NON DEL GIORNO.
  *
- * E' la stessa regola gia' usata in Urgenza.tsx sulle pagine tour, e
- * vale la pena tenerle allineate: "3 booked today" e' una fila, "1
- * booked today" e' una stanza vuota. Un numero basso detto ad alta
- * voce lavora contro chi lo dice. */
-const SOGLIA_OGGI = 3;
+ * "3 booked today" ha due difetti che non si vedono guardando la scheda
+ * a mezzogiorno. Il primo: dipende dall'ora in cui uno apre il sito --
+ * la stessa scheda dice 6 la sera e niente la mattina, perche' la
+ * giornata e' appena cominciata. Il secondo: su sei tour solo quattro
+ * arrivavano a tre in un giorno, quindi meta' delle schede restava muta.
+ *
+ * Su trenta giorni il numero e' stabile, non ha orari, ed e' di un altro
+ * ordine di grandezza: 1.153 invece di 9. E resta un fatto verificabile,
+ * non una finta urgenza -- e' il conto vero delle prenotazioni Regiondo.
+ *
+ * La soglia sale da 3 a 25 di conseguenza: su un mese, tre prenotazioni
+ * sono una stanza vuota esattamente come una sola in un giorno. */
+const SOGLIA_MESE = 25;
 
 /* Le stelle piene sono arrotondate al voto: 4,9 fa cinque stelle piene,
    4,4 ne fa quattro. Il numero esatto sta accanto, quindi nessuno viene
@@ -438,11 +447,13 @@ export function HomeTours({
                 <a className="hm-card" href={t.href} key={t.slug}>
                   <div className="hm-card-img">
                     <span className="hm-card-tag">{ETICHETTA[t.kind] ?? t.kind}</span>
-                    {/* Le prenotazioni di oggi, prese da Regiondo. Non e' una
-                        finta urgenza: se il numero non c'e' o e' basso, il
-                        chip non compare affatto. */}
-                    {t.oggi != null && t.oggi >= SOGLIA_OGGI && (
-                      <span className="hm-card-hot">{t.oggi} booked today</span>
+                    {/* Le prenotazioni dell'ultimo mese, prese da Regiondo.
+                        Non e' una finta urgenza: se il numero non c'e' o e'
+                        basso, il chip non compare affatto. */}
+                    {t.mese != null && t.mese >= SOGLIA_MESE && (
+                      <span className="hm-card-hot">
+                        {t.mese.toLocaleString('en-US')} booked this month
+                      </span>
                     )}
                     {t.foto && (
                       // eslint-disable-next-line @next/next/no-img-element

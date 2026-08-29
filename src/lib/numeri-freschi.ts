@@ -31,14 +31,18 @@ import {
  * niente. Un sito che dice "nessuno ha prenotato oggi" lavora contro chi
  * lo ha scritto.
  *
- * ── PERCHE' UNA FINESTRA DI SETTE GIORNI E NON DI TRENTA ────────────
- * Il ricalcolo completo (trenta giorni, ~1.900 prenotazioni, otto pagine
- * da sei secondi) sta dove stava: e' un lavoro da un minuto e non puo'
- * girare dentro una richiesta. Qui servono solo i numeri che cambiano di
- * ora in ora -- oggi, ieri, gli ultimi sette giorni e le persone -- e per
- * quelli bastano una o due pagine. `ultimi_30` non si tocca: lo scrive il
- * ricalcolo completo, e sovrascriverlo con un conto parziale lo
- * dimezzerebbe.
+ * ── LA FINESTRA E' DI TRENTA GIORNI, NON DI SETTE ───────────────────
+ * Lo era fino al 29/08/2026, quando `ultimi_30` lo scriveva solo il
+ * pulsante in /admin/numeri/. Il guaio non era la precisione: un tour
+ * che entrava in tabella dopo l'ultimo ricalcolo a mano ci entrava con
+ * `ultimi_30` a zero e ci restava, anche vendendo 54 volte in una
+ * settimana. Da quando la home mostra il conteggio del mese, quello zero
+ * si vedeva.
+ *
+ * Le otto pagine costano poco davvero, per due motivi che vanno letti
+ * insieme: partono in parallelo (due andate e ritorni, non otto) e
+ * girano dentro `after()`, cioe' dopo che la risposta e' gia' partita.
+ * Chi ha fatto la richiesta non aspetta un millisecondo in piu'.
  *
  * ── PERCHE' NON SERVE UN SECONDO CRON ───────────────────────────────
  * Il piano gratuito di Vercel concede un solo lavoro programmato al
@@ -59,10 +63,29 @@ import {
  * cliente incassa davvero.
  */
 
-/** Quanti giorni si rileggono a ogni ripasso. Sette e non uno: `ultimi_7`
+/** La finestra dei conteggi settimanali. Sette e non uno: `ultimi_7`
  *  e `persone_7` sono finestre mobili, e ogni giorno che passa ne esce
  *  uno vecchio -- senza rileggerli resterebbero gonfi per sempre. */
 const GIORNI = 7;
+
+/** 🔴 LA FINESTRA CHE SI LEGGE DAVVERO DA REGIONDO: TRENTA GIORNI.
+ *
+ *  Prima se ne leggevano sette e `ultimi_30` lo scriveva solo il pulsante
+ *  in /admin/numeri/. Risultato: un tour comparso dopo l'ultimo ricalcolo
+ *  a mano entrava in tabella con `ultimi_30` a ZERO e ci restava, pur
+ *  vendendo. Il 29/08/2026 era il caso di due tour su sei -- fra cui uno
+ *  con 54 prenotazioni in sette giorni e 0 nel mese. Un numero fermo, di
+ *  nuovo, e stavolta in una cifra mostrata in home.
+ *
+ *  Costa sei richieste in piu' a ripasso (otto pagine invece di due), ma
+ *  girano in parallelo e dentro `after()`: il visitatore non aspetta
+ *  niente, e la guardia dei trenta minuti le tiene a due giri l'ora. */
+const GIORNI_MESE = 30;
+
+/** Tetto alle pagine chieste in un colpo. Trenta giorni fanno ~1.900
+ *  prenotazioni e una pagina ne porta 250: otto bastano. Il tetto e' li'
+ *  perche' un `total_pages` sballato non si trasformi in cento richieste. */
+const PAGINE_MAX = 12;
 
 /** Sotto questa eta' il dato e' abbastanza fresco e non si tocca. */
 export const FRESCO_MINUTI = 30;
@@ -140,8 +163,8 @@ async function mappaProdotti(sb: SupabaseClient) {
 }
 
 /**
- * Rilegge da Regiondo gli ultimi sette giorni e riscrive il riquadro
- * delle ultime prenotazioni e i conteggi di oggi/ieri/settimana.
+ * Rilegge da Regiondo gli ultimi trenta giorni e riscrive il riquadro
+ * delle ultime prenotazioni e i conteggi di oggi/ieri/settimana/mese.
  *
  * @param forza salta la guardia sulla freschezza. Lo usa la chiamata a
  *              mano e il lavoro notturno; il traffico no.
@@ -163,16 +186,22 @@ export async function ripassaNumeri(forza = false): Promise<EsitoRipasso> {
   const oggi = oggiARoma();
   const ieri = giorniPrima(oggi, 1);
   const seiFa = giorniPrima(oggi, GIORNI - 1);
+  const meseFa = giorniPrima(oggi, GIORNI_MESE - 1);
 
-  /* Due pagine bastano: sette giorni fanno circa 400 prenotazioni e una
-     pagina ne porta 250. Si chiede la seconda solo se la prima e' piena,
-     cosi' nei periodi di calma si fa una richiesta sola. */
-  const prima = await prenotazioniPagina(seiFa, 1);
+  /* La prima pagina dice quante sono in tutto; le altre si chiedono
+     insieme, non una dopo l'altra. In fila sarebbero otto andate e
+     ritorni fino a Regiondo -- in parallelo sono due. */
+  const prima = await prenotazioniPagina(meseFa, 1);
   if (!prima) return { ok: false, errore: 'Regiondo non risponde sulle prenotazioni.' };
   const tutte: PrenotazioneGrezza[] = [...prima.righe];
-  if (prima.pagine > 1) {
-    const seconda = await prenotazioniPagina(seiFa, 2);
-    if (seconda) tutte.push(...seconda.righe);
+  const quante = Math.min(prima.pagine, PAGINE_MAX);
+  if (quante > 1) {
+    const altre = await Promise.all(
+      Array.from({ length: quante - 1 }, (_, i) => prenotazioniPagina(meseFa, i + 2)),
+    );
+    /* Una pagina persa non ferma il ripasso: i conteggi vengono un po'
+       bassi per mezz'ora, che e' meglio di non aggiornare niente. */
+    for (const p of altre) if (p) tutte.push(...p.righe);
   }
 
   /* GLI ANNULLAMENTI NON SI CONTANO, e non basta non contarli: se una
@@ -189,12 +218,12 @@ export async function ripassaNumeri(forza = false): Promise<EsitoRipasso> {
   }
 
   /* ── i conteggi ─────────────────────────────────────────────────── */
-  type Conto = { oggi: number; ieri: number; u7: number; p7: number };
+  type Conto = { oggi: number; ieri: number; u7: number; u30: number; p7: number };
   const conti = new Map<string, Conto>();
   const prendi = (slug: string) => {
     let c = conti.get(slug);
     if (!c) {
-      c = { oggi: 0, ieri: 0, u7: 0, p7: 0 };
+      c = { oggi: 0, ieri: 0, u7: 0, u30: 0, p7: 0 };
       conti.set(slug, c);
     }
     return c;
@@ -220,6 +249,7 @@ export async function ripassaNumeri(forza = false): Promise<EsitoRipasso> {
         c.u7 += 1;
         c.p7 += persone;
       }
+      if (giorno >= meseFa) c.u30 += 1;
     }
   }
 
@@ -236,12 +266,13 @@ export async function ripassaNumeri(forza = false): Promise<EsitoRipasso> {
 
   const adesso = new Date().toISOString();
   const righe = [...tuttiSlug].map((slug) => {
-    const c = conti.get(slug) ?? { oggi: 0, ieri: 0, u7: 0, p7: 0 };
+    const c = conti.get(slug) ?? { oggi: 0, ieri: 0, u7: 0, u30: 0, p7: 0 };
     return {
       tour_slug: slug,
       oggi: c.oggi,
       ieri: c.ieri,
       ultimi_7: c.u7,
+      ultimi_30: c.u30,
       persone_7: c.p7,
       aggiornato: adesso,
     };
