@@ -9,10 +9,22 @@
  * noi si puo' inventare, il badge che Viator ha emesso no.
  *
  * Piu' grandi che sulla landing: li' stavano stretti sotto il titolo,
- * qui hanno una fascia loro. Il medaglione centrale del file Viator porta
- * gia' scritto "based on 1,794 reviews on Viator & Tripadvisor" -- il
- * numero e' cresciuto a 1.810, e per questo il testo accanto lo aggiorna
- * dal database mentre l'immagine resta quella emessa da loro.
+ * qui hanno una fascia loro.
+ *
+ * 🔴 IL MEDAGLIONE CENTRALE PORTA UN NUMERO SCRITTO DENTRO L'IMMAGINE,
+ * e quel numero invecchia da solo. Diceva "based on 1,794 reviews on
+ * Viator & Tripadvisor" mentre la stessa pagina, dieci centimetri piu'
+ * sotto, ne dichiarava dodicimila letti dal database: due cifre in
+ * contraddizione sulla stessa schermata fanno dubitare di tutte e due.
+ * Il 29 agosto 2026 il file e' stato rifatto con "12,000+", che e' vero
+ * e non invecchia: Tripadvisor 7.142 piu' GetYourGuide 4.939 fanno
+ * 12.081. Viator ne dichiara 10.035 ma comprendono gia' Tripadvisor,
+ * quindi non si sommano.
+ *
+ * Se un giorno il numero va rifatto: l'originale emesso da Viator e' un
+ * WebP CON TRASPARENZA. Sostituirlo con un JPG a fondo bianco mette un
+ * rettangolo bianco sotto i badge in modalita' scura -- il file nuovo
+ * deve conservare il canale alfa.
  */
 
 const BASE = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/';

@@ -159,7 +159,13 @@ const nextConfig: NextConfig = {
          sparisce, e quelle trenta diventano altrettanti 404 su URL che
          Google ha in indice da anni. Qui si rifa' la stessa cosa, una
          regola per tutte, cosi' non dipende piu' da lui. */
-      { source: '/categoria-prodotto/:path*', destination: '/:path*', permanent: true },
+      /* 🔴 LA BARRA IN FONDO ALLA DESTINAZIONE NON E' UN DETTAGLIO.
+         Senza, il redirect manda a `/destinations/florence-tuscany` e
+         `trailingSlash: true` deve rimediare con un SECONDO 308. Due
+         salti invece di uno su tutti e trenta gli indirizzi che Google
+         conosce da anni: ogni salto in piu' e' autorita' che si disperde
+         e tempo di scansione buttato. */
+      { source: '/categoria-prodotto/:path*', destination: '/:path*/', permanent: true },
 
       /* Il singolare girava su materiali stampati prima che WordPress lo
          correggesse con un suo 301: qui si rifa' la stessa cosa, perche'
@@ -220,6 +226,44 @@ const nextConfig: NextConfig = {
          /shop/ era invece l'elenco di tutti i prodotti: il suo posto e'
          l'indice generale. */
       { source: '/cart/', destination: '/', permanent: true },
+      /* ════════════════════════════════════════════════════════════════
+         🔴 OTTANTASEI INDIRIZZI CHE IL 28 AGOSTO HANNO COMINCIATO A DARE 404.
+         ════════════════════════════════════════════════════════════════
+
+         `/product/<slug>/` e' il permalink di WooCommerce. Non e' un
+         indirizzo morto: su WordPress rispondeva 301 verso
+         `/tour/<slug>/` -- verificato su piu' slug -- quindi e' vivo da
+         anni, e' linkato dall'esterno e ha accumulato autorita'.
+
+         Quel 301 pero' viveva DENTRO WordPress ed e' morto con lui: dal
+         giorno del passaggio tutti e ottantasei rispondono 404. E' lo
+         stesso identico caso di `/categoria-prodotto/` qui sopra, che era
+         stato previsto; questo no, perche' non compare in nessuna
+         sitemap -- ed e' proprio per questo che nessun inventario lo
+         aveva visto.
+
+         Un 404 non trasferisce niente. Ogni giorno che resta cosi' e'
+         posizionamento che si perde su indirizzi che valgono. */
+      { source: '/product/:path*', destination: '/tour/:path*', permanent: true },
+
+      /* LA PAGINAZIONE DI WORDPRESS.
+         `/categoria-prodotto/<cat>/page/2/`, `/shop/page/2/` e `/page/2/`
+         rispondevano 200 con canonical proprio, quindi erano indicizzabili
+         e sono in indice. Sul sito nuovo le categorie non sono paginate:
+         la pagina intera esiste una volta sola. Si mandano tutte alla
+         pagina senza numero, che e' dove sta ora quel contenuto.
+
+         L'ordine conta: queste tre regole devono stare PRIMA di quelle
+         generiche, altrimenti `/categoria-prodotto/:path*` cattura anche
+         `page/2` e produce un indirizzo inesistente. */
+      { source: '/categoria-prodotto/:cat*/page/:n', destination: '/:cat*/', permanent: true },
+      { source: '/shop/page/:n', destination: '/tours-of-italy/', permanent: true },
+      { source: '/page/:n', destination: '/', permanent: true },
+
+      /* L'indice nudo dei tour: su WordPress rimandava a caso alla prima
+         scheda, qui va dove ha senso. */
+      { source: '/tour/', destination: '/tours-of-italy/', permanent: true },
+
       { source: '/shop/', destination: '/tours-of-italy/', permanent: true },
 
       /* Il feed RSS di WordPress. Non c'e' un blog da alimentare: chi lo
@@ -392,6 +436,18 @@ const nextConfig: NextConfig = {
     const soloLanding = [
       {
         source: '/lp/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      },
+      /* 🔴 `/mp/` MANCAVA, ed era l'unica pagina del vecchio host rimasta
+         indicizzabile: rispondeva 200 senza nessun X-Robots-Tag. E' la
+         pagina del punto d'incontro, e' linkata da `/myb/` e da quattro
+         schede tour, ed e' contenuto sottile che ripete informazioni
+         gia' presenti nelle schede -- cioe' esattamente la cosa che
+         compete con loro nella stessa ricerca. */
+      {
+        source: '/mp/:path*',
         headers: [
           { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
         ],

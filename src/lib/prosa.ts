@@ -47,6 +47,23 @@ export type Domanda = { q: string; a: string };
  * risposta</p>`. Il punto interrogativo a volte sta FUORI dal grassetto,
  * quindi non si puo' cercare "strong che finisce con ?".
  *
+ * 🔴 "COSTANTE" LO E' MENO DI QUANTO SEMBRI, e le eccezioni costano
+ * care. Misurato il 29/08/2026, tre schede su ottantasette perdevano una
+ * FAQ intera -- il testo era in `tour_content`, arrivava nella pagina, e
+ * spariva qui:
+ *
+ *   `wine-experience-in-tuscany` scrive la domanda in <b> invece che in
+ *   <strong>. La domanda persa era "Is this a Big Bus tour?", cioe' la
+ *   risposta all'obiezione piu' comune sul tour che vale piu' di tutti.
+ *
+ *   i due transfer da aeroporto chiudono la domanda con i puntini di
+ *   sospensione invece che col punto interrogativo ("...for an early
+ *   departure flight ..."). La risposta persa diceva a che ora apre
+ *   l'aeroporto: esattamente il motivo per cui uno legge quella FAQ.
+ *
+ * Percio' ora si accettano tutti e due i grassetti, e la domanda puo'
+ * chiudersi col punto interrogativo O con i puntini.
+ *
  * Se il riconoscimento fallisce si restituisce lista vuota e il chiamante
  * mostra il testo cosi' com'e': meglio un blocco di testo che una sezione
  * vuota.
@@ -58,7 +75,7 @@ export function faqDa(html: string): Domanda[] {
   const paragrafi = pulito.match(/<p>[\s\S]*?<\/p>/gi) ?? [];
   for (let i = 0; i < paragrafi.length; i++) {
     const p = paragrafi[i];
-    const m = p.match(/^<p>\s*<strong>([\s\S]*?)<\/strong>\s*([?？:]?)\s*(?:<br\s*\/?>)?([\s\S]*)<\/p>$/i);
+    const m = p.match(/^<p>\s*<(?:strong|b)>([\s\S]*?)<\/(?:strong|b)>\s*([?？:\u2026]?|\.\.\.)\s*(?:<br\s*\/?>)?([\s\S]*)<\/p>$/i);
     if (!m) continue;
     const q = (m[1] + (m[2] || '')).replace(/<[^>]+>/g, '').trim();
 
@@ -83,7 +100,7 @@ export function faqDa(html: string): Domanda[] {
      * Quindi si va avanti finche' non si incontra il prossimo grassetto. */
     const pezzi = [m[3].trim()];
     for (let j = i + 1; j < paragrafi.length; j++) {
-      if (/^<p>\s*<strong>/i.test(paragrafi[j])) break;
+      if (/^<p>\s*<(?:strong|b)>/i.test(paragrafi[j])) break;
       const corpo = paragrafi[j].replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
       /* Un paragrafo vuoto o fatto solo di spazi unificatori non aggiunge
          niente e produrrebbe righe vuote dentro l'accordion. */
@@ -101,8 +118,12 @@ export function faqDa(html: string): Domanda[] {
        "CK_C", "Jana_A", "Timothy_H" -- perche' sulla pagina WordPress
        sono scritti nello stesso identico modo: nome in grassetto, a capo,
        testo. Il punto interrogativo e' l'unica cosa che distingue davvero
-       una domanda da un nome. */
-    if (!/[?？]\s*$/.test(q)) continue;
+       una domanda da un nome.
+
+       Si accettano anche i puntini di sospensione, perche' due FAQ vere
+       finiscono cosi' -- e un nome di persona in fondo a una recensione
+       non finisce MAI con i puntini, quindi la guardia regge lo stesso. */
+    if (!/[?？]\s*$/.test(q) && !/(?:…|\.\.\.)\s*$/.test(q)) continue;
 
     /* E una domanda vera ha almeno tre parole: "Price?" non lo e'. */
     if (q.split(/\s+/).length < 3) continue;

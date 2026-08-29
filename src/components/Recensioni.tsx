@@ -132,9 +132,17 @@ export function Recensioni({
           piattaforma ha il suo colore, la sua barra in alto e il suo peso
           tipografico: si riconoscono a colpo d'occhio, senza leggere.
 
-          I numeri sono quelli veri, non arrotondati: "1,794" si legge come
-          un dato, "1,800+" si legge come pubblicita'. Invecchiano, e va
-          bene -- fra sei mesi saranno di piu', non di meno. */}
+          I numeri sono quelli veri, non arrotondati: "7,142" si legge
+          come un dato, "7,000+" si legge come pubblicita'. Qui si puo'
+          fare, perche' arrivano dal database e si aggiornano da soli.
+
+          Il badge dei premi Viator segue la regola opposta -- porta
+          "12,000+" -- e non e' un'incoerenza: quel numero e' dipinto
+          dentro un file immagine e nessuno lo aggiorna. Un numero esatto
+          scritto dentro una figura e' una cifra che comincia a
+          invecchiare il giorno che la si salva; il "piu'" e' cio' che la
+          tiene vera. Dove il numero e' vivo si scrive esatto, dove e'
+          fermo si scrive con il piu'. */}
       {fonti.length > 0 && (
         <div className="rv-badges">
           {fonti.map((f) => {
