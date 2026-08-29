@@ -322,7 +322,13 @@
 .hm-grid{
   display:flex; gap:20px;
   overflow-x:auto; overflow-y:visible;
-  scroll-snap-type:x proximity;
+  /* 🔴 NIENTE `scroll-snap-type` QUI.
+     La fila si muove da sola trenta centesimi di pixel per fotogramma:
+     con lo scatto attivo il browser la tirava indietro sulla scheda piu'
+     vicina a ogni fotogramma, e il risultato era un tremolio invece di
+     uno scorrimento. Lo scatto serve dove si trascina col dito e basta;
+     qui il dito mette in pausa e poi la fila riparte da sola, quindi non
+     manca a nessuno. */
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
   /* il respiro sotto serve all'ombra delle schede, che senza verrebbe
@@ -332,7 +338,6 @@
 .hm-grid::-webkit-scrollbar{ display:none; }
 .hm-grid > .hm-card{
   flex:0 0 clamp(272px, 30%, 344px);
-  scroll-snap-align:start;
 }
 /* Sul telefono la fila esce dai margini e arriva ai bordi: dentro il
    padding della pagina si vedrebbe una scheda e uno spiraglio, e lo
@@ -341,7 +346,6 @@
   .hm-grid{
     gap:12px;
     margin-inline:-20px; padding-inline:20px;
-    scroll-padding-left:20px;
   }
   .hm-grid > .hm-card{ flex:0 0 min(80vw, 320px); }
 }

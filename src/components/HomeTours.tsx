@@ -220,9 +220,94 @@ export function HomeTours({
     });
   }, []);
 
+  /* 🔴 LA FILA SCORRE DA SOLA, E SI FERMA QUANDO SERVE.
+   *
+   * Ferma, la fila non dice che continua: l'ultima scheda tagliata sul
+   * bordo e' un segnale debole, e su un telefono la maggior parte delle
+   * persone non prova nemmeno a trascinare. Muovendosi lentamente dice
+   * da sola "ce n'e' dell'altro", che e' l'unico modo per far arrivare
+   * qualcuno oltre il secondo tour.
+   *
+   * Si ferma in quattro casi, e ognuno ha un motivo diverso:
+   *   - il mouse sopra: qualcuno sta leggendo quella scheda, e muoverla
+   *     mentre la legge e' il modo piu' rapido di farlo desistere;
+   *   - il dito: pausa breve e poi riparte -- NON definitiva, perche' su
+   *     un telefono il dito passa di li' anche solo per scorrere la
+   *     pagina, e uno stop definitivo scatterebbe per sbaglio;
+   *   - le frecce: li' la volonta' e' esplicita, quindi non riparte;
+   *   - fuori dallo schermo o scheda in secondo piano: muovere pixel che
+   *     nessuno guarda e' batteria buttata.
+   *
+   * Arrivata in fondo torna indietro invece di ricominciare da capo:
+   * duplicare le schede per il ciclo infinito vorrebbe dire duplicare
+   * anche i link, e Google leggerebbe ogni tour due volte. */
+  const [fermo, setFermo] = useState(false);
+  const [sopra, setSopra] = useState(false);
+  const [toccata, setToccata] = useState(false);
+  const [inVista, setInVista] = useState(false);
+  const [motoRidotto, setMotoRidotto] = useState(true);
+  const [nascosta, setNascosta] = useState(false);
+  const verso = useRef<1 | -1>(1);
+  const orologioTocco = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const sospendiPerTocco = useCallback(() => {
+    setToccata(true);
+    if (orologioTocco.current) clearTimeout(orologioTocco.current);
+    orologioTocco.current = setTimeout(() => setToccata(false), 4000);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const leggi = () => setMotoRidotto(mq.matches);
+    leggi();
+    mq.addEventListener('change', leggi);
+    const visibilita = () => setNascosta(document.hidden);
+    document.addEventListener('visibilitychange', visibilita);
+    return () => {
+      mq.removeEventListener('change', leggi);
+      document.removeEventListener('visibilitychange', visibilita);
+      if (orologioTocco.current) clearTimeout(orologioTocco.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = fila.current;
+    if (!el) return;
+    const os = new IntersectionObserver(
+      ([v]) => setInVista(v.isIntersecting),
+      { threshold: 0.25 },
+    );
+    os.observe(el);
+    return () => os.disconnect();
+  }, []);
+
+  const scorreDaSola = inVista && !fermo && !sopra && !toccata && !motoRidotto && !nascosta;
+
+  useEffect(() => {
+    const el = fila.current;
+    if (!el || !scorreDaSola) return;
+    let id = 0;
+    const passo = () => {
+      const massimo = el.scrollWidth - el.clientWidth;
+      if (massimo > 4) {
+        /* 0,3 px per fotogramma: a 60Hz sono 18px al secondo, cioe' una
+           scheda ogni diciotto secondi. Deve accorgersene chi guarda, non
+           chi legge. */
+        el.scrollLeft += 0.3 * verso.current;
+        if (el.scrollLeft >= massimo - 1) verso.current = -1;
+        else if (el.scrollLeft <= 1) verso.current = 1;
+      }
+      id = requestAnimationFrame(passo);
+    };
+    id = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(id);
+  }, [scorreDaSola]);
+
   const scorri = useCallback((verso: 1 | -1) => {
     const el = fila.current;
     if (!el) return;
+    /* Chi preme una freccia ha deciso: da qui in poi comanda lui. */
+    setFermo(true);
     const scheda = el.querySelector<HTMLElement>('.hm-card');
     /* Un passo = una scheda intera piu' lo spazio fra due. A "l'80% della
        finestra" si finiva sempre con una scheda tagliata a meta'. */
@@ -336,7 +421,19 @@ export function HomeTours({
                   <path d="m15 6-6 6 6 6" />
                 </svg>
               </button>
-              <div className="hm-grid" ref={fila}>
+              <div
+                className="hm-grid"
+                ref={fila}
+                onPointerEnter={(e) => { if (e.pointerType === 'mouse') setSopra(true); }}
+                onPointerLeave={() => setSopra(false)}
+                onPointerDown={(e) => { if (e.pointerType === 'mouse') setFermo(true); else sospendiPerTocco(); }}
+                onTouchStart={sospendiPerTocco}
+                onTouchMove={sospendiPerTocco}
+                /* Anche la rotella orizzontale del trackpad e' una scelta:
+                   se qualcuno sta scorrendo a mano, la fila non deve
+                   tirare dall'altra parte. */
+                onWheel={sospendiPerTocco}
+              >
               {mostrati.map((t) => (
                 <a className="hm-card" href={t.href} key={t.slug}>
                   <div className="hm-card-img">
