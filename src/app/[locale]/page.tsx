@@ -567,7 +567,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 leave, we collect you at your hotel, apartment or villa &mdash; and if you
                 are staying somewhere else in Italy, we come and get you there too.
               </p>
-              <a className="cta" href={locale === DEFAULT_LOCALE ? '/tour/private-tour-siena-and-san-gimignano/' : `/${locale}/tour/private-tour-siena-and-san-gimignano/`}>
+              {/* 🔴 PUNTAVA A UNA SCHEDA SOLA.
+                  "See the private tours" portava su
+                  /tour/private-tour-siena-and-san-gimignano/, cioe' UN
+                  tour dei ventotto -- e chi cercava i privati si trovava
+                  su Siena e San Gimignano senza capire perche'. Va
+                  all'indice della categoria. */}
+              <a className="cta" href={locale === DEFAULT_LOCALE ? '/private-tours/' : `/${locale}/private-tours/`}>
                 See the private tours
               </a>
             </div>

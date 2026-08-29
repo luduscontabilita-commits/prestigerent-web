@@ -63,8 +63,12 @@ const POSTI: { titolo: string; href: string; da: string; alt: string }[] = [
   {
     titolo: 'From La Spezia port',
     href: '/destinations/la-spezia-destinations/',
-    da: 'tour-chianti-wineries-from-la-spezia',
-    alt: 'The Cinque Terre and Tuscany from La Spezia',
+    /* NON il tour del Chianti da La Spezia: usa la stessa foto della
+       cantina di "Florence & Tuscany", e due riquadri identici nella
+       stessa griglia si leggono come un errore. Le Cinque Terre sono
+       anche l'immagine con cui La Spezia si riconosce. */
+    da: 'tour-to-cinque-terre-from-la-spezia',
+    alt: 'The Cinque Terre, seen from the La Spezia quay',
   },
   {
     titolo: 'From Civitavecchia port',

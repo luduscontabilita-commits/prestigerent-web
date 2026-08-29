@@ -1632,10 +1632,32 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    --ink, --ink-soft e --orange -- cosi' il tema scuro lo segue senza
    una riga in piu' in theme.css.
    ============================================================ */
+/* 🔴 IL MODULO HA UN CONTORNO, ALMENO DOVE C'E' SPAZIO.
+ *
+ * Senza, i campi galleggiavano sul bianco della pagina: su schermo largo
+ * l'occhio non capiva dove comincia e dove finisce la cosa da compilare,
+ * e un modulo senza confini si legge come "altro testo" invece che come
+ * un'azione da fare. Con una cornice diventa un oggetto: si vede in un
+ * colpo che sono sette campi e non settanta, e questo conta -- la paura
+ * di un modulo e' quasi sempre la paura che sia lungo.
+ *
+ * Sul telefono la cornice non si mette: li' il modulo occupa comunque
+ * tutta la larghezza dello schermo, quindi il confine c'e' gia' ed e' il
+ * bordo del telefono. Aggiungerne un altro dentro toglie sedici pixel
+ * per lato ai campi, che su 390px si sentono. */
 .mr{
   max-width:720px; margin:26px auto 0;
   display:flex; flex-direction:column; gap:14px;
   text-align:left;
+}
+@media (min-width:761px){
+  .mr{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:28px 30px 26px;
+    box-shadow:0 1px 2px rgba(16,24,32,.04), 0 14px 34px rgba(16,24,32,.07);
+  }
 }
 
 /* Due campi per riga sul desktop, uno per riga sul telefono. Su schermo
@@ -2220,7 +2242,18 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
 .sv-lab{
   font-size:.98rem; font-weight:700; line-height:1.3; text-align:center;
   color:var(--ink); text-wrap:balance;
+  /* 🔴 DUE RIGHE DI ALTEZZA ANCHE QUANDO NE BASTA UNA.
+     "Transfers with stops en route" va a capo e le altre no: senza
+     un'altezza fissa la fila finiva a quote diverse, e sei cerchi
+     allineati in alto con le scritte sfalsate in basso si leggono come
+     una griglia rotta. Due righe e' il massimo che serve. */
+  min-height:2.6em; display:flex; align-items:flex-start; justify-content:center;
 }
+/* L'anello c'e' sempre, appena accennato: sei cerchi su fondo bianco
+   senza bordo galleggiano, e non si capisce che sono un insieme. Sul
+   passaggio del mouse diventa arancione -- e' lo stesso anello, non uno
+   che compare. */
+.sv-img{ outline-color:var(--line); }
 .sv-card:hover .sv-img,
 .sv-card:focus-visible .sv-img{ outline-color:var(--orange,#FF7D1F); transform:translateY(-3px); }
 .sv-card:hover .sv-img img,
@@ -2611,6 +2644,18 @@ button.hd-top{
 }
 .dst-tutte:hover{ text-decoration:underline; }
 .dst-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+/* 🔴 LA PRIMA TIENE DUE COLONNE.
+   Otto riquadri tutti uguali sono un catalogo, e un catalogo non dice
+   da dove cominciare. Firenze e la Toscana sono l'85% di quello che si
+   vende: se ha la stessa misura di "From Civitavecchia port" la griglia
+   sta mentendo su cosa fa questa azienda. Occupando due colonne prende
+   il posto che le spetta e la fila resta comunque piena, perche' otto
+   riquadri su quattro colonne diventano due righe con il primo doppio. */
+@media (min-width:1101px){
+  .dst-grid{ grid-auto-rows:1fr; }
+  .dst-grid > .dst-card:first-child{ grid-column:span 2; grid-row:span 2; aspect-ratio:auto; }
+  .dst-grid > .dst-card:first-child .dst-nome{ font-size:1.5rem; }
+}
 .dst-card{
   position:relative; display:block; overflow:hidden;
   border-radius:16px; aspect-ratio:4/3; text-decoration:none;
@@ -2629,9 +2674,22 @@ button.hd-top{
 }
 .dst-nome{
   position:absolute; left:16px; right:16px; bottom:14px;
-  color:#fff; font-size:1.02rem; font-weight:800; line-height:1.25;
+  color:#fff; font-size:1.06rem; font-weight:800; line-height:1.25;
   text-shadow:0 1px 3px rgba(8,12,17,.6);
+  display:flex; align-items:center; gap:8px;
 }
+/* La freccia non compare dal nulla: c'e' sempre, e sul passaggio del
+   mouse scorre in avanti. Un elemento che appare sposta il testo
+   accanto; uno che si muove dice la stessa cosa senza spostare niente. */
+.dst-nome::after{
+  content:"→"; font-weight:700; opacity:.55;
+  transition:transform .22s ease, opacity .22s ease;
+}
+.dst-card:hover .dst-nome::after{ transform:translateX(5px); opacity:1; }
+/* Un filo di luce sul bordo: separa il riquadro dal bianco della pagina
+   senza disegnarci intorno una cornice, che su una foto sta sempre male. */
+.dst-card{ box-shadow:0 1px 2px rgba(16,24,32,.06), 0 10px 26px rgba(16,24,32,.10); }
+.dst-card:hover{ box-shadow:0 2px 4px rgba(16,24,32,.08), 0 16px 36px rgba(16,24,32,.16); }
 .dst-card:focus-visible{ outline:3px solid var(--orange); outline-offset:3px; }
 @media (max-width:1100px){ .dst-grid{ grid-template-columns:repeat(2,1fr); } }
 @media (max-width:760px){
