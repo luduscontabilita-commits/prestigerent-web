@@ -375,9 +375,19 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               principale del sito. Uno spazio esplicito rimette la parola
               al suo posto senza spostare un pixel: fra due blocchi lo
               spazio non si vede. */}
+          {/* 🔴 IL TITOLO DICE ANCHE DOVE SI ARRIVA, NON SOLO DA DOVE SI PARTE.
+              "from Florence, through Chianti and Tuscany" descriveva un
+              terzo del catalogo: ci sono Roma, Venezia, Milano, la costiera
+              amalfitana e i porti da crociera, cioe' i giri piu' cari.
+              Chi cerca "private transfer Florence to Rome" leggeva un
+              titolo che parlava di Chianti e si convinceva di essere sul
+              sito sbagliato.
+              Piu' corto anche di misura: la riga in corsivo occupava due
+              righe intere sul telefono e spingeva la foto fuori dallo
+              schermo. */}
           <h1 className="hm-title">
             Private tours, transfers &amp; chauffeur service{' '}
-            <em>from Florence, through Chianti and Tuscany</em>
+            <em>across Italy, from Florence</em>
           </h1>
           {/* 🔴 SESSANTA PAROLE SOPRA LA FOTO, SU UNO SCHERMO DA 390 PIXEL.
               Misurato con i font veri (Manrope 600, 16px, interlinea 1,6):
@@ -412,14 +422,38 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               luoghi (sono nel titolo, due righe sopra) e "several of them
               native speakers, working with us season after season", che e'
               la prova del punto, non il punto. */}
+          {/* 🔴 UNA RIGA, NON QUATTRO.
+           *
+           * Qui c'erano venticinque parole sul telefono e cinquantaquattro
+           * sul desktop: quattro righe di testo bianco sopra la
+           * fotografia, prima ancora di vedere la ricerca. Erano tutte
+           * vere e tutte utili, ma dette in quel punto costavano la foto
+           * -- e la foto e' quello che si vende.
+           *
+           * Resta la frase che nessun intermediario puo' scrivere: i
+           * mezzi sono nostri e gli autisti sono nostri dipendenti. Il
+           * resto -- il ritiro in hotel, l'inglese, le ore libere -- non
+           * sparisce: scende nella fascia chiara sotto la foto, dove si
+           * legge meglio e non costa niente all'immagine. */}
           <p className="hm-sub">
-            Your own car, your own driver, your own hours
-            <span className="hm-piu"> &mdash; through the Chianti wineries, Siena and San Gimignano</span>.
-            We own the vehicles and employ the people:{' '}
-            <b><span className="hm-piu">fluent </span>English-speaking drivers and guides</b>
-            <span className="hm-piu">, several of them native speakers, working with us season after season</span>.
-            Hotel pickup in Florence<span className="hm-piu">, or anywhere in Italy</span>.
+            Our own vehicles, our own English-speaking drivers &mdash;{' '}
+            <b>employed by us, not subcontracted</b>.
           </p>
+
+          {/* I FATTI AL POSTO DELLE PAROLE.
+              Tre cose verificabili su una riga sola, che occupano meno di
+              una frase e dicono di piu': da quanto esistono, quanti
+              clienti, e che si puo' disdire. Il numero dei clienti viene
+              da `azienda.clienti_serviti`, come ovunque. */}
+          <p className="hm-fatti-riga">
+            <span>★ {Number(az?.voto_medio ?? 4.9).toFixed(1)}</span>
+            {az?.clienti_serviti != null && (
+              <span>{Math.round(az.clienti_serviti / 1000)}k+ guests</span>
+            )}
+            <span>Since {az?.anno_fondazione ?? 2002}</span>
+            <span>Free cancellation 24h</span>
+          </p>
+
           {/* Il modulo di ricerca STA QUI, sulla foto: e' la prima cosa
               che si puo' fare. Sotto, in mezzo al bianco, lo trovava solo
               chi scorreva. */}

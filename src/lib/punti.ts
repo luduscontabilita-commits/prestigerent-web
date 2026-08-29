@@ -83,6 +83,34 @@ const POLICY = [
 
 const isPolicy = (s: string) => POLICY.some((r) => r.test(s.trim()));
 
+/* 🔴 IL FILTRO GIUSTO PER UN TOUR E' SBAGLIATO PER UN TRANSFER.
+ *
+ * `POLICY` toglie tutto quello che non dice "cosa vedrai": porta a
+ * porta, bagagli al sicuro, flotta Mercedes, niente code. Su una gita e'
+ * la scelta giusta -- quelle righe le scrive chiunque, e rubano il posto
+ * a Siena e San Gimignano.
+ *
+ * Su un transfer Firenze-Roma pero' NON C'E' niente da vedere: il
+ * prodotto e' esattamente "porta a porta, con i tuoi bagagli, su una
+ * Mercedes, senza cambiare treno". Togliendo quelle righe restava zero,
+ * e la scheda mostrava un buco fra la descrizione e il prezzo -- con le
+ * schede alte uguali, quel vuoto e' grande quanto tre righe.
+ *
+ * Quindi il ripiego: se dopo il filtro severo non resta abbastanza, si
+ * riprova togliendo solo cio' che e' davvero ridondante -- la
+ * sanificazione (retaggio del Covid), la cancellazione gratuita (c'e'
+ * gia' scritta due volte altrove) e il "Read more" dell'importazione.
+ * Il resto sono fatti veri, scritti dall'azienda, e su quei prodotti
+ * sono l'argomento di vendita. */
+const POLICY_MINIMA = [
+  /sanitiz|sanitis/i,
+  /safe for (health|money)/i,
+  /free cancellation|cancel for free|prior (to )?departure/i,
+  /misses port|cruise is canceled|cruise is cancelled/i,
+  /^read more$|^leggi/i,
+];
+const isPolicyMinima = (s: string) => POLICY_MINIMA.some((r) => r.test(s.trim()));
+
 /* ── I VERBI DI APERTURA ──────────────────────────────────────────────────
  * Contati sulle 377 voci vere: visit 47, admire 32, see 31, enjoy 30,
  * explore 29... Sono riempitivo -- "Visit the medieval village of
@@ -377,30 +405,10 @@ const QUANTI = 3;
  * I punti da stampare sulla scheda: due o tre righe corte che dicono cosa
  * si vede e si fa in QUESTO tour, oppure l'elenco vuoto.
  */
-export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
-  if (!blocks) return [];
-
-  const fonti = [
-    ...(blocks.highlights ?? []).filter((h) => !isPolicy(h)),
-    ...dalloSchedule(blocks.tabs?.['TOUR SCHEDULE']),
-  ];
-
+function scegli(fonti: string[]): string[] {
   const fuori: string[] = [];
   const viste = new Set<string>();
   for (const f of fonti) {
-    /* 🔴 QUI IL GRASSETTO SI TOGLIE, NON SI TIENE.
-     *
-     * Dal 29/08/2026 i punti forti in banca dati contengono `<strong>`
-     * intorno al titoletto: sulla PAGINA del tour si stampano come HTML
-     * ed e' quello che vogliamo. Sulla schedina della home no -- li' il
-     * testo viene accorciato a poche parole e stampato come testo
-     * semplice, quindi il tag finiva a video: si leggeva letteralmente
-     * "<strong>Intimate Small Group". Peggio ancora, il taglio cadeva in
-     * mezzo al tag e lo lasciava aperto.
-     *
-     * Si toglie PRIMA di accorciare: se si togliesse dopo, il conto dei
-     * caratteri comprenderebbe i tag e le schedine verrebbero piu' corte
-     * di quanto sembra. */
     const corta = accorcia(f.replace(/<[^>]+>/g, ''));
     if (!corta) continue;
     const k = chiave(corta);
@@ -409,9 +417,24 @@ export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
     fuori.push(corta);
     if (fuori.length === QUANTI) break;
   }
-
-  return fuori.length >= MINIMO ? fuori : [];
+  return fuori;
 }
+
+export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
+  if (!blocks) return [];
+
+  const tutti = blocks.highlights ?? [];
+  const primo = scegli([
+    ...tutti.filter((h) => !isPolicy(h)),
+    ...dalloSchedule(blocks.tabs?.['TOUR SCHEDULE']),
+  ]);
+  if (primo.length >= MINIMO) return primo;
+
+  /* Il ripiego: vedi la nota su POLICY_MINIMA. */
+  const secondo = scegli(tutti.filter((h) => !isPolicyMinima(h)));
+  return secondo.length >= MINIMO ? secondo : primo;
+}
+
 
 /* ── LA PAGINA DEL TOUR, DOVE L'ELENCO LUNGO RESTA ────────────────────────
  * Li' i punti si mostrano tutti e va bene: chi e' arrivato sulla pagina ha

@@ -24,8 +24,13 @@
      qualunque cosa venga dopo, e nessuno deve piu' rincorrere numeri. */
   position:relative; z-index:10;
   min-height:clamp(560px,64vw,720px);
-  display:flex; flex-direction:column; justify-content:center;
-  padding:80px 20px 44px; color:#fff;
+  /* 🔴 IL TESTO STA IN ALTO, NON AL CENTRO.
+     Centrato, il blocco si allargava verso il basso man mano che
+     cresceva e mangiava la foto da tutte e due le parti. Appoggiato in
+     alto, quello che avanza resta fotografia: e' l'unico modo di far
+     vedere il paesaggio senza togliere una parola. */
+  display:flex; flex-direction:column; justify-content:flex-start;
+  padding:52px 20px 44px; color:#fff;
   /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
      ma tagliava anche la tendina della ricerca appena sconfinava sotto
      l'hero -- si vedeva mezzo elenco e basta. Il ritaglio va sullo
@@ -58,6 +63,7 @@
 .hm-hero h1,
 .hm-hero .hm-kicker,
 .hm-hero .hm-sub,
+.hm-hero .hm-fatti-riga,
 .hm-hero .hm-badges span{
   text-shadow:0 1px 2px rgba(8,12,17,.55), 0 2px 18px rgba(8,12,17,.45);
 }
@@ -68,9 +74,12 @@
   font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
   color:var(--orange-hi, #FF9A4D);
 }
+/* Piu' piccolo di prima (era 2,2-4rem): a schermo pieno un titolo da
+   64px occupava tre righe e mezzo schermo. Quello che si guadagna in
+   altezza diventa cielo, che e' il motivo per cui la foto e' li'. */
 .hm-title{
-  font-size:clamp(2.2rem,5.6vw,4rem); font-weight:800; line-height:1.03;
-  letter-spacing:-.025em; margin:0; max-width:16ch;
+  font-size:clamp(1.9rem,4.4vw,3.2rem); font-weight:800; line-height:1.05;
+  letter-spacing:-.025em; margin:0; max-width:19ch;
   text-shadow:0 2px 22px rgba(0,0,0,.42);
 }
 /* la seconda riga in Fraunces corsivo: e' il carattere delle landing, ed
@@ -80,10 +89,27 @@
   font-weight:560; letter-spacing:-.01em;
 }
 .hm-sub{
-  margin:18px 0 0; max-width:52ch; font-size:clamp(1rem,1.5vw,1.12rem);
-  font-weight:600; line-height:1.6; color:rgba(255,255,255,.94);
+  margin:14px 0 0; max-width:46ch; font-size:clamp(.98rem,1.35vw,1.06rem);
+  font-weight:600; line-height:1.5; color:rgba(255,255,255,.94);
   text-shadow:0 1px 12px rgba(0,0,0,.4);
 }
+/* ─── la riga dei fatti sopra la foto ────────────────────────────────
+   Quattro cose verificabili separate da un punto: occupano una riga e
+   dicono piu' di un paragrafo. Vanno a capo da sole se lo schermo e'
+   stretto, ma restano due righe al massimo perche' sono corte. */
+.hm-fatti-riga{
+  display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px;
+  margin:12px 0 0; padding:0;
+  font-size:.86rem; font-weight:700; color:rgba(255,255,255,.92);
+  text-shadow:0 1px 2px rgba(8,12,17,.55), 0 2px 14px rgba(8,12,17,.5);
+}
+.hm-fatti-riga span{ display:inline-flex; align-items:center; }
+/* Il punto separatore e' disegnato, non scritto: cosi' non compare a
+   capo riga da solo quando le voci vanno su due righe. */
+.hm-fatti-riga span + span::before{
+  content:"·"; margin-right:14px; opacity:.5; font-weight:400;
+}
+@media (max-width:400px){ .hm-fatti-riga{ font-size:.8rem; gap:5px 11px; } }
 .hm-search{ margin-top:28px; }
 
 /* la riga della fiducia, sotto il modulo */
