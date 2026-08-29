@@ -151,9 +151,18 @@
 .hm-cta svg{ width:17px; height:17px; }
 
 @media (max-width:760px){
-  /* Sul telefono ancora piu' su: l'immagine e' ritagliata a quadrato,
-     quindi di cielo ce n'e' meno e il soggetto sale. */
-  .hm-hero{ min-height:auto; padding:16px 18px 36px; }
+  /* 🔴 UN'ALTEZZA PROPRIA, NON "quanto il testo".
+     Con `min-height:auto` l'hero era alto quanto il suo contenuto:
+     finche' c'erano sottotitolo lungo e modulo di ricerca la foto veniva
+     grande per caso, e appena quei due sono usciti si e' accartocciata a
+     una striscia. La fotografia non e' lo sfondo del testo, e' meta' di
+     quello che si vende: l'altezza gliela si da', non gliela si lascia
+     avanzare.
+     72vh e' quasi tutto lo schermo meno la testata, e il testo occupa il
+     terzo alto -- in mezzo e in basso resta fotografia.
+     Sul telefono ancora piu' su di prima: l'immagine e' ritagliata a
+     quadrato, quindi di cielo ce n'e' meno e il soggetto sale. */
+  .hm-hero{ min-height:clamp(420px, 72vh, 640px); padding:16px 18px 36px; }
   /* IL TITOLO SI RIMPICCIOLISCE, PERCHE' A 2,2rem ANDAVA IN SEI RIGHE.
      Il clamp di sopra ha per minimo 2,2rem, e sotto i 630px di finestra e'
      sempre il minimo a vincere: 35,2px fissi. Misurato con Manrope 800 sul
