@@ -419,6 +419,38 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <span className="hm-piu">, several of them native speakers, working with us season after season</span>.
             Hotel pickup in Florence<span className="hm-piu">, or anywhere in Italy</span>.
           </p>
+          {/* Il modulo di ricerca STA QUI, sulla foto: e' la prima cosa
+              che si puo' fare. Sotto, in mezzo al bianco, lo trovava solo
+              chi scorreva. */}
+          <Cerca tours={tours} partenze={PARTENZE} />
+
+        </div>
+      </section>
+
+      {/* SUBITO SOTTO LA FOTO, come sul sito WordPress: e' la prima cosa
+          che si legge dopo la promessa, e l'unica che non la scriviamo noi. */}
+      <PrimoAlMondo />
+
+      {/* 🔴 QUESTA ROBA STAVA SOPRA LA FOTO, ED E' SCESA QUI.
+       *
+       * Sull'immagine c'erano sette blocchi: occhiello, titolo, tre righe
+       * di sottotitolo, quattro righe di riconoscimenti, il modulo di
+       * ricerca e due pulsanti. Per tenerli tutti leggibili serviva 0,80
+       * di nero sopra la fotografia -- cioe' si spegneva la foto per far
+       * entrare il testo, e la foto e' meta' di quello che si vende.
+       *
+       * Il conflitto sembrava fra SEO ed estetica, e non lo era: Google
+       * legge il documento, non il disegno. Un titolo sotto l'immagine
+       * vale quanto uno sovrapposto, e queste quattro righe qui sotto
+       * pesano per Google esattamente come pesavano prima.
+       *
+       * Sopra la foto restano le tre cose che devono stare li': il
+       * titolo, una riga di sottotitolo e il modulo di ricerca -- cioe'
+       * cosa vendiamo e come si comincia. Il resto si legge meglio su
+       * fondo chiaro, che e' la condizione normale per leggere.
+       */}
+      <section className="hm-sotto" aria-label="Why book with us">
+        <div className="hm-sotto-in">
           {/* La riga della fiducia risponde alle tre obiezioni di chi
               arriva da un annuncio -- e' vero? posso disdire? chi mi
               porta? -- prima che cominci a scorrere. */}
@@ -446,11 +478,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <span><i>🚐</i> Our own {az?.mezzi_minibus} minibuses, our own drivers</span>
           </div>
 
-          {/* Il modulo di ricerca STA QUI, sulla foto: e' la prima cosa
-              che si puo' fare. Sotto, in mezzo al bianco, lo trovava solo
-              chi scorreva. */}
-          <Cerca tours={tours} partenze={PARTENZE} />
-
           <div className="hm-cta">
             <a className="primo" href="#tours">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
@@ -467,10 +494,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
         </div>
       </section>
-
-      {/* SUBITO SOTTO LA FOTO, come sul sito WordPress: e' la prima cosa
-          che si legge dopo la promessa, e l'unica che non la scriviamo noi. */}
-      <PrimoAlMondo />
 
       {/* I PREMI SUBITO SOTTO LA RICERCA, non a meta' pagina.
           Sono medaglie emesse da Viator e Tripadvisor: rispondono da sole

@@ -39,8 +39,8 @@
 .hm-hero-bg::after{
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(90deg,rgba(10,15,21,.42) 0%,rgba(10,15,21,.24) 46%,rgba(10,15,21,.06) 100%),
-    linear-gradient(180deg,rgba(10,15,21,.16) 0%,rgba(10,15,21,0) 30%,rgba(10,15,21,.46) 100%);
+    linear-gradient(90deg,rgba(10,15,21,.30) 0%,rgba(10,15,21,.15) 46%,rgba(10,15,21,.02) 100%),
+    linear-gradient(180deg,rgba(10,15,21,.10) 0%,rgba(10,15,21,0) 32%,rgba(10,15,21,.34) 100%);
 }
 /* L'ombra intorno alle lettere: due strati, uno stretto e netto che
    stacca il bordo, uno largo e morbido che fa da alone. E' quello che
@@ -2537,4 +2537,51 @@ button.hd-top{
   .pam-logo{ width:58px; }
   .pam-t{ font-size:.9rem; }
   .pam-t b{ font-size:.97rem; }
+}
+
+/* ─── la fascia chiara sotto la foto ─────────────────────────────────
+   Qui sono scesi i riconoscimenti e i due pulsanti, che prima stavano
+   sulla fotografia. Su fondo chiaro si leggono senza che serva
+   scurire l'immagine: e' la ragione per cui il velo sopra la foto ha
+   potuto dimezzarsi due volte.
+   Sta subito sotto la fascia scura del riconoscimento Tripadvisor, e
+   insieme fanno la coda dell'hero: prima il fatto che certifica un
+   altro, poi i nostri. */
+.hm-sotto{ background:var(--card); border-bottom:1px solid var(--line); }
+.hm-sotto-in{
+  max-width:1180px; margin:0 auto; padding:20px 20px 22px;
+  display:flex; flex-wrap:wrap; align-items:center;
+  justify-content:space-between; gap:16px 28px;
+}
+/* I riconoscimenti erano bianchi su foto: adesso sono testo normale, e
+   le icone fanno da elenco. Restano su una riga finche' c'e' posto. */
+.hm-sotto .hm-badges{
+  display:flex; flex-wrap:wrap; gap:8px 22px; margin:0;
+  flex:1 1 460px; min-width:0;
+}
+.hm-sotto .hm-badges span{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.88rem; font-weight:700; color:var(--ink); text-shadow:none;
+}
+.hm-sotto .hm-badges i{ font-style:normal; font-size:1rem; line-height:1; }
+.hm-sotto .hm-badges b{ color:var(--orange); }
+/* I pulsanti tornano a essere due cose diverse: uno pieno che porta ai
+   tour, uno contornato per scrivere. Su fondo chiaro non serve piu' il
+   vetro smerigliato che avevano sulla foto. */
+.hm-sotto .hm-cta{ margin:0; flex:0 0 auto; }
+.hm-sotto .hm-cta .primo{
+  background:var(--orange); color:#fff; box-shadow:none; border:0;
+  backdrop-filter:none;
+}
+.hm-sotto .hm-cta .secondo{
+  background:transparent; color:var(--ink);
+  border:1px solid var(--line); backdrop-filter:none;
+}
+.hm-sotto .hm-cta .secondo:hover{ background:var(--ph); }
+@media (max-width:760px){
+  .hm-sotto-in{ padding:16px 18px 18px; gap:14px; }
+  .hm-sotto .hm-badges{ flex-direction:column; gap:9px; flex-basis:100%; }
+  .hm-sotto .hm-badges span{ font-size:.84rem; }
+  .hm-sotto .hm-cta{ width:100%; }
+  .hm-sotto .hm-cta a{ flex:1 1 0; justify-content:center; }
 }
