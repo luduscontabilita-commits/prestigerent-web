@@ -406,12 +406,25 @@ export function Header({
           <BottoneRichiesta className="hd-top hd-plain hd-solo-mob">
             Quick Request
           </BottoneRichiesta>
+          {/* Il selettore del tema, che in testata sul telefono non ci
+              sta: vedi la nota su .hd-tema piu' sopra. */}
+          <div className="hd-top hd-plain hd-solo-mob hd-tema-mob">
+            <ThemeToggle />
+          </div>
         </nav>
 
         <div className="hd-right">
           <BottoneRichiesta className="hd-quick">Quick Request</BottoneRichiesta>
 
-          <ThemeToggle />
+          {/* 🔴 SUL TELEFONO IL TEMA SCENDE NEL MENU.
+              In testata su 390 pixel ci stanno quattro cose: il marchio
+              col nome, "Quick Request", WhatsApp e il panino. Il quinto
+              posto non c'e', e fra il selettore chiaro/scuro e il NOME
+              DELL'AZIENDA non c'e' partita -- senza il nome, su un sito
+              di prenotazioni, non si sa da chi si sta comprando.
+              Il tema non sparisce: e' dentro il panino, due righe piu'
+              sotto, dove chi lo cerca lo trova. */}
+          <span className="hd-tema"><ThemeToggle /></span>
 
           {/* 🔴 IL SELETTORE C'E' SOLO SE C'E' QUALCOSA DA SELEZIONARE.
               Con una lingua sola era un menu a tendina che si apriva su una

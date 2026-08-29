@@ -806,12 +806,25 @@
   .hd-wa{ padding:9px 11px; }
 }
 @media (max-width:620px){
-  /* La scritta del logo esce: vedi la nota su .hd-quick qui sopra. Il
-     marchio resta, ed e' lui che si riconosce. */
-  .hd-logo strong{ display:none; }
-  .hd-in{ gap:8px; }
+  /* 🔴 IL NOME DELL'AZIENDA RESTA, IL SELETTORE DEL TEMA NO.
+     Per un giro avevo tolto la scritta "Prestige Rent" per fare spazio
+     al pulsante: sbagliato. Su un telefono la testata era l'unico punto
+     in cui il nome compariva, e senza non si capiva piu' da chi si sta
+     comprando -- su un sito dove si lasciano seicento euro non e' un
+     dettaglio grafico.
+     Il posto lo cede il selettore chiaro/scuro, che scende dentro il
+     menu del panino: chi lo cerca lo trova, e nessuno arriva sul sito
+     per cambiare tema. */
+  .hd-tema{ display:none; }
+  .hd-logo strong{ font-size:.94rem; }
+  .hd-in{ gap:8px; padding:0 12px; }
   .hd-right{ gap:6px; }
+  .hd-quick{ padding:8px 10px; font-size:.72rem; }
 }
+/* Il selettore del tema dentro il pannello: e' una voce di menu come le
+   altre, quindi si allinea a sinistra e non si stira. */
+.hd-tema-mob{ justify-content:flex-start; }
+@media (min-width:1281px){ .hd-tema-mob{ display:none !important; } }
 @media (max-width:560px){
   .hd-logo small{ display:none; }
   .hd-in{ gap:10px; padding:0 12px; }
