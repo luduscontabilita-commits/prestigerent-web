@@ -313,7 +313,16 @@
   background:var(--card); border-bottom:1px solid var(--line);
 }
 .hd-in{
-  max-width:1280px; margin:0 auto; padding:0 18px;
+  /* 🔴 1440, NON 1280 COME IL RESTO DEL SITO.
+     Le sette voci a grandezza piena, piu' logo e blocco di destra,
+     misurano circa 1394px. In 1280 non ci stanno, e il risultato era
+     "Destinations" SOPRA "Quick Request". La barra e' l'unico elemento
+     della pagina che ha un contenuto rigido -- le voci hanno
+     `white-space:nowrap` e non vanno a capo -- quindi e' l'unico che ha
+     diritto a piu' spazio del corpo del testo. Allargarla costa un
+     disallineamento di 80px per lato col contenuto sotto; stringere le
+     voci costava leggibilita' su OGNI schermo, anche quelli grandi. */
+  max-width:1440px; margin:0 auto; padding:0 18px;
   display:flex; align-items:center; gap:14px; min-height:64px;
   /* Senza questo la barra si allarga oltre lo schermo invece di
      comprimersi, e WhatsApp finisce fuori a destra: un elemento flex non
@@ -488,32 +497,45 @@
 /* voci che compaiono solo nel pannello del telefono */
 .hd-solo-mob{ display:none !important; }
 
-/* 🔴 LA BARRA E' LARGA 1280 E BASTA, QUALUNQUE SIA LA FINESTRA.
+/* 🔴 LE SOGLIE VANNO CALCOLATE SULLA BARRA, NON SULLA FINESTRA.
  *
- * `.hd-in` ha `max-width:1280px`. Da 1280 in su la finestra cresce ma la
- * barra NO: lo spazio per le voci resta identico a 2560 come a 1281.
+ * Prima `.hd-in` era largo al massimo 1280: da 1280 in su la finestra
+ * cresceva e la barra no, quindi queste soglie -- che guardano la
+ * FINESTRA -- sopra quel valore non si attivavano mai. Le voci a
+ * grandezza piena in 1280px non ci stanno (ne servono ~1394) e
+ * "Destinations" finiva sopra "Quick Request": piu' grande lo schermo,
+ * meno la barra si stringeva. Esattamente al contrario.
  *
- * Qui stava il difetto. Le regole che stringevano le voci erano agganciate
- * alla larghezza della FINESTRA (1440, 1340, 1319): sopra i 1280 non si
- * attivavano mai, e le sette voci a grandezza piena in 1280px non ci
- * stanno -- "Destinations" finiva SOPRA "Quick Request". Piu' grande era
- * lo schermo, meno la barra si stringeva: esattamente al contrario.
- * Misurato: servono ~1360px, ce ne sono 1280.
+ * Ora la barra arriva a 1440 e quindi segue la finestra fin quasi in
+ * fondo: le soglie tornano a voler dire qualcosa, e sopra i 1461 non
+ * serve stringere niente -- il menu si vede a grandezza piena.
  *
- * Percio' la versione stretta non e' piu' un'eccezione per gli schermi
- * piccoli, e' lo stato normale del desktop. Le voci hanno
- * `white-space:nowrap` e il blocco di destra ha `flex:none`: quando la
- * somma supera la larghezza nessuno dei due cede, e si sovrappongono.
+ * ⚠️ Le soglie qui sotto NON sono numeri tondi a caso. Ognuna e' il punto
+ * in cui la larghezza disponibile (finestra - 36px di padding, con il
+ * tetto di 1440) scende sotto quella che serve al passo precedente:
  *
- * ⚠️ NON rimettere qui una soglia `max-width` sopra i 1280: sarebbe cieca
- * per costruzione. L'unica soglia che ha senso e' quella del menu a
- * panino piu' sotto, dove la barra torna a dipendere dalla finestra. */
-.hd-logo small{ display:none; }
-.hd-lang > button span.lg{ display:none; }
-.hd-nav{ margin-left:0; }
-.hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
-.hd-freccia{ padding-inline:4px 0; }
-.hd-quick{ padding:9px 11px; font-size:.78rem; }
+ *   voci piene + sottotitolo del logo   ~1394px  ->  fino a 1461
+ *   senza sottotitolo                   ~1360px  ->  fino a 1411
+ *   + Quick Request stretto, WhatsApp    ~1281px  ->  fino a 1331
+ *     senza la parola
+ *   + voci strette                       ~1188px  ->  fino al panino
+ *
+ * Se si aggiunge o si allunga una voce, questi quattro numeri cambiano
+ * tutti: vanno rimisurati, non ritoccati a occhio. */
+@media (max-width:1460px){
+  .hd-logo small{ display:none; }
+  .hd-lang > button span.lg{ display:none; }
+}
+@media (max-width:1410px){
+  .hd-quick{ padding:9px 11px; font-size:.78rem; }
+  .hd-wa span{ display:none; }
+  .hd-wa{ padding:9px 11px; }
+}
+@media (max-width:1330px){
+  .hd-nav{ margin-left:0; }
+  .hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
+  .hd-freccia{ padding-inline:4px 0; }
+}
 
 /* La rete di sicurezza, se un giorno si aggiunge un'ottava voce: il
    blocco di destra sta su un piano piu' alto e con lo sfondo pieno,
