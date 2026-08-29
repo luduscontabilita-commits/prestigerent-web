@@ -432,7 +432,33 @@ export function puntiScheda(blocks: BlocchiTour | undefined | null): string[] {
 
   /* Il ripiego: vedi la nota su POLICY_MINIMA. */
   const secondo = scegli(tutti.filter((h) => !isPolicyMinima(h)));
-  return secondo.length >= MINIMO ? secondo : primo;
+  if (secondo.length >= MINIMO) return secondo;
+
+  /* 🔴 L'ULTIMA RETE: TRE FATTI VERI PER TUTTO IL CATALOGO.
+   *
+   * Su alcuni transfer non sopravvive niente nemmeno al filtro leggero, e
+   * per un motivo che non e' un difetto: `accorcia` taglia alla prima
+   * punteggiatura, quindi "Time-saving: door-to-door service" diventa
+   * "Time-saving" e viene scartato come troppo vago. Giusto -- ma il
+   * risultato era una scheda con un vuoto grande tre righe fra la
+   * descrizione e il prezzo, perche' nella fila le schede sono alte
+   * uguali.
+   *
+   * Meglio tre fatti veri che un buco. NON sono riempitivo: valgono su
+   * ogni prodotto e sono verificabili uno per uno -- la cancellazione a
+   * ventiquattro ore e' la condizione dichiarata su tutte le schede, i
+   * mezzi sono di proprieta' e gli autisti dipendenti (e' l'argomento
+   * per cui si prenota qui invece che su Viator), e il voucher
+   * elettronico lo emette Regiondo per ogni prodotto, transfer compresi.
+   *
+   * Il giorno che una di queste tre smettesse di essere vera, va tolta
+   * DA QUI e da `src/lib/fatti.ts`, che le ripete nella barra della
+   * scheda tour. */
+  return [
+    'Free cancellation up to 24 hours',
+    'Our own vehicles, our own drivers',
+    'E-ticket on your phone',
+  ];
 }
 
 
