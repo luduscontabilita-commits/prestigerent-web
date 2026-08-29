@@ -280,14 +280,26 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       fuoco: '48% center',
     },
     {
-      /* private-tour-siena-and-san-gimignano -- Siena */
-      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/Sam-Domenico-Church-Siena.jpg',
-      fuoco: '8% center',
+      /* 🔴 SOSTITUITA IL 29/08/2026 PERCHE' ERA SGRANATA.
+         Era `Sam-Domenico-Church-Siena.jpg`, che misura 1200x800: su un
+         hero largo 1920 il browser la ingrandisce del 60%, e a
+         quell'ingrandimento i bordi si sfaldano -- si vede, e su una
+         fotografia grande e' la prima cosa che si nota.
+         Questa e' 1920x1079, cioe' nativa. In piu' ha il cielo su tutto
+         il terzo alto, che e' esattamente dove sta il titolo: la scritta
+         bianca poggia su un fondo uniforme invece che su tetti e alberi.
+         Siena vista dall'alto -- il Duomo e la Torre del Mangia. */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/03/siena-view.jpg',
+      fuoco: 'center',
     },
     {
-      /* private-tour-to-chianti-wineries -- il Chianti e il vino */
-      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/PVT-6.jpg',
-      fuoco: '44% center',
+      /* 🔴 SOSTITUITA IL 29/08/2026, STESSO MOTIVO E PEGGIO.
+         Era `PVT-6.jpg`: 960x640 e 42 KB. Su un hero da 1920 veniva
+         ingrandita del DOPPIO -- il caso piu' sgranato dei sei.
+         Questa e' 1920x1080: i vigneti del Chianti con la villa in cima
+         e la strada bianca, luce di sera. Cielo in alto anche qui. */
+      src: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/09/chianti-toscana-opt.jpg',
+      fuoco: 'center',
     },
     {
       /* florence-and-pisa-from-livorno-tour -- Firenze */
