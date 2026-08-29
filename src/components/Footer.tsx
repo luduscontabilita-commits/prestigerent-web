@@ -112,8 +112,18 @@ export async function Footer({ locale }: { locale: string }) {
         <span>🛡️ 24-hour free cancellation</span>
         <span>💳 No booking fees</span>
         <span>⚡ Instant confirmation</span>
-        {d.voto != null && (
-          <span>⭐ {d.voto.toFixed(1)} from {d.totale.toLocaleString('en-US')} reviews</span>
+        {/* 🔴 UN NUMERO SOLO, E VIENE DALLA TABELLA.
+            Qui c'era "4.9 from 14,005 reviews": un terzo conteggio di
+            recensioni, diverso dai due che comparivano piu' su nella
+            stessa pagina. Tre cifre che parlano della stessa cosa e non
+            coincidono non convincono, si smentiscono.
+            Adesso si dice quanti clienti sono passati, che e' il numero
+            che nessun'altra parte della pagina puo' contraddire. E si
+            legge da `azienda.clienti_serviti`: il giorno che quella riga
+            cambia, cambia ovunque -- footer, schede tour, home -- senza
+            che nessuno debba andare a cercare dov'era scritto. */}
+        {a?.clienti_serviti != null && (
+          <span>⭐ {Math.round(a.clienti_serviti / 1000)}k+ guests since {a.anno_fondazione ?? 2002}</span>
         )}
         <span>📞 24/7 customer care</span>
       </div>

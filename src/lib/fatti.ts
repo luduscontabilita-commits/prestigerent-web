@@ -78,8 +78,37 @@ function cittaDa(html: string | undefined): string | null {
      al posto della partenza. */
   const i = piano.search(/meeting point/i);
   const zona = i >= 0 ? piano.slice(i, i + 400) : piano.slice(0, 400);
-  for (const c of CITTA) if (new RegExp('\b' + c + '\b', 'i').test(zona)) return c;
+  for (const c of CITTA) if (nominata(zona, c)) return c;
   return null;
+}
+
+/* 🔴 NIENTE ESPRESSIONE REGOLARE COSTRUITA DA UNA STRINGA, QUI.
+ *
+ * La prima versione faceva `new RegExp('\b' + citta + '\b')` -- e nel
+ * file c'e' finito UN backslash solo. In un'espressione regolare scritta
+ * a mano `\b` e' il confine di parola; dentro una stringa di JavaScript
+ * e' il carattere BACKSPACE. Il codice compilava, girava, non lanciava
+ * niente: cercava semplicemente un carattere di controllo che in pagina
+ * non c'e', quindi non trovava mai nessuna citta' e la voce "Location"
+ * spariva da tutte le ottantasei schede senza un errore da nessuna
+ * parte. E' il tipo di difetto che si scopre solo guardando la pagina.
+ *
+ * Il confronto qui sotto fa la stessa cosa guardando i due caratteri ai
+ * lati: nessun escape da sbagliare, e si legge. */
+function nominata(testoPiano: string, citta: string): boolean {
+  const t = testoPiano.toLowerCase();
+  const c = citta.toLowerCase();
+  let da = 0;
+  for (;;) {
+    const i = t.indexOf(c, da);
+    if (i < 0) return false;
+    const prima = t[i - 1] ?? ' ';
+    const dopo = t[i + c.length] ?? ' ';
+    /* "Florence" dentro "Florences" non vale; dentro "from Florence." si. */
+    const lettera = (ch: string) => ch >= 'a' && ch <= 'z';
+    if (!lettera(prima) && !lettera(dopo)) return true;
+    da = i + 1;
+  }
 }
 
 /** Il punto d'incontro esatto. NON entra piu' nella barra -- in tre
