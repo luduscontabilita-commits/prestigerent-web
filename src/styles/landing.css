@@ -749,33 +749,32 @@ body{
 .pr-title{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
 .pr-lead{ margin-top:12px; font-size:1.04rem; font-weight:500; color:var(--ink-soft); }
 
-/* ─── la barra dei fatti, sotto il titolo ────────────────────────────
-   Sei risposte in due righe, come sul sito WordPress. La griglia
-   `auto-fit` fa il lavoro da sola: tre colonne dove c'e' spazio, due sul
-   telefono, e se un giorno le voci diventano cinque o sette non si rompe
-   niente. Le voci mancanti non lasciano buchi perche' non vengono
-   proprio disegnate (vedi src/lib/fatti.ts). */
+/* ─── la barra dei fatti, com'era su WordPress ───────────────────────
+   Tre colonne e due righe, non otto righe incolonnate: il primo
+   tentativo occupava sei centimetri di scorrimento in piu' prima ancora
+   che si cominciasse a leggere, e in cambio non dava niente.
+   `auto-fit` con un minimo di 240px fa tre colonne sul desktop, due sul
+   tablet e una sul telefono, da sola e senza soglie da mantenere. */
 .hero-fatti{
-  display:grid; grid-template-columns:repeat(auto-fit, minmax(184px, 1fr));
-  gap:2px 22px; margin:18px 0 0; padding:16px 0 2px;
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:12px 26px; margin:20px 0 0; padding:18px 0 4px;
   border-top:1px solid var(--line);
 }
-.hero-fatti .hf{ display:flex; align-items:baseline; gap:7px; padding:5px 0; min-width:0; }
-/* L'etichetta e' un'insegna, non una frase: piccola, spaziata e in un
-   grigio che la fa leggere DOPO il valore. Chi scorre cerca "5 hours",
-   non la parola "Duration". */
-.hero-fatti dt{
-  font-size:.68rem; font-weight:800; letter-spacing:.055em; text-transform:uppercase;
-  color:var(--ink-soft); opacity:.8; flex:none;
+.hero-fatti .hf{ display:flex; align-items:flex-start; gap:9px; min-width:0; }
+/* L'icona e' il vero indice: l'occhio trova "quanto dura" dalla
+   clessidra, senza leggere la parola. Arancione come sul sito vecchio --
+   e' l'unico punto di colore della zona, quindi guida lo sguardo. */
+.hero-fatti .hf > svg{
+  width:19px; height:19px; flex:none; margin-top:1px; color:var(--orange);
 }
-.hero-fatti dd{
-  margin:0; font-size:.92rem; font-weight:700; color:var(--ink);
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
+.hero-fatti .hf-t{ min-width:0; line-height:1.45; }
+/* Etichetta e valore sulla stessa riga, come una frase: "Duration: 5
+   hours" si legge di colpo, due colonne allineate no. */
+.hero-fatti dt{ display:inline; font-size:.9rem; font-weight:800; color:var(--ink); }
+.hero-fatti dd{ display:inline; margin:0; font-size:.9rem; font-weight:500; color:var(--ink-soft); }
 @media (max-width:560px){
-  .hero-fatti{ grid-template-columns:1fr 1fr; gap:0 14px; padding-top:13px; }
-  .hero-fatti dt{ font-size:.63rem; }
-  .hero-fatti dd{ font-size:.85rem; }
+  .hero-fatti{ grid-template-columns:1fr; gap:9px; padding-top:14px; }
+  .hero-fatti dt, .hero-fatti dd{ font-size:.86rem; }
 }
 
 .pr-prose{ font-size:1.01rem; line-height:1.72; color:var(--ink-soft); }

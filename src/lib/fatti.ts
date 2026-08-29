@@ -28,7 +28,11 @@ import { testo } from '@/lib/prosa';
  * il cliente e la giornata.
  */
 
-export type Fatto = { etichetta: string; valore: string };
+export type Fatto = { icona: Icona; etichetta: string; valore: string };
+
+export type Icona =
+  | 'luogo' | 'durata' | 'ora' | 'lingua' | 'tipo' | 'gruppo'
+  | 'annullamento' | 'biglietto' | 'ritrovo';
 
 /** Il primo orario che compare nel testo, in forma leggibile.
  *  "8:45am (if booked for the 9:00am tour departure)" -> "9:00am"
@@ -56,7 +60,32 @@ function orariDa(html: string | undefined): string | null {
   return null;
 }
 
-/** Il punto d'incontro, accorciato al nome del posto. */
+/* Le citta' da cui si parte davvero. Non e' un elenco di fantasia: sono
+   quelle che compaiono nelle schede TIME / LOCATION e nelle categorie
+   (Firenze piu' i porti). Si cercano nel testo del ritrovo, e se non ce
+   n'e' nessuna la voce non si mostra -- vedi la nota in cima al file su
+   perche' qui un valore predefinito e' pericoloso. */
+const CITTA = [
+  'Florence', 'Livorno', 'La Spezia', 'Naples', 'Civitavecchia',
+  'Rome', 'Milan', 'Venice', 'Genoa', 'Pisa', 'Sorrento', 'Salerno',
+];
+
+function cittaDa(html: string | undefined): string | null {
+  if (!html) return null;
+  const piano = testo(html.replace(/<[^>]+>/g, ' '));
+  /* Si guarda solo la parte che parla del ritrovo: piu' avanti il testo
+     nomina le mete del giro (Siena, San Gimignano) e prenderebbe quelle
+     al posto della partenza. */
+  const i = piano.search(/meeting point/i);
+  const zona = i >= 0 ? piano.slice(i, i + 400) : piano.slice(0, 400);
+  for (const c of CITTA) if (new RegExp('\b' + c + '\b', 'i').test(zona)) return c;
+  return null;
+}
+
+/** Il punto d'incontro esatto. NON entra piu' nella barra -- in tre
+ *  colonne "Piazzale Montelungo, opposite the parking lot" andava a capo
+ *  e rompeva la griglia -- ma la funzione resta perche' il dato serve
+ *  altrove e ritrovarlo costa. */
 function ritrovoDa(html: string | undefined): string | null {
   if (!html) return null;
   const piano = testo(html.replace(/<[^>]+>/g, ' '));
@@ -93,25 +122,28 @@ export function fattiDi(opzioni: {
   const tempoLuogo = schede?.['TIME / LOCATION'];
   const fuori: Fatto[] = [];
 
-  const ritrovo = ritrovoDa(tempoLuogo);
-  if (ritrovo) fuori.push({ etichetta: 'Meeting point', valore: ritrovo });
+  /* L'ORDINE E' QUELLO DEL SITO VECCHIO, e non per nostalgia: Location,
+     Duration e Time sono le tre domande che si fanno per prime, e stanno
+     sulla prima riga della griglia a tre colonne. Il resto segue. */
+  const citta = cittaDa(tempoLuogo);
+  if (citta) fuori.push({ icona: 'luogo', etichetta: 'Location', valore: citta });
 
-  if (durata) fuori.push({ etichetta: 'Duration', valore: durata });
+  if (durata) fuori.push({ icona: 'durata', etichetta: 'Duration', valore: durata });
 
   const orari = orariDa(tempoLuogo);
-  if (orari) fuori.push({ etichetta: 'Departure', valore: orari });
+  if (orari) fuori.push({ icona: 'ora', etichetta: 'Time', valore: orari });
 
   /* L'inglese non e' un'ipotesi: ogni scheda dichiara "English speaking
      driver/guide" fra le cose comprese, e il sito e' in inglese soltanto. */
-  fuori.push({ etichetta: 'Language', valore: 'English' });
+  fuori.push({ icona: 'lingua', etichetta: 'Language', valore: 'English' });
 
-  if (kind && TIPO[kind]) fuori.push({ etichetta: 'Tour type', valore: TIPO[kind] });
-  if (kind && GRUPPO[kind]) fuori.push({ etichetta: 'Group', valore: GRUPPO[kind] });
+  if (kind && TIPO[kind]) fuori.push({ icona: 'tipo', etichetta: 'Tour type', valore: TIPO[kind] });
+  if (kind && GRUPPO[kind]) fuori.push({ icona: 'gruppo', etichetta: 'Group', valore: GRUPPO[kind] });
 
   /* Le ventiquattro ore valgono su tutto il catalogo: e' la condizione
      che l'azienda applica, scritta in ogni scheda e ripetuta nel
      calendario. */
-  fuori.push({ etichetta: 'Cancellation', valore: 'Free up to 24h' });
+  fuori.push({ icona: 'annullamento', etichetta: 'Free cancellation', valore: 'Up to 24 hrs' });
 
   /* 🔴 SI DICE IL FATTO, NON LA PROMESSA.
      La tentazione e' scrivere "easy and fast check-in", che pero' e' un
@@ -121,7 +153,7 @@ export function fattiDi(opzioni: {
      una fila? -- e si chiude dicendo dov'e' il biglietto. Vale su tutto
      il catalogo: Regiondo emette un voucher elettronico per ogni
      prodotto, transfer compresi. */
-  fuori.push({ etichetta: 'Ticket', valore: 'E-ticket on your phone' });
+  fuori.push({ icona: 'biglietto', etichetta: 'Ticket', valore: 'E-ticket on your phone' });
 
   return fuori;
 }

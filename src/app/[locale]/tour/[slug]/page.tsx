@@ -14,6 +14,7 @@ import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
 import { fattiDi } from '@/lib/fatti';
+import { BarraFatti } from '@/components/BarraFatti';
 import { FasciaFiducia } from '@/components/Riprova';
 import { Premi } from '@/components/Premi';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
@@ -448,23 +449,9 @@ export default async function TourPage({
          * dal testo della scheda TIME / LOCATION. Dove il dato manca la
          * voce sparisce -- vedi la nota in src/lib/fatti.ts su perche' un
          * valore predefinito qui sarebbe pericoloso. */}
-        {(() => {
-          const fatti = fattiDi({
-            kind: tour.kind,
-            durata: product?.durationLabel,
-            schede,
-          });
-          return fatti.length >= 3 ? (
-            <dl className="hero-fatti">
-              {fatti.map((f) => (
-                <div className="hf" key={f.etichetta}>
-                  <dt>{f.etichetta}</dt>
-                  <dd>{f.valore}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null;
-        })()}
+        <BarraFatti
+          fatti={fattiDi({ kind: tour.kind, durata: product?.durationLabel, schede })}
+        />
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
             solo dove sono davvero sue. */}
