@@ -695,7 +695,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <div className="hm-fleet-count">
             <div><b>{az?.mezzi_minibus ?? 11}</b><span>25-seat minibuses</span></div>
             <div><b>{az?.mezzi_auto_numero ?? 8}</b><span>Mercedes cars &amp; vans</span></div>
-            <div><b>25</b><span>guests in one vehicle</span></div>
+            {/* 🔴 QUI C'ERA "25 guests in one vehicle". Tolto: lo dice gia'
+                il riquadro di fianco, "25-seat minibuses". Due numeri
+                uguali affiancati che raccontano lo stesso fatto non fanno
+                due prove, ne fanno mezza -- chi legge si ferma a capire
+                se il secondo 25 sia un altro dato, scopre di no, e da li'
+                in poi guarda gli altri numeri con meno fiducia. */}
           </div>
 
           <div className="hm-fleet">
