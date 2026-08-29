@@ -13,6 +13,7 @@ import { BottoneRichiesta } from '@/components/RichiestaModale';
 import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { fattiDi } from '@/lib/fatti';
 import { FasciaFiducia } from '@/components/Riprova';
 import { Premi } from '@/components/Premi';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
@@ -429,6 +430,41 @@ export default async function TourPage({
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
           </p>
         )}
+
+        {/* 🔴 LE SEI RISPOSTE, PRIMA DI QUALUNQUE TESTO.
+         *
+         * Il sito WordPress le aveva qui: Location, Duration, Time,
+         * Language, Tour Type, Free Cancellation -- sei fatti in due
+         * righe, senza aprire niente. Nel passaggio quella riga e'
+         * sparita e le stesse informazioni sono finite dentro le schede,
+         * dove per leggerle bisogna sapere che ci sono.
+         *
+         * Sono le domande che uno si fa PRIMA di decidere se vale la pena
+         * leggere il resto: se non trova la durata in tre secondi non
+         * scorre, torna indietro.
+         *
+         * Ogni voce viene da un dato vero e compare solo se c'e': la
+         * durata da Regiondo, il tipo dal catalogo, orari e ritrovo letti
+         * dal testo della scheda TIME / LOCATION. Dove il dato manca la
+         * voce sparisce -- vedi la nota in src/lib/fatti.ts su perche' un
+         * valore predefinito qui sarebbe pericoloso. */}
+        {(() => {
+          const fatti = fattiDi({
+            kind: tour.kind,
+            durata: product?.durationLabel,
+            schede,
+          });
+          return fatti.length >= 3 ? (
+            <dl className="hero-fatti">
+              {fatti.map((f) => (
+                <div className="hf" key={f.etichetta}>
+                  <dt>{f.etichetta}</dt>
+                  <dd>{f.valore}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null;
+        })()}
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
             solo dove sono davvero sue. */}

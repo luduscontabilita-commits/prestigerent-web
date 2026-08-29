@@ -749,14 +749,52 @@ body{
 .pr-title{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
 .pr-lead{ margin-top:12px; font-size:1.04rem; font-weight:500; color:var(--ink-soft); }
 
+/* ─── la barra dei fatti, sotto il titolo ────────────────────────────
+   Sei risposte in due righe, come sul sito WordPress. La griglia
+   `auto-fit` fa il lavoro da sola: tre colonne dove c'e' spazio, due sul
+   telefono, e se un giorno le voci diventano cinque o sette non si rompe
+   niente. Le voci mancanti non lasciano buchi perche' non vengono
+   proprio disegnate (vedi src/lib/fatti.ts). */
+.hero-fatti{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(184px, 1fr));
+  gap:2px 22px; margin:18px 0 0; padding:16px 0 2px;
+  border-top:1px solid var(--line);
+}
+.hero-fatti .hf{ display:flex; align-items:baseline; gap:7px; padding:5px 0; min-width:0; }
+/* L'etichetta e' un'insegna, non una frase: piccola, spaziata e in un
+   grigio che la fa leggere DOPO il valore. Chi scorre cerca "5 hours",
+   non la parola "Duration". */
+.hero-fatti dt{
+  font-size:.68rem; font-weight:800; letter-spacing:.055em; text-transform:uppercase;
+  color:var(--ink-soft); opacity:.8; flex:none;
+}
+.hero-fatti dd{
+  margin:0; font-size:.92rem; font-weight:700; color:var(--ink);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+@media (max-width:560px){
+  .hero-fatti{ grid-template-columns:1fr 1fr; gap:0 14px; padding-top:13px; }
+  .hero-fatti dt{ font-size:.63rem; }
+  .hero-fatti dd{ font-size:.85rem; }
+}
+
 .pr-prose{ font-size:1.01rem; line-height:1.72; color:var(--ink-soft); }
 .pr-prose p{ margin:0 0 15px; }
 .pr-prose strong{ color:var(--ink); font-weight:700; }
 .pr-prose h6{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:640;
   font-size:1.28rem; color:var(--ink); margin:28px 0 12px; letter-spacing:-0.01em; }
 .pr-prose h6 strong{ font-weight:640; }
-.pr-prose ul{ margin:0 0 16px; padding-left:20px; }
-.pr-prose li{ margin-bottom:8px; }
+/* 🔴 UN ELENCO NON E' UN ARTICOLO, E NON SI IMPAGINA COME TALE.
+   Il vecchio sito scriveva "Included" a interlinea stretta e ci stava in
+   una schermata; qui, a 1,72 di interlinea e 8px fra le voci, lo stesso
+   elenco ne occupava due e mezza -- stesso testo, due volte e mezzo lo
+   scorrimento. Un elenco di fatti si scorre con gli occhi: righe vicine
+   si leggono in blocco, righe lontane costringono a rileggere dove si
+   era. La prosa vera (i paragrafi, l'itinerario) resta larga: quella si
+   legge davvero e l'aria le serve. */
+.pr-prose ul{ margin:0 0 14px; padding-left:19px; }
+.pr-prose li{ margin-bottom:2px; line-height:1.5; }
+.pr-prose li::marker{ color:var(--ink-soft); }
 .pr-prose a{ color:var(--sienna-2); font-weight:700; }
 .pr-prose > *:last-child{ margin-bottom:0; }
 

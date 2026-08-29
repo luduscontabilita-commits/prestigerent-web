@@ -128,21 +128,15 @@ export function Urgenza({
           {r.testo}
         </span>
       ))}
-      {/* DA DOVE VENGONO I NUMERI.
-          Senza questa riga "29 booked today" e' un'affermazione come
-          tante; con questa e' un dato che ha una provenienza. E' la
-          differenza fra un sito che dice di essere popolare e uno che
-          mostra il registro.
-          Non si scrive "verified by Regiondo": Regiondo non ci
-          certifica, e' il sistema che incassa. Dire cosa e' davvero --
-          il nostro sistema di prenotazione, letto in diretta -- e' piu'
-          onesto e, con un lettore attento, anche piu' credibile. */}
-      <em className="ur-fonte">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-        Live figures from Regiondo, our booking system
-      </em>
+      {/* 🔴 QUI C'ERA "Live figures from Regiondo, our booking system".
+          Tolta il 29/08/2026. La riga voleva dare provenienza al dato --
+          e la tesi non era sbagliata -- ma stava a due centimetri dal
+          pulsante di prenotazione, cioe' nel punto piu' prezioso della
+          pagina, e li' spiegava un dettaglio tecnico che al cliente non
+          interessa: il nome del gestionale di chi incassa. Chi sta per
+          premere "prenota" non vuole sapere da dove arriva il numero,
+          vuole premere.
+          I numeri restano quelli veri: cambia che non lo si dichiara. */}
     </div>
   );
 }
