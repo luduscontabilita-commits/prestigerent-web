@@ -29,7 +29,22 @@ export function Cerca({ tours, partenze }: { tours: SchedaTour[]; partenze: Part
 
   return (
     <>
-      <SearchBar partenze={partenze} onCerca={setFiltro} />
+      {/* 🔴 IL MODULO DI RICERCA E' SPENTO, NON CANCELLATO.
+       *
+       * Occupava mezzo schermo sopra la foto -- tre pastiglie e un
+       * pulsante -- e la foto e' quello che si vende. Si riaccende
+       * togliendo il commento, e torna esattamente com'era.
+       *
+       * ⚠️ NON si toglie il componente `Cerca` dalla home per spegnerlo:
+       * la lista dei tour la disegna LUI, con un portale dentro
+       * `#lista-tour`. Togliendolo sparirebbero anche i tour, ed e' un
+       * effetto che non si vede leggendo la home -- il portale rende la
+       * dipendenza invisibile da fuori.
+       *
+       * Resta anche `filtro`, che senza il modulo vale sempre null: la
+       * lista si comporta come se nessuno avesse cercato niente, che e'
+       * il caso di partenza. */}
+      {/* <SearchBar partenze={partenze} onCerca={setFiltro} /> */}
       {dove ? createPortal(lista, dove) : lista}
     </>
   );

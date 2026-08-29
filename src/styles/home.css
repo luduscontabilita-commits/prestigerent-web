@@ -38,6 +38,9 @@
      bianca non toglie niente all'immagine, e per giunta si legge meglio
      perche' sotto ha un fondo uniforme. */
   padding:22px 20px 44px; color:#fff;
+  /* spazio in fondo per la fascia del riconoscimento, che ora e'
+     sovrapposta e non occupa piu' altezza propria */
+  padding-bottom:104px;
   /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
      ma tagliava anche la tendina della ricerca appena sconfinava sotto
      l'hero -- si vedeva mezzo elenco e basta. Il ritaglio va sullo
@@ -2593,10 +2596,11 @@ button.hd-top{
    dell'hero. Il colore e' scuro perche' il marchio Tripadvisor e'
    bianco: vedi la nota nel componente. */
 .pam{
-  /* z-index basso apposta: deve stare sopra il proprio sfondo e basta.
-     Sopra ci passa l'hero, che ha un piano piu' alto. */
-  position:relative; z-index:1;
-  margin-top:-1px;
+  /* Appoggiata sul bordo basso della foto, dentro l'hero: e' la coda
+     dell'immagine, non una sezione a se'. `absolute` e non `relative`
+     perche' il testo dell'hero sta in alto e in mezzo deve restare solo
+     fotografia. */
+  position:absolute; left:0; right:0; bottom:0; z-index:6;
   background:linear-gradient(180deg, rgba(24,30,42,.72), rgba(24,30,42,.92));
   color:#fff; backdrop-filter:blur(3px);
 }

@@ -435,11 +435,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
            * resto -- il ritiro in hotel, l'inglese, le ore libere -- non
            * sparisce: scende nella fascia chiara sotto la foto, dove si
            * legge meglio e non costa niente all'immagine. */}
-          <p className="hm-sub">
-            Our own vehicles, our own English-speaking drivers &mdash;{' '}
-            <b>employed by us, not subcontracted</b>.
-          </p>
-
+          {/* 🔴 IL SOTTOTITOLO E' USCITO DALLA FOTO.
+              Diceva "Our own vehicles, our own English-speaking drivers
+              -- employed by us, not subcontracted": una frase vera e
+              importante, ma sopra l'immagine era l'ultima riga di testo
+              rimasta a coprirla. L'argomento non si perde -- sta nel
+              blocco "We own the vehicles" piu' in basso, per esteso e su
+              fondo chiaro. Qui restano il titolo e i quattro fatti. */}
           {/* I FATTI AL POSTO DELLE PAROLE.
               Tre cose verificabili su una riga sola, che occupano meno di
               una frase e dicono di piu': da quanto esistono, quanti
@@ -460,11 +462,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <Cerca tours={tours} partenze={PARTENZE} />
 
         </div>
-      </section>
 
-      {/* SUBITO SOTTO LA FOTO, come sul sito WordPress: e' la prima cosa
-          che si legge dopo la promessa, e l'unica che non la scriviamo noi. */}
-      <PrimoAlMondo />
+        {/* 🔴 DENTRO LA FOTO, APPOGGIATA SUL BORDO BASSO.
+            Sul sito WordPress era cosi': una striscia scura sul fondo
+            dell'immagine, con la foto che si intravede sotto. Messa come
+            sezione separata sotto l'hero diventava un'altra cosa -- un
+            blocco pieno che si legge come una sezione nuova, mentre
+            questa e' la coda della fotografia.
+            Sta dentro `.hm-hero`, che ha gia' un piano suo: cosi' resta
+            sopra l'immagine senza rincorrere numeri di livello. */}
+        <PrimoAlMondo />
+      </section>
 
       {/* 🔴 QUESTA ROBA STAVA SOPRA LA FOTO, ED E' SCESA QUI.
        *
