@@ -2935,3 +2935,88 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
   .hm-nobile{ padding-block:38px; }
   .hm-occhiello{ font-size:.68rem; letter-spacing:.14em; }
 }
+
+/* ══ LA FASCIA DEI NUMERI ═══════════════════════════════════════════
+ *
+ * Fondo scuro, e non per gusto: e' l'unica sezione scura della home, e
+ * dopo tre sezioni chiare il contrasto la fa guardare senza bisogno di
+ * urlare con un colore. Le cifre sono chiare su scuro, che e' anche il
+ * modo in cui un numero grande si legge meglio.
+ *
+ * La fascia esce dal contenitore e arriva ai bordi: dentro un riquadro
+ * col bordo arrotondato -- com'era -- sembrava un ritaglio appoggiato
+ * sulla pagina invece di una parte della pagina. */
+.fn-sez{ padding:0; }
+.fn-fondo{
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(194,90,2,.13), transparent 62%),
+    #1B262F;
+  color:#F3EDE4;
+  padding:44px 20px;
+}
+.fn{
+  max-width:1180px; margin:0 auto;
+  display:grid; grid-template-columns:repeat(4,1fr);
+}
+/* I filetti fra le celle, non intorno: una cornice chiusa fa "tabella",
+   quattro colonne separate fanno "misure". L'ultimo non serve. */
+.fn-cella{
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  gap:8px; padding:6px 16px;
+  border-inline-end:1px solid rgba(243,237,228,.14);
+}
+.fn-cella:last-child{ border-inline-end:0; }
+
+.fn-num{
+  font-family:'Fraunces',Georgia,serif;
+  font-size:clamp(2.3rem,4.6vw,3.4rem); font-weight:640; line-height:1;
+  letter-spacing:-.02em; color:#fff;
+  /* Le cifre che salgono cambiano larghezza a ogni fotogramma: senza
+     questo la riga sotto ballava per tutta la durata del conteggio. */
+  font-variant-numeric:tabular-nums;
+}
+.fn-eti{
+  font-size:.78rem; font-weight:700; line-height:1.4;
+  letter-spacing:.02em; color:rgba(243,237,228,.72);
+  max-width:20ch;
+}
+
+/* ── LE STELLE ──────────────────────────────────────────────────────
+   Due file sovrapposte: sotto quelle spente, sopra quelle accese
+   ritagliate in larghezza. Cosi' il 90% dell'ultima stella e' davvero
+   il 90% della sua forma, non una stella intera di un colore diverso. */
+.fn-stelle{ position:relative; display:inline-block; height:15px; line-height:0; }
+.fn-stelle-vuote, .fn-stelle-piene{ display:flex; gap:2px; line-height:0; }
+.fn-stelle-vuote svg{ fill:rgba(243,237,228,.22); }
+.fn-stelle-piene{
+  position:absolute; inset-inline-start:0; top:0; overflow:hidden;
+  transition:width .9s cubic-bezier(.22,.85,.3,1) .15s;
+}
+.fn-stelle-piene svg{ fill:#F0A02B; flex:0 0 auto; }
+
+/* ── L'ANELLO ───────────────────────────────────────────────────────
+   Il numero sta DENTRO il cerchio, quindi la cella degli anni ha una
+   misura sua e non segue le altre tre. */
+.fn-tondo{ position:relative; display:inline-grid; place-items:center; width:96px; height:96px; }
+.fn-anello{ width:96px; height:96px; transform:rotate(-90deg); }
+.fn-anello circle{ fill:none; stroke-width:5; }
+.fn-anello-fondo{ stroke:rgba(243,237,228,.15); }
+.fn-anello-tratto{
+  stroke:#D2442B;              /* il rosso: e' l'unico punto di rosso della home */
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1.4s cubic-bezier(.22,.85,.3,1) .2s;
+}
+.fn-num-tondo{ position:absolute; font-size:clamp(1.7rem,3.2vw,2.2rem); }
+
+@media (prefers-reduced-motion: reduce){
+  .fn-stelle-piene, .fn-anello-tratto{ transition:none; }
+}
+
+@media (max-width:860px){
+  .fn{ grid-template-columns:repeat(2,1fr); gap:26px 0; }
+  /* A due colonne il filetto di destra della prima e della terza cella
+     e' l'unico che serve: gli altri due cadrebbero sul bordo. */
+  .fn-cella:nth-child(2n){ border-inline-end:0; }
+  .fn-fondo{ padding:34px 18px; }
+  .fn-tondo, .fn-anello{ width:84px; height:84px; }
+}

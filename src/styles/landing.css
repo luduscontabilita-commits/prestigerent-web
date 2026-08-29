@@ -491,7 +491,19 @@ body{
   --link:#A8431F;          /* 6.02:1 — i link erano a 4.44:1 */
 }
 .cta{ font-size:1.2rem; }
-.pr-prose a{ color:var(--link); }
+/* I COLLEGAMENTI DENTRO IL TESTO SI DEVONO VEDERE.
+   Erano solo di colore: in mezzo a un paragrafo di risposta -- dove
+   stanno i rimandi agli altri tour, tipo "la versione privata" nelle FAQ
+   del vino -- il colore da solo non basta a far capire che si preme, e
+   per chi non distingue bene i colori non esiste proprio. La linea sotto
+   e' staccata di due pixel, cosi' non taglia le lettere discendenti. */
+.pr-prose a{
+  color:var(--link);
+  text-decoration:underline;
+  text-underline-offset:2px;
+  text-decoration-thickness:1px;
+}
+.pr-prose a:hover{ text-decoration-thickness:2px; }
 
 /* ============================================================
    SPAZIATURE EREDITATE — la landing originale aveva 3 sezioni in

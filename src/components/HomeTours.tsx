@@ -275,6 +275,19 @@ export function HomeTours({
    * anche i link, e Google leggerebbe ogni tour due volte. */
   const [fermo, setFermo] = useState(false);
   const [sopra, setSopra] = useState(false);
+  /* 🔴 IL CURSORE FERMO NON E' ATTENZIONE.
+     Su un telefono il dito passa e se ne va; su un computer il cursore
+     RESTA dove l'hanno lasciato, e la fila e' larga quanto lo schermo:
+     bastava averlo posato li' perche' non ripartisse mai piu'. Se non si
+     muove per tre secondi non sta leggendo quella scheda, sta leggendo
+     altro -- e la fila puo' riprendere. Al primo movimento si ferma di
+     nuovo, che e' il comportamento che serve davvero. */
+  const orologioFermoMouse = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mouseFermo = useCallback(() => {
+    setSopra(true);
+    if (orologioFermoMouse.current) clearTimeout(orologioFermoMouse.current);
+    orologioFermoMouse.current = setTimeout(() => setSopra(false), 3000);
+  }, []);
   const [toccata, setToccata] = useState(false);
   const [inVista, setInVista] = useState(false);
   const [motoRidotto, setMotoRidotto] = useState(true);
@@ -307,27 +320,65 @@ export function HomeTours({
     if (!el) return;
     const os = new IntersectionObserver(
       ([v]) => setInVista(v.isIntersecting),
-      { threshold: 0.25 },
+      /* 0.15 e non 0.25: le schede sono alte, e su un portatile basso la
+         fila non arriva mai a mostrare un quarto di se stessa tutta
+         insieme -- restava fuori vista anche mentre la si guardava. */
+      { threshold: 0.15 },
     );
     os.observe(el);
     return () => os.disconnect();
-  }, []);
+    /* Dipende dal numero di schede: la fila viene montata da un portale e
+       al primo giro `fila.current` puo' essere ancora vuoto. Con l'elenco
+       vuoto delle dipendenze l'osservatore non si agganciava piu' a
+       niente, e `inVista` restava falso per sempre. */
+  }, [mostrati.length]);
 
   const scorreDaSola = inVista && !fermo && !sopra && !toccata && !motoRidotto && !nascosta;
+
+  /* 🔴 LA POSIZIONE SI TIENE QUI, NON NEL DOM.
+   *
+   * Prima ogni fotogramma faceva `el.scrollLeft += 0.3`. Su un telefono
+   * funzionava; su Windows con lo schermo al 125% -- che e' l'impostazione
+   * predefinita di Windows 11 -- no, e non per un motivo visibile: il
+   * browser arrotonda `scrollLeft` al pixel dello schermo, quindi 0,3
+   * veniva scritto e riletto come zero, all'infinito. La fila era ferma e
+   * il codice girava.
+   *
+   * Con la posizione tenuta qui in virgola mobile il resto non si perde
+   * mai: si accumula finche' non vale un pixel intero, e a quel punto la
+   * fila si muove davvero. */
+  const posizione = useRef(0);
+  const ultimoIstante = useRef(0);
 
   useEffect(() => {
     const el = fila.current;
     if (!el || !scorreDaSola) return;
     let id = 0;
-    const passo = () => {
+    posizione.current = el.scrollLeft;
+    ultimoIstante.current = 0;
+
+    /* Pixel al SECONDO, non per fotogramma: uno schermo da 144Hz faceva
+       correre la fila al doppio della velocita' di uno da 60. Venti px al
+       secondo vuol dire una scheda ogni diciassette secondi: deve
+       accorgersene chi guarda, non disturbare chi legge. */
+    const VELOCITA = 20;
+
+    const passo = (istante: number) => {
+      const trascorso = ultimoIstante.current ? istante - ultimoIstante.current : 16;
+      ultimoIstante.current = istante;
       const massimo = el.scrollWidth - el.clientWidth;
       if (massimo > 4) {
-        /* 0,3 px per fotogramma: a 60Hz sono 18px al secondo, cioe' una
-           scheda ogni diciotto secondi. Deve accorgersene chi guarda, non
-           chi legge. */
-        el.scrollLeft += 0.3 * verso.current;
-        if (el.scrollLeft >= massimo - 1) verso.current = -1;
-        else if (el.scrollLeft <= 1) verso.current = 1;
+        /* Se qualcun altro ha mosso la fila -- una freccia, il dito, la
+           tastiera -- si riparte da dove sta adesso, altrimenti al primo
+           fotogramma la si strapperebbe indietro. */
+        if (Math.abs(el.scrollLeft - posizione.current) > 4) posizione.current = el.scrollLeft;
+        /* Un fotogramma perso non deve diventare un salto: oltre i 64ms
+           (la scheda e' tornata in primo piano, il computer ha arrancato)
+           si conta come un fotogramma normale. */
+        posizione.current += (VELOCITA * Math.min(trascorso, 64)) / 1000 * verso.current;
+        if (posizione.current >= massimo) { posizione.current = massimo; verso.current = -1; }
+        else if (posizione.current <= 0) { posizione.current = 0; verso.current = 1; }
+        el.scrollLeft = posizione.current;
       }
       id = requestAnimationFrame(passo);
     };
@@ -458,8 +509,12 @@ export function HomeTours({
               <div
                 className="hm-grid"
                 ref={fila}
-                onPointerEnter={(e) => { if (e.pointerType === 'mouse') setSopra(true); }}
-                onPointerLeave={() => setSopra(false)}
+                onPointerEnter={(e) => { if (e.pointerType === 'mouse') mouseFermo(); }}
+                onPointerMove={(e) => { if (e.pointerType === 'mouse') mouseFermo(); }}
+                onPointerLeave={() => {
+                  if (orologioFermoMouse.current) clearTimeout(orologioFermoMouse.current);
+                  setSopra(false);
+                }}
                 onPointerDown={(e) => { if (e.pointerType === 'mouse') setFermo(true); else sospendiPerTocco(); }}
                 onTouchStart={sospendiPerTocco}
                 onTouchMove={sospendiPerTocco}

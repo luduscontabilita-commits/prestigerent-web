@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { PrimoAlMondo } from '@/components/PrimoAlMondo';
-import { Conta } from '@/components/Conta';
+import { FasciaNumeri } from '@/components/FasciaNumeri';
 import { Destinazioni } from '@/components/Destinazioni';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
@@ -611,66 +611,28 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           non e' il "#1 su 967" che girava nei riassunti, e' un #2 su 248 --
           che pero' e' vero, e un secondo posto vero vale piu' di un primo
           posto falso. */}
-      <section className="pr-sec tight" id="proof">
-        <div className="pr-wrap wide">
-          {/* I numeri salgono quando la fascia entra nell'inquadratura.
-              Il valore finale e' nell'HTML fin dall'inizio: l'animazione
-              parte dopo il montaggio e solo se qualcuno la guarda. Vedi
-              la nota in Conta.tsx su perche' NON si parte da zero nel
-              markup. */}
-          <div className="hm-proof">
-            <div>
-              <b>{d.voto != null ? <Conta a={d.voto} decimali={1} /> : null}</b>
-              <span>average out of 5</span>
-            </div>
-            {/* 🔴 I CLIENTI, NON LE RECENSIONI.
-                Era l'ultimo conteggio di recensioni rimasto in giro dopo
-                averli tolti da testata, footer e schede tour: "14.005
-                verified traveller reviews", che non coincideva con nessuno
-                degli altri perche' calcolato su un'altra base. Un numero
-                che nessun'altra parte della pagina puo' contraddire vale
-                piu' di uno esatto che ne contraddice altri due. */}
-            {az?.clienti_serviti != null && (
-              <div>
-                <b><Conta a={Math.round(az.clienti_serviti / 1000)} suffisso="k+" /></b>
-                <span>guests since {az.anno_fondazione ?? 2002}</span>
-              </div>
-            )}
-            <div>
-              <b>
-                {az?.classifica_posizione != null ? (
-                  <Conta a={az.classifica_posizione} prefisso="#" />
-                ) : null}
-              </b>
-              {/* 🔴 SI ABBASSA SOLO L'INIZIALE, NON TUTTA LA STRINGA.
-                  Con `.toLowerCase()` la riga diceva "of 248
-                  transportation companies in florence": il nome della
-                  citta' in minuscolo dentro il dato che serve proprio a
-                  farsi verificare. E' lo stesso errore gia' corretto
-                  nella fascia di fiducia (vedi Riprova.tsx), che qui era
-                  rimasto. */}
-              <span>
-                of {az?.classifica_su}{' '}
-                {az?.classifica_categoria
-                  ? az.classifica_categoria.charAt(0).toLowerCase() +
-                    az.classifica_categoria.slice(1)
-                  : ''}
-              </span>
-            </div>
-            <div>
-              <b>{d.anni != null ? <Conta a={d.anni} /> : null}</b>
-              <span>years, since {az?.anno_fondazione}</span>
-            </div>
-          </div>
-          {/* 🔴 QUI C'ERA "Travelers' Choice 2026 · verified on Tripadvisor,
-              August 2026". Tolta il 29/08/2026.
-              La tesi era giusta -- dire da dove viene un numero lo rende
-              verificabile -- ma la riga faceva l'opposto: una data
-              scritta a mano invecchia da sola, e fra tre mesi "August
-              2026" avrebbe detto al lettore che il dato e' vecchio,
-              proprio sotto i numeri che devono convincerlo. I premi
-              stanno gia' due sezioni piu' su, con i marchi emessi dalle
-              piattaforme, che sono la prova vera. */}
+      {/* LA FASCIA DEI NUMERI.
+          Un numero senza fonte e' un'affermazione; con la fonte e' una
+          prova. Il #2 su 248 e' verificato sulla scheda Tripadvisor il
+          24/08/2026: non e' il "#1 su 967" che girava nei riassunti, ed
+          e' meglio -- un secondo posto vero vale piu' di un primo posto
+          falso.
+          Il markup sta tutto in FasciaNumeri.tsx: stelle sul voto,
+          anello sugli anni, e le cifre che salgono quando la fascia
+          entra davvero sotto gli occhi. */}
+      <section className="pr-sec fn-sez" id="proof">
+        <div className="fn-fondo">
+          <FasciaNumeri
+            n={{
+              voto: d.voto,
+              clienti: az?.clienti_serviti ?? null,
+              anno: az?.anno_fondazione ?? null,
+              anni: d.anni,
+              posizione: az?.classifica_posizione ?? null,
+              su: az?.classifica_su ?? null,
+              categoria: az?.classifica_categoria ?? null,
+            }}
+          />
         </div>
       </section>
 
