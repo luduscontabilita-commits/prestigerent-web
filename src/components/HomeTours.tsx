@@ -61,6 +61,29 @@ const ETICHETTA: Record<string, string> = {
   other: 'Tour',
 };
 
+/* 🔴 IL TITOLO DICE COSA SI STA GUARDANDO.
+ *
+ * Diceva "6 tours", e basta. Il numero non e' un titolo: chi preme
+ * "Transfers" si aspetta di leggere "Transfers", e senza quella conferma
+ * non e' sicuro che il filtro abbia fatto qualcosa -- soprattutto sul
+ * telefono, dove le pastiglie delle categorie sono gia' scorse via in
+ * alto e non si vede piu' quale e' accesa.
+ *
+ * Sono al plurale e per esteso, non le etichette corte delle pastiglie:
+ * "From the port" sta bene su un bottone, come titolo di sezione no. */
+const TITOLO: Record<string, string> = {
+  small_group: 'Small group tours',
+  private: 'Private tours',
+  cruise: 'Shore excursions from the port',
+  transfer: 'Private transfers',
+  other: 'Other tours',
+};
+
+/* Senza filtri non si mostra "tutto": si mostrano i tour scelti a mano in
+   `PRIMI`, cioe' quelli che vendono. Il titolo lo dice, invece di
+   lasciar credere che sia un elenco qualunque tagliato a sei. */
+const TITOLO_CONSIGLIATI = 'Our most booked experiences';
+
 /* SOTTO QUESTA SOGLIA IL NUMERO NON SI SCRIVE.
  *
  * E' la stessa regola gia' usata in Urgenza.tsx sulle pagine tour, e
@@ -204,8 +227,25 @@ export function HomeTours({
 
           <div className="pr-head" style={{ marginBottom: 18 }}>
             <h2 className="pr-title">
-              {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
+              {(() => {
+                const cat = filtro?.tipo || categoria;
+                if (cat) return TITOLO[cat] ?? ETICHETTA[cat] ?? cat;
+                /* Con una ricerca in corso il titolo resta neutro: la riga
+                   sotto dice gia' quanti risultati e con quali criteri, e
+                   ripeterlo in grande non aggiunge niente. */
+                if (luogo || daUrl || filtro?.da || filtro?.persone) return 'Tours';
+                return TITOLO_CONSIGLIATI;
+              })()}
             </h2>
+            {/* Il conteggio scende sotto il titolo: era lui il titolo, e
+                un numero grande in cima a una sezione non dice di cosa
+                si tratta. Qui fa il suo mestiere, che e' dare la misura. */}
+            <p className="pr-lead">
+              {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
+              {!(filtro?.tipo || categoria) && !luogo && !daUrl && !filtro?.da
+                ? ' · hand-picked, the ones our guests book most'
+                : ''}
+            </p>
             {dalMenu && (
               <span className="hm-chip">
                 In and around {dalMenu}
