@@ -40,14 +40,16 @@ export function Diretto({ whatsapp: _whatsapp }: { whatsapp: string }) {
       <ul>
         <li>
           <span aria-hidden="true">💬</span>
-          <b>Before</b> — ask us anything before you pay, and we answer ourselves:
-          not a call center, not a chatbot.
+          <b>Before</b> — ask us anything before you pay. You talk to us directly,
+          without a middleman passing messages back and forth: not a call center,
+          not a chatbot, no waiting a day for an answer someone else has to fetch.
         </li>
         <li>
           <span aria-hidden="true">📱</span>
           <b>Every way to reach us, in the confirmation</b> — WhatsApp, SMS, phone
           and email, with the direct number of the people running your day. No
-          booking reference, no ticket queue.
+          booking reference, no ticket queue, no answer that has to travel through
+          a platform first.
         </li>
         <li>
           <span aria-hidden="true">📞</span>

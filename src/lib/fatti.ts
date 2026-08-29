@@ -113,5 +113,15 @@ export function fattiDi(opzioni: {
      calendario. */
   fuori.push({ etichetta: 'Cancellation', valore: 'Free up to 24h' });
 
+  /* 🔴 SI DICE IL FATTO, NON LA PROMESSA.
+     La tentazione e' scrivere "easy and fast check-in", che pero' e' un
+     giudizio nostro sul nostro servizio: chi legge lo sconta come
+     pubblicita' e non gli cambia niente. La preoccupazione vera e'
+     un'altra e molto piu' concreta -- devo stampare qualcosa? devo fare
+     una fila? -- e si chiude dicendo dov'e' il biglietto. Vale su tutto
+     il catalogo: Regiondo emette un voucher elettronico per ogni
+     prodotto, transfer compresi. */
+  fuori.push({ etichetta: 'Ticket', valore: 'E-ticket on your phone' });
+
   return fuori;
 }
