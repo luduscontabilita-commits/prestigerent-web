@@ -51,6 +51,29 @@ export async function generateMetadata({
       icon: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png',
       apple: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png',
     },
+    /* 🔴 L'ANTEPRIMA GRANDE NEI RISULTATI, che il sito vecchio aveva e
+       questo aveva perso.
+       Su WordPress ogni pagina portava
+       `max-snippet:-1, max-video-preview:-1, max-image-preview:large`;
+       qui non c'era nessuna meta robots. L'indicizzazione non cambia --
+       senza direttive vale index/follow -- ma cambia COME si viene
+       mostrati: senza `max-image-preview:large` Google usa la miniatura
+       piccola invece della foto grande, e su un sito di tour cercato dal
+       telefono e' la differenza fra un risultato che si guarda e uno che
+       si scorre. E' anche il requisito di fatto per finire in Discover
+       con l'immagine grande.
+       Vale su tutte e 120 le pagine perche' sta nel layout. */
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     openGraph: ogDiBase(isLocale(locale) ? locale : DEFAULT_LOCALE),
     twitter: TWITTER,
   };
