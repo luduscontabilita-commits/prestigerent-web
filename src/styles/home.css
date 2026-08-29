@@ -315,14 +315,14 @@
 .hd-in{
   /* 🔴 1440, NON 1280 COME IL RESTO DEL SITO.
      Le sette voci a grandezza piena, piu' logo e blocco di destra,
-     misurano circa 1394px. In 1280 non ci stanno, e il risultato era
+     misurano circa 1430px. In 1280 non ci stanno, e il risultato era
      "Destinations" SOPRA "Quick Request". La barra e' l'unico elemento
      della pagina che ha un contenuto rigido -- le voci hanno
      `white-space:nowrap` e non vanno a capo -- quindi e' l'unico che ha
      diritto a piu' spazio del corpo del testo. Allargarla costa un
      disallineamento di 80px per lato col contenuto sotto; stringere le
      voci costava leggibilita' su OGNI schermo, anche quelli grandi. */
-  max-width:1440px; margin:0 auto; padding:0 18px;
+  max-width:1500px; margin:0 auto; padding:0 18px;
   display:flex; align-items:center; gap:14px; min-height:64px;
   /* Senza questo la barra si allarga oltre lo schermo invece di
      comprimersi, e WhatsApp finisce fuori a destra: un elemento flex non
@@ -352,7 +352,7 @@
 .hd-top{
   display:inline-flex; align-items:center; gap:4px;
   padding:20px 8px; text-decoration:none; white-space:nowrap;
-  font-size:.85rem; font-weight:700; color:var(--ink);
+  font-size:.9rem; font-weight:700; color:var(--ink);
   border-bottom:3px solid transparent; margin-bottom:-1px;
   transition:color .14s, border-color .14s;
 }
@@ -452,13 +452,23 @@
 
 /* ─── destra: richiesta, tema, lingue, WhatsApp ───────────────────── */
 .hd-right{ display:flex; align-items:center; gap:7px; flex:none; margin-left:auto; }
+/* 🔴 PIENO, NON CONTORNATO.
+   Con il bordo grigio su sfondo bianco era il quarto elemento per
+   contrasto della barra, dopo WhatsApp (verde pieno), le voci in nero e
+   il logo: la richiesta di preventivo -- che e' il modo in cui si
+   raccoglie un contatto quando il cliente non prenota subito -- si
+   leggeva come un dettaglio di servizio. Ora e' arancione pieno, lo
+   stesso arancione di "Find tours": due inviti forti in barra, uno per
+   chi vuole guardare e uno per chi vuole chiedere. */
 .hd-quick{
-  padding:9px 14px; border-radius:10px; text-decoration:none;
-  font-size:.82rem; font-weight:800; white-space:nowrap;
-  border:1px solid var(--line); color:var(--ink); background:var(--card);
-  transition:border-color .15s, color .15s;
+  padding:9px 16px; border-radius:10px; text-decoration:none;
+  font-size:.85rem; font-weight:800; white-space:nowrap;
+  border:1px solid var(--orange); color:#fff; background:var(--orange);
+  box-shadow:0 1px 2px rgba(0,0,0,.10);
+  transition:filter .15s, box-shadow .15s, transform .12s;
 }
-.hd-quick:hover{ border-color:var(--orange); color:var(--orange); }
+.hd-quick:hover{ filter:brightness(1.07); box-shadow:0 3px 10px rgba(255,125,31,.32); }
+.hd-quick:active{ transform:translateY(1px); }
 
 .hd-lang{ position:relative; }
 .hd-lang > button{
@@ -506,34 +516,34 @@
  * "Destinations" finiva sopra "Quick Request": piu' grande lo schermo,
  * meno la barra si stringeva. Esattamente al contrario.
  *
- * Ora la barra arriva a 1440 e quindi segue la finestra fin quasi in
- * fondo: le soglie tornano a voler dire qualcosa, e sopra i 1461 non
+ * Ora la barra arriva a 1500 e quindi segue la finestra fin quasi in
+ * fondo: le soglie tornano a voler dire qualcosa, e sopra i 1471 non
  * serve stringere niente -- il menu si vede a grandezza piena.
  *
  * ⚠️ Le soglie qui sotto NON sono numeri tondi a caso. Ognuna e' il punto
  * in cui la larghezza disponibile (finestra - 36px di padding, con il
- * tetto di 1440) scende sotto quella che serve al passo precedente:
+ * tetto di 1500) scende sotto quella che serve al passo precedente:
  *
- *   voci piene + sottotitolo del logo   ~1394px  ->  fino a 1461
- *   senza sottotitolo                   ~1360px  ->  fino a 1411
- *   + Quick Request stretto, WhatsApp    ~1281px  ->  fino a 1331
+ *   voci piene + sottotitolo del logo   ~1430px  ->  fino a 1471
+ *   senza sottotitolo                   ~1396px  ->  fino a 1436
+ *   + Quick Request stretto, WhatsApp    ~1317px  ->  fino a 1361
  *     senza la parola
- *   + voci strette                       ~1188px  ->  fino al panino
+ *   + voci strette                       ~1231px  ->  fino al panino
  *
  * Se si aggiunge o si allunga una voce, questi quattro numeri cambiano
  * tutti: vanno rimisurati, non ritoccati a occhio. */
-@media (max-width:1460px){
+@media (max-width:1470px){
   .hd-logo small{ display:none; }
   .hd-lang > button span.lg{ display:none; }
 }
-@media (max-width:1410px){
-  .hd-quick{ padding:9px 11px; font-size:.78rem; }
+@media (max-width:1435px){
+  .hd-quick{ padding:9px 12px; font-size:.8rem; }
   .hd-wa span{ display:none; }
   .hd-wa{ padding:9px 11px; }
 }
-@media (max-width:1330px){
+@media (max-width:1360px){
   .hd-nav{ margin-left:0; }
-  .hd-top{ padding-inline:5px; font-size:.8rem; gap:3px; }
+  .hd-top{ padding-inline:5px; font-size:.84rem; gap:3px; }
   .hd-freccia{ padding-inline:4px 0; }
 }
 
@@ -2284,7 +2294,17 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
    Il browser ai <button> mette font, bordo e sfondo suoi: qui si
    tolgono, cosi' le regole di .hd-quick continuano a valere e in pagina
    non cambia niente di visibile. */
-button.hd-quick,
+/* 🔴 DUE REGOLE SEPARATE, e non una sola come prima.
+   `button.hd-quick` e' piu' specifico di `.hd-quick`: finche' azzerava
+   anche `border` e `background`, vinceva lui e il bottone arancione
+   restava trasparente. A "Quick Request" si toglie solo cio' che mette
+   il browser (font, cursore, aspetto nativo); sfondo e bordo sono suoi
+   e devono sopravvivere. Per `.hd-top`, che e' e resta una voce di menu
+   senza sfondo, l'azzeramento completo va bene. */
+button.hd-quick{
+  font:inherit; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}
 button.hd-top{
   font:inherit; border:0; background:none; cursor:pointer;
   -webkit-appearance:none; appearance:none;
