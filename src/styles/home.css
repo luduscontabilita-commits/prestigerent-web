@@ -38,9 +38,10 @@
      bianca non toglie niente all'immagine, e per giunta si legge meglio
      perche' sotto ha un fondo uniforme. */
   padding:22px 20px 44px; color:#fff;
-  /* spazio in fondo per la fascia del riconoscimento, che ora e'
-     sovrapposta e non occupa piu' altezza propria */
-  padding-bottom:104px;
+  /* spazio in fondo per la fascia del riconoscimento, che e' sovrapposta
+     e non occupa piu' altezza propria. Su schermo largo la fascia sta in
+     una riga sola e misura circa 72px: 92 e' quella piu' il respiro. */
+  padding-bottom:92px;
   /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
      ma tagliava anche la tendina della ricerca appena sconfinava sotto
      l'hero -- si vedeva mezzo elenco e basta. Il ritaglio va sullo
@@ -163,10 +164,15 @@
      Sul telefono ancora piu' su di prima: l'immagine e' ritagliata a
      quadrato, quindi di cielo ce n'e' meno e il soggetto sale. */
   .hm-hero{
-    min-height:clamp(470px, 76vh, 680px);
-    /* Sotto c'e' la fascia del riconoscimento, che e' sovrapposta: lo
-       spazio glielo si riserva qui, altrimenti sale sul titolo. */
-    padding:16px 18px 118px;
+    min-height:clamp(440px, 66vh, 600px);
+    /* 🔴 LO SPAZIO RISERVATO ALLA FASCIA E' MISURATO, NON A OCCHIO.
+       Compatta com'e' adesso la fascia misura circa 72px: 11+11 di
+       padding, il marchio da 46 e due righe di testo. Riservarne 118
+       lasciava quarantasei pixel di vuoto fra il titolo e la fascia --
+       che e' il "troppo spazio" che si vedeva. 88 e' la misura piu' un
+       margine di sicurezza per i telefoni che ingrandiscono i caratteri
+       di sistema, dove la fascia diventa tre righe. */
+    padding:16px 18px 88px;
   }
   /* IL TITOLO SI RIMPICCIOLISCE, PERCHE' A 2,2rem ANDAVA IN SEI RIGHE.
      Il clamp di sopra ha per minimo 2,2rem, e sotto i 630px di finestra e'
