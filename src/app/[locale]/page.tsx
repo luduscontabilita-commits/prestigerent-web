@@ -486,9 +486,20 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               </svg>
               Explore tours
             </a>
-            <a className="secondo" href="https://wa.me/393338424047" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25" />
+            {/* 🔴 PORTA AL MODULO, NON A WHATSAPP.
+                Mandava fuori dal sito, e chi esce per scrivere su WhatsApp
+                spesso non torna: la richiesta resta a meta' e non ne
+                rimane traccia da nessuna parte. Il modulo invece arriva
+                nella posta, si puo' rileggere, e il messaggio parte gia'
+                con il servizio compilato.
+                WhatsApp resta comunque a un tocco: c'e' il pulsante verde
+                in testata su ogni pagina, e la barra in basso sul
+                telefono. Non si perde niente, si smette solo di
+                accompagnare fuori chi stava per lasciare un contatto. */}
+            <a className="secondo" href="#contact">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                   strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.6-.8L3 21l1.9-5.1A8.3 8.3 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5Z" />
               </svg>
               Ask us anything
             </a>
