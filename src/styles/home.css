@@ -23,15 +23,33 @@
 }
 .hm-hero-bg{ position:absolute; inset:0; z-index:0; overflow:hidden; }
 .hm-hero-bg img{ width:100%; height:100%; object-fit:cover; display:block; }
-/* La velatura non e' decorazione: sopra una foto in pieno sole il testo
-   bianco sparisce, e il titolo e' la prima cosa che deve leggersi. Piu'
-   scura a sinistra, dove sta il testo, e leggera a destra per non
-   spegnere la foto. */
+/* 🔴 LA VELATURA E' MOLTO PIU' LEGGERA DI PRIMA, E IL TESTO SI DIFENDE DA SE'.
+ *
+ * Era 0,80 di nero a sinistra: la Toscana in pieno sole diventava una
+ * foto notturna, e quella foto e' meta' dell'argomento -- e' quello che
+ * la gente compra. Sul sito WordPress la foto restava luminosa e a
+ * reggere la leggibilita' era l'ombra INTORNO alle lettere, non una
+ * coperta sopra tutto.
+ *
+ * Qui si fa lo stesso: velo appena accennato per staccare il bianco, e
+ * `text-shadow` sui testi (piu' sotto) che li tiene leggibili anche su
+ * una nuvola bianca. In fondo resta piu' scuro, ma solo li': sotto
+ * stanno il modulo di ricerca e i pulsanti, che hanno bisogno di un
+ * fondo tranquillo su cui appoggiarsi. */
 .hm-hero-bg::after{
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(90deg,rgba(10,15,21,.80) 0%,rgba(10,15,21,.58) 46%,rgba(10,15,21,.22) 100%),
-    linear-gradient(180deg,rgba(10,15,21,.42) 0%,rgba(10,15,21,0) 34%,rgba(10,15,21,.50) 100%);
+    linear-gradient(90deg,rgba(10,15,21,.42) 0%,rgba(10,15,21,.24) 46%,rgba(10,15,21,.06) 100%),
+    linear-gradient(180deg,rgba(10,15,21,.16) 0%,rgba(10,15,21,0) 30%,rgba(10,15,21,.46) 100%);
+}
+/* L'ombra intorno alle lettere: due strati, uno stretto e netto che
+   stacca il bordo, uno largo e morbido che fa da alone. E' quello che
+   permette di alzare la foto senza perdere una parola. */
+.hm-hero h1,
+.hm-hero .hm-kicker,
+.hm-hero .hm-sub,
+.hm-hero .hm-badges span{
+  text-shadow:0 1px 2px rgba(8,12,17,.55), 0 2px 18px rgba(8,12,17,.45);
 }
 .hm-hero-in{ position:relative; z-index:5; max-width:1180px; margin:0 auto; width:100%; }
 
@@ -185,8 +203,41 @@
   .hm-go{ grid-column:1 / -1; min-height:58px; }
   .hm-f{ min-height:62px; padding:10px 16px; }
 }
+/* 🔴 SUL TELEFONO NON SI IMPILA TUTTO IN COLONNA.
+ *
+ * A una colonna sola venivano tre pastiglie da 70px una sopra l'altra
+ * piu' il pulsante: quasi trecento pixel di modulo, cioe' mezzo schermo
+ * speso prima ancora di vedere un tour. E i tre campi non hanno lo
+ * stesso peso -- "da dove parti" e' una frase, "che tipo" e "quanti
+ * siete" sono due parole.
+ *
+ * Quindi: la partenza tiene la riga intera, gli altri due se la
+ * dividono, e il pulsante chiude. Da tre righe a due, e le pastiglie
+ * scendono a 58px perche' con due parole dentro non serve altezza. */
 @media (max-width:520px){
-  .hm-search{ grid-template-columns:1fr; }
+  .hm-search{ grid-template-columns:1fr 1fr; gap:9px; }
+  .hm-search > .sc:first-child{ grid-column:1 / -1; }
+  .hm-go{ grid-column:1 / -1; min-height:54px; }
+  .sc-btn{ min-height:58px; padding:9px 32px 9px 15px; gap:2px; }
+  .sc-eti{ font-size:.62rem; letter-spacing:.06em; }
+  .sc-val{ font-size:.94rem; }
+}
+
+/* 🔴 UN SOLO PULSANTE ARANCIONE PER VOLTA.
+   Sul telefono "FIND TOURS" (il modulo) e "Explore tours" finivano uno
+   sotto l'altro, tutti e due arancioni pieni e larghi uguale: due inviti
+   identici a due passi, che chiedono di scegliere fra due cose che poi
+   portano quasi allo stesso posto. Chi deve scegliere fra due pulsanti
+   uguali spesso non ne preme nessuno.
+   Sopra i 760px restano com'erano: li' stanno affiancati e si capisce
+   che uno cerca e l'altro sfoglia. */
+@media (max-width:760px){
+  .hm-cta .primo{
+    background:rgba(18,24,32,.62); color:#fff;
+    border:1px solid rgba(255,255,255,.35); backdrop-filter:blur(6px);
+    box-shadow:none;
+  }
+  .hm-cta .primo:hover{ background:rgba(18,24,32,.82); }
 }
 
 
@@ -2415,7 +2466,18 @@ button.hd-top{
    e' loro, ed e' proprio quello a renderlo credibile.
    Sta attaccata alla foto senza stacco: e' la coda dell'hero, non una
    sezione a se'. */
-.pam{ background:#2E3548; color:#fff; }
+/* 🔴 TRANSLUCIDA E ATTACCATA ALLA FOTO, come sul sito WordPress: li' era
+   una fascia scura appoggiata sul bordo basso dell'immagine, con la foto
+   che si intravedeva sotto. Un blocco pieno sotto la foto e' un'altra
+   cosa -- si legge come una sezione nuova, e la fascia invece e' la coda
+   dell'hero. Il colore e' scuro perche' il marchio Tripadvisor e'
+   bianco: vedi la nota nel componente. */
+.pam{
+  position:relative; z-index:5;
+  margin-top:-1px;
+  background:linear-gradient(180deg, rgba(24,30,42,.72), rgba(24,30,42,.92));
+  color:#fff; backdrop-filter:blur(3px);
+}
 .pam-in{
   max-width:1080px; margin:0 auto; padding:18px 22px;
   display:flex; align-items:center; gap:20px;
