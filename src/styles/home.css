@@ -2408,3 +2408,29 @@ button.hd-top{
 @media (prefers-reduced-motion: reduce){
   .faq-indice a, .faq-voce summary, .faq-voce summary svg{ transition:none; }
 }
+
+/* ─── la fascia del riconoscimento Tripadvisor ──────────────────────
+   Scura per forza: il marchio emesso da Tripadvisor e' BIANCO su
+   trasparente, quindi su fondo chiaro sparirebbe. Non si ridisegna --
+   e' loro, ed e' proprio quello a renderlo credibile.
+   Sta attaccata alla foto senza stacco: e' la coda dell'hero, non una
+   sezione a se'. */
+.pam{ background:#2E3548; color:#fff; }
+.pam-in{
+  max-width:1080px; margin:0 auto; padding:18px 22px;
+  display:flex; align-items:center; gap:20px;
+}
+.pam-logo{ width:74px; height:auto; flex:none; }
+.pam-t{
+  margin:0; font-size:1rem; line-height:1.4; color:rgba(255,255,255,.9);
+  max-width:52ch;
+}
+/* Il grassetto e' giallo come sul sito vecchio: e' la mezza riga che si
+   legge davvero, il resto e' il contesto che la rende verificabile. */
+.pam-t b{ display:block; color:#F5C147; font-weight:800; font-size:1.06rem; }
+@media (max-width:640px){
+  .pam-in{ gap:14px; padding:15px 16px; }
+  .pam-logo{ width:58px; }
+  .pam-t{ font-size:.9rem; }
+  .pam-t b{ font-size:.97rem; }
+}

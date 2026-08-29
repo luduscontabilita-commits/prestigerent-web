@@ -33,7 +33,15 @@ export function StickyBook({
        testata fosse uscita dallo schermo, e su un telefono l'hero e' alto
        quanto lo schermo -- quindi per la prima schermata e mezza non
        c'era modo di prenotare senza risalire.
-       🔴 E ORA BASTA IL PRIMO SCORRIMENTO, non piu' 300px.
+       🔴 DUECENTO PIXEL: ne' subito ne' tardi.
+       Trecento erano troppi -- su un telefono sono piu' di mezzo schermo,
+       e la barra arrivava quando il titolo era gia' uscito. Quaranta erano
+       troppo pochi: bastava sfiorare la rotella e compariva addosso a chi
+       stava ancora leggendo il titolo, che e' il modo piu' rapido di farla
+       chiudere mentalmente prima ancora di averla letta.
+       Duecento e' il punto in cui uno ha deciso di scorrere sul serio.
+
+       (nota storica, prima erano 300)
        Trecento pixel sembrano pochi e non lo sono: su un telefono sono
        piu' di mezzo schermo, cioe' la barra compariva quando il titolo
        era gia' uscito dall'inquadratura. Chi scorre di poco -- per
@@ -48,7 +56,7 @@ export function StickyBook({
     const aggiorna = () => setMostra(scorso && !formDentro);
 
     const alloScroll = () => {
-      const ora = window.scrollY > 40;
+      const ora = window.scrollY > 200;
       if (ora !== scorso) {
         scorso = ora;
         aggiorna();

@@ -6,6 +6,7 @@ import { fetchProduct } from '@/lib/regiondo';
 import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@/lib/locales';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
+import { PrimoAlMondo } from '@/components/PrimoAlMondo';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
 import { puntiScheda } from '@/lib/punti';
@@ -454,6 +455,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           </div>
         </div>
       </section>
+
+      {/* SUBITO SOTTO LA FOTO, come sul sito WordPress: e' la prima cosa
+          che si legge dopo la promessa, e l'unica che non la scriviamo noi. */}
+      <PrimoAlMondo />
 
       {/* I PREMI SUBITO SOTTO LA RICERCA, non a meta' pagina.
           Sono medaglie emesse da Viator e Tripadvisor: rispondono da sole
