@@ -30,7 +30,14 @@
      alto, quello che avanza resta fotografia: e' l'unico modo di far
      vedere il paesaggio senza togliere una parola. */
   display:flex; flex-direction:column; justify-content:flex-start;
-  padding:52px 20px 44px; color:#fff;
+  /* 🔴 IL TITOLO COMINCIA SUBITO, PERCHE' IN ALTO C'E' IL CIELO.
+     Con 52px di respiro in cima il blocco scendeva sul soggetto della
+     foto -- i vigneti, il gruppo, il paese -- cioe' copriva proprio la
+     parte che si vuole far vedere. Nelle sei foto dell'hero il terzo
+     superiore e' quasi sempre cielo o mare: e' li' che una scritta
+     bianca non toglie niente all'immagine, e per giunta si legge meglio
+     perche' sotto ha un fondo uniforme. */
+  padding:22px 20px 44px; color:#fff;
   /* NIENTE overflow:hidden QUI. Serviva a ritagliare la foto di sfondo,
      ma tagliava anche la tendina della ricerca appena sconfinava sotto
      l'hero -- si vedeva mezzo elenco e basta. Il ritaglio va sullo
@@ -70,7 +77,7 @@
 .hm-hero-in{ position:relative; z-index:5; max-width:1180px; margin:0 auto; width:100%; }
 
 .hm-kicker{
-  display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+  display:inline-flex; align-items:center; gap:8px; margin-bottom:10px;
   font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase;
   color:var(--orange-hi, #FF9A4D);
 }
@@ -141,7 +148,9 @@
 .hm-cta svg{ width:17px; height:17px; }
 
 @media (max-width:760px){
-  .hm-hero{ min-height:auto; padding:60px 18px 36px; }
+  /* Sul telefono ancora piu' su: l'immagine e' ritagliata a quadrato,
+     quindi di cielo ce n'e' meno e il soggetto sale. */
+  .hm-hero{ min-height:auto; padding:16px 18px 36px; }
   /* IL TITOLO SI RIMPICCIOLISCE, PERCHE' A 2,2rem ANDAVA IN SEI RIGHE.
      Il clamp di sopra ha per minimo 2,2rem, e sotto i 630px di finestra e'
      sempre il minimo a vincere: 35,2px fissi. Misurato con Manrope 800 sul
