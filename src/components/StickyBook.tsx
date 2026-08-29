@@ -33,14 +33,22 @@ export function StickyBook({
        testata fosse uscita dallo schermo, e su un telefono l'hero e' alto
        quanto lo schermo -- quindi per la prima schermata e mezza non
        c'era modo di prenotare senza risalire.
-       Ora bastano 300px: appena si comincia a scorrere davvero, il
-       prezzo e il pulsante sono li'. */
+       🔴 E ORA BASTA IL PRIMO SCORRIMENTO, non piu' 300px.
+       Trecento pixel sembrano pochi e non lo sono: su un telefono sono
+       piu' di mezzo schermo, cioe' la barra compariva quando il titolo
+       era gia' uscito dall'inquadratura. Chi scorre di poco -- per
+       vedere la foto sotto, o solo per capire quanto e' lunga la pagina
+       -- non la vedeva affatto. Quaranta pixel sono un gesto solo: la
+       barra arriva appena la pagina si muove, e da li' in poi il prezzo
+       e il pulsante restano sempre a portata di pollice.
+       Non parte da zero apposta: a pagina ferma coprirebbe il contenuto
+       dell'hero senza che nessuno abbia chiesto niente. */
     let scorso = false;
     let formDentro = false;
     const aggiorna = () => setMostra(scorso && !formDentro);
 
     const alloScroll = () => {
-      const ora = window.scrollY > 300;
+      const ora = window.scrollY > 40;
       if (ora !== scorso) {
         scorso = ora;
         aggiorna();

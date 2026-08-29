@@ -157,20 +157,51 @@ gtag('set','url_passthrough',true);
     }catch(e){ return true; }
   }
 
-  var CSS='#pr-cons{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;'
-    +'background:#14110f;color:#f2ede6;padding:18px 24px calc(18px + env(safe-area-inset-bottom));'
-    +'font:15px/1.5 system-ui,-apple-system,sans-serif;box-shadow:0 -2px 24px rgba(0,0,0,.35)}'
-    +'#pr-cons .pr-in{max-width:1080px;margin:0 auto;display:flex;gap:24px;align-items:center;flex-wrap:wrap}'
-    +'#pr-cons p{margin:0;flex:1 1 360px;min-width:240px}'
-    +'#pr-cons a{color:#e0b768}'
-    +'#pr-cons .pr-bot{display:flex;gap:10px;flex-wrap:wrap}'
-    +'#pr-cons button{font:600 15px/1 system-ui,sans-serif;cursor:pointer;padding:13px 26px;'
-    +'border-radius:4px;border:1px solid #7a6f63;background:#2a2522;color:#f2ede6;min-width:132px}'
-    +'#pr-cons button:hover{border-color:#e0b768;background:#332c27}'
-    +'#pr-cons button:focus-visible{outline:2px solid #e0b768;outline-offset:2px}'
-    +'html.pr-cons-aperto .pg-bar,html.pr-cons-aperto .pr-sticky{bottom:var(--pr-cons-h)!important}'
-    +'@media(max-width:640px){#pr-cons{padding:14px 16px calc(14px + env(safe-area-inset-bottom))}'
-    +'#pr-cons .pr-in{gap:14px}#pr-cons .pr-bot{width:100%}#pr-cons button{flex:1 1 0;min-width:0}}';
+  /* 🔴 UN RIQUADRO IN BASSO A DESTRA, NON UNA FASCIA NERA.
+   *
+   * Prima era una barra scura a tutta larghezza appoggiata sul fondo.
+   * Due difetti, e il secondo costava soldi: copriva l'intera base dello
+   * schermo -- cioe' il posto della barra "BOOK NOW" -- e la sua sola
+   * presenza obbligava a spingere in su tutto quello che stava li'
+   * sotto, con una regola che sovrascriveva la posizione di due elementi
+   * (html.pr-cons-aperto .pr-sticky, che si alzava dell'altezza esatta
+   * del banner).
+   *
+   * ⚠️ Questo commento vive DENTRO una stringa template: niente
+   * apostrofi inversi qui, la chiuderebbero a meta' e la compilazione si
+   * ferma su un errore che indica una riga a caso.
+   *
+   * Il sito WordPress usava Complianz nella variante
+   * "bottom-right-minimal": un riquadro piccolo nell'angolo, che non
+   * pretende la pagina e non nasconde niente. Si torna a quello, e come
+   * effetto secondario sparisce anche la spinta sulla barra di
+   * prenotazione: due elementi che non si toccano piu' non hanno piu'
+   * bisogno di sapere l'uno dell'altezza dell'altro.
+   *
+   * Sul telefono resta largo quanto lo schermo -- un riquadro da 380px
+   * in un angolo di un display da 390 e' la stessa cosa -- ma sta SOPRA
+   * la barra di prenotazione, non davanti.
+   */
+  var CSS='#pr-cons{position:fixed;right:18px;bottom:18px;z-index:2147483000;width:380px;max-width:calc(100vw - 28px);'
+    +'background:#fff;color:#1e2a32;border:1px solid #dfe3e6;border-radius:12px;padding:18px 18px 16px;'
+    +'font:14px/1.55 system-ui,-apple-system,sans-serif;box-shadow:0 10px 40px rgba(20,26,32,.22)}'
+    +'@media (prefers-color-scheme:dark){#pr-cons{background:#1b1917;color:#efeae4;border-color:#312c28;'
+    +'box-shadow:0 10px 40px rgba(0,0,0,.5)}}'
+    +'#pr-cons .pr-tit{font-size:15px;font-weight:800;margin:0 0 7px}'
+    +'#pr-cons p{margin:0 0 14px}'
+    +'#pr-cons a{color:#F5760B;font-weight:600}'
+    +'#pr-cons .pr-bot{display:flex;gap:9px}'
+    +'#pr-cons button{font:700 14px/1 system-ui,sans-serif;cursor:pointer;padding:11px 16px;'
+    +'border-radius:8px;border:1px solid #dfe3e6;background:transparent;color:inherit;flex:1 1 0}'
+    +'@media (prefers-color-scheme:dark){#pr-cons button{border-color:#312c28}}'
+    +'#pr-cons button.pr-si{background:#F5760B;border-color:#F5760B;color:#fff}'
+    +'#pr-cons button:hover{border-color:#F5760B}'
+    +'#pr-cons button.pr-si:hover{filter:brightness(1.07)}'
+    +'#pr-cons button:focus-visible{outline:2px solid #F5760B;outline-offset:2px}'
+    /* Sul telefono la barra "BOOK NOW" sta appiccicata in fondo: il
+       riquadro le si mette SOPRA invece che davanti. */
+    +'@media(max-width:760px){#pr-cons{right:10px;left:10px;width:auto;'
+    +'bottom:calc(88px + env(safe-area-inset-bottom,0px));padding:15px 15px 13px}}';
 
   var riquadro=null;
   function misura(){
@@ -182,11 +213,12 @@ gtag('set','url_passthrough',true);
     var d=document.createElement('div'); riquadro=d;
     d.id='pr-cons'; d.setAttribute('role','dialog');
     d.setAttribute('aria-label','Cookie preferences'); d.setAttribute('tabindex','-1');
-    d.innerHTML='<div class="pr-in"><p>We use cookies to measure how our ads perform and to '
-      +'improve this site. Accept or refuse as you prefer: refusing costs you nothing and '
-      +'booking works either way. <a href="'+POLICY+'">Cookie policy</a></p>'
+    d.innerHTML='<p class="pr-tit">Cookie consent</p>'
+      +'<p>We use cookies to measure how our ads perform and to improve this site. '
+      +'Refusing costs you nothing: booking works either way. '
+      +'<a href="'+POLICY+'">Cookie policy</a></p>'
       +'<div class="pr-bot"><button type="button" class="pr-no">Refuse</button>'
-      +'<button type="button" class="pr-si">Accept</button></div></div>';
+      +'<button type="button" class="pr-si">Accept</button></div>';
     document.body.appendChild(d);
     document.documentElement.className+=' pr-cons-aperto';
     misura(); window.addEventListener('resize',misura);
