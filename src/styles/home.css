@@ -789,8 +789,28 @@
   .hd-col-t{ margin-top:10px; }
 
   .hd-burger{ display:block; }
-  .hd-quick, .hd-wa span{ display:none; }
+  /* 🔴 "QUICK REQUEST" RESTA VISIBILE ANCHE SUL TELEFONO.
+   *
+   * Prima spariva sotto i 1280, e sul telefono in testata restavano solo
+   * il tema, WhatsApp e il panino: chi non voleva scrivere su WhatsApp
+   * -- che sono i piu' -- non aveva nessun modo evidente di chiedere un
+   * preventivo senza aprire il menu e cercarlo.
+   *
+   * Lo spazio si trova togliendo la SCRITTA del logo, non il logo: il
+   * marchio tondo si riconosce da solo e continua a portare alla home,
+   * mentre "Prestige Rent" scritto accanto occupa 110 pixel per ripetere
+   * quello che il marchio dice gia'. E' lo scambio giusto: un nome che
+   * si legge due volte contro un pulsante che non c'era. */
+  .hd-quick{ display:inline-flex; padding:8px 11px; font-size:.74rem; }
+  .hd-wa span{ display:none; }
   .hd-wa{ padding:9px 11px; }
+}
+@media (max-width:620px){
+  /* La scritta del logo esce: vedi la nota su .hd-quick qui sopra. Il
+     marchio resta, ed e' lui che si riconosce. */
+  .hd-logo strong{ display:none; }
+  .hd-in{ gap:8px; }
+  .hd-right{ gap:6px; }
 }
 @media (max-width:560px){
   .hd-logo small{ display:none; }
