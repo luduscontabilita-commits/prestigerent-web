@@ -54,6 +54,16 @@ export default function proxy(req: NextRequest) {
        /myb, ed era l'unica delle tre a non essere esclusa qui. Senza,
        diventa /en/mp/ e da li' un 404 -- proprio per chi ha appena pagato
        e sta cercando dove ci si vede. */
+    /* 🔴 `/booking/` — segnalato rotto da Violeta il 30/08/2026.
+       E' il link che l'ufficio manda ai clienti per prenotare. Non era in
+       questo elenco perche' non l'aveva mai nominato nessuno: dal
+       passaggio il proxy gli metteva davanti `/en/`, il catch-all delle
+       lingue non lo trovava e rispondeva 404. Chi lo riceveva non poteva
+       prenotare, per due giorni, senza che nessuno se ne accorgesse.
+       La lezione: le pagine servite dal vecchio host vanno escluse QUI e
+       inoltrate in next.config. Una sola delle due non basta. */
+    pathname.startsWith('/booking/') ||
+    pathname === '/booking' ||
     pathname.startsWith('/mp/') ||
     pathname === '/mp' ||
     /* /guest-albums/ e' la pagina delle foto che l'ospite riceve dopo il
