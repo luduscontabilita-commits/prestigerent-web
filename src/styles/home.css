@@ -25,8 +25,18 @@
   position:relative; z-index:10;
   /* L'altezza della SCENA -- foto piu' titolo -- in una variabile sola,
      perche' la usa anche la fascia Tripadvisor qui sotto e i due valori
-     devono restare uguali per forza. */
-  --hm-scena:clamp(560px,64vw,720px);
+     devono restare uguali per forza.
+
+     🔴 LA LEGA LA FINESTRA, NON SOLO LA LARGHEZZA.
+     Era `clamp(560px,64vw,720px)`: su uno schermo largo faceva sempre
+     720px, e su un portatile da 15 pollici -- dove di finestra utile ce
+     ne sono circa 780 -- la fascia Tripadvisor finiva sull'ultima riga
+     di pixel, tagliata a meta' dal bordo. Visibile per modo di dire.
+     Ora la scena non supera mai la finestra meno 130px, che e' lo spazio
+     che serve alla fascia per starci dentro tutta con un margine. Su un
+     monitor alto il tetto resta 720. `svh` e non `vh` perche' sui
+     telefoni `vh` conta anche la barra del browser che poi sparisce. */
+  --hm-scena:clamp(440px, min(64vw, calc(100svh - 130px)), 720px);
   min-height:var(--hm-scena);
   /* 🔴 IL TESTO STA IN ALTO, NON AL CENTRO.
      Centrato, il blocco si allargava verso il basso man mano che
@@ -168,7 +178,11 @@
      Sul telefono ancora piu' su di prima: l'immagine e' ritagliata a
      quadrato, quindi di cielo ce n'e' meno e il soggetto sale. */
   .hm-hero{
-    min-height:clamp(440px, 66vh, 600px);
+    /* Sul telefono la scena e' piu' bassa. Si cambia la VARIABILE e non
+       `min-height`, se no la fascia -- che si aggancia alla variabile --
+       resterebbe all'altezza del desktop e uscirebbe dalla foto. */
+    --hm-scena:clamp(440px, 66svh, 600px);
+    min-height:var(--hm-scena);
     /* 🔴 LO SPAZIO RISERVATO ALLA FASCIA E' MISURATO, NON A OCCHIO.
        Compatta com'e' adesso la fascia misura circa 72px: 11+11 di
        padding, il marchio da 46 e due righe di testo. Riservarne 118
