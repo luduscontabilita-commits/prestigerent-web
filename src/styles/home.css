@@ -3141,3 +3141,17 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
    dati diversi. */
 @media (max-width:1099px){ .fh{ display:none; } }
 @media (min-width:1100px){ .hm-fatti-riga{ display:none; } }
+
+/* ══ LA GALLERIA FOTAFLO ════════════════════════════════════════════
+ * Il markup lo scrive Fotaflo e non lo controlliamo: qui si sistemano
+ * solo le due cose che sul loro fondo bianco non si notano e sulla
+ * nostra pagina si'. */
+.ftf{ margin-top:26px; }
+.ftf:empty{ margin-top:0; }
+/* La finestra a schermo intero che si apre al clic viene spostata dentro
+   <body> dal loro script: deve stare sopra la barra fissa e sopra la
+   bolla WhatsApp, altrimenti il pulsante verde galleggia sulle foto. */
+#fotaflo-gallery-widget{ z-index:200; }
+/* Angoli e ombra come le schede del resto del sito: le foto arrivano
+   squadrate e in mezzo a una pagina di riquadri arrotondati stonano. */
+.ftf .fotaflo-media-container{ border-radius:10px; overflow:hidden; }

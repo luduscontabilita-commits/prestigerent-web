@@ -1,83 +1,72 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 /* LA GALLERIA DI FOTAFLO.
  *
- * ── PERCHE' NON SI INCOLLA E BASTA IL LORO CODICE ───────────────────
- * Quello che Fotaflo consegna e' uno `<script>` che, mentre la pagina si
- * disegna, ne crea un secondo e se lo infila accanto. Su WordPress va
- * bene; qui no: React ricostruisce l'albero quando gli pare, e uno
- * script piazzato a mano dentro il suo albero puo' venire rimosso, o
- * eseguito due volte alla prima navigazione interna. Il secondo caso e'
- * il piu' fastidioso, perche' non da' errore: raddoppia le fotografie.
+ * ── 🔴 L'ID SULLO SCRIPT NON E' DECORATIVO: E' IL PUNTO D'INNESTO ───
+ * Prima creavo il tag `<script>` senza id, perche' sembrava un dettaglio
+ * del loro copia-e-incolla. Non lo era. Il codice di Fotaflo, quando le
+ * fotografie arrivano, fa esattamente questo:
  *
- * Qui si fa la stessa identica cosa, ma da dentro un effetto: si crea il
- * tag una volta sola, si aspetta, e si toglie quando la pagina cambia.
+ *     const script = document.getElementById("fotaflo-gallery-widget-script")
+ *     script.insertAdjacentHTML('afterend', html)
+ *
+ * cioe' cerca UN ELEMENTO CON QUELL'ID e ci appende la galleria subito
+ * dopo. Senza id trovava `null`, l'errore finiva dentro un `catch` che
+ * si limita a scrivere in console, e la pagina restava vuota **senza
+ * nessun segnale**: 100 fotografie servite dal loro server e zero in
+ * pagina. E' il tipo di guasto peggiore -- tutto risponde 200 e non si
+ * vede niente.
+ *
+ * ── PERCHE' NON SI INCOLLA E BASTA IL LORO CODICE ───────────────────
+ * Il loro frammento crea un secondo script mentre la pagina si disegna.
+ * Su WordPress va bene; dentro React quel tag puo' essere rimosso o
+ * eseguito due volte, e la seconda volta raddoppia le fotografie senza
+ * dare errore. Qui lo si fa una volta sola, da dentro un effetto.
  *
  * ── LA CHIAVE E' PUBBLICA, E VA BENE COSI' ──────────────────────────
  * `key=67aa5a82` viaggia nell'indirizzo di uno script che carica il
- * browser: chiunque apra la pagina la vede. Non e' un segreto e non va
- * trattata come tale -- non e' una password, e' il nome della galleria.
- * A difendere le foto e' l'elenco degli indirizzi autorizzati nel
- * pannello Fotaflo: da un dominio non autorizzato la stessa chiave
- * risponde 404. Misurato.
- *
- * ── SE NON C'E' NIENTE, NON SI VEDE NIENTE ──────────────────────────
- * Oggi la galleria torna vuota: l'indirizzo di questa pagina non e'
- * ancora fra quelli autorizzati e nessuna foto e' marcata come
- * pubblicabile. In quel caso il contenitore resta alto zero e la pagina
- * non ha buchi -- meglio una sezione che manca di una che promette
- * fotografie e mostra un rettangolo bianco.
+ * browser: chiunque apra la pagina la vede. Non e' una password, e' il
+ * nome della galleria. A difendere le foto e' l'elenco degli indirizzi
+ * autorizzati nel pannello Fotaflo: da un dominio non autorizzato la
+ * stessa chiave risponde 404. Misurato.
  */
 
 const CHIAVE = '67aa5a82';
+const ID_INNESTO = 'fotaflo-gallery-widget-script';
+
+/* 🔴 UNA VOLTA SOLA PER APERTURA DI PAGINA.
+   Il loro script dichiara `const fotafloGalleryWidget` nello spazio
+   globale: caricarlo due volte non lo ricarica, lancia un errore di
+   ridichiarazione e da li' in poi non funziona piu' niente. Questa
+   guardia vale finche' il browser non ricarica davvero la pagina. */
+let gia = false;
 
 export function GalleriaFotaflo() {
   const posto = useRef<HTMLDivElement>(null);
-  /* Serve solo a dare al contenitore un po' d'aria quando le foto ci
-     sono davvero: senza, il margine resterebbe anche a galleria vuota. */
-  const [piena, setPiena] = useState(false);
 
   useEffect(() => {
     const el = posto.current;
-    if (!el) return;
-
-    /* `client_url` e' l'indirizzo della pagina SENZA la query, ed e'
-       quello che Fotaflo confronta con la lista degli autorizzati. Si
-       calcola come nel loro codice originale, per non discostarsi. */
-    const href = window.location.href;
-    const clientUrl = href.substring(0, href.indexOf(window.location.search) || href.length);
+    if (!el || gia) return;
+    gia = true;
 
     const s = document.createElement('script');
+    /* L'id: e' qui che Fotaflo appendera' la galleria. */
+    s.id = ID_INNESTO;
+    /* `client_url` e' l'indirizzo della pagina senza la query, ed e'
+       quello che confrontano con la lista degli autorizzati. Si calcola
+       come nel loro codice originale, per non discostarsi. */
+    const href = window.location.href;
+    const clientUrl = href.substring(0, href.indexOf(window.location.search) || href.length);
     s.src =
       'https://app.fotaflo.com/embeds/gallery_widgets/v2023-08-30.js' +
-      `?key=${CHIAVE}&client_url=${encodeURIComponent(clientUrl)}`;
+      `?key=${CHIAVE}&client_url=${clientUrl}`;
     s.async = true;
     el.appendChild(s);
-
-    /* Il loro script inserisce le immagini quando gli arrivano, e non
-       avvisa: si guarda il contenitore e si smette appena c'e' qualcosa. */
-    const osserva = new MutationObserver(() => {
-      if (el.querySelector('img, .fotaflo-gallery')) {
-        setPiena(true);
-        osserva.disconnect();
-      }
-    });
-    osserva.observe(el, { childList: true, subtree: true });
-
-    return () => {
-      osserva.disconnect();
-      el.innerHTML = '';
-    };
   }, []);
 
-  return (
-    <div
-      ref={posto}
-      className="ftf"
-      style={{ marginTop: piena ? 26 : 0 }}
-      aria-label="Photographs from our tours"
-    />
-  );
+  /* Il contenitore resta alto zero finche' non arriva niente: a galleria
+     vuota la pagina non mostra un rettangolo bianco che sembra rotto. */
+  return <div ref={posto} className="ftf" aria-label="Photographs from our tours" />;
 }
