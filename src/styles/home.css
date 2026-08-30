@@ -23,7 +23,11 @@
      dichiarato qui, tutto quello che sta nell'hero resta sopra
      qualunque cosa venga dopo, e nessuno deve piu' rincorrere numeri. */
   position:relative; z-index:10;
-  min-height:clamp(560px,64vw,720px);
+  /* L'altezza della SCENA -- foto piu' titolo -- in una variabile sola,
+     perche' la usa anche la fascia Tripadvisor qui sotto e i due valori
+     devono restare uguali per forza. */
+  --hm-scena:clamp(560px,64vw,720px);
+  min-height:var(--hm-scena);
   /* 🔴 IL TESTO STA IN ALTO, NON AL CENTRO.
      Centrato, il blocco si allargava verso il basso man mano che
      cresceva e mangiava la foto da tutte e due le parti. Appoggiato in
@@ -2718,23 +2722,41 @@ button.hd-top{
   /* Appoggiata sul bordo basso della foto, dentro l'hero: e' la coda
      dell'immagine, non una sezione a se'. `absolute` e non `relative`
      perche' il testo dell'hero sta in alto e in mezzo deve restare solo
-     fotografia. */
-  position:absolute; left:0; right:0; bottom:0; z-index:6;
-  background:linear-gradient(180deg, rgba(24,30,42,.72), rgba(24,30,42,.92));
-  color:#fff; backdrop-filter:blur(3px);
+     fotografia.
+
+     🔴 SI AGGANCIA A `--hm-scena`, NON A `bottom:0`.
+     Con `bottom:0` finiva in fondo a `.hm-hero` -- che al primo disegno
+     contiene anche TUTTO l'elenco dei tour, perche' <Cerca> li stampa li'
+     dentro finche' React non li sposta in `#lista-tour`. Risultato: la
+     fascia veniva piazzata migliaia di pixel sotto la foto, cioe' in un
+     punto dove non la vede nessuno, e ricompariva solo dopo
+     l'idratazione. Ancorandola all'altezza dichiarata della scena il
+     punto e' sempre lo stesso, prima e dopo. */
+  position:absolute; left:0; right:0; top:var(--hm-scena,100%); z-index:6;
+  transform:translateY(-100%);
+  /* Piu' chiara di prima: sul sito vecchio era un velo grigio che
+     lasciava vedere la fotografia sotto, non una fascia nera. E' quello
+     che la fa leggere come la coda dell'immagine invece che come una
+     barra appiccicata sopra. */
+  background:linear-gradient(180deg, rgba(28,34,44,.42), rgba(20,26,34,.78));
+  color:#fff; backdrop-filter:blur(2px);
+  border-top:1px solid rgba(255,255,255,.16);
 }
 .pam-in{
-  max-width:1080px; margin:0 auto; padding:18px 22px;
-  display:flex; align-items:center; gap:20px;
+  max-width:1080px; margin:0 auto; padding:22px 22px 24px;
+  display:flex; align-items:center; justify-content:center; gap:26px;
 }
-.pam-logo{ width:74px; height:auto; flex:none; }
+.pam-logo{ width:92px; height:auto; flex:none; }
 .pam-t{
-  margin:0; font-size:1rem; line-height:1.4; color:rgba(255,255,255,.9);
+  margin:0; font-size:1.1rem; line-height:1.45; color:#fff;
   max-width:52ch;
+  /* L'ombra e non un fondo piu' scuro: cosi' la foto resta visibile
+     sotto e le lettere reggono lo stesso su qualunque punto le capiti. */
+  text-shadow:0 1px 3px rgba(0,0,0,.55);
 }
 /* Il grassetto e' giallo come sul sito vecchio: e' la mezza riga che si
    legge davvero, il resto e' il contesto che la rende verificabile. */
-.pam-t b{ display:block; color:#F5C147; font-weight:800; font-size:1.06rem; }
+.pam-t b{ display:block; color:#F5C147; font-weight:800; font-size:1.34rem; letter-spacing:-.01em; }
 /* 🔴 SUL TELEFONO LA FASCIA DEVE STARE IN DUE RIGHE.
    A .9rem la frase ne prendeva tre e, essendo appoggiata sul fondo
    dell'immagine, saliva fino a coprire l'ultima riga del titolo. La
@@ -2742,10 +2764,10 @@ button.hd-top{
    suo mestiere. Testo piu' piccolo, marchio piu' piccolo, e la parte in
    giallo -- l'unica che si legge davvero -- resta grande. */
 @media (max-width:640px){
-  .pam-in{ gap:11px; padding:11px 14px; }
-  .pam-logo{ width:46px; }
-  .pam-t{ font-size:.78rem; line-height:1.3; }
-  .pam-t b{ font-size:.92rem; }
+  .pam-in{ gap:12px; padding:13px 14px; }
+  .pam-logo{ width:54px; }
+  .pam-t{ font-size:.8rem; line-height:1.32; }
+  .pam-t b{ font-size:1rem; }
 }
 
 /* ─── la fascia chiara sotto la foto ─────────────────────────────────
