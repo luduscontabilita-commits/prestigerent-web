@@ -3045,3 +3045,36 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
   .fn-fondo{ padding:34px 18px; }
   .fn-tondo, .fn-anello{ width:84px; height:84px; }
 }
+
+/* ══ LA BOLLA WHATSAPP FISSA ════════════════════════════════════════
+ * Verde WhatsApp e non arancione: e' il colore con cui la si riconosce
+ * senza leggere niente, e in una pagina dove l'arancione vuol dire
+ * "prenota" un secondo pulsante arancione competerebbe con quello. */
+.wa-bolla{
+  position:fixed; z-index:60;
+  inset-inline-end:20px; bottom:20px;
+  width:58px; height:58px; border-radius:50%;
+  display:grid; place-items:center;
+  background:#25D366; color:#fff;
+  box-shadow:0 6px 20px rgba(0,0,0,.26);
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+.wa-bolla:hover{ transform:translateY(-2px) scale(1.04); box-shadow:0 10px 26px rgba(0,0,0,.32); }
+.wa-bolla:active{ transform:translateY(0) scale(.97); }
+.wa-bolla:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
+
+/* 🔴 SOPRA LA BARRA FISSA, NON SOTTO.
+   Sulle schede tour da telefono in fondo c'e' gia' la barra "prenota":
+   a bottom:20px la bolla ci finiva sopra a meta', coprendo il prezzo.
+   Il corpo porta la classe quando quella barra c'e'; senza, la bolla
+   resta dov'e'. */
+@media (max-width:1179px){
+  .wa-bolla{ bottom:calc(20px + var(--barra-fissa, 0px)); }
+}
+@media (max-width:640px){
+  .wa-bolla{ width:52px; height:52px; inset-inline-end:14px; }
+  .wa-bolla svg{ width:26px; height:26px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .wa-bolla, .wa-bolla:hover{ transition:none; transform:none; }
+}

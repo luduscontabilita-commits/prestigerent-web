@@ -11,6 +11,7 @@ import { ultimePrenotazioni } from '@/lib/riprova';
 import { ProvaSociale } from '@/components/ProvaSociale';
 import { supabase } from '@/lib/supabase';
 import { SLUG_MENU } from '@/lib/menu';
+import { BollaWhatsApp } from '@/components/BollaWhatsApp';
 import { Footer } from '@/components/Footer';
 import { Consenso } from '@/components/Consenso';
 import { Tracciamento } from '@/components/Tracciamento';
@@ -210,6 +211,10 @@ export default async function LocaleLayout({
         <Header locale={locale} voti={voti} foto={foto} />
         {children}
         <Footer locale={locale} />
+        {/* La bolla WhatsApp, fissa in basso a destra su ogni pagina.
+            Ha preso il posto del widget di chat del sito vecchio: vedi
+            BollaWhatsApp.tsx per il perche'. */}
+        <BollaWhatsApp />
         {/* I riquadri delle prenotazioni vere. Le righe passano cosi' come
             sono e il link se lo costruisce il componente: ogni minuto ne
             rilegge di nuove da /api/prenotazioni, e se il collegamento si
