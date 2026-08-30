@@ -62,6 +62,10 @@ export default function proxy(req: NextRequest) {
        prenotare, per due giorni, senza che nessuno se ne accorgesse.
        La lezione: le pagine servite dal vecchio host vanno escluse QUI e
        inoltrate in next.config. Una sola delle due non basta. */
+    /* L'indirizzo a cui il modulo di /booking/ spedisce davvero. Senza
+       questa riga il proxy ci mette davanti `/en/` e il POST muore. */
+    pathname === '/wp-admin/admin-ajax.php' ||
+    pathname.startsWith('/wp-json/fluentform/') ||
     pathname.startsWith('/booking/') ||
     pathname === '/booking' ||
     pathname.startsWith('/mp/') ||

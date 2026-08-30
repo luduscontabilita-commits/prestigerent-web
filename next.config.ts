@@ -369,6 +369,29 @@ const nextConfig: NextConfig = {
          senza toccare niente altro. */
       ...inoltra('/booking', '/booking'),
 
+      /* 🔴 IL MODULO DI /booking/ NON BASTA CHE SI APRA: DEVE POTER PARTIRE.
+         La pagina e' un FluentForms di WordPress e spedisce in POST su
+         `prestigerent.com/wp-admin/admin-ajax.php`. Quell'indirizzo sul
+         sito nuovo non esiste: verificato il 30/08/2026, HTTP 404. Quindi
+         anche rimessa in piedi la pagina, il cliente compilava tutto,
+         premeva invia e non succedeva niente — senza nemmeno un errore.
+         Peggio del 404 di prima, perche' l'errore era invisibile.
+
+         Si inoltra SOLO `admin-ajax.php`, non tutta `/wp-admin/`: la
+         bacheca di WordPress sotto prestigerent.com non ci deve stare.
+         Stesso criterio per `/wp-json/`: passa solo il pezzo di
+         FluentForms, non l'intera API — da `/wp-json/wp/v2/users` si
+         legge l'elenco degli utenti, ed e' gia' una voce aperta nella
+         lista della sicurezza. */
+      {
+        source: '/wp-admin/admin-ajax.php',
+        destination: `https://${hostLegacy}/wp-admin/admin-ajax.php`,
+      },
+      {
+        source: '/wp-json/fluentform/:path*',
+        destination: `https://${hostLegacy}/wp-json/fluentform/:path*`,
+      },
+
       /* 🔴 LE FOTO. Tutte e 794 le immagini dei tour -- 87 schede su 87,
          piu' la home e ogni griglia di categoria -- hanno l'indirizzo
          scritto per esteso su prestigerent.com/wp-content/. Non passano da
