@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, PIU_LINGUE, regiondoLocale } from '@
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
 import { HeroFoto } from '@/components/HeroFoto';
 import { PrimoAlMondo } from '@/components/PrimoAlMondo';
-import { FasciaNumeri } from '@/components/FasciaNumeri';
+import { FasciaNumeri, FattiHero } from '@/components/FasciaNumeri';
 import { Destinazioni } from '@/components/Destinazioni';
 import { Cerca } from '@/components/Cerca';
 import { prezzoDi } from '@/lib/prezzi';
@@ -504,6 +504,21 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             questa e' la coda della fotografia.
             Sta dentro `.hm-hero`, che ha gia' un piano suo: cosi' resta
             sopra l'immagine senza rincorrere numeri di livello. */}
+        {/* Le quattro misure in piccolo, sul lato destro della foto che
+            era vuoto. Su schermo stretto spariscono e resta la riga
+            sotto il titolo: vedi la nota in FattiHero. */}
+        <FattiHero
+          n={{
+            voto: d.voto,
+            clienti: az?.clienti_serviti ?? null,
+            anno: az?.anno_fondazione ?? null,
+            anni: d.anni,
+            posizione: az?.classifica_posizione ?? null,
+            su: az?.classifica_su ?? null,
+            categoria: az?.classifica_categoria ?? null,
+          }}
+        />
+
         <PrimoAlMondo />
       </section>
 

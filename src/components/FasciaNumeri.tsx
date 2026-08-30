@@ -205,3 +205,66 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
     </div>
   );
 }
+
+/* ── GLI STESSI NUMERI, PICCOLI, SULLA FOTO ─────────────────────────
+ *
+ * Nell'hero il lato destro era vuoto: la fotografia da sola, con tutto il
+ * testo ammassato a sinistra. Qui vanno le stesse quattro misure, in
+ * piccolo -- stelle e anello compresi, perche' sono quelli che si leggono
+ * da lontano senza mettersi a decifrare cifre.
+ *
+ * 🔴 NON SI RIPETONO DUE VOLTE. Sotto il titolo c'e' gia' la riga
+ * "★4.9 · 700k+ guests · Since 2002": su schermo largo quella sparisce e
+ * resta questo blocco, sotto i 1100px succede il contrario. Gli stessi
+ * numeri detti due volte nella stessa schermata non convincono il doppio,
+ * fanno solo dubitare che siano due dati diversi -- e' lo stesso motivo
+ * per cui e' stato tolto il riquadro "25 guests in one vehicle".
+ *
+ * Il fondo e' un velo scuro e non un riquadro pieno: la foto deve
+ * continuare a vedersi sotto, altrimenti diventa una scatola appoggiata
+ * sull'immagine. */
+export function FattiHero({ n }: { n: Numeri }) {
+  const { rif, dentro } = usaInVista<HTMLDivElement>();
+  const meta = n.anni != null ? Math.max(5, Math.ceil((n.anni + 1) / 5) * 5) : 25;
+
+  return (
+    <div className="fh" ref={rif}>
+      {n.voto != null && (
+        <div className="fh-c">
+          <b className="fh-n">
+            <Conta a={n.voto} decimali={1} />
+          </b>
+          <Stelle voto={n.voto} dentro={dentro} />
+          <span className="fh-e">average rating</span>
+        </div>
+      )}
+      {n.clienti != null && (
+        <div className="fh-c">
+          <b className="fh-n">
+            <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" durata={2500} />
+          </b>
+          <span className="fh-e">guests driven</span>
+        </div>
+      )}
+      {n.posizione != null && (
+        <div className="fh-c">
+          <b className="fh-n">
+            <Conta a={n.posizione} prefisso="#" />
+          </b>
+          <span className="fh-e">of {n.su} in Florence</span>
+        </div>
+      )}
+      {n.anni != null && (
+        <div className="fh-c">
+          <span className="fh-tondo">
+            <Anello anni={n.anni} meta={meta} dentro={dentro} />
+            <b className="fh-n fh-n-tondo">
+              <Conta a={n.anni} />
+            </b>
+          </span>
+          <span className="fh-e">years on the road</span>
+        </div>
+      )}
+    </div>
+  );
+}

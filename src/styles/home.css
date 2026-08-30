@@ -3092,3 +3092,52 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
 @media (prefers-reduced-motion: reduce){
   .wa-bolla, .wa-bolla:hover{ transition:none; transform:none; }
 }
+
+/* ══ I NUMERI PICCOLI SULLA FOTO ════════════════════════════════════
+ * Lato destro dell'hero, che era vuoto. Si aggancia a --hm-scena come la
+ * fascia Tripadvisor: prima dell'idratazione l'hero contiene anche tutti
+ * i tour, quindi qualunque misura presa dal suo fondo finirebbe fuori
+ * schermo. */
+.fh{
+  position:absolute; z-index:7;
+  inset-inline-end:clamp(24px, 3.5vw, 60px);
+  top:clamp(96px, 15vh, 168px);
+  display:grid; gap:14px;
+  padding:20px 22px;
+  border-radius:16px;
+  /* Velo, non riquadro: la foto continua a vedersi sotto. Senza il velo
+     le cifre bianche cadono su un cielo chiaro e spariscono. */
+  background:linear-gradient(180deg, rgba(18,24,32,.44), rgba(18,24,32,.62));
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 10px 34px rgba(8,14,20,.28);
+  text-align:end;
+}
+.fh-c{ display:grid; justify-items:end; gap:3px; }
+.fh-c + .fh-c{ padding-top:12px; border-top:1px solid rgba(255,255,255,.13); }
+.fh-n{
+  font-family:'Fraunces',Georgia,serif;
+  font-size:1.62rem; font-weight:640; line-height:1; color:#fff;
+  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+}
+.fh-e{
+  font-size:.7rem; font-weight:700; letter-spacing:.02em;
+  color:rgba(255,255,255,.82); text-shadow:0 1px 3px rgba(0,0,0,.45);
+}
+/* Le stelle sono le stesse della fascia, rimpicciolite dal contenitore. */
+.fh .fn-stelle{ height:12px; }
+.fh .fn-stelle svg{ width:12px; height:12px; }
+.fh-tondo{ position:relative; display:inline-grid; place-items:center; width:58px; height:58px; }
+.fh-tondo .fn-anello{ width:58px; height:58px; }
+.fh-tondo .fn-anello circle{ stroke-width:6; }
+.fh-n-tondo{ position:absolute; font-size:1.2rem; }
+
+/* 🔴 O QUESTO O LA RIGA SOTTO IL TITOLO, MAI TUTTI E DUE.
+   `.hm-fatti-riga` dice gia' "★4.9 · 700k+ guests · Since 2002". Sotto i
+   1100px non c'e' spazio per il blocco laterale e resta la riga; sopra,
+   comanda il blocco e la riga sparisce. Gli stessi numeri due volte nella
+   stessa schermata non convincono il doppio: fanno dubitare che siano due
+   dati diversi. */
+@media (max-width:1099px){ .fh{ display:none; } }
+@media (min-width:1100px){ .hm-fatti-riga{ display:none; } }
