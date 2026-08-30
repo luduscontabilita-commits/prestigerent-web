@@ -358,6 +358,17 @@ const nextConfig: NextConfig = {
       ...inoltra('/lp', '/lp'),
       ...inoltra('/myb', '/myb'),
 
+      /* 🔴 `/booking/` — SEGNALATO DA VIOLETA IL 30/08/2026, ROTTO.
+         E' il link che l'ufficio manda ai clienti per far prenotare: non
+         era nell'elenco delle pagine del vecchio host perche' non l'aveva
+         nominato nessuno, e dal passaggio rispondeva 404. Chi lo riceveva
+         non poteva prenotare, e nessuno di noi lo sapeva.
+         Sul vecchio server c'e' ancora e risponde 200: si inoltra li',
+         esattamente com'era. Non e' la soluzione definitiva — va rifatta
+         come pagina del sito nuovo — ma rimette in piedi il link adesso,
+         senza toccare niente altro. */
+      ...inoltra('/booking', '/booking'),
+
       /* 🔴 LE FOTO. Tutte e 794 le immagini dei tour -- 87 schede su 87,
          piu' la home e ogni griglia di categoria -- hanno l'indirizzo
          scritto per esteso su prestigerent.com/wp-content/. Non passano da
