@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Date: Sun, 30 Aug 2026 16:37:46 GMT
+Server: Apache
+Disabled-plugins: 0 on 2026-08-30 04:37:47
+Link: <https://dev.prestigerent.com/wp-json/>; rel="https://api.w.org/", <https://dev.prestigerent.com/wp-json/wp/v2/product_cat/29>; rel="alternate"; title="JSON"; type="application/json"
+Upgrade: h2,h2c
+Connection: Upgrade
+Last-Modified: Sun, 30 Aug 2026 16:37:49 GMT
+Cache-Control: max-age=0
+Expires: Sun, 30 Aug 2026 16:37:46 GMT
+Vary: Accept-Encoding
+X-Robots-Tag: noindex, nofollow, noarchive
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+

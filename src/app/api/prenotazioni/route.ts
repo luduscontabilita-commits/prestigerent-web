@@ -92,7 +92,23 @@ export async function GET() {
     { avvisi, conteggi },
     {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        /* 🔴 TRE INTESTAZIONI, NON UNA.
+           Con `Cache-Control: public, s-maxage=60, ...` Next riscriveva il
+           valore e in rete arrivava soltanto `public`: verificato il
+           30/08/2026 con `curl -I`, `X-Vercel-Cache: MISS` a ogni
+           richiesta. Senza `s-maxage` la cache di rete non trattiene
+           niente, quindi ogni visitatore faceva interrogare il database e
+           faceva ripartire il controllo del ripasso -- l'opposto di quello
+           che questa rotta vuole ottenere.
+
+           `Vercel-CDN-Cache-Control` e `CDN-Cache-Control` parlano alla
+           rete e Next non li tocca; `Cache-Control` resta per il browser,
+           che invece deve richiedere ogni volta (i numeri cambiano). Il
+           browser chiede, la rete risponde dalla copia: e' esattamente il
+           comportamento voluto. */
+        'Cache-Control': 'public, max-age=0, must-revalidate',
+        'CDN-Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     },
   );
