@@ -54,3 +54,14 @@ scripts/*.log.jsonl
 /home.html
 /t.html
 /r.json
+
+# scarti delle verifiche con curl: non devono mai finire nel repo
+*.tmp.html
+/b.html
+/h.html
+/p.html
+/pp.html
+/x.html
+/sm.xml
+/r.txt
+/h.txt
