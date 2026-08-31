@@ -502,7 +502,11 @@ export default async function TourPage({
                 {[0, 1, 2, 3, 4].map((i) => <i className="star" key={i} />)}
               </span>
               <span>
-                <b>{voto.valore}</b> · {voto.quante.toLocaleString('en-US')} reviews
+                {/* sempre una cifra decimale: un tour con 5,0 stampava "5",
+                    e accanto agli altri che dicono "4.9" sembrava un numero
+                    di un altro tipo, non un voto. */}
+                <b>{Number(voto.valore).toFixed(1)}</b> ·{' '}
+                {voto.quante.toLocaleString('en-US')} reviews
                 {voto.dove ? ` on ${voto.dove}` : ''}
               </span>
             </span>
