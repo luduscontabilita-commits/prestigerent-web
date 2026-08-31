@@ -66,3 +66,8 @@ scripts/*.log.jsonl
 /r.txt
 /h.txt
 supabase/.temp/
+
+# Il foglio di installazione contiene TUTTE le chiavi in chiaro e questo
+# repository e' pubblico: se finisse in un commit sarebbe pubblicato al
+# mondo, e restarebbe nella cronologia anche dopo averlo tolto.
+INSTALLAZIONE_NUOVO_PC.md
