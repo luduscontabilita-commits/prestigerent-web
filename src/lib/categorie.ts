@@ -38,6 +38,18 @@ export type Categoria = {
   intro: string;
   /** 🔴 IL PARAGRAFO CHE PARLA A CHI LEGGE, non ai motori.
    *
+   *  ⚠️ I TEMPI DI PERCORRENZA SI PRENDONO DAL SITO, NON DA ALTRO.
+   *  Il 31/08/2026 avevo scritto qui "tre ore e mezza" per Firenze-Roma,
+   *  prendendo i valori dalla lista delle durate da correggere su
+   *  Regiondo -- valori giusti nel merito, ma non ancora confermati. Il
+   *  risultato erano due numeri diversi per lo stesso viaggio nello
+   *  stesso sito: 4 ore sulla scheda del prodotto, 3 e mezza nel testo
+   *  della categoria. Uno dei due e' per forza sbagliato, e chi lo nota
+   *  smette di credere a tutti e due.
+   *  Regola, decisa dalla proprieta': si scrive quello che dice il sito.
+   *  Il giorno che le durate su Regiondo vengono corrette, si cambiano
+   *  QUI nello stesso momento -- non prima.
+   *
    *  `intro` dice cosa c'e' dentro: minibus, venticinque posti, pranzo in
    *  cantina. Sono i fatti, e servono -- ma nessuno ha mai comprato una
    *  giornata perche' il minibus ha venticinque posti.
@@ -170,7 +182,7 @@ export const CATEGORIE: Categoria[] = [
       'The driver is waiting when you land, not summoned when you land. The price is agreed before you travel ' +
         'and does not move for traffic, waiting time or a delayed flight. And whatever you are carrying — four ' +
         'people with four suitcases, a family of eight, golf clubs, a cello — we have the vehicle for it, and ' +
-        'it is a comfortable one, because Florence to Rome is three and a half hours and nobody should spend ' +
+        'it is a comfortable one, because Florence to Rome is four hours and nobody should spend ' +
         'them with a bag on their knees.',
       'Tell us the flight number and the address. We do the rest.',
     ],
@@ -330,7 +342,7 @@ export const CATEGORIE: Categoria[] = [
     padre: '/transfers/direct-transfers/',
     prosa: [
       'Florence to Rome, Milan, Venice, the airports and the cruise ports — door to door, with your luggage in the car and nobody else in it.',
-      'Three and a half hours to Rome or Milan, three to Venice. Long enough that the vehicle matters: ours are comfortable, air conditioned, and big enough for the bags you actually have rather than the bags a price list assumes.',
+      'Four hours to Rome, to Milan or to Venice. Long enough that the vehicle matters: ours are comfortable, air conditioned, and big enough for the bags you actually have rather than the bags a price list assumes.',
     ],
   },
   {
@@ -350,7 +362,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Milan city and Malpensa to Florence, the Lakes and beyond.',
     padre: '/transfers/direct-transfers/',
     prosa: [
-      'Milan city and Malpensa to Florence, the Lakes and beyond. Malpensa to Florence is four and a half hours: the sort of journey where a proper vehicle and a driver who does it every week are worth more than a saving of twenty euro.',
+      'Milan city and Malpensa to Florence, the Lakes and beyond. Malpensa to Florence is four hours: the sort of journey where a proper vehicle and a driver who does it every week are worth more than a saving of twenty euro.',
     ],
   },
   {
@@ -470,7 +482,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Milan, the Lakes and the motor valley — Ferrari, Lamborghini, Ducati and Modena.',
     padre: '/destinations/',
     prosa: [
-      'Milan, Malpensa and the lakes. From Florence it is three and a half hours, and there are several things worth stopping for on the way — Ferrari, Modena, Parma — that turn the transfer into the day.',
+      'Milan, Malpensa and the lakes. From Florence it is four hours, and there are several things worth stopping for on the way — Ferrari, Modena, Parma — that turn the transfer into the day.',
     ],
   },
   {
