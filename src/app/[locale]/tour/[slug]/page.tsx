@@ -452,7 +452,7 @@ export default async function TourPage({
       {/* SOTTO il calendario, non sopra: chi ha gia' scelto la data non
           va interrotto. Serve a chi arriva in fondo senza decidersi, ed
           e' li' che il confronto con Viator si vince o si perde. */}
-      <Diretto whatsapp="https://wa.me/393338424047" />
+      <Diretto whatsapp="https://wa.me/393338424047" tipo={tour.kind} />
     </>
   );
 

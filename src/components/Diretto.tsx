@@ -12,8 +12,8 @@
  *
  * Chi prenota su Viator, se il volo arriva tardi o piove o si perde la
  * mattina del tour, scrive a un servizio clienti che non sa a che ora
- * parte il pullman e non puo' chiamare l'autista. Qui scrive a chi il
- * pullman lo guida.
+ * parte il mezzo e non puo' chiamare l'autista. Qui scrive a chi quel
+ * mezzo lo guida.
  *
  * E' l'argomento che conta di piu' sulle prenotazioni grandi: una
  * famiglia che deve spendere 900 euro in un paese che non conosce non
@@ -33,7 +33,26 @@
  * modulo di richiesta, la barra in basso sul telefono -- e sono loro il
  * posto giusto per farlo.
  */
-export function Diretto({ whatsapp: _whatsapp }: { whatsapp: string }) {
+export function Diretto({
+  whatsapp: _whatsapp,
+  tipo,
+}: {
+  whatsapp: string;
+  /* 🔴 SU UN TOUR PRIVATO NON C'E' NESSUN PULLMAN.
+   *
+   * Questo blocco compare su TUTTE le schede, e diceva "qualcosa
+   * dimenticato sul pullman" anche sulla scheda del Cinque Terre privato
+   * -- dove il cliente ha una Mercedes con autista e nessun pullman.
+   * Una parola sbagliata in un blocco che serve a rassicurare fa
+   * esattamente il contrario: dice che il testo e' scritto per qualcun
+   * altro, e che nessuno l'ha riletto.
+   *
+   * Non si risolve con una parola generica tipo "veicolo", che non dice
+   * niente e suona da modulo. Si risolve col mezzo giusto: il minibus
+   * per i piccoli gruppi, la macchina per i privati e i transfer. */
+  tipo?: string | null;
+}) {
+  const mezzo = tipo === 'small_group' ? 'on the minibus' : 'in the car';
   return (
     <div className="dr">
       <p className="dr-t">Book here and you are not on your own</p>
@@ -58,7 +77,7 @@ export function Diretto({ whatsapp: _whatsapp }: { whatsapp: string }) {
         </li>
         <li>
           <span aria-hidden="true">🤝</span>
-          <b>After</b> — same people, same number. Something left on the bus, a receipt
+          <b>After</b> — same people, same number. Something left {mezzo}, a receipt
           you need, another day to book: you already know who to ask.
         </li>
         <li>

@@ -131,9 +131,9 @@ export const CATEGORIE: Categoria[] = [
     prosa: [
       'There is a version of a wine tasting where a coach pulls up, forty people are handed a plastic cup in a ' +
         'courtyard, and everyone is back on board in fifty minutes. This is not that.',
-      'We take you to families we have known for twenty years — estates that still bottle their own wine and ' +
-        'still let you into the cellar where it sleeps. You will meet the person whose name is on the label, ' +
-        'taste the olive oil pressed a hundred metres from where you are standing, and sit down to a lunch that ' +
+      'We take you to family estates in the Chianti hills — the ones that still bottle their own wine and ' +
+        'still let you walk into the cellar. ' +
+        'You taste the wine and the olive oil where they are made, and sit down to lunch that ' +
         'was cooked that morning for the number of people who actually turned up.',
       'And because we are not selling you someone else’s tour, we can say what nobody else will: which ' +
         'bottle is worth carrying home, and which one is worth drinking here and forgetting.',
@@ -218,7 +218,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Livorno is the port for Florence, Pisa and the Tuscan countryside. We are on the quay when you dock, and back before all aboard.',
     padre: '/cruise-port-tours/',
     prosa: [
-      'Livorno is the door to Florence, Pisa and the Chianti hills. We are on the quay before you are through the terminal, and the day is planned backwards from your all-aboard time — never forwards from the gangway.',
+      'Livorno is the port for Florence, Pisa and the Tuscan countryside. We are on the quay when you dock, and the day is planned backwards from your all-aboard time — never forwards from the gangway.',
       'Most people ask for Florence. Some of the best days we run from here go the other way, into the vineyards, and nobody regrets it.',
     ],
   },
@@ -262,7 +262,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Sorrento, Positano, Amalfi and Pompeii, with a driver who knows the coast road.',
     padre: '/cruise-port-tours/',
     prosa: [
-      'Positano, Amalfi, Ravello and Pompeii, with a driver who takes that coast road every week rather than once a season — which is exactly what you want on a road that narrow.',
+      'Positano, Amalfi, Ravello and Pompeii, with a driver who knows that coast road — which is exactly what you want on a road that narrow.',
       'Smooth through the bends, a stop whenever anyone wants one, and back at the tender well before the last one leaves.',
     ],
   },
@@ -392,9 +392,9 @@ export const CATEGORIE: Categoria[] = [
     intro: 'The journey you had to make anyway, turned into a day out: same trip, one or two stops, one price.',
     padre: '/transfers/',
     prosa: [
-      'You have to get from Florence to Rome anyway. You can spend three hours on a motorway, or you can spend the same day seeing Siena, Assisi or Orvieto and arrive at your hotel in the evening.',
+      'You have to get from Florence to Rome anyway. You can spend four hours on a motorway, or you can spend the same day seeing Siena, Assisi or Orvieto and arrive at your hotel in the evening.',
       'It is the same journey, the same luggage in the same car, and one price agreed in advance. The only difference is that the day counts for something instead of being lost between two cities.',
-      'It is the thing our guests are most surprised we do — and the one they tell their friends about.',
+      'It costs you nothing extra in time. It is the same day either way.',
     ],
   },
   {
@@ -404,7 +404,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Siena, Assisi, Orvieto or Chianti on the way south — instead of three hours of motorway.',
     padre: '/transfers/transfers-with-stop-enroute/',
     prosa: [
-      'Siena, Assisi, Orvieto or the Chianti hills on the way south — instead of three hours of motorway and a service station.',
+      'Siena, Assisi, Orvieto or the Chianti hills on the way south — instead of four hours of motorway and a service station.',
       'Your bags stay in the car, your driver waits while you walk, and you reach Rome in the evening having actually seen something.',
     ],
   },
@@ -448,7 +448,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Siena, San Gimignano, Chianti, Pisa, Lucca and the wine country — everything we run from Florence.',
     padre: '/destinations/',
     prosa: [
-      'This is home. We have been driving these roads since 2002, and almost everything we run starts within an hour of Florence.',
+      'This is home. We have been driving these roads since 2002, and most of what we run starts in Florence.',
       'Chianti and its cellars, Siena and San Gimignano, Pisa, Lucca, the Cinque Terre and the Val d’Orcia — in a small group or with the car to yourselves, for half a day or for all of it.',
       'If you are staying in Florence, everything on this page comes to collect you at the door.',
     ],
