@@ -1,5 +1,6 @@
 import { DEFAULT_LOCALE } from '@/lib/locales';
 import { ANNO_FONDAZIONE } from '@/lib/anni';
+import { testoBreve } from '@/lib/cifre';
 import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
@@ -31,19 +32,43 @@ import '@/styles/legale.css';
  * chi e' Prestige Rent invece di indovinarlo.
  */
 
+/* 🔴 PAGINE VERE, NON LA HOME FILTRATA (31/08/2026).
+ *
+ * Qui c'erano quattro voci che puntavano a `/?kind=small_group` e simili:
+ * la home con un filtro addosso. Il footer vecchio invece puntava alle
+ * SETTE pagine di categoria, e aveva ragione lui -- quelle pagine adesso
+ * esistono tutte sul sito nuovo, hanno un titolo, un testo scritto e un
+ * indirizzo proprio. Un link a una pagina vale; un link alla home con un
+ * parametro attaccato non dice a Google che quella pagina esiste.
+ *
+ * Controllate una per una il 31/08/2026: tutte rispondono 200. */
 const ESPERIENZE = [
-  ['Small group tours', '/?kind=small_group'],
-  ['Private tours', '/?kind=private'],
-  ['Cruise port tours', '/?kind=cruise'],
-  ['Transfers', '/?kind=transfer'],
+  ['Small group tours', '/small-group-tours/'],
+  ['Private tours', '/private-tours/'],
+  ['Cruise port tours', '/cruise-port-tours/'],
+  ['Wine and food experiences', '/wine-and-food-experiences/'],
+  ['Direct transfers', '/transfers/direct-transfers/'],
+  ['Transfers with a stop', '/transfers/transfers-with-stop-enroute/'],
+  ['Tours of Italy', '/tours-of-italy/'],
 ];
 
-const PARTENZE = [
-  ['Florence', '/?from=florence'],
-  ['Livorno port', '/?from=livorno'],
-  ['La Spezia port', '/?from=la-spezia'],
-  ['Civitavecchia (Rome)', '/?from=civitavecchia'],
-  ['Naples port', '/?from=naples'],
+/* 🔴 LE DESTINAZIONI AL POSTO DI "DEPARTING FROM".
+ *
+ * Prima c'erano cinque voci `/?from=...`, che sono la stessa home filtrata
+ * cinque volte. Il footer vecchio aveva una colonna di destinazioni con
+ * pagine proprie -- Firenze, Roma, Venezia, Napoli, i due porti -- e sono
+ * pagine che sul sito nuovo ci sono e rispondono. E' anche la colonna che
+ * risponde alla domanda con cui la gente arriva davvero: non "che tipo di
+ * tour", ma "ci portate a Roma?". */
+const DESTINAZIONI = [
+  ['Florence & Tuscany', '/destinations/florence-tuscany/'],
+  ['Rome', '/destinations/rome-destinations/'],
+  ['Venice', '/destinations/venice-destinations/'],
+  ['Milan & Lake Como', '/destinations/milan-como-destinations/'],
+  ['Naples & Amalfi Coast', '/destinations/naples-amalfi-coast/'],
+  ['Livorno port', '/destinations/livorno-port-destinations/'],
+  ['Civitavecchia port', '/destinations/civitavecchia-destinations/'],
+  ['See all destinations', '/destinations/'],
 ];
 
 /* Qui ci vanno i quattro prodotti che valgono l'85%, non un campione. */
@@ -66,13 +91,29 @@ const PARTENZE = [
  * sul vecchio hosting e ci resta (e' la pagina che il cliente apre il
  * giorno del tour); `Payment` e' il link Stripe, esterno e vivo. */
 const AZIENDA = [
-  ['About us', '/about-us/'],
   /* Le 145 domande. Sul vecchio sito questa voce c'era nel piede di ogni
      pagina, ed e' li' che la gente la cerca: quando ha una domanda pratica
      e non sa dove chiederla. */
   ['FAQs', '/faqs/'],
+  ['Contact us', '/contact-us/'],
   ['Meeting point', '/mp/'],
+  ['About us', '/about-us/'],
+  /* Il footer vecchio diceva "Our Vehicles" e mandava a una pagina sua;
+     sul sito nuovo quella pagina e' diventata la sezione della flotta in
+     home. Si punta dritto all'ancora invece che all'indirizzo vecchio: il
+     redirect funziona, ma ogni salto in piu' e' tempo perso e un pezzo di
+     autorevolezza che resta per strada. */
+  ['Our vehicles', '/#fleet'],
 ];
+
+/* 🔴 TRE VOCI DEL FOOTER VECCHIO CHE NON TORNANO.
+ * `Reviews`, `Security` e `Affiliate program` oggi finiscono TUTTE E TRE
+ * su /about-us/ (verificato il 31/08/2026: 308). Rimetterle vorrebbe dire
+ * tre righe diverse che aprono la stessa pagina -- per chi legge e' un
+ * footer che promette tre cose e ne mantiene una. Tornano il giorno che
+ * quelle pagine esistono davvero.
+ * `Covid-19` non torna e basta: nel 2026 dice "non aggiorniamo il sito da
+ * cinque anni". */
 
 /* Fuori dal sito: non passano da `p()` perche' non hanno una lingua. */
 const AZIENDA_FUORI = [
@@ -135,7 +176,7 @@ export async function Footer({ locale }: { locale: string }) {
             cambia, cambia ovunque -- footer, schede tour, home -- senza
             che nessuno debba andare a cercare dov'era scritto. */}
         {a?.clienti_serviti != null && (
-          <span>⭐ {Math.round(a.clienti_serviti / 1000)}k+ guests since {a.anno_fondazione ?? ANNO_FONDAZIONE}</span>
+          <span>⭐ {testoBreve(a.clienti_serviti)} guests since {a.anno_fondazione ?? ANNO_FONDAZIONE}</span>
         )}
         <span>📞 24/7 customer care</span>
       </div>
@@ -167,8 +208,8 @@ export async function Footer({ locale }: { locale: string }) {
         </div>
 
         <div className="ft-col">
-          <p className="ft-t">Departing from</p>
-          {PARTENZE.map(([t, h]) => (
+          <p className="ft-t">Destinations</p>
+          {DESTINAZIONI.map(([t, h]) => (
             <a key={h} href={p(h)}>{t}</a>
           ))}
         </div>
@@ -187,7 +228,7 @@ export async function Footer({ locale }: { locale: string }) {
             titolo che dice "Most booked". Chi cercava le domande
             frequenti doveva leggere una lista di tour per trovarle. */}
         <div className="ft-col">
-          <p className="ft-t">Prestige Rent</p>
+          <p className="ft-t">Help</p>
           {AZIENDA.map(([t, h]) => (
             <a key={h} href={p(h)}>{t}</a>
           ))}
