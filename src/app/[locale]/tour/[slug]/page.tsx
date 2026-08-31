@@ -499,7 +499,20 @@ export default async function TourPage({
             {/* Dollari e sterline accanto, con il "circa": si incassa in
                 euro e la conversione vera la fa la carta del cliente. */}
             {affiancato(prezzo.valore, cambio) && (
-              <em className="hero-cambio">{affiancato(prezzo.valore, cambio)}</em>
+              /* 🔴 "AT TODAY'S RATE" NON E' UNA CAUTELA, E' UNA PROVA.
+                 Un prezzo in dollari senza data e' un numero scritto una
+                 volta e mai piu' toccato -- e chi legge lo sa, perche' su
+                 mezzo internet e' cosi'. Dire che e' il cambio di oggi
+                 racconta che qualcuno lo aggiorna, e a quel punto il
+                 numero vale.
+                 "You pay in euro" chiude l'altra meta': la conversione
+                 vera la fa la carta del cliente col SUO cambio. Chi legge
+                 $104 e si vede addebitare $107 scrive una mail; chi ha
+                 letto questa riga no. */
+              <em className="hero-cambio">
+                {affiancato(prezzo.valore, cambio)} &mdash; European Central Bank rate,
+                charged in euro
+              </em>
             )}
             {product?.durationLabel ? ` · ${product.durationLabel}` : null}
             {/* 🔴 DA DOVE SI PARTE, nella riga che tutti leggono.

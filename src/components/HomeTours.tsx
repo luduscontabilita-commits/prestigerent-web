@@ -632,6 +632,13 @@ export function HomeTours({
                           {affiancato(t.prezzo, cambio) && (
                             <em className="hm-price-cambio">
                               {affiancato(t.prezzo, cambio)}
+                              {/* "oggi" sparisce sotto i 600px: li' la
+                                  riga andrebbe a capo e la scheda
+                                  crescerebbe di una riga rispetto alle
+                                  altre della griglia. Il segno ≈ resta
+                                  comunque, e la scheda del tour dice la
+                                  frase intera. */}
+                              <i className="solo-largo"> at the ECB rate</i>
                             </em>
                           )}
                         </>
