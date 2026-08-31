@@ -2942,16 +2942,6 @@ button.hd-top{
  *
  * Vale solo quando `vetrina` e' vera in HomeTours.tsx, cioe' quando non
  * si sta filtrando: appena si cerca, la promessa non varrebbe piu'. */
-.hm-nobile{
-  /* Il fondo caldo esce dal contenitore e prende tutta la riga: e'
-     quello che fa leggere il blocco come una fascia e non come un
-     riquadro appoggiato in mezzo alla pagina. */
-  background:
-    linear-gradient(180deg, rgba(110,27,44,.045), rgba(110,27,44,0) 62%),
-    var(--fondo-caldo, #FBF7F1);
-  border-block:1px solid var(--line);
-  padding-block:52px;
-}
 html[data-theme="dark"] .hm-nobile{
   background:
     linear-gradient(180deg, rgba(255,154,77,.06), rgba(255,154,77,0) 62%),
@@ -2984,12 +2974,67 @@ html[data-theme="dark"] .hm-occhiello{ color:var(--orange-hi, #FF9A4D); }
    deciso e un'ombra vera, cosi' si staccano dal fondo caldo invece di
    sparirci dentro come farebbero con l'ombra di prima, calcolata sul
    bianco. */
-.hm-nobile .hm-card{
-  border-color:color-mix(in srgb, var(--line) 70%, var(--wine) 30%);
-  box-shadow:0 2px 10px rgba(36,51,63,.06);
+.hm-nobile{
+  /* L'oro sta qui e non in mezzo alle regole: e' un colore solo, e se un
+     domani va scaldato o smorzato si cambia in un punto.
+     Non e' giallo. Un giallo acceso su un fondo crema fa evidenziatore,
+     non lusso: questo e' un ottone spento, che accanto al vino della casa
+     sta senza litigare. */
+  --oro:#B8912F;
+  --oro-luce:#E6D2A0;
+  background:
+    linear-gradient(180deg, rgba(110,27,44,.045), rgba(110,27,44,0) 62%),
+    var(--fondo-caldo, #FBF7F1);
+  border-block:1px solid var(--line);
+  padding-block:52px;
 }
-.hm-nobile .hm-card:hover{ box-shadow:0 16px 38px rgba(110,27,44,.16); }
-html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
+
+/* 🔴 LE SCHEDE DELLA VETRINA HANNO LA CORNICE D'ORO.
+   Non e' decorazione: questa fascia e' l'unica della home dove le schede
+   sono scelte da noi invece che ordinate da un conteggio, e la cornice e'
+   quello che lo dice prima ancora che si legga l'occhiello.
+   Tre strati, e servono tutti e tre:
+     - il bordo d'oro, sottile: un bordo spesso sembra un contorno di
+       Word, non una cornice;
+     - un filo bianco DENTRO il bordo (`inset`), che stacca l'oro dal
+       contenuto e fa leggere due linee invece di una. E' il trucco delle
+       cornici vere, e costa un'ombra;
+     - un alone caldissimo intorno, quasi invisibile, che tiene la scheda
+       staccata dal fondo crema -- sul quale un'ombra grigia sparisce. */
+.hm-nobile .hm-card{
+  border-color:var(--oro);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.72),
+    0 2px 12px rgba(150,110,30,.10);
+}
+.hm-nobile .hm-card:hover{
+  border-color:color-mix(in srgb, var(--oro) 82%, #000 18%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.72),
+    0 16px 38px rgba(150,110,30,.22);
+}
+
+/* Il filo d'oro fra la foto e il testo: chiude la cornice anche dentro,
+   dove altrimenti l'immagine e il corpo bianco si toccano e basta. */
+.hm-nobile .hm-card-img{ border-bottom:1px solid var(--oro-luce); }
+
+/* Il prezzo e' l'ultima cosa che si guarda prima di cliccare: la riga
+   che lo separa passa d'oro anche lei, cosi' la cornice si richiude in
+   fondo invece di finire a meta'. */
+.hm-nobile .hm-price{ border-top:1px solid var(--oro-luce); }
+
+html[data-theme="dark"] .hm-nobile{
+  --oro:#C9A44C;
+  --oro-luce:rgba(201,164,76,.34);
+}
+html[data-theme="dark"] .hm-nobile .hm-card{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+}
+html[data-theme="dark"] .hm-nobile .hm-card:hover{
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.05),
+    0 16px 38px rgba(0,0,0,.45);
+}
 
 /* Le frecce prendono il fondo della fascia, altrimenti restano due
    pastiglie bianche appiccicate sopra un fondo che bianco non e'. */

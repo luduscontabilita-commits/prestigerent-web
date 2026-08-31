@@ -417,10 +417,18 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               sito sbagliato.
               Piu' corto anche di misura: la riga in corsivo occupava due
               righe intere sul telefono e spingeva la foto fuori dallo
-              schermo. */}
+              schermo.
+
+              31/08/2026 -- la Toscana e' tornata dentro, e non e' un passo
+              indietro. "across Italy" da solo aveva il difetto opposto:
+              l'85% del venduto e' Toscana -- vino, Siena, San Gimignano --
+              e chi cerca "wine tour from Florence" leggeva un titolo che
+              prometteva l'Italia intera, cioe' un'agenzia generica. Ora ci
+              sono tutte e due, nell'ordine giusto: prima quello che si
+              vende di piu', poi il resto del catalogo. */}
           <h1 className="hm-title">
             Private tours, transfers &amp; chauffeur service{' '}
-            <em>across Italy, from Florence</em>
+            <em>across Tuscany and Italy, from Florence</em>
           </h1>
           {/* 🔴 SESSANTA PAROLE SOPRA LA FOTO, SU UNO SCHERMO DA 390 PIXEL.
               Misurato con i font veri (Manrope 600, 16px, interlinea 1,6):
