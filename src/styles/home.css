@@ -1372,7 +1372,15 @@ html[data-theme="dark"] .ct-head .ct-prosa{
    dietro il bordo, altrimenti sembra un adesivo. */
 .ct-top{
   position:absolute; z-index:3;
-  top:51px; inset-inline-start:-38px;
+  /* Il nastro taglia l'angolo passando per (0,D) e (D,0). La rotazione
+     non sposta il centro dell'elemento, quindi il centro va messo in
+     (D/2, D/2) -- ed e' li' che cade la scritta, che e' centrata.
+     D=110: centro (55,55), larghezza 200, altezza ~22
+     -> left = 55-100 = -45, top = 55-11 = 44.
+     Piu' vicino all'angolo di prima (D=124), cosi' sta sul cielo o sulla
+     pietra invece che sulle facce della gente. Sotto i 110 non si
+     scende: la scritta comincerebbe a toccare il bordo arrotondato. */
+  top:44px; inset-inline-start:-45px;
   width:200px; padding:5px 0;
   transform:rotate(-45deg);
   transform-origin:center;

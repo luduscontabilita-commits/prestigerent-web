@@ -116,6 +116,17 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Wine and food experiences in Tuscany',
     intro:
       'The days people come to Tuscany for: family estates in the Chianti hills, cellars you walk into, tastings of wine and olive oil, and lunch where the wine is made. Our own vehicles, our own guides, no intermediaries.',
+    prosa: [
+      'There is a version of a wine tasting where a coach pulls up, forty people are handed a plastic cup in a ' +
+        'courtyard, and everyone is back on board in fifty minutes. This is not that.',
+      'We take you to families we have known for twenty years — estates that still bottle their own wine and ' +
+        'still let you into the cellar where it sleeps. You will meet the person whose name is on the label, ' +
+        'taste the olive oil pressed a hundred metres from where you are standing, and sit down to a lunch that ' +
+        'was cooked that morning for the number of people who actually turned up.',
+      'And because we are not selling you someone else’s tour, we can say what nobody else will: which ' +
+        'bottle is worth carrying home, and which one is worth drinking here and forgetting.',
+      'You are not visiting a winery. You are having lunch at one.',
+    ],
   },
   {
     path: '/cruise-port-tours/',
@@ -129,6 +140,24 @@ export const CATEGORIE: Categoria[] = [
        vecchio sito, parola per parola. */
     intro:
       'Off the ship, into Italy, back on board in time. Book with confidence thanks to our Worry-free policy for cruisers: in the past 25 years none of our clients have missed the boat, and in the very rare case you are dropped off late through our mistake, we arrange and pay for your accommodation, meals and transport to your next port of call. If your ship does not dock at all — weather, a change of itinerary — there is no penalty and no cancellation fee.',
+    prosa: [
+      'We know exactly what you are worried about, because everyone asks the same question in the same voice: ' +
+        'what if the ship leaves without me.',
+      'In twenty-five years it has never happened. Not once. That is not luck — it is that we build the day ' +
+        'backwards from your sailing time, not forwards from the quay. We know how long the road to Florence ' +
+        'really takes on a Tuesday in August, which gate at Livorno is quicker, and how much slack to leave for ' +
+        'the one thing that always goes long. If the traffic turns, your driver knows the way around it, ' +
+        'because he drives it every week and not once a season.',
+      'And if the worst ever did happen through a mistake of ours, it is written down and it is ours to fix: we ' +
+        'arrange and pay for your hotel, your meals and your transport to the next port. If your ship never ' +
+        'docks at all — weather, a change of itinerary — you pay nothing and there is no cancellation fee.',
+      'The rest is the part you came for. The coast roads out of Livorno, La Spezia and Sorrento are some of the ' +
+        'most beautiful drives in Italy, and they are also winding: our drivers take them smoothly and slowly ' +
+        'through the bends, because a spectacular view is wasted on someone who feels ill. Air conditioning, ' +
+        'water on board, and a stop whenever anyone wants one.',
+      'You get off the ship, you see the real thing, and you are back on board with time to spare. That is the ' +
+        'whole promise.',
+    ],
   },
   {
     path: '/transfers/',
@@ -136,6 +165,15 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Private transfers across Italy',
     intro:
       'City to city, airport to hotel, port to port. A fixed price agreed before you travel, a driver who waits if your flight is late, and space for everyone’s luggage.',
+    prosa: [
+      'A transfer has one job: be there, on time, and get you across Italy without the day costing you anything.',
+      'The driver is waiting when you land, not summoned when you land. The price is agreed before you travel ' +
+        'and does not move for traffic, waiting time or a delayed flight. And whatever you are carrying — four ' +
+        'people with four suitcases, a family of eight, golf clubs, a cello — we have the vehicle for it, and ' +
+        'it is a comfortable one, because Florence to Rome is three and a half hours and nobody should spend ' +
+        'them with a bag on their knees.',
+      'Tell us the flight number and the address. We do the rest.',
+    ],
   },
   {
     path: '/tours-of-italy/',
