@@ -509,9 +509,7 @@ export default async function TourPage({
                  vera la fa la carta del cliente col SUO cambio. Chi legge
                  $104 e si vede addebitare $107 scrive una mail; chi ha
                  letto questa riga no. */
-              <em className="hero-cambio">
-                {affiancato(prezzo.valore, cambio)} at today&rsquo;s rate &mdash; charged in euro
-              </em>
+              <em className="hero-cambio">{affiancato(prezzo.valore, cambio)}</em>
             )}
             {product?.durationLabel ? ` · ${product.durationLabel}` : null}
             {/* 🔴 DA DOVE SI PARTE, nella riga che tutti leggono.
@@ -525,6 +523,13 @@ export default async function TourPage({
             {partenza ? ` · from ${partenza}` : null}
             {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
+            {/* La spiegazione del cambio scende sotto, piccola: serve a chi
+                la cerca e non ruba spazio a chi guarda il numero. */}
+            {affiancato(prezzo.valore, cambio) && (
+              <small className="hero-nota">
+                Other currencies at today&rsquo;s rate &mdash; you are charged in euro
+              </small>
+            )}
           </p>
         )}
 

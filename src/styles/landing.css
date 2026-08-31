@@ -1469,10 +1469,20 @@ html{ scroll-behavior:auto; }
 .hero-loc svg{ width:15px; height:15px; flex:0 0 auto; color:var(--orange); }
 @media (max-width:560px){ .hero-loc{ font-size:.68rem; padding:6px 12px; margin-bottom:12px;
   letter-spacing:.05em; line-height:1.45; } }
-.hero-dep{ margin:12px auto 0; max-width:760px; font-size:.95rem; font-weight:600;
-  line-height:1.55; color:var(--ink-soft); }
-.hero-dep b{ color:var(--ink); font-weight:800; }
-@media (max-width:560px){ .hero-dep{ font-size:.88rem; } }
+/* 🔴 IL PREZZO E' LA COSA PIU' GRANDE DI QUESTA RIGA.
+   Stava allo stesso corpo di "5 hours" e "from Florence", cioe' pesava
+   quanto la durata. Ma su una scheda che deve vendere una giornata da
+   ottantanove euro, il numero e' l'informazione: si guarda quello e poi
+   il resto. `line-height:1.35` tiene la riga compatta anche col prezzo
+   grande, cosi' non si apre un buco sotto al titolo. */
+.hero-dep{ margin:14px auto 0; max-width:760px; font-size:.95rem; font-weight:600;
+  line-height:1.35; color:var(--ink-soft); }
+.hero-dep b{ color:var(--ink); font-weight:800; font-size:1.42rem;
+  letter-spacing:-.015em; }
+@media (max-width:560px){
+  .hero-dep{ font-size:.88rem; }
+  .hero-dep b{ font-size:1.24rem; }
+}
 .pr-opt-dep{ display:block; margin-top:6px; font-size:.78rem; font-weight:800;
   letter-spacing:.02em; color:var(--ink); }
 .pr-opt-dep.is-priv{ color:var(--orange); }
