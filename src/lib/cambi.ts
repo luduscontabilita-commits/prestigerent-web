@@ -6,11 +6,26 @@
  * poco o tanto, e quella e' una delle scuse per cui non torna. Il numero
  * accanto costa una riga e toglie quel passaggio.
  *
- * ── LA FONTE ────────────────────────────────────────────────────────
- * Frankfurter, che ripubblica i cambi ufficiali della BCE. Gratis, senza
- * chiave, senza registrazione. Se cade, si legge la BCE direttamente: e'
- * la stessa identica fonte, e il 31/08/2026 ho verificato che i due dessero
- * gli stessi numeri fino all'ultimo decimale (1,1643 e 0,8572).
+ * ── LA FONTE, E PERCHE' NON E' PIU' LA BCE ──────────────────────────
+ * Si usa il cambio di MERCATO, non quello ufficiale della BCE.
+ *
+ * Sembra un dettaglio da pignoli e non lo e'. Il 31/08/2026 la pagina
+ * diceva "€640 ≈ $745"; chi apriva Google per controllare leggeva $742.
+ * Tre dollari di differenza -- lo 0,4% -- e nessuno dei due numeri era
+ * sbagliato: la BCE pubblica UN cambio al giorno, solo nei giorni
+ * feriali, e quel lunedi' l'ultimo pubblicato era ancora quello di
+ * venerdi'. Tre giorni di mercato in mezzo.
+ *
+ * Ma il cliente non fa questo ragionamento. Apre Google, vede un numero
+ * diverso dal nostro, e da li' in poi non crede piu' nemmeno al prezzo.
+ * Un badge che serve a farsi verificare deve reggere alla verifica, e la
+ * verifica la fa Google.
+ *
+ * Quindi: `open.er-api.com` per primo (cambio di mercato, aggiornato ogni
+ * giorno compresi sabato e domenica, gratis e senza chiave -- il
+ * 31/08/2026 dava 1,159921 contro l'1,1594 di Google, cioe' lo 0,04%).
+ * Se non risponde si ripiega sulla BCE, che e' meno aderente ma sempre
+ * vera, e poi sulla BCE letta direttamente.
  *
  * ── COME RESTA VELOCE ───────────────────────────────────────────────
  * Nessuna chiamata dal browser, nessun JavaScript nella pagina. La
@@ -47,6 +62,25 @@ const ATTESA = 4_000;
  *  ne' piu' di 1,6, e con la sterlina il campo e' anche piu' stretto. */
 function sensato(usd: number, gbp: number) {
   return usd > 0.8 && usd < 1.6 && gbp > 0.6 && gbp < 1.1;
+}
+
+/** Il cambio di mercato: e' quello che vede chi controlla su Google. */
+async function daMercato(): Promise<Cambi | null> {
+  const r = await fetch('https://open.er-api.com/v6/latest/EUR', {
+    next: { revalidate: DURATA },
+  });
+  if (!r.ok) return null;
+  const d = (await r.json()) as {
+    result?: string;
+    time_last_update_utc?: string;
+    rates?: { USD?: number; GBP?: number };
+  };
+  if (d.result !== 'success') return null;
+  const usd = Number(d.rates?.USD);
+  const gbp = Number(d.rates?.GBP);
+  if (!sensato(usd, gbp)) return null;
+  const g = d.time_last_update_utc ? new Date(d.time_last_update_utc) : null;
+  return { usd, gbp, giorno: g && !isNaN(+g) ? g.toISOString().slice(0, 10) : '' };
 }
 
 async function daFrankfurter(): Promise<Cambi | null> {
@@ -106,7 +140,7 @@ function conLimite<T>(p: Promise<T>, ms: number): Promise<T | null> {
 }
 
 async function chiedi(): Promise<Cambi | null> {
-  for (const fonte of [daFrankfurter, dallaBce]) {
+  for (const fonte of [daMercato, daFrankfurter, dallaBce]) {
     try {
       const c = await conLimite(fonte(), ATTESA);
       if (c) return c;

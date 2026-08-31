@@ -510,8 +510,7 @@ export default async function TourPage({
                  $104 e si vede addebitare $107 scrive una mail; chi ha
                  letto questa riga no. */
               <em className="hero-cambio">
-                {affiancato(prezzo.valore, cambio)} &mdash; European Central Bank rate,
-                charged in euro
+                {affiancato(prezzo.valore, cambio)} at today&rsquo;s rate &mdash; charged in euro
               </em>
             )}
             {product?.durationLabel ? ` · ${product.durationLabel}` : null}
