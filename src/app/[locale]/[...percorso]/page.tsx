@@ -192,6 +192,11 @@ export default async function Categoria_({
       <header className="ct-head">
         <h1>{cat.titolo}</h1>
         <p>{cat.intro}</p>
+        {/* Il paragrafo che parla alla persona invece che ai motori. Sta
+            sotto l'intro e non al suo posto: la riga secca la legge chi
+            scorre e finisce nei risultati di Google, questa la legge chi
+            sta scegliendo con due schede aperte. */}
+        {cat.prosa && <p className="ct-prosa">{cat.prosa}</p>}
       </header>
 
       {figlie.length > 0 && (
@@ -240,6 +245,20 @@ export default async function Categoria_({
                       loading="lazy"
                       decoding="async"
                     />
+                  )}
+                  {/* 🔴 LA FASCIA "TOP EXPERIENCE", E CHI SE LA MERITA.
+                      Non e' un elenco scritto a mano: la prende chi ha
+                      almeno mille recensioni su una piattaforma sola. Cosi'
+                      non va aggiornata, e soprattutto non si puo' mettere
+                      per simpatia -- il giorno che un tour cresce se la
+                      prende da solo, e se calasse la perderebbe.
+                      Mille e non cento: sotto quella soglia "top" non e'
+                      un giudizio, e' una decorazione. Oggi la prendono in
+                      tre, e sono i tre che vendono. */}
+                  {q && q.quante >= 1000 && (
+                    <span className="ct-top" aria-hidden="true">
+                      <b>Top experience</b>
+                    </span>
                   )}
                   <h3 className={classeTitolo('ct-nome', nome)}>{nome}</h3>
                 </div>

@@ -1284,6 +1284,60 @@ html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
 .ct-head h1{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; color:var(--ink); margin:0; line-height:1.14; }
 .ct-head p{ margin:12px 0 0; color:var(--ink-soft); font-size:1rem; line-height:1.66; }
 
+/* Il paragrafo lungo: piu' largo di respiro e piu' scuro dell'intro,
+   perche' e' quello che si legge davvero. La riga sopra resta il
+   sommario; questa e' la voce. */
+.ct-head .ct-prosa{
+  margin-top:16px; max-width:66ch;
+  color:var(--ink); font-size:1.04rem; line-height:1.72;
+}
+.ct-head .ct-prosa::first-letter{
+  /* Un capolettera appena accennato: dice "qui si legge" senza fare
+     giornale. Mezza dimensione in piu', non tre. */
+  font-size:1.32em; font-weight:700; line-height:1;
+}
+
+/* ── LA FASCIA "TOP EXPERIENCE" ──────────────────────────────────────
+   In diagonale sull'angolo, come il nastro di una scatola.
+   Perche' cosi' e non una pastiglia dritta: le pastiglie in alto le
+   hanno gia' tutte le schede della home ("SMALL GROUP", "198 booked this
+   month"), e una in piu' si perderebbe fra le altre. Il nastro obliquo
+   e' l'unica forma che non somiglia a niente altro nella pagina.
+   Il contenitore `.ct-img` ha gia' `overflow:hidden`: il nastro esce
+   dall'angolo e viene tagliato pulito dal bordo arrotondato, senza
+   maschere. */
+.ct-top{
+  position:absolute; z-index:3;
+  top:16px; inset-inline-start:-46px;
+  width:180px; padding:5px 0;
+  transform:rotate(-45deg);
+  transform-origin:center;
+  text-align:center;
+  background:linear-gradient(135deg, #C9A44C, #A8801F 58%, #C9A44C);
+  box-shadow:0 2px 8px rgba(60,40,0,.28);
+  pointer-events:none;
+}
+.ct-top b{
+  display:block;
+  font-size:.62rem; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:#FFF9EA;
+  text-shadow:0 1px 2px rgba(70,45,0,.45);
+  white-space:nowrap;
+}
+/* Le due tacche che fanno sembrare il nastro piegato invece che
+   incollato: due triangolini scuri sotto le estremita'. Senza, resta un
+   rettangolo storto. */
+.ct-top::before, .ct-top::after{
+  content:""; position:absolute; top:100%;
+  border:6px solid transparent; border-top-color:#8A6716;
+}
+.ct-top::before{ inset-inline-start:34px; }
+.ct-top::after{ inset-inline-end:34px; }
+@media (max-width:420px){
+  .ct-top{ top:13px; inset-inline-start:-50px; width:170px; }
+  .ct-top b{ font-size:.58rem; }
+}
+
 .ct-figlie{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
 .ct-figlie a{
   padding:8px 14px; border-radius:999px; text-decoration:none;

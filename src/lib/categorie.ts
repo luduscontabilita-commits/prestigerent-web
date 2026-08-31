@@ -32,8 +32,23 @@ export type Categoria = {
   /** l'indirizzo, identico a WordPress, barra finale compresa */
   path: string;
   titolo: string;
-  /** compare sotto il titolo e nella descrizione per i motori */
+  /** compare sotto il titolo e nella descrizione per i motori.
+   *  Resta la riga secca e informativa: e' quella che finisce nei
+   *  risultati di Google, e li' devono starci i fatti. */
   intro: string;
+  /** 🔴 IL PARAGRAFO CHE PARLA A CHI LEGGE, non ai motori.
+   *
+   *  `intro` dice cosa c'e' dentro: minibus, venticinque posti, pranzo in
+   *  cantina. Sono i fatti, e servono -- ma nessuno ha mai comprato una
+   *  giornata perche' il minibus ha venticinque posti.
+   *
+   *  Questo dice perche' quella giornata vale, e si rivolge alla persona
+   *  che sta decidendo con due schede aperte. Va sotto l'intro, non al
+   *  suo posto: chi scorre veloce legge la prima e va alle foto, chi sta
+   *  scegliendo legge tutte e due.
+   *
+   *  Facoltativo: dove manca, la pagina resta com'era. */
+  prosa?: string;
   /** lo slug della categoria WooCommerce: e' l'ultimo pezzo del percorso,
    *  e coincide sempre. Da li' si legge quali tour ci stanno dentro --
    *  associazioni fatte a mano su WordPress, tour per tour. */
@@ -50,6 +65,14 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Small group tours from Florence',
     intro:
       'Three days out of Florence in our own minibuses, never more than 25 guests, with our own guides and lunch at a family winery. Departures every week, booking confirmed instantly.',
+    prosa:
+      'You came to Tuscany for a reason, and it probably was not to follow a numbered flag through a car park. ' +
+      'These are the days we would book ourselves: a small group, one of our own drivers who knows which road ' +
+      'to take when the light is right, and a family who opens their cellar because they want to, not because ' +
+      'a coach is due. You will taste wine where it is made, sit down to a lunch someone cooked that morning, ' +
+      'and have time to stand still in a square without being counted. ' +
+      'Twenty-four years of doing this, and the part we are proudest of is not the itinerary — it is that ' +
+      'people come back, and bring their friends.',
   },
   {
     path: '/private-tours/',
