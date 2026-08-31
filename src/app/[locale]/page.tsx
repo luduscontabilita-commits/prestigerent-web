@@ -19,6 +19,7 @@ import { Premi } from '@/components/Premi';
 import { fonti, inEvidenza, votiPerTour } from '@/lib/recensioni';
 import { riprova, tuttiIConteggi } from '@/lib/riprova';
 import { ANNO_FONDAZIONE, anniDiAttivita, aParoleMaiusc } from '@/lib/anni';
+import { testoBreve } from '@/lib/cifre';
 import { VideoTestimonianze } from '@/components/VideoTestimonianze';
 import { Servizi } from '@/components/Servizi';
 import { Esperienza } from '@/components/Esperienza';
@@ -499,7 +500,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <p className="hm-fatti-riga">
             <span>★ {Number(az?.voto_medio ?? 4.9).toFixed(1)}</span>
             {az?.clienti_serviti != null && (
-              <span>{Math.round(az.clienti_serviti / 1000)}k+ guests</span>
+              <span>{testoBreve(az.clienti_serviti)} guests</span>
             )}
             <span>Since {az?.anno_fondazione ?? ANNO_FONDAZIONE}</span>
             <span>Free cancellation 24h</span>
@@ -529,6 +530,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             clienti: az?.clienti_serviti ?? null,
             anno: az?.anno_fondazione ?? null,
             anni: d.anni,
+            tour: az?.tour_effettuati ?? null,
             posizione: az?.classifica_posizione ?? null,
             su: az?.classifica_su ?? null,
             categoria: az?.classifica_categoria ?? null,
@@ -576,7 +578,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             {az?.clienti_serviti != null && (
               <span>
                 <i>⭐</i> <b>{Number(az.voto_medio ?? 4.9).toFixed(1)}</b> from{' '}
-                {Math.round(az.clienti_serviti / 1000)}k+ guests since{' '}
+                {testoBreve(az.clienti_serviti)} guests since{' '}
                 {az.anno_fondazione ?? ANNO_FONDAZIONE}
               </span>
             )}
@@ -659,6 +661,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               clienti: az?.clienti_serviti ?? null,
               anno: az?.anno_fondazione ?? null,
               anni: d.anni,
+              tour: az?.tour_effettuati ?? null,
               posizione: az?.classifica_posizione ?? null,
               su: az?.classifica_su ?? null,
               categoria: az?.classifica_categoria ?? null,

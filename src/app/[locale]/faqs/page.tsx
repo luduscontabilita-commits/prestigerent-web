@@ -133,6 +133,15 @@ export default async function Faqs({
         </p>
       </header>
 
+      {/* 🔴 LE DUE PERSONE PRIMA DELLE CENTOQUARANTACINQUE RISPOSTE.
+          Chi apre le FAQ ha gia' una domanda in testa, e che sia
+          esattamente una delle nostre non e' detto: l'indice da solo
+          gli chiede di cercare, e chi non trova se ne va senza
+          scrivere a nessuno. Il blocco c'e' anche in fondo, ma in
+          fondo ci arriva chi ha gia' scorso tutto. Senza modulo:
+          quello resta uno solo, in coda. */}
+      <ContactSection locale={locale} soloAiuto />
+
       {/* L'indice: con centoquarantacinque domande, arrivare in fondo
           scorrendo non e' navigare, e' rassegnarsi. */}
       <section className="pr-sec tight">

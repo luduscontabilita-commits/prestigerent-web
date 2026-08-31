@@ -104,6 +104,21 @@ body{
   max-width:20ch;
   margin:0 auto;
 }
+/* ── LA TESTA E LA CODA DEL TITOLO ────────────────────────────────
+   Arrivano dalla landing del vino, dove il titolo non e' una riga sola:
+   sopra c'e' "A small, intimate" e sotto "-- small group or private
+   tour". Le regole sono copiate da li' senza ritocchi, perche' quel
+   titolo e' gia' stato guardato e approvato cosi': cambiarne le misure
+   nel trasloco vorrebbe dire pubblicare una cosa diversa. */
+.hero-title .ht-lead{ display:inline; }
+.hero-title .ht-tail{ display:inline; }
+@media (max-width:640px){
+  /* La testa non deve spezzarsi: "A small," da sola su una riga sembra un
+     errore di impaginazione. La coda invece e' lunga e deve andare a capo. */
+  .hero-title .ht-lead{ display:inline-block; white-space:nowrap; font-size:min(1.55rem, 6.6vw); }
+  .hero-title .ht-tail{ display:inline; white-space:normal; font-size:inherit; }
+}
+
 .hl{
   font-family:'Fraunces', Georgia, serif;
   font-style:italic;

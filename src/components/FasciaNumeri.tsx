@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ANNO_FONDAZIONE } from '@/lib/anni';
+import { inBreve, perEsteso } from '@/lib/cifre';
 import { Conta } from '@/components/Conta';
 
 /* LA FASCIA DEI NUMERI.
@@ -34,6 +35,7 @@ import { Conta } from '@/components/Conta';
 export type Numeri = {
   voto: number | null;
   clienti: number | null;
+  tour: number | null;
   anno: number | null;
   anni: number | null;
   posizione: number | null;
@@ -168,9 +170,28 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
                 l'arrivo, e l'unico numero della fascia che vale la pena
                 guardare mentre sale e' proprio questo. Due secondi e
                 mezzo: si vede la corsa, e non si aspetta. */}
-            <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" durata={2500} />
+            <Conta
+              a={inBreve(n.clienti).valore}
+              decimali={inBreve(n.clienti).decimali}
+              suffisso={inBreve(n.clienti).suffisso}
+              durata={2500}
+            />
           </b>
           <span className="fn-eti">guests driven since {n.anno ?? ANNO_FONDAZIONE}</span>
+        </div>
+      )}
+
+      {n.tour != null && (
+        <div className="fn-cella">
+          <b className="fn-num">
+            <Conta
+              a={inBreve(n.tour).valore}
+              decimali={inBreve(n.tour).decimali}
+              suffisso={inBreve(n.tour).suffisso}
+              durata={2500}
+            />
+          </b>
+          <span className="fn-eti">tours and transfers</span>
         </div>
       )}
 
@@ -184,7 +205,7 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
               nome della citta' in minuscolo dentro il dato che serve
               proprio a farsi verificare. */}
           <span className="fn-eti">
-            of {n.su}{' '}
+            {n.su ? `of ${perEsteso(n.su)} ` : ''}
             {n.categoria
               ? n.categoria.charAt(0).toLowerCase() + n.categoria.slice(1)
               : ''}
@@ -242,9 +263,27 @@ export function FattiHero({ n }: { n: Numeri }) {
       {n.clienti != null && (
         <div className="fh-c">
           <b className="fh-n">
-            <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" durata={2500} />
+            <Conta
+              a={inBreve(n.clienti).valore}
+              decimali={inBreve(n.clienti).decimali}
+              suffisso={inBreve(n.clienti).suffisso}
+              durata={2500}
+            />
           </b>
           <span className="fh-e">guests driven</span>
+        </div>
+      )}
+      {n.tour != null && (
+        <div className="fh-c">
+          <b className="fh-n">
+            <Conta
+              a={inBreve(n.tour).valore}
+              decimali={inBreve(n.tour).decimali}
+              suffisso={inBreve(n.tour).suffisso}
+              durata={2500}
+            />
+          </b>
+          <span className="fh-e">tours and transfers</span>
         </div>
       )}
       {n.posizione != null && (
@@ -252,7 +291,12 @@ export function FattiHero({ n }: { n: Numeri }) {
           <b className="fh-n">
             <Conta a={n.posizione} prefisso="#" />
           </b>
-          <span className="fh-e">of {n.su} in Florence</span>
+          {/* Senza il "di quanti" la riga si accorcia e resta la
+              sola cosa che si voleva dire. */}
+          <span className="fh-e">
+            {n.su ? `of ${n.su} ` : ''}
+            {n.categoria ?? 'in Florence'}
+          </span>
         </div>
       )}
       {n.anni != null && (

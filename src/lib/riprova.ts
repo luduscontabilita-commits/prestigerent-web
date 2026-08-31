@@ -52,6 +52,14 @@ export type Azienda = {
    * sugli anni dall'apertura. Va scritta con il "+" e mai come cifra
    * esatta. */
   clienti_serviti: number | null;
+  /* 🔴 QUANTI TOUR, NON QUANTE PRENOTAZIONI MISURATE.
+   * Regiondo ne conta 109.380 dall'aprile 2022, ma prima di quella
+   * data non esiste registro: questi 270.000 sono la cifra della
+   * proprieta' -- 1.100.000 persone divise per una media di quattro
+   * a prenotazione, arrotondata in difetto. Sta in tabella e non
+   * calcolata qui apposta: se un giorno il conteggio diventa
+   * misurabile si cambia la riga, non il codice. */
+  tour_effettuati: number | null;
   voto_medio: number | null;
 };
 
@@ -113,10 +121,16 @@ export async function riprova(): Promise<Riprova> {
     anni: a?.anno_fondazione ? new Date().getFullYear() - a.anno_fondazione : null,
     totale,
     voto: voto != null ? Math.round(voto * 10) / 10 : null,
-    classifica:
-      a?.classifica_posizione && a.classifica_su
-        ? `#${a.classifica_posizione} of ${a.classifica_su} ${a.classifica_categoria ?? ''}`.trim()
-        : null,
+    /* Il "of 248" e' facoltativo. Dal 31/08/2026 non si dice piu':
+     * quella classifica e' "Transportation companies in Florence",
+     * cioe' noleggio con conducente, e sopra c'e' la tramvia -- che
+     * un tour operator non e'. Restava una posizione giusta nella
+     * categoria sbagliata, letta da chi sta comprando una giornata
+     * a Siena. Svuotando `classifica_su` la frase si accorcia da
+     * sola, senza toccare una riga di codice. */
+    classifica: a?.classifica_posizione
+      ? `#${a.classifica_posizione}${a.classifica_su ? ` of ${a.classifica_su}` : ''} ${a.classifica_categoria ?? ''}`.trim()
+      : null,
   };
 }
 

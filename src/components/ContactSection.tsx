@@ -28,17 +28,30 @@ import { ModuloRichiesta } from '@/components/ModuloRichiesta';
 export function ContactSection({
   locale = DEFAULT_LOCALE,
   tour,
+  soloAiuto = false,
 }: {
   /** la lingua della pagina: senza, il modulo parlerebbe inglese ovunque */
   locale?: string;
   /** il nome del tour, quando questa sezione sta su una scheda tour */
   tour?: string;
+  /* 🔴 SOLO LA FACCIA E I TRE MODI PER SCRIVERE, SENZA IL MODULO.
+   * In cima alle FAQ serve la stessa cosa che c'e' in fondo -- le due
+   * persone che rispondono e i tre recapiti -- ma NON il modulo: due
+   * moduli nella stessa pagina vogliono dire due volte gli stessi
+   * `id` sui campi, e a quel punto cliccare un'etichetta porta il
+   * cursore nell'altro modulo. Per lo stesso motivo qui sparisce
+   * anche `id="contact"`: un'ancora ripetuta non e' un'ancora. */
+  soloAiuto?: boolean;
 } = {}) {
   const t = testiModulo(locale);
 
   return (
-    <section className="pr-sec tight alt" id="contact">
+    <section
+      className={`pr-sec tight alt${soloAiuto ? ' pr-sec-aiuto' : ''}`}
+      id={soloAiuto ? undefined : 'contact'}
+    >
       <div className="pr-wrap">
+        {!soloAiuto && (
         <div className="pr-head" style={{ marginBottom: 22 }}>
           {/* 🔴 NON E' UN INVITO A SCRIVERE INVECE DI PRENOTARE.
               Prima diceva "Before you book" e "Talk to a real person": a
@@ -58,6 +71,7 @@ export function ContactSection({
             work it out. A person answers, usually within a few hours.
           </p>
         </div>
+        )}
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -107,6 +121,8 @@ export function ContactSection({
           </a>
         </div>
 
+        {!soloAiuto && (
+          <>
         {/* L'ancora serve per davvero: e' l'indirizzo a cui mandare chi
             clicca "CONTACT" da un annuncio o da una pagina senza
             calendario, e deve restare stabile. */}
@@ -121,6 +137,8 @@ export function ContactSection({
         </div>
 
         <ModuloRichiesta locale={locale} tour={tour} />
+          </>
+        )}
       </div>
     </section>
   );

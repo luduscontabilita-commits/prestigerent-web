@@ -521,7 +521,6 @@ export default async function TourPage({
                 una volta e passata a tutti e due -- quindi non possono
                 dire due cose diverse. */}
             {partenza ? ` · from ${partenza}` : null}
-            {utile(product?.participants) ? ` · ${utile(product?.participants)}` : null}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
             {/* La spiegazione del cambio scende sotto, piccola: serve a chi
                 la cerca e non ruba spazio a chi guarda il numero. */}

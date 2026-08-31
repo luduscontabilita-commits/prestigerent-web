@@ -3254,7 +3254,10 @@ html[data-theme="dark"] .hm-nobile .hm-card:hover{
 }
 .fn{
   max-width:1180px; margin:0 auto;
-  display:grid; grid-template-columns:repeat(4,1fr);
+  /* Cinque e non quattro dal 31/08/2026: accanto ai clienti c'e' il
+     numero dei tour, e i due si spiegano a vicenda solo se stanno
+     sulla stessa riga. */
+  display:grid; grid-template-columns:repeat(5,1fr);
 }
 /* I filetti fra le celle, non intorno: una cornice chiusa fa "tabella",
    quattro colonne separate fanno "misure". L'ultimo non serve. */

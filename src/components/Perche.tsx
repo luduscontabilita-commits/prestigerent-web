@@ -37,6 +37,7 @@
  */
 
 import { anniDiAttivita } from '@/lib/anni';
+import { perEsteso } from '@/lib/cifre';
 
 type Props = {
   /** media voto, dal database delle recensioni */
@@ -111,7 +112,7 @@ export function Perche({ voto, clienti, anni }: Props) {
                 sulla piattaforma che la scheda nomina. */}
             We love what we do, and so do our guests:{' '}
             {clienti
-              ? `over ${Math.round(clienti / 1000).toLocaleString('en-US')},000 guests driven`
+              ? `over ${perEsteso(clienti)} guests driven`
               : 'hundreds of thousands of guests driven'}
             {anni ? ` in ${anni} years on the road` : ''}
             {voto ? `, rated ${voto.toFixed(1)} out of 5 on average` : ''}.
