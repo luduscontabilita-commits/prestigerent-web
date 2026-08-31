@@ -399,9 +399,13 @@ export default async function TourPage({
         <h2 className="bk-title">Book this tour</h2>
         <p className="bk-sub">Pick your date and the number of guests.</p>
       </div>
+      {/* Sopra il calendario resta solo quello che la riga sotto NON
+          dice: il prezzo piu' basso e nessuna commissione. Disdetta e
+          conferma stavano scritte due volte a quindici centimetri di
+          distanza, e ripetere una promessa non la raddoppia -- la
+          indebolisce. */}
       <div className="pr-tguar">
-        <span><i aria-hidden="true">🛡️</i><b>Free cancellation</b> up to 24h</span>
-        <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
+        <span><i aria-hidden="true">🏷️</i><b>Best price</b> &mdash; no booking fee</span>
       </div>
       {/* L'ultimo centimetro prima della decisione: quante prenotazioni
           oggi, quante questa settimana, quanti posti per partenza. Tutto
@@ -414,6 +418,37 @@ export default async function TourPage({
       {tour.regiondo_sku && (
         <RegiondoWidget sku={tour.regiondo_sku} title={product?.name || nome} locale={locale} />
       )}
+      {/* 🔴 LE TRE RASSICURAZIONI, SUBITO SOTTO IL CALENDARIO.
+          E' li' che si tira fuori la carta, non in fondo alla pagina.
+          Le landing avevano gia' questa riga esatta -- lucchetto,
+          "Encrypted checkout", disdetta, conferma -- e le schede del sito
+          no: ne dicevano due su tre, in un punto diverso, sopra il
+          calendario. Chi arriva da un annuncio vede le landing e le
+          schede nello stesso viaggio: due rassicurazioni diverse per lo
+          stesso acquisto fanno pensare a due venditori diversi.
+          Sono le tre obiezioni di chi non vi conosce: e' sicuro pagare
+          qui, posso disdire, quando ho la conferma. Una scheda che ne
+          dice due lascia aperta la terza. */}
+      <div className="pr-pay">
+        <svg
+          className="pr-gico"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        <span>Encrypted checkout</span>
+        <span className="pr-pay-sep">·</span>
+        <span>Free cancellation up to 24h</span>
+        <span className="pr-pay-sep">·</span>
+        <span>Instant confirmation</span>
+      </div>
       {/* SOTTO il calendario, non sopra: chi ha gia' scelto la data non
           va interrotto. Serve a chi arriva in fondo senza decidersi, ed
           e' li' che il confronto con Viator si vince o si perde. */}
