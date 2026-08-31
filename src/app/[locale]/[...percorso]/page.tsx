@@ -196,7 +196,15 @@ export default async function Categoria_({
             sotto l'intro e non al suo posto: la riga secca la legge chi
             scorre e finisce nei risultati di Google, questa la legge chi
             sta scegliendo con due schede aperte. */}
-        {cat.prosa && <p className="ct-prosa">{cat.prosa}</p>}
+        {cat.prosa && cat.prosa.length > 0 && (
+          <div className="ct-prosa">
+            {cat.prosa.map((riga, i) => (
+              <p key={i} className={i === cat.prosa!.length - 1 ? 'ct-prosa-fine' : undefined}>
+                {riga}
+              </p>
+            ))}
+          </div>
+        )}
       </header>
 
       {figlie.length > 0 && (

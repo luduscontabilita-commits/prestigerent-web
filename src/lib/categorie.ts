@@ -47,8 +47,12 @@ export type Categoria = {
    *  suo posto: chi scorre veloce legge la prima e va alle foto, chi sta
    *  scegliendo legge tutte e due.
    *
+   *  E' un ELENCO di paragrafi, non un testo unico: nove righe di fila
+   *  sono un muro che non legge nessuno, e spezzarle in tre e' l'unico
+   *  modo perche' l'ultima -- quella che deve restare -- si veda.
+   *
    *  Facoltativo: dove manca, la pagina resta com'era. */
-  prosa?: string;
+  prosa?: string[];
   /** lo slug della categoria WooCommerce: e' l'ultimo pezzo del percorso,
    *  e coincide sempre. Da li' si legge quali tour ci stanno dentro --
    *  associazioni fatte a mano su WordPress, tour per tour. */
@@ -65,14 +69,15 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Small group tours from Florence',
     intro:
       'Three days out of Florence in our own minibuses, never more than 25 guests, with our own guides and lunch at a family winery. Departures every week, booking confirmed instantly.',
-    prosa:
-      'You came to Tuscany for a reason, and it probably was not to follow a numbered flag through a car park. ' +
-      'These are the days we would book ourselves: a small group, one of our own drivers who knows which road ' +
-      'to take when the light is right, and a family who opens their cellar because they want to, not because ' +
-      'a coach is due. You will taste wine where it is made, sit down to a lunch someone cooked that morning, ' +
-      'and have time to stand still in a square without being counted. ' +
-      'Twenty-four years of doing this, and the part we are proudest of is not the itinerary — it is that ' +
-      'people come back, and bring their friends.',
+    prosa: [
+      'You came to Tuscany for a reason, and it probably was not to follow a numbered flag through a car park.',
+      'These are the days we would book ourselves. A small group. One of our own drivers, who knows which road ' +
+        'to take when the light is right. A family who opens their cellar because they want to, not because a ' +
+        'coach is due. You taste the wine where it is made, sit down to a lunch someone cooked that morning, ' +
+        'and have time to stand still in a square without being counted.',
+      'Twenty-four years of doing this, and the part we are proudest of is not the itinerary. It is that ' +
+        'people come back, and bring their friends.',
+    ],
   },
   {
     path: '/private-tours/',

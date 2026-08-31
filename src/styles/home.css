@@ -1284,17 +1284,54 @@ html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
 .ct-head h1{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; color:var(--ink); margin:0; line-height:1.14; }
 .ct-head p{ margin:12px 0 0; color:var(--ink-soft); font-size:1rem; line-height:1.66; }
 
-/* Il paragrafo lungo: piu' largo di respiro e piu' scuro dell'intro,
-   perche' e' quello che si legge davvero. La riga sopra resta il
-   sommario; questa e' la voce. */
+/* ── IL BLOCCO DI PROSA ──────────────────────────────────────────────
+   Prima era un paragrafo unico di nove righe largo ottantacinque
+   caratteri: un muro. Tre difetti, tutti e tre risolti qui.
+
+   1. LA MISURA. Oltre i 68 caratteri l'occhio perde il capo della riga
+      successiva e si rilegge da solo. `max-width` in `ch` e non in pixel,
+      cosi' la misura resta giusta se un domani cambia il corpo.
+   2. IL RITMO. Tre paragrafi invece di uno: il primo apre, il secondo
+      racconta, il terzo e' quello che deve restare -- ed e' l'unico che
+      si legge sicuramente, perche' e' corto e sta da solo.
+   3. IL CONTORNO. Su un fondo bianco senza niente intorno il testo
+      sembrava capitato li'. Un riquadro caldo con un filo a sinistra lo
+      rende una voce che parla, non un paragrafo dimenticato. Il filo e'
+      color vino, che e' il colore della casa: dice "questo lo diciamo
+      noi" senza scriverlo. */
 .ct-head .ct-prosa{
-  margin-top:16px; max-width:66ch;
-  color:var(--ink); font-size:1.04rem; line-height:1.72;
+  margin-top:22px;
+  max-width:64ch;
+  padding:20px 24px 20px 26px;
+  background:var(--fondo-caldo, #FBF7F1);
+  border:1px solid var(--line);
+  border-inline-start:3px solid var(--wine);
+  border-radius:0 14px 14px 0;
 }
-.ct-head .ct-prosa::first-letter{
-  /* Un capolettera appena accennato: dice "qui si legge" senza fare
-     giornale. Mezza dimensione in piu', non tre. */
-  font-size:1.32em; font-weight:700; line-height:1;
+.ct-head .ct-prosa p{
+  margin:0; color:var(--ink);
+  font-size:1.03rem; line-height:1.68; max-width:none;
+}
+.ct-head .ct-prosa p + p{ margin-top:14px; }
+
+/* L'ultima riga: piu' grande e piu' scura delle altre, e staccata da un
+   filo. E' la frase che vale la pagina -- "tornano, e portano gli
+   amici" -- e in mezzo alle altre si perdeva. */
+.ct-head .ct-prosa .ct-prosa-fine{
+  margin-top:18px; padding-top:16px;
+  border-top:1px solid var(--line);
+  font-size:1.1rem; font-weight:600; line-height:1.55;
+  color:var(--ink); letter-spacing:-.01em;
+}
+
+html[data-theme="dark"] .ct-head .ct-prosa{
+  background:rgba(255,255,255,.03);
+}
+
+@media (max-width:600px){
+  .ct-head .ct-prosa{ padding:16px 18px 18px 19px; }
+  .ct-head .ct-prosa p{ font-size:.99rem; }
+  .ct-head .ct-prosa .ct-prosa-fine{ font-size:1.04rem; }
 }
 
 /* ── LA FASCIA "TOP EXPERIENCE" ──────────────────────────────────────
@@ -1306,10 +1343,25 @@ html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
    Il contenitore `.ct-img` ha gia' `overflow:hidden`: il nastro esce
    dall'angolo e viene tagliato pulito dal bordo arrotondato, senza
    maschere. */
+/* 🔴 DOVE VA MESSO IL NASTRO, E PERCHE' I NUMERI SONO QUESTI.
+   Prima era `top:16px; left:-46px`, e la scritta usciva dall'angolo: si
+   leggeva "...PERIENC". La ruotazione non sposta il centro
+   dell'elemento, quindi il testo -- che e' centrato -- finisce dove sta
+   il centro. Con quei valori il centro cadeva a 44 pixel dal bordo
+   sinistro e 28 dall'alto: troppo in alto e troppo a sinistra, fuori
+   dal triangolo visibile.
+   La regola: se si vuole che la banda tagli l'angolo passando per
+   (0,D) e (D,0), il suo centro deve stare in (D/2, D/2). Con D=124 il
+   centro va in (62,62); larghezza 200 e altezza ~22 danno
+   left = 62-100 = -38 e top = 62-11 = 51. La scritta cade in mezzo alla
+   diagonale e non tocca nessun bordo.
+   La banda e' larga 200 e la corda visibile e' 124*1,41 = 175: gli
+   ESTREMI vengono tagliati, ed e' giusto -- un nastro deve sparire
+   dietro il bordo, altrimenti sembra un adesivo. */
 .ct-top{
   position:absolute; z-index:3;
-  top:16px; inset-inline-start:-46px;
-  width:180px; padding:5px 0;
+  top:51px; inset-inline-start:-38px;
+  width:200px; padding:5px 0;
   transform:rotate(-45deg);
   transform-origin:center;
   text-align:center;
@@ -1331,10 +1383,11 @@ html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
   content:""; position:absolute; top:100%;
   border:6px solid transparent; border-top-color:#8A6716;
 }
-.ct-top::before{ inset-inline-start:34px; }
-.ct-top::after{ inset-inline-end:34px; }
+.ct-top::before{ inset-inline-start:24px; }
+.ct-top::after{ inset-inline-end:24px; }
 @media (max-width:420px){
-  .ct-top{ top:13px; inset-inline-start:-50px; width:170px; }
+  /* stessa regola, con D=110: centro (55,55), larghezza 180, altezza ~20 */
+  .ct-top{ top:45px; inset-inline-start:-35px; width:180px; }
   .ct-top b{ font-size:.58rem; }
 }
 
