@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
 import { SearchBar, type Partenza } from '@/components/SearchBar';
 import { HomeTours, type SchedaTour } from '@/components/HomeTours';
+import type { Cambi } from '@/lib/cambi';
 
 /* Tiene insieme il modulo di ricerca e la lista dei tour.
  *
@@ -17,7 +18,16 @@ import { HomeTours, type SchedaTour } from '@/components/HomeTours';
  * qui e ci resta se il browser non esegue JavaScript. Cosi' i link ai
  * tour sono nel codice della pagina anche per chi la scansiona.
  */
-export function Cerca({ tours, partenze }: { tours: SchedaTour[]; partenze: Partenza[] }) {
+export function Cerca({
+  tours,
+  partenze,
+  cambio,
+}: {
+  tours: SchedaTour[];
+  partenze: Partenza[];
+  /* i cambi del giorno: li legge il server, qui passano e basta */
+  cambio: Cambi | null;
+}) {
   const [filtro, setFiltro] = useState<{ da: string; persone: number; tipo?: string } | null>(null);
   const [dove, setDove] = useState<HTMLElement | null>(null);
 
@@ -25,7 +35,7 @@ export function Cerca({ tours, partenze }: { tours: SchedaTour[]; partenze: Part
     setDove(document.getElementById('lista-tour'));
   }, []);
 
-  const lista = <HomeTours tours={tours} filtro={filtro} />;
+  const lista = <HomeTours tours={tours} filtro={filtro} cambio={cambio} />;
 
   return (
     <>

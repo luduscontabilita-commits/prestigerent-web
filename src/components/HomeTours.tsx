@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { affiancato, type Cambi } from '@/lib/cambi';
 import { foto, fotoSet } from '@/lib/foto';
 import { testo } from '@/lib/prosa';
 import { classeTitolo } from '@/lib/punti';
@@ -121,9 +122,11 @@ const STELLE = (n: number) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.
 export function HomeTours({
   tours,
   filtro,
+  cambio,
 }: {
   tours: SchedaTour[];
   filtro: { da: string; persone: number; tipo?: string } | null;
+  cambio: Cambi | null;
 }) {
   /* Il filtro arriva dal modulo di ricerca, che ora sta nell'hero:
      lo stato vive nella home, comune ai due. */
@@ -616,6 +619,21 @@ export function HomeTours({
                         <>
                           <small>from</small>
                           <b>&euro;{t.prezzo.toFixed(0)}</b>
+                          {/* 🔴 DOLLARI E STERLINE, MA CON IL SEGNO "CIRCA".
+                              Tre clienti su quattro sono americani o
+                              inglesi: chi legge "€149" senza sapere il
+                              cambio deve aprire un'altra scheda, e spesso
+                              non torna. Il "circa" non e' prudenza da
+                              avvocati: si incassa in EURO, e la
+                              conversione vera la fa la carta del cliente
+                              col suo cambio. Chi legge $174 e si vede
+                              addebitare $178 scrive una mail; chi legge
+                              "≈ $174" no. */}
+                          {affiancato(t.prezzo, cambio) && (
+                            <em className="hm-price-cambio">
+                              {affiancato(t.prezzo, cambio)}
+                            </em>
+                          )}
                         </>
                       ) : (
                         <span className="ask">Price on request</span>

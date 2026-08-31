@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { affiancato, cambi } from '@/lib/cambi';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
 import { fetchProduct } from '@/lib/regiondo';
@@ -213,6 +214,7 @@ export default async function TourPage({
   /* Dipende dalle fonti d'azienda, quindi non puo' stare nel Promise.all
      sopra. Le prende da `fiducia`: nessuna query in piu'. */
   const iPunteggi = await punteggiDi(slug, fiducia.fonti);
+  const cambio = await cambi();
   const [quante, laDisp, video] = await Promise.all([
     prenotazioniDi(slug),
     disponibilitaDi(slug),
@@ -459,6 +461,11 @@ export default async function TourPage({
         {prezzo != null && (
           <p className="hero-dep">
             <b>from &euro;{prezzo.valore.toFixed(0)}</b>
+            {/* Dollari e sterline accanto, con il "circa": si incassa in
+                euro e la conversione vera la fa la carta del cliente. */}
+            {affiancato(prezzo.valore, cambio) && (
+              <em className="hero-cambio">{affiancato(prezzo.valore, cambio)}</em>
+            )}
             {product?.durationLabel ? ` · ${product.durationLabel}` : null}
             {/* 🔴 DA DOVE SI PARTE, nella riga che tutti leggono.
                 "from €89 · 5 hours" non dice la cosa che a un turista

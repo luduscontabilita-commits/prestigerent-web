@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom';
+import { cambi } from '@/lib/cambi';
 import { foto as ottimizza } from '@/lib/foto';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
@@ -162,6 +163,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
      dizionario una volta sola invece di cercarli dentro l'array ottantasette
      volte. */
   const perSlug = new Map(conteggi.map((c) => [c.tour_slug, c]));
+
+  /* I cambi del giorno per il prezzo affiancato. Li legge il server e
+     restano in cache 24 ore: la pagina non diventa dinamica e il
+     browser non fa nessuna richiesta in piu'. Se la fonte non risponde
+     torna null e si mostra solo l'euro. */
+  const cambio = await cambi();
 
   const tours: SchedaTour[] = righe.map((r) => {
     const riga =
@@ -500,7 +507,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {/* Il modulo di ricerca STA QUI, sulla foto: e' la prima cosa
               che si puo' fare. Sotto, in mezzo al bianco, lo trovava solo
               chi scorreva. */}
-          <Cerca tours={tours} partenze={PARTENZE} />
+          <Cerca tours={tours} partenze={PARTENZE} cambio={cambio} />
 
         </div>
 
