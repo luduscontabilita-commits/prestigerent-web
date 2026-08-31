@@ -879,6 +879,7 @@ export default async function TourPage({
         titolo={nome}
         prezzo={prezzo?.valore ?? null}
         unita={unitaDi(tutteLeSchede, tour.kind)}
+        cambio={cambio}
       />
       </div>{/* /.pg-cols */}
     </main>

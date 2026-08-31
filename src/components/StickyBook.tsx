@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { affiancato, type Cambi } from '@/lib/cambi';
 
 /* La barra fissa in basso con prezzo e pulsante, come sulla landing.
  *
@@ -18,10 +19,12 @@ export function StickyBook({
   titolo,
   prezzo,
   unita,
+  cambio,
 }: {
   titolo: string;
   prezzo: number | null;
   unita: string;
+  cambio?: Cambi | null;
 }) {
   const [mostra, setMostra] = useState(false);
 
@@ -94,6 +97,12 @@ export function StickyBook({
           <div className="pr-sticky-price">
             <span className="from">from</span> <b>&euro;{prezzo.toFixed(0)}</b>{' '}
             <span className="per">{unita}</span>
+            {/* Qui la riga e' strettissima e sta sopra il pulsante: solo
+                le due cifre, senza la fonte. Chi vuole il dettaglio ce
+                l'ha venti centimetri piu' su, nell'intestazione. */}
+            {affiancato(prezzo, cambio ?? null) && (
+              <span className="pr-sticky-cambio">{affiancato(prezzo, cambio ?? null)}</span>
+            )}
           </div>
         )}
       </div>

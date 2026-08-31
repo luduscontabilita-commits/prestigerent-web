@@ -2486,6 +2486,14 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
 }
 @media (max-width:360px){ .hm-price-cambio{ display:none; } }
 .hm-price-cambio .solo-largo{ font-style:normal; }
+/* La barra appiccicata in fondo alla scheda: la riga e' altissima due
+   centimetri e ci sta solo il numero. */
+.pr-sticky-cambio{
+  display:block; font-size:.7rem; font-weight:700;
+  color:var(--ink-soft); font-variant-numeric:tabular-nums;
+  margin-top:1px; letter-spacing:.01em;
+}
+@media (max-width:400px){ .pr-sticky-cambio{ display:none; } }
 @media (max-width:600px){ .hm-price-cambio .solo-largo{ display:none; } }
 
 /* Sulla scheda del tour la riga e' gia' lunga ("from €149 · 9 hours ·

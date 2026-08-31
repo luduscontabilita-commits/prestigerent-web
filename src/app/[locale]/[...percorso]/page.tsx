@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { affiancato, cambi } from '@/lib/cambi';
 import { foto as ottimizza, fotoSet } from '@/lib/foto';
 import { notFound } from 'next/navigation';
 import { supabase, type TourRow } from '@/lib/supabase';
@@ -163,6 +164,10 @@ export default async function Categoria_({
       })
   );
 
+  /* i cambi del giorno, dal server, in cache 24 ore: la pagina resta
+     statica e il browser non chiede niente in piu' */
+  const cambio = await cambi();
+
   const figlie = figlieDi(cat.path);
   const briciole = [{ nome: 'Home', path: '/' }];
   if (cat.padre) {
@@ -317,6 +322,12 @@ export default async function Categoria_({
                       <>
                         <small>from</small>
                         <b>&euro;{rg.prezzo.toFixed(0)}</b>
+                        {affiancato(rg.prezzo, cambio) && (
+                          <em className="hm-price-cambio">
+                            {affiancato(rg.prezzo, cambio)}
+                            <i className="solo-largo"> at the ECB rate</i>
+                          </em>
+                        )}
                       </>
                     ) : (
                       <span className="ask">Price on request</span>

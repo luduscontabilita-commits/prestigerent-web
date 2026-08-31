@@ -37,7 +37,9 @@ const DURATA = 86_400;
 
 /* Quattro secondi e si molla. Senza un limite, un'API lenta trattiene la
    ricostruzione della pagina: il prezzo in dollari non vale un secondo di
-   attesa in piu' su una pagina che deve caricare in meno di uno. */
+   attesa in piu' su una pagina che deve caricare in meno di uno.
+   Il limite NON si fa con `AbortSignal` passato a `fetch`: quello
+   disattiva la cache di Next e trasforma una richiesta in centoventi. */
 const ATTESA = 4_000;
 
 /** Numeri plausibili, per non stampare un prezzo assurdo se la fonte
@@ -49,7 +51,6 @@ function sensato(usd: number, gbp: number) {
 
 async function daFrankfurter(): Promise<Cambi | null> {
   const r = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP', {
-    signal: AbortSignal.timeout(ATTESA),
     next: { revalidate: DURATA },
   });
   if (!r.ok) return null;
@@ -62,7 +63,6 @@ async function daFrankfurter(): Promise<Cambi | null> {
 
 async function dallaBce(): Promise<Cambi | null> {
   const r = await fetch('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', {
-    signal: AbortSignal.timeout(ATTESA),
     next: { revalidate: DURATA },
   });
   if (!r.ok) return null;
@@ -78,10 +78,37 @@ async function dallaBce(): Promise<Cambi | null> {
   return { usd, gbp, giorno: g ? g[1] : '' };
 }
 
-export async function cambi(): Promise<Cambi | null> {
+/* 🔴 UNA CHIAMATA SOLA PER TUTTO IL PROCESSO, E IL MOTIVO NON E' LA
+ * VELOCITA'.
+ *
+ * Il sito genera 36 pagine di categoria e 86 schede tour: se ognuna
+ * chiedesse il cambio per conto suo sarebbero oltre cento richieste alla
+ * stessa API nello stesso minuto, e la prima cosa che fa un servizio
+ * gratuito e' rifiutarle. E' successo davvero: sulla home e sulle schede
+ * il prezzo in dollari c'era, sulle pagine di categoria no -- non per un
+ * errore di codice, ma perche' quelle chiamate erano state respinte.
+ *
+ * `next: { revalidate }` da solo non bastava: passare un `signal` a
+ * `fetch` fa saltare la cache di Next, e ogni pagina ripartiva da capo.
+ * Il segnale e' stato tolto e il limite di tempo si fa con una corsa fra
+ * la richiesta e un timer -- che ottiene la stessa cosa senza toccare le
+ * opzioni di `fetch`.
+ *
+ * La promessa si tiene qui: la prima pagina che chiede fa la richiesta,
+ * tutte le altre aspettano quella. */
+let inCorso: Promise<Cambi | null> | null = null;
+
+function conLimite<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    p,
+    new Promise<null>((res) => setTimeout(() => res(null), ms)),
+  ]);
+}
+
+async function chiedi(): Promise<Cambi | null> {
   for (const fonte of [daFrankfurter, dallaBce]) {
     try {
-      const c = await fonte();
+      const c = await conLimite(fonte(), ATTESA);
       if (c) return c;
     } catch {
       /* si prova la prossima: qui un errore non deve mai far cadere la
@@ -89,6 +116,20 @@ export async function cambi(): Promise<Cambi | null> {
     }
   }
   return null;
+}
+
+export async function cambi(): Promise<Cambi | null> {
+  if (!inCorso) {
+    inCorso = chiedi().catch(() => null);
+    /* se e' andata male non si tiene il fallimento per sempre: al giro
+       dopo si riprova. Se e' andata bene la promessa resta, e vale finche'
+       il processo vive -- che e' meno delle 24 ore della cache di Next,
+       quindi non si rischia di servire un cambio vecchio. */
+    inCorso.then((c) => {
+      if (!c) inCorso = null;
+    });
+  }
+  return inCorso;
 }
 
 /** "≈ $104 · £76" — o stringa vuota se i cambi non ci sono.
