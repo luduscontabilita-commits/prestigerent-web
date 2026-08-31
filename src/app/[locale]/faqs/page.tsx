@@ -5,6 +5,7 @@ import { metaDi } from '@/lib/seo';
 import { ContactSection } from '@/components/ContactSection';
 import { grafo, breadcrumb, organization, hreflangDi } from '@/lib/schema';
 import sezioni from '@/lib/faq-dati.json';
+import { ANNO_FONDAZIONE, conAnni } from '@/lib/anni';
 import '@/styles/home.css';
 
 export const revalidate = 3600;
@@ -42,7 +43,7 @@ const QUANTE = SEZIONI.reduce((n, s) => n + s.voci.length, 0);
 
 /** Il testo di una risposta senza marcatura, per i dati strutturati. */
 function nudo(html: string): string {
-  return html
+  return conAnni(html)
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
@@ -122,7 +123,7 @@ export default async function Faqs({
       />
 
       <header className="ab-hero">
-        <p className="ab-kicker">Florence &middot; since 2002</p>
+        <p className="ab-kicker">Florence &middot; since {ANNO_FONDAZIONE}</p>
         <h1>Frequently asked questions</h1>
         <p className="ab-lead">
           {QUANTE} answers to what guests actually ask us &mdash; luggage,
@@ -171,7 +172,7 @@ export default async function Faqs({
                       risposta, non decorazione. */}
                   <div
                     className="faq-r"
-                    dangerouslySetInnerHTML={{ __html: v.r }}
+                    dangerouslySetInnerHTML={{ __html: conAnni(v.r) }}
                   />
                 </details>
               ))}

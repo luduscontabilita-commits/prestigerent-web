@@ -87,7 +87,7 @@ export const CATEGORIE: Categoria[] = [
         'to take when the light is right. A family who opens their cellar because they want to, not because a ' +
         'coach is due. You taste the wine where it is made, sit down to a lunch someone cooked that morning, ' +
         'and have time to stand still in a square without being counted.',
-      'Twenty-four years of doing this, and the part we are proudest of is not the itinerary. It is that ' +
+      '{Anni} years of doing this, and the part we are proudest of is not the itinerary. It is that ' +
         'people come back, and bring their friends.',
     ],
   },
@@ -105,7 +105,7 @@ export const CATEGORIE: Categoria[] = [
         'where coaches are simply not allowed, so you are set down at the door and not half a mile away. ' +
         'The driver speaks your language, has driven these roads for years, and will tell you which trattoria ' +
         'is worth the detour and which one is worth skipping.',
-      'Twenty-four years means we have already made the mistakes for you: the winery that does not pick up the ' +
+      '{Anni} years means we have already made the mistakes for you: the winery that does not pick up the ' +
         'phone in August, the restaurant that seats strangers at the back, the hour when the Duomo is a wall of ' +
         'shoulders. What is left is the version that works — and it can change at eleven in the morning, ' +
         'because it is your car and your day.',
@@ -151,11 +151,11 @@ export const CATEGORIE: Categoria[] = [
        era rimasta la promessa e sparita la garanzia. Testo ripreso dal
        vecchio sito, parola per parola. */
     intro:
-      'Off the ship, into Italy, back on board in time. Book with confidence thanks to our Worry-free policy for cruisers: in the past 25 years none of our clients have missed the boat, and in the very rare case you are dropped off late through our mistake, we arrange and pay for your accommodation, meals and transport to your next port of call. If your ship does not dock at all — weather, a change of itinerary — there is no penalty and no cancellation fee.',
+      'Off the ship, into Italy, back on board in time. Book with confidence thanks to our Worry-free policy for cruisers: in the past {anni} years none of our clients have missed the boat, and in the very rare case you are dropped off late through our mistake, we arrange and pay for your accommodation, meals and transport to your next port of call. If your ship does not dock at all — weather, a change of itinerary — there is no penalty and no cancellation fee.',
     prosa: [
       'We know exactly what you are worried about, because everyone asks the same question in the same voice: ' +
         'what if the ship leaves without me.',
-      'In twenty-five years it has never happened. Not once. That is not luck — it is that we build the day ' +
+      'In {parole} years it has never happened. Not once. That is not luck — it is that we build the day ' +
         'backwards from your sailing time, not forwards from the quay. We know how long the road to Florence ' +
         'really takes on a Tuesday in August, which gate at Livorno is quicker, and how much slack to leave for ' +
         'the one thing that always goes long. If the traffic turns, your driver knows the way around it, ' +
@@ -448,7 +448,7 @@ export const CATEGORIE: Categoria[] = [
     intro: 'Siena, San Gimignano, Chianti, Pisa, Lucca and the wine country — everything we run from Florence.',
     padre: '/destinations/',
     prosa: [
-      'This is home. We have been driving these roads since 2002, and most of what we run starts in Florence.',
+      'This is home. We have been driving these roads since {dal}, and most of what we run starts in Florence.',
       'Chianti and its cellars, Siena and San Gimignano, Pisa, Lucca, the Cinque Terre and the Val d’Orcia — in a small group or with the car to yourselves, for half a day or for all of it.',
       'If you are staying in Florence, everything on this page comes to collect you at the door.',
     ],

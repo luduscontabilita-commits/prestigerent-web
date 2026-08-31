@@ -49,7 +49,8 @@ export type Azienda = {
    * misurata sono 264.000 persone da aprile 2022 (109.380 prenotazioni
    * per 2,41 persone di media, contate su Regiondo il 29/08/2026); prima
    * di quella data Regiondo non ha nulla, e il resto e' ricostruzione
-   * sugli anni dal 2002. Va scritta con il "+" e mai come cifra esatta. */
+   * sugli anni dall'apertura. Va scritta con il "+" e mai come cifra
+   * esatta. */
   clienti_serviti: number | null;
   voto_medio: number | null;
 };

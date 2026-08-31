@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { ANNO_FONDAZIONE } from '@/lib/anni';
 import { Conta } from '@/components/Conta';
 
 /* LA FASCIA DEI NUMERI.
@@ -169,7 +170,7 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
                 mezzo: si vede la corsa, e non si aspetta. */}
             <Conta a={Math.round(n.clienti / 1000)} suffisso="k+" durata={2500} />
           </b>
-          <span className="fn-eti">guests driven since {n.anno ?? 2002}</span>
+          <span className="fn-eti">guests driven since {n.anno ?? ANNO_FONDAZIONE}</span>
         </div>
       )}
 
@@ -199,7 +200,7 @@ export function FasciaNumeri({ n }: { n: Numeri }) {
               <Conta a={n.anni} />
             </b>
           </span>
-          <span className="fn-eti">years on the road, since {n.anno ?? 2002}</span>
+          <span className="fn-eti">years on the road, since {n.anno ?? ANNO_FONDAZIONE}</span>
         </div>
       )}
     </div>

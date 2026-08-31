@@ -36,14 +36,17 @@
  * schede, che e' una resa peggiore ma non un guasto.
  */
 
+import { anniDiAttivita } from '@/lib/anni';
+
 type Props = {
   /** media voto, dal database delle recensioni */
   voto: number | null;
   /** quanti ospiti avete portato in giro: `azienda.clienti_serviti` */
   clienti?: number | null;
   /** anni di attivita', calcolati sull'anno di fondazione. Puo' mancare:
-   *  in quel caso la frase dice "more than 20 years", che e' vero da
-   *  quando l'azienda esiste (2002) e non e' un numero inventato. */
+   *  in quel caso la cifra la calcola `anniDiAttivita()` da `ANNO_FONDAZIONE`
+   *  (2000, vedi `src/lib/anni.ts`). Il "more than" toglie uno: con 26
+   *  compiuti si dice "more than 25", che resta vero tutto l'anno. */
   anni: number | null;
   /* Il totale delle recensioni e il piazzamento Tripadvisor arrivavano
      qui e non servono piu': il primo era un totale sommato fra tre
@@ -151,7 +154,7 @@ export function Perche({ voto, clienti, anni }: Props) {
       corpo: (
         <>
           <p>
-            We have been in the travel industry for more than {anni ?? 20} years. We
+            We have been in the travel industry for more than {(anni ?? anniDiAttivita()) - 1} years. We
             know how complicated it can be to plan a trip to a foreign country,
             and our goal is to put that experience at your disposal, suggesting
             what actually fits what you are after.

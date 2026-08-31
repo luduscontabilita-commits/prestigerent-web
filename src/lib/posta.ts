@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { ANNO_FONDAZIONE } from './anni';
 
 /* L'EMAIL CHE AVVISA CHE E' ARRIVATA UNA RICHIESTA.
  *
@@ -149,7 +150,7 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   righe.push(
     '',
     '--',
-    'Prestige Rent S.R.L. - Tours & Transfers in Italy since 2002',
+    `Prestige Rent S.R.L. - Tours & Transfers in Italy since ${ANNO_FONDAZIONE}`,
     'Via Della Saggina 98, 50145 Florence, Italy',
     '',
     'Office     +39 055 286059',

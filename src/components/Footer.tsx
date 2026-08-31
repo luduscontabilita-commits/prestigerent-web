@@ -1,4 +1,5 @@
 import { DEFAULT_LOCALE } from '@/lib/locales';
+import { ANNO_FONDAZIONE } from '@/lib/anni';
 import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
@@ -23,7 +24,8 @@ import '@/styles/legale.css';
  *    quasi nessuno, e WhatsApp converte molto meglio (§13 del masterplan
  *    chiede moduli brevi e contatto immediato).
  *
- * COSA SI AGGIUNGE: la riga di identita' -- Firenze, dal 2002, flotta
+ * COSA SI AGGIUNGE: la riga di identita' -- Firenze, dall'anno di
+ * fondazione (`src/lib/anni.ts`), flotta
  * propria, autisti dipendenti, 4,9 su 7.139 recensioni. E' la definizione
  * canonica dell'entita' (§6.1), cioe' cio' che permette a un'AI di sapere
  * chi e' Prestige Rent invece di indovinarlo.
@@ -133,7 +135,7 @@ export async function Footer({ locale }: { locale: string }) {
             cambia, cambia ovunque -- footer, schede tour, home -- senza
             che nessuno debba andare a cercare dov'era scritto. */}
         {a?.clienti_serviti != null && (
-          <span>⭐ {Math.round(a.clienti_serviti / 1000)}k+ guests since {a.anno_fondazione ?? 2002}</span>
+          <span>⭐ {Math.round(a.clienti_serviti / 1000)}k+ guests since {a.anno_fondazione ?? ANNO_FONDAZIONE}</span>
         )}
         <span>📞 24/7 customer care</span>
       </div>

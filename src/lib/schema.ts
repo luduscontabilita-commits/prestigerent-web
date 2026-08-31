@@ -1,4 +1,5 @@
 import { LOCALES, DEFAULT_LOCALE, PIU_LINGUE, getLocale } from './locales';
+import { ANNO_FONDAZIONE } from './anni';
 
 export const SITE = 'https://prestigerent.com';
 
@@ -26,9 +27,12 @@ export function organization() {
     '@id': ORG_ID,
     name: 'Prestige Rent',
     url: `${SITE}/`,
-    foundingDate: '2002',
+    /* Non scritto a mano: e' la stessa cifra che vede il sito. Un
+     * `foundingDate` che smentisce il "since" stampato in pagina e' il
+     * genere di incoerenza che una macchina nota subito. */
+    foundingDate: String(ANNO_FONDAZIONE),
     description:
-      'Tours and private transfers across Italy with our own fleet and our own English-speaking drivers, based in Florence since 2002.',
+      `Tours and private transfers across Italy with our own fleet and our own English-speaking drivers, based in Florence since ${ANNO_FONDAZIONE}.`,
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Via Della Saggina 98',

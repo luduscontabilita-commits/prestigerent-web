@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { riprova } from '@/lib/riprova';
+import { ANNO_FONDAZIONE, anniDiAttivita, aParoleMaiusc } from '@/lib/anni';
 import { metaDi } from '@/lib/seo';
 import { fonti, inEvidenza } from '@/lib/recensioni';
 import { FasciaFiducia } from '@/components/Riprova';
@@ -34,9 +35,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const [d, m] = await Promise.all([riprova(), metaDi('/about-us/', 'en')]);
-  const anni = d.anni ?? 20;
+  const anni = d.anni ?? anniDiAttivita();
   return {
-    title: m?.title ?? `About Prestige Rent — Florence tour operator since ${d.azienda?.anno_fondazione ?? 2002}`,
+    title: m?.title ?? `About Prestige Rent — Florence tour operator since ${d.azienda?.anno_fondazione ?? ANNO_FONDAZIONE}`,
     description: m?.description ??
       `We are a Florence company running our own minibuses and cars with our own employed ` +
       `drivers and guides — ${anni} years, ${d.totale.toLocaleString('en-US')} verified ` +
@@ -131,7 +132,7 @@ export default async function ChiSiamo({
       <Recensioni
         fonti={leFonti}
         recensioni={leRecensioni}
-        titolo="Twenty-four years of guests"
+        titolo={`${aParoleMaiusc(d.anni ?? anniDiAttivita())} years of guests`}
       />
 
       <section className="ab-nap">

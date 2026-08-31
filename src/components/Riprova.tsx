@@ -1,4 +1,5 @@
 import type { Riprova as Dati } from '@/lib/riprova';
+import { ANNO_FONDAZIONE } from '@/lib/anni';
 
 /* LA FASCIA DI FIDUCIA, riutilizzabile su ogni pagina.
  *
@@ -32,7 +33,7 @@ export function FasciaFiducia({ dati, compatta }: { dati: Dati; compatta?: boole
   if (azienda?.clienti_serviti)
     voci.push({
       n: `${Math.round(azienda.clienti_serviti / 1000)}k+`,
-      t: `guests since ${azienda.anno_fondazione ?? 2002}`,
+      t: `guests since ${azienda.anno_fondazione ?? ANNO_FONDAZIONE}`,
     });
   if (azienda?.voto_medio != null)
     voci.push({ n: Number(azienda.voto_medio).toFixed(1), t: 'average guest rating' });

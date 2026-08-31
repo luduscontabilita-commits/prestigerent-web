@@ -11,6 +11,7 @@ import { metaDi } from '@/lib/seo';
 import { prezzoDi } from '@/lib/prezzi';
 import { classeTitolo, puntiScheda } from '@/lib/punti';
 import { testo } from '@/lib/prosa';
+import { conAnni } from '@/lib/anni';
 import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
 import { Premi } from '@/components/Premi';
@@ -92,7 +93,7 @@ export async function generateMetadata({
 
   return {
     title: m?.title ?? `${c.titolo} — Prestige Rent`,
-    description: m?.description ?? c.intro.slice(0, 155),
+    description: m?.description ?? conAnni(c.intro).slice(0, 155),
     ...(quanti === 0 ? { robots: { index: false, follow: true } } : {}),
     alternates: hreflangDi(
       (l) => (l === DEFAULT_LOCALE ? c.path : `/${l}${c.path}`),
@@ -196,7 +197,7 @@ export default async function Categoria_({
 
       <header className="ct-head">
         <h1>{cat.titolo}</h1>
-        <p>{cat.intro}</p>
+        <p>{conAnni(cat.intro)}</p>
         {/* Il paragrafo che parla alla persona invece che ai motori. Sta
             sotto l'intro e non al suo posto: la riga secca la legge chi
             scorre e finisce nei risultati di Google, questa la legge chi
@@ -217,7 +218,7 @@ export default async function Categoria_({
                     : undefined
                 }
               >
-                {riga}
+                {conAnni(riga)}
               </p>
             ))}
           </div>
