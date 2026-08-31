@@ -198,8 +198,20 @@ export default async function Categoria_({
             sta scegliendo con due schede aperte. */}
         {cat.prosa && cat.prosa.length > 0 && (
           <div className="ct-prosa">
+            {/* 🔴 IL FILO SOPRA L'ULTIMA RIGA SOLO SE C'E' QUALCOSA DA
+                STACCARE. Dove il testo e' un paragrafo solo, quello e'
+                anche l'ultimo: si prendeva il filo sopra la testa e in
+                pagina restava una riga orizzontale sospesa fra il titolo e
+                il testo, che sembrava un errore di impaginazione. */}
             {cat.prosa.map((riga, i) => (
-              <p key={i} className={i === cat.prosa!.length - 1 ? 'ct-prosa-fine' : undefined}>
+              <p
+                key={i}
+                className={
+                  cat.prosa!.length > 1 && i === cat.prosa!.length - 1
+                    ? 'ct-prosa-fine'
+                    : undefined
+                }
+              >
                 {riga}
               </p>
             ))}
