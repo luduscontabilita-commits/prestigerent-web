@@ -686,6 +686,22 @@
 .hd-quick:hover{ filter:brightness(1.07); box-shadow:0 3px 10px rgba(255,125,31,.32); }
 .hd-quick:active{ transform:translateY(1px); }
 
+/* Il pulsante delle FAQ: stessa forma di "Quick Request", peso diverso.
+   Contornato invece che pieno, perche' l'arancione pieno in testata deve
+   restare UNO SOLO -- se due cose gridano, non grida niente. */
+.hd-faq{
+  padding:9px 14px; border-radius:10px; text-decoration:none;
+  font-size:.85rem; font-weight:800; white-space:nowrap;
+  border:1px solid var(--line); color:var(--ink); background:transparent;
+  transition:border-color .15s, color .15s, background .15s;
+}
+.hd-faq:hover{
+  border-color:var(--orange); color:var(--orange);
+  background:color-mix(in srgb, var(--orange) 7%, transparent);
+}
+.hd-faq:active{ transform:translateY(1px); }
+@media (max-width:1179px){ .hd-solo-desk{ display:none; } }
+
 .hd-lang{ position:relative; }
 .hd-lang > button{
   display:inline-flex; align-items:center; gap:5px;

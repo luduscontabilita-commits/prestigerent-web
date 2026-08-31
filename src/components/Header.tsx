@@ -460,6 +460,20 @@ export function Header({
         </nav>
 
         <div className="hd-right">
+          {/* 🔴 LE FAQ IN TESTATA, ACCANTO A "QUICK REQUEST" E NON DENTRO.
+              Chi ha un dubbio pratico -- i bagagli, il seggiolino, la
+              sedia a rotelle, cosa succede se la nave non attracca -- non
+              vuole scrivere a nessuno: vuole leggere la risposta e basta.
+              Se l'unica strada visibile e' il modulo, quel dubbio diventa
+              una scheda chiusa invece di una domanda.
+              Sta PRIMA di Quick Request per ordine di sforzo: leggere
+              costa meno che scrivere, e chi non trova la risposta ha il
+              pulsante arancione mezzo centimetro piu' in la'.
+              Sul telefono sparisce -- lo spazio in testata e' per il nome
+              dell'azienda -- ma resta nel menu, dove c'era gia'. */}
+          <a className="hd-faq hd-solo-desk" href={p('/faqs/')}>
+            FAQ
+          </a>
           <a className="hd-quick" href="#contact" onClick={vaiAlModulo}>
             Quick Request
           </a>
