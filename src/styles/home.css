@@ -1308,41 +1308,6 @@ html[data-theme="dark"] .pw-ta{ filter:invert(1) brightness(1.1); }
   border-inline-start:3px solid var(--wine);
   border-radius:0 14px 14px 0;
 }
-
-/* 🔴 SUL FISSO IL RIQUADRO SI ALLARGA, MA LE RIGHE NO.
-   Sono due cose diverse e vanno tenute separate: il riquadro stretto in
-   mezzo a mille pixel vuoti sembra dimenticato, ma allargare le RIGHE
-   fino a li' le renderebbe illeggibili -- oltre i 68 caratteri l'occhio
-   perde il capo della riga dopo.
-   Quindi da 1024px in su il riquadro prende tutta la larghezza della
-   griglia sotto (cosi' i due blocchi si allineano invece di sfalsarsi) e
-   il contenuto si divide in due: i paragrafi a sinistra a misura giusta,
-   e la frase finale a destra, grande, come una citazione. Lo spazio si
-   riempie e la riga che deve restare smette di essere l'ultima di un
-   elenco: diventa la cosa che si legge per prima. */
-@media (min-width:1024px){
-  .ct-head{ max-width:none; }
-  .ct-head .ct-prosa{
-    max-width:none;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);
-    gap:0 34px;
-    align-items:center;
-    padding:26px 30px 26px 32px;
-  }
-  .ct-head .ct-prosa > p{ grid-column:1; }
-  .ct-head .ct-prosa .ct-prosa-fine{
-    grid-column:2; grid-row:1 / -1;
-    align-self:center;
-    margin:0; padding:0 0 0 30px;
-    border-top:0;
-    border-inline-start:1px solid var(--line);
-    font-size:1.28rem; line-height:1.42;
-  }
-  /* Il titolo e l'intro restano stretti: allargarli farebbe due righe
-     lunghissime sotto un H1 gia' grande. */
-  .ct-head h1, .ct-head > p:not(.ct-prosa){ max-width:760px; }
-}
 .ct-head .ct-prosa p{
   margin:0; color:var(--ink);
   font-size:1.03rem; line-height:1.68; max-width:none;
@@ -1395,11 +1360,8 @@ html[data-theme="dark"] .ct-head .ct-prosa{
    dietro il bordo, altrimenti sembra un adesivo. */
 .ct-top{
   position:absolute; z-index:3;
-  /* D=150: centro in (75,75) -> left = 75-95, top = 75-11. Piu' dentro
-     dei 124 di prima, perche' su una scheda da 268 pixel la scritta
-     arrivava a filo del bordo sinistro e la "TO" si perdeva. */
-  top:64px; inset-inline-start:-20px;
-  width:190px; padding:5px 0;
+  top:51px; inset-inline-start:-38px;
+  width:200px; padding:5px 0;
   transform:rotate(-45deg);
   transform-origin:center;
   text-align:center;
@@ -1409,7 +1371,7 @@ html[data-theme="dark"] .ct-head .ct-prosa{
 }
 .ct-top b{
   display:block;
-  font-size:.6rem; font-weight:800; letter-spacing:.1em;
+  font-size:.62rem; font-weight:800; letter-spacing:.14em;
   text-transform:uppercase; color:#FFF9EA;
   text-shadow:0 1px 2px rgba(70,45,0,.45);
   white-space:nowrap;
@@ -1425,8 +1387,7 @@ html[data-theme="dark"] .ct-head .ct-prosa{
 .ct-top::after{ inset-inline-end:24px; }
 @media (max-width:420px){
   /* stessa regola, con D=110: centro (55,55), larghezza 180, altezza ~20 */
-  /* D=132: centro (66,66), larghezza 175, altezza ~20 */
-  .ct-top{ top:56px; inset-inline-start:-21px; width:175px; }
+  .ct-top{ top:45px; inset-inline-start:-35px; width:180px; }
   .ct-top b{ font-size:.58rem; }
 }
 
