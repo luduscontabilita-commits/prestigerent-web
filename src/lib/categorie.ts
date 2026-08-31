@@ -181,6 +181,10 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Tours of Italy',
     intro:
       'Everything we run, from a half day in Chianti to a week across the country — small group departures, private days and transfers with stops along the way.',
+      prosa: [
+      'Everything we run, in one place: half a day in Chianti, a full day in Siena, a week that begins in Florence and ends on the Amalfi Coast.',
+      'If you know when you are coming but not yet what to do with the days, this is the page to scroll.',
+    ],
   },
   {
     path: '/destinations/',
@@ -188,42 +192,329 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Where we can take you',
     intro:
       'Florence and Tuscany, the Amalfi Coast, Rome, Venice, the Lakes. Choose where you are starting from and see what we run from there.',
+      prosa: [
+      'Start from where you are staying, or from where your ship docks. Every page here lists what can honestly be done from that point in a day — not everything that happens to exist within two hundred kilometres of it.',
+      'If what you want is not on the list, it usually still exists. Ask us.',
+    ],
   },
 
   /* ── i porti ─────────────────────────────────────────────────────── */
-  { path: '/cruise-port-tours/livorno-port/', cat: 'livorno-port', titolo: 'Tours from Livorno cruise port', intro: 'Livorno is the port for Florence, Pisa and the Tuscan countryside. We are on the quay when you dock, and back before all aboard.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/la-spezia-port/', cat: 'la-spezia-port', titolo: 'Tours from La Spezia cruise port', intro: 'La Spezia is the gateway to the Cinque Terre, and also within reach of Florence and Pisa in a day.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/civitavecchia/', cat: 'civitavecchia', titolo: 'Tours from Civitavecchia cruise port', intro: 'Civitavecchia is the port for Rome. An hour and a quarter each way, and the day is yours.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/naples-port/', cat: 'naples-port', titolo: 'Tours from Naples cruise port', intro: 'Pompeii, Vesuvius, Sorrento and the Amalfi Coast, all within a day of the Naples quay.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/sorrento-port/', cat: 'sorrento-port', titolo: 'Tours from Sorrento port', intro: 'Sorrento, Positano, Amalfi and Pompeii, with a driver who knows the coast road.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/salerno-port/', cat: 'salerno-port', titolo: 'Tours from Salerno port', intro: 'Salerno puts the Amalfi Coast and Pompeii within easy reach for the day.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/amalfi-positano-port/', cat: 'amalfi-positano-port', titolo: 'Tours from Amalfi and Positano', intro: 'The Amalfi Coast from the water: Ravello, Positano, Amalfi and Pompeii.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/palermo/', cat: 'palermo', titolo: 'Tours from Palermo cruise port', intro: 'Palermo, Monreale and western Sicily, with a private driver for the day.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/messina/', cat: 'messina', titolo: 'Tours from Messina cruise port', intro: 'Taormina, Etna and the Sicilian east coast, from the Messina quay.', padre: '/cruise-port-tours/' },
-  { path: '/cruise-port-tours/taormina-port/', cat: 'taormina-port', titolo: 'Tours from Taormina', intro: 'Taormina, Etna and the villages of eastern Sicily.', padre: '/cruise-port-tours/' },
+  {
+    path: '/cruise-port-tours/livorno-port/',
+    cat: 'livorno-port',
+    titolo: 'Tours from Livorno cruise port',
+    intro: 'Livorno is the port for Florence, Pisa and the Tuscan countryside. We are on the quay when you dock, and back before all aboard.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Livorno is the door to Florence, Pisa and the Chianti hills. We are on the quay before you are through the terminal, and the day is planned backwards from your all-aboard time — never forwards from the gangway.',
+      'Most people ask for Florence. Some of the best days we run from here go the other way, into the vineyards, and nobody regrets it.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/la-spezia-port/',
+    cat: 'la-spezia-port',
+    titolo: 'Tours from La Spezia cruise port',
+    intro: 'La Spezia is the gateway to the Cinque Terre, and also within reach of Florence and Pisa in a day.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'From La Spezia the Cinque Terre are close enough to walk their streets properly and still be back on board with time to spare. Florence and Pisa are also possible in the day.',
+      'We will tell you honestly which of the two is the better use of your hours, and it depends on how long your ship is in port — not on which tour we would rather sell.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/civitavecchia/',
+    cat: 'civitavecchia',
+    titolo: 'Tours from Civitavecchia cruise port',
+    intro: 'Civitavecchia is the port for Rome. An hour and a quarter each way, and the day is yours.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'An hour and a quarter to Rome, each way. That leaves a real day in the city rather than a lap of it: the Colosseum, the Vatican, or simply lunch somewhere Romans actually eat.',
+      'Your driver stays with you all day, so what you have seen by four o’clock decides what you do at half past four.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/naples-port/',
+    cat: 'naples-port',
+    titolo: 'Tours from Naples cruise port',
+    intro: 'Pompeii, Vesuvius, Sorrento and the Amalfi Coast, all within a day of the Naples quay.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Pompeii, Vesuvius, Sorrento and the Amalfi Coast are all within a day of the Naples quay — but not all of them in the same day, and anyone who promises you otherwise has never driven that coast road in August.',
+      'Tell us how many hours you have and we will tell you which two of the four are the right ones.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/sorrento-port/',
+    cat: 'sorrento-port',
+    titolo: 'Tours from Sorrento port',
+    intro: 'Sorrento, Positano, Amalfi and Pompeii, with a driver who knows the coast road.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Positano, Amalfi, Ravello and Pompeii, with a driver who takes that coast road every week rather than once a season — which is exactly what you want on a road that narrow.',
+      'Smooth through the bends, a stop whenever anyone wants one, and back at the tender well before the last one leaves.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/salerno-port/',
+    cat: 'salerno-port',
+    titolo: 'Tours from Salerno port',
+    intro: 'Salerno puts the Amalfi Coast and Pompeii within easy reach for the day.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Salerno puts the Amalfi Coast and Pompeii comfortably inside a day, and it is the quieter end of the coast — the traffic builds from the other direction.',
+      'A private car, a driver who knows where to stop for the photograph everyone wants, and no waiting for forty other people to come back to a bus.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/amalfi-positano-port/',
+    cat: 'amalfi-positano-port',
+    titolo: 'Tours from Amalfi and Positano',
+    intro: 'The Amalfi Coast from the water: Ravello, Positano, Amalfi and Pompeii.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'You are already in the postcard. From here the day is about what is behind it: Ravello above the coast, the villages the coaches skip, and Pompeii inland.',
+      'We collect you at the tender and we are there again when you come back down.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/palermo/',
+    cat: 'palermo',
+    titolo: 'Tours from Palermo cruise port',
+    intro: 'Palermo, Monreale and western Sicily, with a private driver for the day.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Palermo, Monreale and western Sicily with a private driver for the day — in a city where knowing which street to take is worth more than knowing where you are going.',
+      'Back at the ship in time, with the market and the cathedral behind you rather than a photograph of a coach park.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/messina/',
+    cat: 'messina',
+    titolo: 'Tours from Messina cruise port',
+    intro: 'Taormina, Etna and the Sicilian east coast, from the Messina quay.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Taormina and Etna from the Messina quay: the theatre with the volcano behind it, and the volcano itself if the day allows it.',
+      'The road up Etna is long and the weather on it changes fast — your driver watches it, so the plan can change at eleven without costing you the day.',
+    ],
+  },
+  {
+    path: '/cruise-port-tours/taormina-port/',
+    cat: 'taormina-port',
+    titolo: 'Tours from Taormina',
+    intro: 'Taormina, Etna and the villages of eastern Sicily.',
+    padre: '/cruise-port-tours/',
+    prosa: [
+      'Taormina, Etna and the villages of eastern Sicily, at the pace of someone who is not counting heads.',
+      'A private car from the tender, a driver who knows where to park in a town where nobody can park, and back with time to spare.',
+    ],
+  },
 
   /* ── i transfer ──────────────────────────────────────────────────── */
-  { path: '/transfers/direct-transfers/', cat: 'direct-transfers', titolo: 'Direct transfers', intro: 'Straight from A to B, fixed price, no stops. Airports, stations, hotels and ports.', padre: '/transfers/' },
-  { path: '/transfers/direct-transfers/florence-direct-transfers/', cat: 'florence-direct-transfers', titolo: 'Direct transfers from Florence', intro: 'From Florence to Rome, Milan, Venice, the airports and the ports.', padre: '/transfers/direct-transfers/' },
-  { path: '/transfers/direct-transfers/rome-direct-transfers/', cat: 'rome-direct-transfers', titolo: 'Direct transfers from Rome', intro: 'Rome and Fiumicino to Florence, Tuscany and the ports.', padre: '/transfers/direct-transfers/' },
-  { path: '/transfers/direct-transfers/milan-direct-transfers/', cat: 'milan-direct-transfers', titolo: 'Direct transfers from Milan', intro: 'Milan city and Malpensa to Florence, the Lakes and beyond.', padre: '/transfers/direct-transfers/' },
-  { path: '/transfers/direct-transfers/venice-direct-transfers/', cat: 'venice-direct-transfers', titolo: 'Direct transfers from Venice', intro: 'Venice and its airport to Florence, Bologna and the north.', padre: '/transfers/direct-transfers/' },
-  { path: '/transfers/direct-transfers/naples/', cat: 'naples', titolo: 'Direct transfers from Naples', intro: 'Naples, its airport and the port, to Rome, Sorrento and the Amalfi Coast.', padre: '/transfers/direct-transfers/' },
-  { path: '/transfers/transfers-with-stop-enroute/', cat: 'transfers-with-stop-enroute', titolo: 'Transfers with a stop on the way', intro: 'The journey you had to make anyway, turned into a day out: same trip, one or two stops, one price.', padre: '/transfers/' },
-  { path: '/transfers/transfers-with-stop-enroute/florence-to-rome/', cat: 'florence-to-rome', titolo: 'Florence to Rome with a stop', intro: 'Siena, Assisi, Orvieto or Chianti on the way south — instead of three hours of motorway.', padre: '/transfers/transfers-with-stop-enroute/' },
-  { path: '/transfers/transfers-with-stop-enroute/florence-to-venice/', cat: 'florence-to-venice', titolo: 'Florence to Venice with a stop', intro: 'Bologna, Ferrara, Padua or the Ferrari museum on the way north.', padre: '/transfers/transfers-with-stop-enroute/' },
-  { path: '/transfers/transfers-with-stop-enroute/florence-to-milan/', cat: 'florence-to-milan', titolo: 'Florence to Milan with a stop', intro: 'Ferrari, Lamborghini, Modena and its balsamic, or the outlet, on the way to Milan.', padre: '/transfers/transfers-with-stop-enroute/' },
-  { path: '/transfers/transfers-with-stop-enroute/rome-to-naples/', cat: 'rome-to-naples', titolo: 'Rome to Naples with a stop', intro: 'Pompeii or the Amalfi Coast on the way down, with your luggage in the car.', padre: '/transfers/transfers-with-stop-enroute/' },
+  {
+    path: '/transfers/direct-transfers/',
+    cat: 'direct-transfers',
+    titolo: 'Direct transfers',
+    intro: 'Straight from A to B, fixed price, no stops. Airports, stations, hotels and ports.',
+    padre: '/transfers/',
+    prosa: [
+      'Straight from A to B. No stops, no detours, no meter running.',
+      'The price is fixed before you travel and does not move — not for traffic, not for a flight that lands ninety minutes late, not for the third suitcase nobody mentioned. The driver waits, because that is what the price already includes.',
+    ],
+  },
+  {
+    path: '/transfers/direct-transfers/florence-direct-transfers/',
+    cat: 'florence-direct-transfers',
+    titolo: 'Direct transfers from Florence',
+    intro: 'From Florence to Rome, Milan, Venice, the airports and the ports.',
+    padre: '/transfers/direct-transfers/',
+    prosa: [
+      'Florence to Rome, Milan, Venice, the airports and the cruise ports — door to door, with your luggage in the car and nobody else in it.',
+      'Three and a half hours to Rome or Milan, three to Venice. Long enough that the vehicle matters: ours are comfortable, air conditioned, and big enough for the bags you actually have rather than the bags a price list assumes.',
+    ],
+  },
+  {
+    path: '/transfers/direct-transfers/rome-direct-transfers/',
+    cat: 'rome-direct-transfers',
+    titolo: 'Direct transfers from Rome',
+    intro: 'Rome and Fiumicino to Florence, Tuscany and the ports.',
+    padre: '/transfers/direct-transfers/',
+    prosa: [
+      'Rome and Fiumicino to Florence, Tuscany and the ports. A fixed price, a driver who is already there when you clear customs, and a name on a sign rather than an app and a wait.',
+    ],
+  },
+  {
+    path: '/transfers/direct-transfers/milan-direct-transfers/',
+    cat: 'milan-direct-transfers',
+    titolo: 'Direct transfers from Milan',
+    intro: 'Milan city and Malpensa to Florence, the Lakes and beyond.',
+    padre: '/transfers/direct-transfers/',
+    prosa: [
+      'Milan city and Malpensa to Florence, the Lakes and beyond. Malpensa to Florence is four and a half hours: the sort of journey where a proper vehicle and a driver who does it every week are worth more than a saving of twenty euro.',
+    ],
+  },
+  {
+    path: '/transfers/direct-transfers/venice-direct-transfers/',
+    cat: 'venice-direct-transfers',
+    titolo: 'Direct transfers from Venice',
+    intro: 'Venice and its airport to Florence, Bologna and the north.',
+    padre: '/transfers/direct-transfers/',
+    prosa: [
+      'Venice and its airport to Florence, Bologna and the north. We meet you where the water stops — Piazzale Roma or the airport — and take it from there.',
+    ],
+  },
+  {
+    path: '/transfers/direct-transfers/naples/',
+    cat: 'naples',
+    titolo: 'Direct transfers from Naples',
+    intro: 'Naples, its airport and the port, to Rome, Sorrento and the Amalfi Coast.',
+    padre: '/transfers/direct-transfers/',
+    prosa: [
+      'Naples, its airport and its port, to Rome, Sorrento and the Amalfi Coast. On that coast the size of the vehicle is not a detail: we choose it for the road, not only for the number of seats.',
+    ],
+  },
+  {
+    path: '/transfers/transfers-with-stop-enroute/',
+    cat: 'transfers-with-stop-enroute',
+    titolo: 'Transfers with a stop on the way',
+    intro: 'The journey you had to make anyway, turned into a day out: same trip, one or two stops, one price.',
+    padre: '/transfers/',
+    prosa: [
+      'You have to get from Florence to Rome anyway. You can spend three hours on a motorway, or you can spend the same day seeing Siena, Assisi or Orvieto and arrive at your hotel in the evening.',
+      'It is the same journey, the same luggage in the same car, and one price agreed in advance. The only difference is that the day counts for something instead of being lost between two cities.',
+      'It is the thing our guests are most surprised we do — and the one they tell their friends about.',
+    ],
+  },
+  {
+    path: '/transfers/transfers-with-stop-enroute/florence-to-rome/',
+    cat: 'florence-to-rome',
+    titolo: 'Florence to Rome with a stop',
+    intro: 'Siena, Assisi, Orvieto or Chianti on the way south — instead of three hours of motorway.',
+    padre: '/transfers/transfers-with-stop-enroute/',
+    prosa: [
+      'Siena, Assisi, Orvieto or the Chianti hills on the way south — instead of three hours of motorway and a service station.',
+      'Your bags stay in the car, your driver waits while you walk, and you reach Rome in the evening having actually seen something.',
+    ],
+  },
+  {
+    path: '/transfers/transfers-with-stop-enroute/florence-to-venice/',
+    cat: 'florence-to-venice',
+    titolo: 'Florence to Venice with a stop',
+    intro: 'Bologna, Ferrara, Padua or the Ferrari museum on the way north.',
+    padre: '/transfers/transfers-with-stop-enroute/',
+    prosa: [
+      'Bologna for lunch, Ferrara for the walls, Padua for the frescoes, or the Ferrari museum at Maranello — on the way north, without adding a day to the trip.',
+    ],
+  },
+  {
+    path: '/transfers/transfers-with-stop-enroute/florence-to-milan/',
+    cat: 'florence-to-milan',
+    titolo: 'Florence to Milan with a stop',
+    intro: 'Ferrari, Lamborghini, Modena and its balsamic, or the outlet, on the way to Milan.',
+    padre: '/transfers/transfers-with-stop-enroute/',
+    prosa: [
+      'Ferrari and Lamborghini, Modena and its balsamic, Parma, or the designer outlets — on the way to Milan rather than on a day you do not have.',
+      'One price, one car, and the suitcases stay where they are.',
+    ],
+  },
+  {
+    path: '/transfers/transfers-with-stop-enroute/rome-to-naples/',
+    cat: 'rome-to-naples',
+    titolo: 'Rome to Naples with a stop',
+    intro: 'Pompeii or the Amalfi Coast on the way down, with your luggage in the car.',
+    padre: '/transfers/transfers-with-stop-enroute/',
+    prosa: [
+      'Pompeii on the way down, with your luggage in the car and nobody to meet at a coach park afterwards. You arrive in Naples in the evening having already done the thing you came south for.',
+    ],
+  },
 
   /* ── le destinazioni ─────────────────────────────────────────────── */
-  { path: '/destinations/florence-tuscany/', cat: 'florence-tuscany', titolo: 'Florence and Tuscany', intro: 'Siena, San Gimignano, Chianti, Pisa, Lucca and the wine country — everything we run from Florence.', padre: '/destinations/' },
-  { path: '/destinations/rome-destinations/', cat: 'rome-destinations', titolo: 'Rome', intro: 'Rome for the day from Florence, from Civitavecchia, or as a transfer with stops on the way.', padre: '/destinations/' },
-  { path: '/destinations/venice-destinations/', cat: 'venice-destinations', titolo: 'Venice', intro: 'Venice for the day, or as a transfer through Bologna, Ferrara and Padua.', padre: '/destinations/' },
-  { path: '/destinations/milan-como-destinations/', cat: 'milan-como-destinations', titolo: 'Milan and Lake Como', intro: 'Milan, the Lakes and the motor valley — Ferrari, Lamborghini, Ducati and Modena.', padre: '/destinations/' },
-  { path: '/destinations/naples-amalfi-coast/', cat: 'naples-amalfi-coast', titolo: 'Naples and the Amalfi Coast', intro: 'Pompeii, Vesuvius, Sorrento, Positano, Amalfi and Ravello.', padre: '/destinations/' },
-  { path: '/destinations/livorno-port-destinations/', cat: 'livorno-port-destinations', titolo: 'From Livorno port', intro: 'What we run from the Livorno quay: Florence, Pisa, Siena, Chianti and the Cinque Terre.', padre: '/destinations/' },
-  { path: '/destinations/la-spezia-destinations/', cat: 'la-spezia-destinations', titolo: 'From La Spezia port', intro: 'The Cinque Terre, Portofino, Florence and Pisa from the La Spezia quay.', padre: '/destinations/' },
-  { path: '/destinations/civitavecchia-destinations/', cat: 'civitavecchia-destinations', titolo: 'From Civitavecchia port', intro: 'Rome, Orvieto and Tarquinia from the port of Rome.', padre: '/destinations/' },
+  {
+    path: '/destinations/florence-tuscany/',
+    cat: 'florence-tuscany',
+    titolo: 'Florence and Tuscany',
+    intro: 'Siena, San Gimignano, Chianti, Pisa, Lucca and the wine country — everything we run from Florence.',
+    padre: '/destinations/',
+    prosa: [
+      'This is home. We have been driving these roads since 2002, and almost everything we run starts within an hour of Florence.',
+      'Chianti and its cellars, Siena and San Gimignano, Pisa, Lucca, the Cinque Terre and the Val d’Orcia — in a small group or with the car to yourselves, for half a day or for all of it.',
+      'If you are staying in Florence, everything on this page comes to collect you at the door.',
+    ],
+  },
+  {
+    path: '/destinations/rome-destinations/',
+    cat: 'rome-destinations',
+    titolo: 'Rome',
+    intro: 'Rome for the day from Florence, from Civitavecchia, or as a transfer with stops on the way.',
+    padre: '/destinations/',
+    prosa: [
+      'Rome in a day from Florence or from the port at Civitavecchia, and Rome as a starting point for the days around it.',
+      'A private driver in Rome is worth more than in most cities: the traffic is what it is, the restricted zones are real, and the difference between being set down at the door and being set down half a mile away is an hour of your day.',
+    ],
+  },
+  {
+    path: '/destinations/venice-destinations/',
+    cat: 'venice-destinations',
+    titolo: 'Venice',
+    intro: 'Venice for the day, or as a transfer through Bologna, Ferrara and Padua.',
+    padre: '/destinations/',
+    prosa: [
+      'Venice in a day from Florence, or as the end of a journey north with a stop on the way.',
+      'We take you as far as the water allows — Piazzale Roma — and we are there again when you come back out.',
+    ],
+  },
+  {
+    path: '/destinations/milan-como-destinations/',
+    cat: 'milan-como-destinations',
+    titolo: 'Milan and Lake Como',
+    intro: 'Milan, the Lakes and the motor valley — Ferrari, Lamborghini, Ducati and Modena.',
+    padre: '/destinations/',
+    prosa: [
+      'Milan, Malpensa and the lakes. From Florence it is three and a half hours, and there are several things worth stopping for on the way — Ferrari, Modena, Parma — that turn the transfer into the day.',
+    ],
+  },
+  {
+    path: '/destinations/naples-amalfi-coast/',
+    cat: 'naples-amalfi-coast',
+    titolo: 'Naples and the Amalfi Coast',
+    intro: 'Pompeii, Vesuvius, Sorrento, Positano, Amalfi and Ravello.',
+    padre: '/destinations/',
+    prosa: [
+      'Pompeii, Vesuvius, Sorrento, Positano and Amalfi — from the port, from the airport, or as part of a journey down from Rome.',
+      'On that coast the road decides the day. We choose the vehicle for the road and the hour for the traffic, which is why our days there feel shorter than they are.',
+    ],
+  },
+  {
+    path: '/destinations/livorno-port-destinations/',
+    cat: 'livorno-port-destinations',
+    titolo: 'From Livorno port',
+    intro: 'What we run from the Livorno quay: Florence, Pisa, Siena, Chianti and the Cinque Terre.',
+    padre: '/destinations/',
+    prosa: [
+      'Everything within a day of the Livorno quay: Florence, Pisa, Lucca and the Chianti hills.',
+      'Times are calculated backwards from your all-aboard, and we are on the quay before you are through the terminal.',
+    ],
+  },
+  {
+    path: '/destinations/la-spezia-destinations/',
+    cat: 'la-spezia-destinations',
+    titolo: 'From La Spezia port',
+    intro: 'The Cinque Terre, Portofino, Florence and Pisa from the La Spezia quay.',
+    padre: '/destinations/',
+    prosa: [
+      'The Cinque Terre first, because they are close and because they are the reason most ships stop here. Florence and Pisa are also within the day if your ship is in port long enough — we will tell you honestly whether it is.',
+    ],
+  },
+  {
+    path: '/destinations/civitavecchia-destinations/',
+    cat: 'civitavecchia-destinations',
+    titolo: 'From Civitavecchia port',
+    intro: 'Rome, Orvieto and Tarquinia from the port of Rome.',
+    padre: '/destinations/',
+    prosa: [
+      'An hour and a quarter from the quay to the centre of Rome. That is the whole reason this port exists for a traveller, and it is enough for a real day rather than a rushed one.',
+    ],
+  },
 ];
 
 export const PERCORSI = CATEGORIE.map((c) => c.path);
