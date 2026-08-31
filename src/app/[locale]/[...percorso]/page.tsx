@@ -322,11 +322,11 @@ export default async function Categoria_({
                       <>
                         <small>from</small>
                         <b>&euro;{rg.prezzo.toFixed(0)}</b>
+                        {/* solo le cifre: la fonte non ci sta in una scheda
+                            e usciva tagliata a meta'. Sta sulla scheda del
+                            tour, dove c'e' spazio per dirla intera. */}
                         {affiancato(rg.prezzo, cambio) && (
-                          <em className="hm-price-cambio">
-                            {affiancato(rg.prezzo, cambio)}
-                            <i className="solo-largo"> at the ECB rate</i>
-                          </em>
+                          <em className="hm-price-cambio">{affiancato(rg.prezzo, cambio)}</em>
                         )}
                       </>
                     ) : (

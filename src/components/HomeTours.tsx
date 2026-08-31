@@ -619,7 +619,16 @@ export function HomeTours({
                         <>
                           <small>from</small>
                           <b>&euro;{t.prezzo.toFixed(0)}</b>
-                          {/* 🔴 DOLLARI E STERLINE, MA CON IL SEGNO "CIRCA".
+                          {/* 🔴 DOLLARI E STERLINE, MA SOLO LE CIFRE.
+                              Qui NON si scrive da dove viene il cambio:
+                              "at the ECB rate" faceva 45 caratteri su una
+                              riga larga meno di 200 pixel, e usciva dalla
+                              scheda tagliato a meta' ("...at the ECI").
+                              La fonte sta sulla scheda del tour, dove
+                              c'e' spazio per dirla intera. Qui basta il
+                              segno ≈: dice gia' che e' una conversione.
+
+                              E il segno "circa" non e' una cautela.
                               Tre clienti su quattro sono americani o
                               inglesi: chi legge "€149" senza sapere il
                               cambio deve aprire un'altra scheda, e spesso
@@ -632,13 +641,6 @@ export function HomeTours({
                           {affiancato(t.prezzo, cambio) && (
                             <em className="hm-price-cambio">
                               {affiancato(t.prezzo, cambio)}
-                              {/* "oggi" sparisce sotto i 600px: li' la
-                                  riga andrebbe a capo e la scheda
-                                  crescerebbe di una riga rispetto alle
-                                  altre della griglia. Il segno ≈ resta
-                                  comunque, e la scheda del tour dice la
-                                  frase intera. */}
-                              <i className="solo-largo"> at the ECB rate</i>
                             </em>
                           )}
                         </>
