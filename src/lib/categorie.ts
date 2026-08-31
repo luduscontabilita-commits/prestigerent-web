@@ -85,6 +85,20 @@ export const CATEGORIE: Categoria[] = [
     titolo: 'Private tours in Tuscany and beyond',
     intro:
       'Your party only, your own driver, your own hours. We collect you where you are staying — in Florence or anywhere in Italy — and the day is built around what you want to see.',
+    prosa: [
+      'A private day is not a bigger version of a group tour. It starts from a different question: not ' +
+        'where the bus goes, but what you would like today to be.',
+      'Your driver comes to you — your hotel, a villa in the hills, the port at Livorno, the airport at ' +
+        'four in the morning if that is when you land. Our cars carry the permits for the restricted centres ' +
+        'where coaches are simply not allowed, so you are set down at the door and not half a mile away. ' +
+        'The driver speaks your language, has driven these roads for years, and will tell you which trattoria ' +
+        'is worth the detour and which one is worth skipping.',
+      'Twenty-four years means we have already made the mistakes for you: the winery that does not pick up the ' +
+        'phone in August, the restaurant that seats strangers at the back, the hour when the Duomo is a wall of ' +
+        'shoulders. What is left is the version that works — and it can change at eleven in the morning, ' +
+        'because it is your car and your day.',
+      'Tell us what you would like the day to feel like. We build the rest around it.',
+    ],
   },
   {
     /* 🔴 RIMESSA IL 28/08/2026, DOPO AVERLA TOLTA PER SBAGLIO.
