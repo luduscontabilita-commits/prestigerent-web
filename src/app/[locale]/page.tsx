@@ -776,14 +776,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           lasciare la carta -- e se cambia il volo, chi mi risponde di
           domenica, siete voi o rivendete. Nel passaggio da WordPress era
           sparito ed era l'unico posto dove quelle risposte c'erano. */}
-      <Perche
-        voto={d.voto}
-        totale={d.totale}
-        posizione={az?.classifica_posizione}
-        su={az?.classifica_su}
-        categoria={az?.classifica_categoria}
-        anni={d.anni}
-      />
+      <Perche voto={d.voto} clienti={az?.clienti_serviti} anni={d.anni} />
 
       <VideoTestimonianze />
 

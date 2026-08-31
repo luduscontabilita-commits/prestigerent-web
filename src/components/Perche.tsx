@@ -39,19 +39,19 @@
 type Props = {
   /** media voto, dal database delle recensioni */
   voto: number | null;
-  /** totale recensioni verificate, tutte le piattaforme */
-  totale: number;
-  /** il piazzamento Tripadvisor, dalla scheda azienda */
-  posizione?: number | null;
-  su?: number | null;
-  categoria?: string | null;
+  /** quanti ospiti avete portato in giro: `azienda.clienti_serviti` */
+  clienti?: number | null;
   /** anni di attivita', calcolati sull'anno di fondazione. Puo' mancare:
    *  in quel caso la frase dice "more than 20 years", che e' vero da
    *  quando l'azienda esiste (2002) e non e' un numero inventato. */
   anni: number | null;
+  /* Il totale delle recensioni e il piazzamento Tripadvisor arrivavano
+     qui e non servono piu': il primo era un totale sommato fra tre
+     piattaforme, il secondo nominava Tripadvisor. Tolti il 31/08/2026.
+     Il piazzamento continua a stare nel riquadro sopra la foto. */
 };
 
-export function Perche({ voto, totale, posizione, su, categoria, anni }: Props) {
+export function Perche({ voto, clienti, anni }: Props) {
   const schede = [
     {
       id: 'travel-safe',
@@ -93,33 +93,32 @@ export function Perche({ voto, totale, posizione, su, categoria, anni }: Props) 
       corpo: (
         <>
           <p>
-            {/* 🔴 QUI NON SI NOMINA VIATOR, e non e' una dimenticanza.
-                Il totale d'azienda somma Tripadvisor, GetYourGuide e chi ha
-                prenotato con noi: Viator ne resta FUORI, perche' il suo
-                numero comprende gia' quello di Tripadvisor e sommarli
-                vorrebbe dire contare due volte le stesse recensioni.
-                Elencare una piattaforma che non e' nella somma e' il modo
-                piu' rapido di far sembrare inventato un numero vero. */}
-            We love what we do, and so do our guests: {totale.toLocaleString('en-US')}{' '}
-            verified reviews across Tripadvisor, GetYourGuide and guests who
-            booked with us directly
-            {voto ? `, ${voto.toFixed(1)} out of 5 on average` : ''}.
+            {/* 🔴 IL NUMERO E' QUELLO DEGLI OSPITI, NON DELLE RECENSIONI.
+                Prima diceva "14.005 recensioni verificate su Tripadvisor,
+                GetYourGuide e chi ha prenotato con noi". Era un totale
+                sommato fra tre piattaforme: vero, ma che non si ritrova
+                identico da nessuna parte -- chi apre Tripadvisor per
+                controllare ne trova settemila, e da li' in poi non crede
+                piu' nemmeno al prezzo.
+                Gli ospiti portati in giro sono un dato VOSTRO, non c'e'
+                nessuna piattaforma dove possa non tornare, ed e' anche piu'
+                grande: settecentomila contro quattordicimila.
+                Il voto resta perche' e' la stessa cifra che si legge sulle
+                schede e nella fascia dei numeri, e li' e' verificabile
+                sulla piattaforma che la scheda nomina. */}
+            We love what we do, and so do our guests:{' '}
+            {clienti
+              ? `over ${Math.round(clienti / 1000).toLocaleString('en-US')},000 guests driven`
+              : 'hundreds of thousands of guests driven'}
+            {anni ? ` in ${anni} years on the road` : ''}
+            {voto ? `, rated ${voto.toFixed(1)} out of 5 on average` : ''}.
           </p>
-          {posizione && su && categoria && (
-            <p>
-              {/* 🔴 NIENTE " in Florence" SCRITTO A MANO IN CODA.
-                  `classifica_categoria` vale gia' "Transportation companies
-                  in Florence": aggiungerne un altro produceva "#2 of 248
-                  transportation companies in florence in Florence" sulla
-                  home. La citta' sta nel dato, non nel markup -- e si
-                  abbassa solo l'iniziale, cosi' la frase scorre senza
-                  spegnere la maiuscola di Florence. */}
-              On Tripadvisor we are ranked #{posizione} of {su}{' '}
-              {categoria.charAt(0).toLowerCase() + categoria.slice(1)}, and we
-              hold the Travelers&rsquo; Choice award.
-            </p>
-          )}
           <p>
+            {/* Il piazzamento e il premio erano qui e sono stati tolti il
+                31/08/2026 insieme al nome della piattaforma. Non si perde
+                niente: il piazzamento continua a stare nel riquadro sopra
+                la foto, dove lo vede chi arriva, e li' e' una riga sola
+                invece di un paragrafo. */}
             What our guests write is the most important resource we have to keep
             improving, and reading it is always a pleasure.
           </p>

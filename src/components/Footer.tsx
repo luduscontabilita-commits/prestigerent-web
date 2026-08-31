@@ -84,17 +84,27 @@ const PIU_PRENOTATI = [
   ['Private Chianti & wineries', '/tour/private-tour-to-chianti-wineries/'],
 ];
 
-/* Instagram e TikTok c'erano nel footer di WordPress e qui erano sparite.
-   Non e' una svista da poco: sono i due canali dove un tour operator si fa
-   vedere, e il pubblico americano ci arriva prima che dal sito. Gli
-   indirizzi sono quelli veri del footer vecchio. */
-const SOCIAL = [
-  ['Tripadvisor', 'https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html'],
-  ['Instagram', 'https://www.instagram.com/prestigerentitaly'],
-  ['Facebook', 'https://www.facebook.com/prestigerent/'],
-  ['TikTok', 'https://www.tiktok.com/@prestigerentitaly'],
-  ['GetYourGuide', 'https://www.getyourguide.com/prestige-rent-tours-in-italy-s8058/'],
-];
+/* 🔴 IL FOOTER NON MANDA PIU' FUORI (31/08/2026).
+   C'erano Tripadvisor, Instagram, Facebook, TikTok e GetYourGuide. Tolti
+   tutti su richiesta della proprieta', e la ragione regge: gli ultimi due
+   sono i marketplace da cui questo sito serve proprio ad affrancarsi --
+   un cliente arrivato qui, mandato su GetYourGuide, torna a comprare da
+   loro e la commissione la pagate voi. Anche gli altri tre portano fuori
+   dalla pagina nel punto in cui l'unica cosa che deve succedere e'
+   prenotare.
+   Gli indirizzi restano scritti qui sotto: il giorno che si vogliono
+   rimettere -- magari solo i social, non i marketplace -- basta
+   riportarli nell'elenco.
+
+   const SOCIAL = [
+     ['Tripadvisor',  'https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html'],
+     ['Instagram',    'https://www.instagram.com/prestigerentitaly'],
+     ['Facebook',     'https://www.facebook.com/prestigerent/'],
+     ['TikTok',       'https://www.tiktok.com/@prestigerentitaly'],
+     ['GetYourGuide', 'https://www.getyourguide.com/prestige-rent-tours-in-italy-s8058/'],
+   ];
+*/
+const SOCIAL: [string, string][] = [];
 
 export async function Footer({ locale }: { locale: string }) {
   const p = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
@@ -239,11 +249,15 @@ export async function Footer({ locale }: { locale: string }) {
 
 
       <div className="ft-bottom">
-        <span className="ft-social">
-          {SOCIAL.map(([t, h]) => (
-            <a key={h} href={h} target="_blank" rel="noopener">{t}</a>
-          ))}
-        </span>
+        {/* Se l'elenco e' vuoto non resta uno spazio vuoto in mezzo al
+            footer: il contenitore proprio non esiste. */}
+        {SOCIAL.length > 0 && (
+          <span className="ft-social">
+            {SOCIAL.map(([t, h]) => (
+              <a key={h} href={h} target="_blank" rel="noopener">{t}</a>
+            ))}
+          </span>
+        )}
         {/* I circuiti di pagamento c'erano nel footer di WordPress e qui
             mancavano. Sono scritti, non disegnati: i loghi ufficiali hanno
             regole d'uso proprie e un logo rifatto male fa sembrare finto
