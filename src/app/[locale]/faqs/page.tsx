@@ -65,7 +65,12 @@ export async function generateMetadata({
   const { locale } = await params;
   const m = await metaDi('/faqs/', 'en');
   return {
-    title: m?.title ?? 'Frequently asked questions — Prestige Rent',
+    /* 🔴 IL TITOLO DICE ANCHE DI COSA SI PARLA, non solo che tipo di
+       pagina e'. "Frequently asked questions — Prestige Rent" descrive il
+       contenitore: chi cerca su Google "tuscany tour luggage" o "italy
+       tour wheelchair" non trova niente che gli somigli. Le parole che
+       contano sono Italy e Tuscany, e nel titolo non c'erano. */
+    title: m?.title ?? 'FAQ — Prestige Rent · Italy and Tuscany Tours',
     description:
       m?.description ??
       `Everything guests ask before booking: luggage, child seats, wheelchairs, ` +
