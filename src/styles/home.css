@@ -2240,10 +2240,31 @@ html[data-theme="dark"] .mr-errore{ color:#FF8A9B; }
   font-weight:800;
 }
 .hm-durata{ white-space:nowrap; }
-.hm-voto{ display:inline-flex; align-items:baseline; gap:5px; min-width:0; }
+
+/* 🔴 IL VOTO VA A CAPO DA SOLO, E SENZA IL PUNTINO DAVANTI.
+   Stava in fila con durata e posti, separato dal punto mediano che
+   `.hm-fatti > * + *::before` mette fra un fatto e l'altro. Ma il voto e'
+   lungo -- stelle, numero, "8,250 reviews on Viator" -- e andava a capo
+   quasi sempre: il punto mediano finiva ORFANO a inizio riga, un puntino
+   sospeso nel vuoto prima delle stelle. Si vedeva su tutte e quattro le
+   schede della home.
+   `flex-basis:100%` gli da' la sua riga sempre, non solo quando non ci
+   sta, cosi' la scheda ha la stessa forma su tutte le larghezze. Ed e'
+   anche piu' giusto: durata e posti sono i dati del prodotto, il voto e'
+   quello che ne dicono gli altri. Due cose diverse, due righe. */
+.hm-voto{
+  display:inline-flex; align-items:baseline; gap:5px; min-width:0;
+  flex-basis:100%; margin-top:3px;
+}
+.hm-fatti > .hm-voto::before{ content:none; margin:0; }
 .hm-voto .hm-stars{
+  /* Oro, non l'arancione del marchio. Sulla scheda l'arancione e' gia' la
+     pastiglia "SMALL GROUP", quella delle prenotazioni del mese e le
+     spunte dei punti forti: se anche le stelle sono arancioni, il voto
+     diventa un elemento di interfaccia come gli altri. In oro torna a
+     essere quello che e' -- un giudizio -- e si stacca da solo. */
   font-style:normal; flex:none;
-  color:var(--orange); font-size:.8rem; letter-spacing:.5px;
+  color:#F0A02B; font-size:.86rem; letter-spacing:.5px;
 }
 .hm-voto b{ flex:none; color:var(--ink); font-weight:800; }
 /* A 320px il conteggio non ci sta: si accorcia con i puntini. Se andasse
