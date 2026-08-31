@@ -1067,8 +1067,13 @@ a.rv-badge:hover{
 }
 .rv-b-score{ display:flex; align-items:baseline; gap:2px; line-height:1; }
 .rv-b-score b{
-  font-family:Fraunces,Georgia,serif; font-size:2.5rem; font-weight:640;
-  font-style:italic; color:var(--ink); line-height:1;
+  /* Anche questo e' un numero, non un titolo: dritto. Il corsivo di
+     Fraunces resta l'accento della prosa -- il nome di un luogo dentro un
+     titolo -- e non tocca mai le cifre. */
+  font-family:Fraunces,Georgia,serif; font-size:2.5rem; font-weight:700;
+  font-style:normal; font-optical-sizing:auto;
+  font-variation-settings:'opsz' 96;
+  letter-spacing:-.02em; color:var(--ink); line-height:1;
 }
 .rv-b-of{ font-size:.85rem; font-weight:700; color:var(--ink-soft); }
 .rv-b-stars{ color:#F5A623; letter-spacing:2px; font-size:.98rem; margin-top:7px; }
@@ -3007,9 +3012,22 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
 .fn-cella:last-child{ border-inline-end:0; }
 
 .fn-num{
+  /* 🔴 DRITTO, NON CORSIVO, E DETTO A VOCE ALTA.
+     Fraunces si carica in tutti e due i tagli, e il corsivo e' l'accento
+     dei titoli: sulle cifre inclina il "4.9" e il "700k+" e li fa
+     sembrare storti invece che eleganti. `font-style:normal` qui e' una
+     dichiarazione, non una ridondanza: senza, basta che qualcuno tolga il
+     taglio dritto dal collegamento in layout.tsx e le cifre tornano
+     inclinate senza che nessuno capisca perche'.
+     `opsz` alto e' la ragione per cui questo carattere sta bene grande:
+     alle dimensioni da titolo Fraunces alza il contrasto fra aste e
+     grazie, ed e' li' che diventa bello. */
   font-family:'Fraunces',Georgia,serif;
-  font-size:clamp(2.3rem,4.6vw,3.4rem); font-weight:640; line-height:1;
-  letter-spacing:-.02em; color:#fff;
+  font-style:normal;
+  font-optical-sizing:auto;
+  font-variation-settings:'opsz' 120;
+  font-size:clamp(2.3rem,4.6vw,3.4rem); font-weight:700; line-height:1;
+  letter-spacing:-.022em; color:#fff;
   /* Le cifre che salgono cambiano larghezza a ogni fotogramma: senza
      questo la riga sotto ballava per tutta la durata del conteggio. */
   font-variant-numeric:tabular-nums;
@@ -3116,9 +3134,15 @@ html[data-theme="dark"] .hm-nobile .hm-card{ box-shadow:none; }
 .fh-c{ display:grid; justify-items:end; gap:3px; }
 .fh-c + .fh-c{ padding-top:12px; border-top:1px solid rgba(255,255,255,.13); }
 .fh-n{
+  /* stesso trattamento della fascia: dritto, non corsivo. Qui l'`opsz` e'
+     piu' basso perche' il riquadro e' piccolo -- a corpo piccolo Fraunces
+     con il contrasto alto si sgrana. */
   font-family:'Fraunces',Georgia,serif;
-  font-size:1.62rem; font-weight:640; line-height:1; color:#fff;
-  letter-spacing:-.01em; font-variant-numeric:tabular-nums;
+  font-style:normal;
+  font-optical-sizing:auto;
+  font-variation-settings:'opsz' 72;
+  font-size:1.66rem; font-weight:700; line-height:1; color:#fff;
+  letter-spacing:-.015em; font-variant-numeric:tabular-nums;
   text-shadow:0 1px 4px rgba(0,0,0,.4);
 }
 .fh-e{

@@ -65,3 +65,4 @@ scripts/*.log.jsonl
 /sm.xml
 /r.txt
 /h.txt
+supabase/.temp/

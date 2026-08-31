@@ -161,12 +161,20 @@ export default async function LocaleLayout({
             Senza questo collegamento nessuno li scarica e tutta la pagina
             ripiega sul font di sistema: il testo resta leggibile ma la
             grafica sembra "spoglia". Sono gli stessi identici pesi della
-            landing, non un'approssimazione. */}
+            landing, non un'approssimazione.
+
+            🔴 SI CHIEDONO ANCHE I TAGLI DRITTI (`0,9..144,...`), non solo i
+            corsivi. Fino al 31/08/2026 di Fraunces arrivava SOLO il corsivo:
+            ogni punto che scriveva `font-family:Fraunces` senza volere il
+            corsivo -- le cifre della fascia dei numeri e del riquadro
+            nell'hero -- lo prendeva lo stesso, perche' era l'unico taglio
+            disponibile. Le cifre venivano inclinate, e su un "4.9" o un
+            "700k+" il corsivo non e' un accento: e' un difetto. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560;1,9..144,640&family=Manrope:wght@500;600;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,560;1,9..144,640&family=Manrope:wght@500;600;800&display=swap"
         />
       </head>
       <body>

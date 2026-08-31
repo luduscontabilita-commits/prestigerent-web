@@ -356,12 +356,40 @@ export default async function TourPage({
     (max, f) => (max == null || f.quante! > max.quante! ? f : max),
     null
   );
-  const voto =
-    tour.rating != null && tour.reviews_count != null
-      ? { valore: tour.rating, quante: tour.reviews_count }
-      : piuGrande
-        ? { valore: piuGrande.voto_medio!, quante: piuGrande.quante! }
-        : null;
+  /* 🔴 UNA SOLA FONTE PER IL VOTO, E NON E' PIU' UNA COLONNA SCRITTA A MANO.
+   *
+   * Fino al 31/08/2026 qui vinceva `tour.rating` / `tour.reviews_count`:
+   * tre colonne riempite a mano, piene su DUE righe di 86. Due conseguenze,
+   * tutte e due invisibili finche' non si andava a guardare.
+   *
+   *  1. La riga col voto sotto al titolo compariva su due pagine sole.
+   *     Sulla scheda del vino -- 8.250 recensioni su Viator, la pagina dove
+   *     atterra il traffico pagato -- non c'era niente. Il voto stava nel
+   *     JSON-LD e nelle schede del menu, cioe' ovunque tranne dove uno sta
+   *     decidendo se comprare.
+   *
+   *  2. Il numero scritto a mano invecchia e nessuno se ne accorge. Siena
+   *     dichiarava 1.794 mentre Viator ne conta 1.811: scritto una volta e
+   *     rimasto li'.
+   *
+   * Adesso il voto viene sempre da `valutazioni_tour`, la stessa fonte che
+   * usa il menu, e vale la stessa regola gia' scritta piu' sopra: NON si
+   * sommano le piattaforme, si prende quella con piu' recensioni e si usa
+   * il suo voto, il suo numero e la sua etichetta. Cosi' il numero nel
+   * JSON-LD e quello stampato nell'hero sono lo stesso carattere per
+   * carattere -- che e' la condizione che Google pone per non prendersi una
+   * penalizzazione, ed e' anche l'unico modo perche' un badge di prova
+   * sociale regga se qualcuno lo va a controllare.
+   *
+   * Le tre colonne restano in tabella ma non le legge piu' nessuno. Non
+   * vanno riempite: un numero a mano qui torna a divergere il giorno dopo. */
+  const voto = piuGrande
+    ? {
+        valore: piuGrande.voto_medio!,
+        quante: piuGrande.quante!,
+        dove: piuGrande.etichetta,
+      }
+    : null;
 
   const calendario = (
     <>
@@ -467,15 +495,15 @@ export default async function TourPage({
 
         {/* Le recensioni appartengono a UN tour, non all'azienda: si mostrano
             solo dove sono davvero sue. */}
-        {tour.rating != null && tour.reviews_count != null && (
+        {voto != null && (
           <div className="trust">
             <span className="t-item">
               <span className="stars-img" aria-hidden="true">
                 {[0, 1, 2, 3, 4].map((i) => <i className="star" key={i} />)}
               </span>
               <span>
-                <b>{tour.rating}</b> · {tour.reviews_count.toLocaleString('en-US')} reviews
-                {tour.reviews_source ? ` on ${tour.reviews_source}` : ''}
+                <b>{voto.valore}</b> · {voto.quante.toLocaleString('en-US')} reviews
+                {voto.dove ? ` on ${voto.dove}` : ''}
               </span>
             </span>
           </div>
