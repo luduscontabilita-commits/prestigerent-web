@@ -29,7 +29,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
  * per sempre.
  */
 
-export type Destinatario = 'google' | 'meta';
+export type Destinatario = 'google' | 'meta' | 'ga4';
 
 export type Esito = {
   ordine: string;

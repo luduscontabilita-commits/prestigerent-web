@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { dalGiorno, raccogli, type Conversione } from '@/lib/conversioni';
 import { caricaSuGoogle, googleConfigurato } from '@/lib/conversioni-google';
 import { caricaSuMeta, metaConfigurato } from '@/lib/conversioni-meta';
+import { caricaSuGa4, ga4Configurato } from '@/lib/conversioni-ga4';
 import {
   giaFatte,
   memoriaConfigurata,
@@ -126,6 +127,7 @@ async function esegui(req: NextRequest) {
   const ammettiCoupon = q.get('coupon') === 'si';
   const soloGoogle = q.get('solo') === 'google';
   const soloMeta = q.get('solo') === 'meta';
+  const soloGa4 = q.get('solo') === 'ga4';
 
   /* ── 1. REGIONDO ────────────────────────────────────────────────── */
   const raccolto = await raccogli(giorni, ammettiCoupon);
@@ -168,16 +170,26 @@ async function esegui(req: NextRequest) {
   const daFare = (d: Destinatario): Conversione[] =>
     raccolto.righe.filter((r) => !fatte.insieme.has(`${d}:${r.ordine}`));
 
-  const perGoogle = soloMeta ? [] : daFare('google');
-  const perMeta = soloGoogle ? [] : daFare('meta');
+  const solo = soloGoogle || soloMeta || soloGa4;
+  const perGoogle = solo && !soloGoogle ? [] : daFare('google');
+  const perMeta = solo && !soloMeta ? [] : daFare('meta');
+  /* 🔴 GA4 NON GUARDA LA MEMORIA, GUARDA ANALYTICS.
+     Gli altri due si fidano del registro locale: se una riga risulta
+     gia' caricata non riparte. Qui no, e non e' una svista: la
+     domanda non e' "l'ho gia' mandata io?" ma "Analytics ce l'ha
+     gia', magari perche' gliel'ha portata il browser?". Il
+     controllo lo fa `caricaSuGa4` interrogando Analytics, e se
+     Analytics non risponde non manda niente. */
+  const perGa4 = solo && !soloGa4 ? [] : raccolto.righe;
 
   /* ── 3. I DUE DESTINATARI, INDIPENDENTI ────────────────────────────
      `allSettled` e non `all`: con `all` un'eccezione su Meta butterebbe
      via anche l'esito di Google, che magari e' andato benissimo -- e
      senza esito non si segna niente, quindi si ricaricherebbe. */
-  const [rg, rm] = await Promise.allSettled([
+  const [rg, rm, ra] = await Promise.allSettled([
     perGoogle.length ? caricaSuGoogle(perGoogle, prova) : null,
     perMeta.length ? caricaSuMeta(perMeta, prova) : null,
+    perGa4.length ? caricaSuGa4(perGa4, prova, giorni) : null,
   ]);
 
   const google =
@@ -206,6 +218,20 @@ async function esegui(req: NextRequest) {
           errore: String(rm.reason).slice(0, 300),
         };
 
+  const ga4 =
+    ra.status === 'fulfilled'
+      ? ra.value
+      : {
+          configurato: ga4Configurato(),
+          inviate: perGa4.length,
+          accettati: [] as string[],
+          rifiutati: perGa4.map((r) => r.ordine),
+          gia: [] as string[],
+          troppoVecchie: 0,
+          motivi: {} as Record<string, number>,
+          errore: String(ra.reason).slice(0, 300),
+        };
+
   /* ── 4. SI SEGNA SOLO QUELLO CHE E' PASSATO ────────────────────── */
   const valori = new Map(raccolto.righe.map((r) => [r.ordine, r]));
   const daSegnare: Esito[] = [];
@@ -230,6 +256,10 @@ async function esegui(req: NextRequest) {
     if (meta) {
       aggiungi('meta', meta.accettati, 'ok');
       aggiungi('meta', meta.rifiutati, 'rifiutata');
+    }
+    if (ga4) {
+      aggiungi('ga4', ga4.accettati, 'ok');
+      aggiungi('ga4', ga4.rifiutati, 'rifiutata');
     }
   }
 
@@ -268,6 +298,7 @@ async function esegui(req: NextRequest) {
          abbiamo chieste, non perche' fossero gia' fatte. */
       gia_su_google: ordini.filter((o) => fatte.insieme.has(`google:${o}`)).length,
       gia_su_meta: ordini.filter((o) => fatte.insieme.has(`meta:${o}`)).length,
+      gia_su_ga4: ordini.filter((o) => fatte.insieme.has(`ga4:${o}`)).length,
       segnate: prova ? 0 : daSegnare.filter((x) => x.esito === 'ok').length,
       scrittura: segnate.ok ? 'ok' : `FALLITA: ${segnate.errore}`,
     },
@@ -297,6 +328,24 @@ async function esegui(req: NextRequest) {
       motivi: ordinati(meta.motivi),
       tracce: meta.richieste.slice(0, 5),
       errore: meta.errore,
+    },
+    /* 🔴 QUI IL NUMERO DA GUARDARE E' `gia_viste_dal_browser`.
+       Se sale verso il totale, vuol dire che il browser sta portando ad
+       Analytics quasi tutto e questo pezzo serve poco. Se resta basso --
+       ad agosto 2026 era il 52% -- vuol dire che meta' delle vendite ad
+       Analytics arriva solo da qui. */
+    ga4: ga4 && {
+      configurato: ga4.configurato,
+      gia_viste_dal_browser: ga4.gia.length,
+      inviate: ga4.inviate,
+      accettate: ga4.accettati.length,
+      rifiutate: ga4.rifiutati.length,
+      /* Il Measurement Protocol scarta senza dirlo tutto cio' che e' piu'
+         vecchio di 72 ore: se questo numero non e' zero, il lavoro
+         notturno ha saltato piu' di tre giorni. */
+      troppo_vecchie_per_analytics: ga4.troppoVecchie,
+      motivi: ordinati(ga4.motivi),
+      errore: ga4.errore,
     },
     durata_ms: Date.now() - partito,
   };
