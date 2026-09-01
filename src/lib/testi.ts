@@ -124,6 +124,7 @@ export type CodiceErrore =
   | 'nome'
   | 'email'
   | 'telefono'
+  | 'tour'
   | 'quando'
   | 'persone'
   | 'messaggio'
@@ -140,20 +141,25 @@ const EN: TestiModulo = {
   sottotitolo:
     'Private tours are built, not booked from a calendar. Send us the details and a real person answers — usually within a few hours.',
 
-  nome: 'Your name',
+  nome: 'Name',
   email: 'Email',
-  telefono: 'Phone or WhatsApp',
+  telefono: 'Phone (include country code, e.g. +1)',
   tour: 'Service you are interested in',
-  quando: 'Preferred date',
-  persone: 'How many of you',
-  messaggio: 'What should we know?',
+  quando: 'Date',
+  persone: 'Number of guests',
+  messaggio: 'Notes (if applicable)',
 
-  nomeEs: 'Jane Miller',
-  emailEs: 'jane@example.com',
-  telefonoEs: '+1 555 0100',
-  tourEs: 'Siena & San Gimignano, a transfer, or tell us',
-  messaggioEs:
-    'Pick-up from our hotel in Florence, a wheelchair to fit in the boot, back by 6pm…',
+  nomeEs: 'John Doe',
+  emailEs: 'johndoe@example.com',
+  telefonoEs: '+1 555 019 2831',
+  /* Il segnaposto chiede i dettagli invece di limitarsi a un esempio: e'
+     la differenza fra una richiesta a cui si puo' rispondere con un
+     preventivo e una a cui bisogna rispondere con tre domande. */
+  tourEs:
+    'Describe it with as many details as possible (pick-up and drop-off, ' +
+    'pick-up time, preferred itinerary…). A clearer request lets us answer ' +
+    'more precisely.',
+  messaggioEs: 'Special requests, preferences, or additional details…',
 
   facoltativo: 'optional',
   invia: 'Send my request',
@@ -180,6 +186,7 @@ const EN: TestiModulo = {
     nome: 'Please tell us your name, so we know who we are writing back to.',
     email: 'Please check the email address — that is where our answer goes.',
     telefono: 'That phone number looks too short. Leave it empty if you prefer email only.',
+    tour: 'Please tell us which service you are interested in.',
     quando: 'Please pick a date from today onwards, within the next two years.',
     persone: 'How many people are traveling? Any number from 1 to 60.',
     messaggio: 'Your message is too long — please keep it under 2,000 characters.',
@@ -202,8 +209,8 @@ const DE: TestiModulo = {
   email: 'E-Mail',
   telefono: 'Telefon oder WhatsApp',
   tour: 'Leistung, die Sie interessiert',
-  quando: 'Wunschtermin',
-  persone: 'Wie viele Personen',
+  quando: 'Datum',
+  persone: 'Anzahl der Gaste',
   messaggio: 'Was sollten wir wissen?',
 
   nomeEs: 'Anna Müller',
@@ -238,6 +245,7 @@ const DE: TestiModulo = {
     nome: 'Bitte nennen Sie uns Ihren Namen, damit wir wissen, wem wir antworten.',
     email: 'Bitte prüfen Sie die E-Mail-Adresse — dorthin geht unsere Antwort.',
     telefono: 'Diese Telefonnummer scheint zu kurz. Lassen Sie das Feld leer, wenn Sie nur per E-Mail schreiben möchten.',
+    tour: 'Bitte sagen Sie uns, welche Leistung Sie interessiert.',
     quando: 'Bitte wählen Sie ein Datum ab heute, innerhalb der nächsten zwei Jahre.',
     persone: 'Wie viele Personen reisen mit? Eine Zahl zwischen 1 und 60.',
     messaggio: 'Ihre Nachricht ist zu lang — bitte höchstens 2.000 Zeichen.',
@@ -260,8 +268,8 @@ const IT: TestiModulo = {
   email: 'Email',
   telefono: 'Telefono o WhatsApp',
   tour: 'Servizio che le interessa',
-  quando: 'Data desiderata',
-  persone: 'Quante persone',
+  quando: 'Data',
+  persone: 'Numero di persone',
   messaggio: 'Cosa dobbiamo sapere?',
 
   nomeEs: 'Giulia Rossi',
@@ -296,6 +304,7 @@ const IT: TestiModulo = {
     nome: 'Ci dica come si chiama, così sappiamo a chi stiamo rispondendo.',
     email: 'Controlli l’indirizzo email: è lì che arriva la nostra risposta.',
     telefono: 'Questo numero sembra troppo corto. Lo lasci vuoto se preferisce solo l’email.',
+    tour: 'Dicci quale servizio ti interessa.',
     quando: 'Scelga una data da oggi in avanti, entro i prossimi due anni.',
     persone: 'Quante persone viaggiano? Un numero da 1 a 60.',
     messaggio: 'Il messaggio è troppo lungo: resti entro 2.000 caratteri.',

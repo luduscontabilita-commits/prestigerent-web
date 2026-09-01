@@ -189,14 +189,25 @@ export async function POST(req: NextRequest) {
   const email = pulisci(corpo.email, 160).toLowerCase();
   if (!EMAIL.test(email)) return no('email', 'email non valida', 'email');
 
+  /* 🔴 DAL 01/09/2026 IL TELEFONO E' OBBLIGATORIO.
+     Prima vuoto andava benissimo. La proprieta' ha deciso il contrario:
+     senza numero l'ufficio non puo' richiamare, e su un tour privato da
+     migliaia di euro una telefonata chiude quello che tre email non
+     chiudono.
+     Il controllo vero sta QUI e non nel browser: `required` si aggira in
+     dieci secondi, e il modulo parte con `noValidate`. */
   const telefono = pulisci(corpo.telefono, 40);
-  /* Vuoto va benissimo: e' facoltativo. Scritto male no -- un numero di
-     tre cifre non e' un numero, e' un campo compilato per sbaglio. */
-  if (telefono && telefono.replace(/\D/g, '').length < 6) {
-    return no('telefono', 'telefono troppo corto', 'telefono');
+  if (telefono.replace(/\D/g, '').length < 6) {
+    return no('telefono', 'telefono mancante o troppo corto', 'telefono');
   }
 
-  const tour = pulisci(corpo.tour, 160) || null;
+  /* Il servizio: era una riga facoltativa, ora e' il riquadro dove si
+     descrive cosa serve. Si chiedono qualche parola, non una: "tour"
+     scritto da solo non e' una richiesta a cui si possa rispondere. */
+  const tour = pulisci(corpo.tour, 600);
+  if (tour.length < 3) {
+    return no('tour', 'servizio mancante', 'tour');
+  }
   const messaggio = pulisci(corpo.messaggio, 2000);
   /* Il taglio a 2000 lo fa gia' `pulisci`, ma se il testo arrivato era
      piu' lungo lo si dice invece di consegnare all'operatore un
@@ -208,8 +219,10 @@ export async function POST(req: NextRequest) {
   /* La data. Il CHECK sulla tabella tiene solo la finestra larga
      (2020-2100) perche' Postgres nei CHECK non accetta `current_date`:
      "non nel passato" si puo' controllare solo qui. */
+  /* 🔴 Obbligatoria dal 01/09/2026, come il resto tranne le note. */
   let quando: string | null = null;
   const dataGrezza = pulisci(corpo.quando, 10);
+  if (!dataGrezza) return no('quando', 'data mancante', 'quando');
   if (dataGrezza) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dataGrezza)) {
       return no('quando', 'data in un formato inatteso', 'quando');
@@ -229,7 +242,12 @@ export async function POST(req: NextRequest) {
     quando = dataGrezza;
   }
 
+  /* 🔴 Obbligatorio dal 01/09/2026: senza sapere quanti sono non si
+     puo' dire ne' il mezzo ne' il prezzo, e l'ufficio deve riscrivere. */
   let persone: number | null = null;
+  if (corpo.persone === null || corpo.persone === undefined || corpo.persone === '') {
+    return no('persone', 'numero di persone mancante', 'persone');
+  }
   if (corpo.persone !== null && corpo.persone !== undefined && corpo.persone !== '') {
     const n = Number(corpo.persone);
     if (!Number.isInteger(n) || n < 1 || n > 60) {

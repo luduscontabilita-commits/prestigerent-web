@@ -230,11 +230,24 @@ export function ModuloRichiesta({ locale, tour }: Props) {
 
   const rotto = (campo: string) => (campoRotto === campo ? 'mr-rotto' : undefined);
 
+  /* 🔴 TUTTO OBBLIGATORIO TRANNE LE NOTE (01/09/2026).
+     Deciso dalla proprieta': una richiesta senza telefono, senza data e
+     senza numero di persone costringe l'ufficio a scrivere per chiedere
+     quelle tre cose, e ogni giro di email e' un giorno perso.
+     Il prezzo si paga in abbandoni -- ogni campo obbligatorio in piu' fa
+     uscire qualcuno -- ed e' un prezzo accettato sapendolo: il modulo
+     faceva circa sei richieste al giorno, e fra due settimane si guarda
+     se sono calate.
+     L'asterisco e' `aria-hidden` perche' a chi usa un lettore di schermo
+     lo dice gia' l'attributo `required`: ripeterlo lo fa leggere due
+     volte. */
+  const obb = <b className="mr-obb" aria-hidden="true">*</b>;
+
   return (
     <form className="mr" onSubmit={invia} noValidate>
       <div className="mr-riga">
         <label className="mr-campo">
-          <span>{t.nome}</span>
+          <span>{t.nome}{obb}</span>
           <input
             name="nome" type="text" required autoComplete="name"
             maxLength={80} placeholder={t.nomeEs} className={rotto('nome')}
@@ -242,7 +255,7 @@ export function ModuloRichiesta({ locale, tour }: Props) {
         </label>
 
         <label className="mr-campo">
-          <span>{t.email}</span>
+          <span>{t.email}{obb}</span>
           <input
             name="email" type="email" required autoComplete="email" inputMode="email"
             maxLength={160} placeholder={t.emailEs} className={rotto('email')}
@@ -250,42 +263,46 @@ export function ModuloRichiesta({ locale, tour }: Props) {
         </label>
       </div>
 
+      {/* L'ordine e' quello del foglio disegnato dalla proprieta':
+          nome/email, poi telefono/persone, poi la data da sola, e in
+          fondo i due riquadri lunghi. */}
       <div className="mr-riga">
         <label className="mr-campo">
-          <span>{t.telefono} <i>{t.facoltativo}</i></span>
+          <span>{t.telefono}{obb}</span>
           <input
-            name="telefono" type="tel" autoComplete="tel" inputMode="tel"
+            name="telefono" type="tel" required autoComplete="tel" inputMode="tel"
             maxLength={40} placeholder={t.telefonoEs} className={rotto('telefono')}
           />
         </label>
 
         <label className="mr-campo">
-          <span>{t.tour} <i>{t.facoltativo}</i></span>
-          {/* Prefilato quando si arriva da una scheda tour: chi sta
-              guardando il Wine Experience non deve riscriverne il nome, e
-              chi risponde vede subito di cosa si parla. Resta modificabile
-              perche' meta' delle richieste vere chiedono un'altra cosa. */}
+          <span>{t.persone}{obb}</span>
           <input
-            name="tour" type="text" maxLength={160}
-            defaultValue={tour ?? ''} placeholder={t.tourEs} className={rotto('tour')}
+            name="persone" type="number" required min={1} max={60} inputMode="numeric"
+            placeholder="4" className={rotto('persone')}
           />
         </label>
       </div>
 
       <div className="mr-riga">
         <label className="mr-campo">
-          <span>{t.quando} <i>{t.facoltativo}</i></span>
-          <input name="quando" type="date" className={rotto('quando')} />
-        </label>
-
-        <label className="mr-campo">
-          <span>{t.persone} <i>{t.facoltativo}</i></span>
-          <input
-            name="persone" type="number" min={1} max={60} inputMode="numeric"
-            placeholder="4" className={rotto('persone')}
-          />
+          <span>{t.quando}{obb}</span>
+          <input name="quando" type="date" required className={rotto('quando')} />
         </label>
       </div>
+
+      <label className="mr-campo mr-largo">
+        <span>{t.tour}{obb}</span>
+        {/* Riquadro e non riga singola: qui si descrive il servizio con i
+            dettagli -- orari, punti di ritrovo, itinerario -- e in una riga
+            sola non ci stanno. Resta prefilato col nome del tour quando si
+            arriva da una scheda: chi guarda il Wine Experience trova gia'
+            scritto di cosa si parla e aggiunge il resto. */}
+        <textarea
+          name="tour" rows={3} required maxLength={600}
+          defaultValue={tour ?? ''} placeholder={t.tourEs} className={rotto('tour')}
+        />
+      </label>
 
       <label className="mr-campo">
         <span>{t.messaggio} <i>{t.facoltativo}</i></span>

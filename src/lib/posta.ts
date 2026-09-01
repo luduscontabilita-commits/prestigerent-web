@@ -186,32 +186,39 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
   const c = conf();
   if (!c) return { ok: false, errore: 'posta non configurata' };
 
-  /* L'oggetto porta gia' tutto quello che serve per decidere se aprire
-     adesso o fra un'ora: chi, che tour, quante persone. Chi risponde
+  /* 🔴 IN INGLESE, PERCHE' IN INGLESE LAVORA CHI LA LEGGE.
+     Fino al 01/09/2026 questa email era tutta in italiano -- oggetto
+     compreso -- e finisce nella casella di chi risponde ai clienti, che
+     l'inglese ce l'ha come lingua di lavoro. Segnalato dalla proprieta'
+     come "strane scritte". Il testo per il cliente era gia' inglese: era
+     rimasta indietro solo la nostra.
+
+     L'oggetto porta gia' tutto quello che serve per decidere se aprire
+     adesso o fra un'ora: chi, che servizio, quante persone. Chi risponde
      guarda l'elenco della posta, non apre ogni messaggio. */
   const oggetto =
-    `Richiesta dal sito — ${r.nome}` +
-    (r.tour ? ` · ${r.tour}` : '') +
+    `New request — ${r.nome}` +
+    (r.tour ? ` · ${r.tour.replace(/\s+/g, ' ').slice(0, 60)}` : '') +
     (r.persone ? ` · ${r.persone} pax` : '');
 
   const righe = [
-    r.messaggio?.trim() || '(nessun messaggio scritto)',
+    r.messaggio?.trim() || '(no notes)',
     '',
     '───────────────',
     `${r.nome} · ${r.email}${r.telefono ? ` · ${r.telefono}` : ''}`,
-    r.tour ? `tour: ${r.tour}` : null,
-    r.quando ? `data desiderata: ${r.quando}` : null,
-    r.persone != null ? `persone: ${r.persone}` : null,
-    `lingua: ${r.lingua}`,
-    r.pagina ? `pagina: https://prestigerent.com${r.pagina}` : null,
-    `consenso a ricevere comunicazioni: ${r.marketing ? 'sì' : 'no'}`,
+    r.tour ? `Service: ${r.tour}` : null,
+    r.quando ? `Date: ${r.quando}` : null,
+    r.persone != null ? `Guests: ${r.persone}` : null,
+    `Language: ${r.lingua}`,
+    r.pagina ? `Page: https://prestigerent.com${r.pagina}` : null,
+    `Marketing consent: ${r.marketing ? 'yes' : 'no'}`,
   ].filter(Boolean);
 
   try {
     const t = apri(c);
 
     await t.sendMail({
-      from: `Sito Prestige Rent <${c.user}>`,
+      from: `Prestige Rent website <${c.user}>`,
       to: c.a,
       /* Si risponde direttamente al cliente premendo "Rispondi": nessuno
          deve copiare l'indirizzo a mano, ed e' il gesto che fa guadagnare

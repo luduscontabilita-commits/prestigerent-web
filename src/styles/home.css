@@ -3426,3 +3426,16 @@ html[data-theme="dark"] .hm-nobile .hm-card:hover{
 /* Angoli e ombra come le schede del resto del sito: le foto arrivano
    squadrate e in mezzo a una pagina di riquadri arrotondati stonano. */
 .ftf .fotaflo-media-container{ border-radius:10px; overflow:hidden; }
+
+/* ── L'OBBLIGO, SEGNATO ────────────────────────────────────────────
+   Dal 01/09/2026 nel modulo tutto e' obbligatorio tranne le note.
+   L'asterisco e' arancione e non rosso: il rosso in un modulo vuoto
+   sembra un errore gia' commesso, e mette fretta invece di informare. */
+.mr-campo .mr-obb{
+  color:var(--orange); font-weight:800; margin-inline-start:2px;
+}
+/* Il riquadro del servizio occupa tutta la riga: e' quello in cui si
+   chiede di scrivere orari, punti di ritrovo e itinerario, e in mezza
+   larghezza si scrive meno. */
+.mr .mr-largo{ grid-column:1 / -1; }
+.mr .mr-largo textarea{ min-height:96px; }
