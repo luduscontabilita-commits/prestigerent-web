@@ -1,4 +1,5 @@
 import { NextResponse, after, type NextRequest } from 'next/server';
+import crypto from 'node:crypto';
 import { supabase } from '@/lib/supabase';
 import { isLocale, DEFAULT_LOCALE } from '@/lib/locales';
 import { ghlConfigurato, contattoDaRichiesta } from '@/lib/ghl';
@@ -196,18 +197,18 @@ export async function POST(req: NextRequest) {
      chiudono.
      Il controllo vero sta QUI e non nel browser: `required` si aggira in
      dieci secondi, e il modulo parte con `noValidate`. */
+  /* Obbligatorio, ma NON si giudica come e' scritto. Un numero che a noi
+     sembra corto puo' essere giusto in un paese che non conosciamo, e
+     rifiutare una richiesta vera per una cifra in meno costa molto piu'
+     di un numero da ricontrollare a mano. */
   const telefono = pulisci(corpo.telefono, 40);
-  if (telefono.replace(/\D/g, '').length < 6) {
-    return no('telefono', 'telefono mancante o troppo corto', 'telefono');
-  }
+  if (!telefono) return no('telefono', 'telefono mancante', 'telefono');
 
   /* Il servizio: era una riga facoltativa, ora e' il riquadro dove si
      descrive cosa serve. Si chiedono qualche parola, non una: "tour"
      scritto da solo non e' una richiesta a cui si possa rispondere. */
   const tour = pulisci(corpo.tour, 600);
-  if (tour.length < 3) {
-    return no('tour', 'servizio mancante', 'tour');
-  }
+  if (!tour) return no('tour', 'servizio mancante', 'tour');
   const messaggio = pulisci(corpo.messaggio, 2000);
   /* Il taglio a 2000 lo fa gia' `pulisci`, ma se il testo arrivato era
      piu' lungo lo si dice invece di consegnare all'operatore un
@@ -220,41 +221,42 @@ export async function POST(req: NextRequest) {
      (2020-2100) perche' Postgres nei CHECK non accetta `current_date`:
      "non nel passato" si puo' controllare solo qui. */
   /* 🔴 Obbligatoria dal 01/09/2026, come il resto tranne le note. */
-  let quando: string | null = null;
+  /* 🔴 LA DATA NON FA PIU' CADERE LA RICHIESTA (01/09/2026).
+     Prima una data in un formato inatteso, o fuori dalla finestra di due
+     anni, faceva rifiutare tutto: la persona aveva scritto nome, email,
+     telefono e cosa voleva, e si vedeva rispondere di no per un campo che
+     l'ufficio avrebbe sistemato in tre secondi.
+     Ora si chiede che ci sia -- quella e' l'obbligatorieta' -- ma se non
+     si riesce a leggerla la richiesta parte lo stesso e la data resta
+     vuota. Nell'email si vede che manca, e chi risponde la chiede.
+     Una richiesta arrivata storta vale infinitamente piu' di una
+     richiesta rifiutata. */
   const dataGrezza = pulisci(corpo.quando, 10);
   if (!dataGrezza) return no('quando', 'data mancante', 'quando');
-  if (dataGrezza) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataGrezza)) {
-      return no('quando', 'data in un formato inatteso', 'quando');
-    }
-    const d = new Date(dataGrezza + 'T12:00:00Z');
-    const oggi = new Date();
-    oggi.setUTCHours(0, 0, 0, 0);
-    const fra2anni = new Date(oggi);
-    fra2anni.setUTCFullYear(fra2anni.getUTCFullYear() + 2);
-    /* Un giorno di margine all'indietro: chi scrive dalla California ha
-       una data di ieri secondo il nostro fuso mentre da lui e' ancora
-       oggi, e rifiutargliela sarebbe incomprensibile. */
-    const ieri = new Date(oggi.getTime() - 24 * 60 * 60 * 1000);
-    if (Number.isNaN(d.getTime()) || d < ieri || d > fra2anni) {
-      return no('quando', 'data fuori dalla finestra utile', 'quando');
-    }
-    quando = dataGrezza;
+  let quando: string | null = /^\d{4}-\d{2}-\d{2}$/.test(dataGrezza) ? dataGrezza : null;
+  if (quando) {
+    const d = new Date(quando + 'T12:00:00Z');
+    if (Number.isNaN(d.getTime())) quando = null;
   }
 
   /* 🔴 Obbligatorio dal 01/09/2026: senza sapere quanti sono non si
      puo' dire ne' il mezzo ne' il prezzo, e l'ufficio deve riscrivere. */
-  let persone: number | null = null;
-  if (corpo.persone === null || corpo.persone === undefined || corpo.persone === '') {
-    return no('persone', 'numero di persone mancante', 'persone');
-  }
-  if (corpo.persone !== null && corpo.persone !== undefined && corpo.persone !== '') {
-    const n = Number(corpo.persone);
-    if (!Number.isInteger(n) || n < 1 || n > 60) {
-      return no('persone', 'numero di persone fuori scala', 'persone');
-    }
-    persone = n;
-  }
+  /* 🔴 IL NUMERO DI PERSONE NON SI GIUDICA PIU' (01/09/2026).
+     C'era un tetto a 60 e un controllo sull'intero: chi scriveva 600 per
+     sbaglio si vedeva rifiutare TUTTA la richiesta, e non e' il nostro
+     mestiere dirgli che si e' sbagliato -- e' il mestiere di chi risponde,
+     che glielo chiede in una riga.
+     Obbligatorio significa che il campo va compilato, non che il valore
+     debba piacerci. Quello che non entra nella colonna del database si
+     salva a vuoto e resta scritto nel messaggio, cosi' nessuno perde
+     l'informazione. */
+  const personeGrezze = pulisci(String(corpo.persone ?? ''), 12);
+  if (!personeGrezze) return no('persone', 'numero di persone mancante', 'persone');
+  const n = Number(personeGrezze);
+  /* La colonna e' uno `smallint`: oltre 32.000 il database rifiuterebbe
+     la scrittura e si perderebbe tutta la richiesta per un campo solo. */
+  const persone: number | null =
+    Number.isInteger(n) && n >= 1 && n <= 30000 ? n : null;
 
   const lingua = isLocale(String(corpo.lingua)) ? String(corpo.lingua) : DEFAULT_LOCALE;
 
@@ -298,41 +300,43 @@ export async function POST(req: NextRequest) {
   const sub_id = /^[gf]-[\w.-]{10,500}$/.test(clicGrezzo) ? clicGrezzo : null;
 
   /* ── LA SCRITTURA ────────────────────────────────────────────────── */
-  const { data: creata, error } = await supabase
-    .from('richieste')
-    .insert({
+  /* 🔴 IL NUMERO SI GENERA QUI E SI SCRIVE INSIEME AL RESTO.
+     Per un'ora questa rotta ha fatto `.select('id').single()` dopo la
+     scrittura, per rileggersi l'identificativo appena creato. Sembra
+     innocuo e ha rotto il modulo per tutti: la chiave pubblica ha il
+     permesso di SCRIVERE in questa tabella ma non di LEGGERLA -- ed e'
+     giusto cosi', altrimenti chiunque potrebbe scaricarsi le richieste
+     dei clienti. La rilettura falliva, l'errore ricadeva su tutta
+     l'operazione, e la persona si vedeva 'scrittura non riuscita' dopo
+     aver compilato sei campi.
+     Generandolo prima non c'e' niente da rileggere. */
+  const riferimento =
+    'PR-' + crypto.randomUUID().replace(/-/g, '').slice(0, 6).toUpperCase();
+
+  const { error } = await supabase.from('richieste').insert({
     nome,
     email,
     telefono: telefono || null,
     tour,
     quando,
     persone,
-    messaggio: messaggio || null,
+    /* Se il numero di persone non era un numero, si allega al messaggio:
+       cosi' chi risponde lo vede lo stesso invece di trovare un campo
+       vuoto e nessuna spiegazione. */
+    messaggio:
+      (persone === null && personeGrezze
+        ? `[guests: ${personeGrezze}] ${messaggio}`.trim()
+        : messaggio) || null,
     lingua,
     pagina,
     marketing,
     consenso_il: consensoIl,
     sub_id,
-      /* Esplicito, anche se e' il default: la policy pubblica accetta solo
-         'nuova', e vederlo scritto qui spiega perche'. */
-      stato: 'nuova',
-    })
-    /* Si rilegge l'identificativo appena scritto: serve a costruire il
-       numero di richiesta da dare al cliente. */
-    .select('id')
-    .single();
-
-  /* 🔴 IL NUMERO DELLA RICHIESTA.
-     Chiesto dalla proprieta' il 01/09/2026. Non si mostra
-     l'identificativo intero -- trentasei caratteri che nessuno detta al
-     telefono -- ma le prime sei cifre in maiuscolo, che bastano: con sei
-     richieste al giorno servirebbero secoli perche' due si somiglino, e
-     chi risponde ritrova la riga cercando quel pezzo.
-     Se la rilettura fallisce si va avanti lo stesso: un'email senza
-     numero e' meglio di una richiesta persa. */
-  const riferimento = creata?.id
-    ? 'PR-' + String(creata.id).replace(/-/g, '').slice(0, 6).toUpperCase()
-    : null;
+    riferimento,
+    /* Esplicito, anche se e' il default: la policy pubblica accetta solo
+       'nuova', e vederlo scritto qui spiega perche'. */
+    stato: 'nuova',
+  });
 
   if (error) {
     /* Nel registro il motivo vero, al visitatore una frase che dice cosa
