@@ -1700,18 +1700,22 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
   margin-top:14px; padding:14px 16px; border-radius:12px;
   background:var(--ph); border:1px solid var(--line);
 }
-.dr-t{
-  margin:0 0 9px; font-size:.68rem; font-weight:800;
-  letter-spacing:1px; text-transform:uppercase; color:var(--ink-soft);
+/* 🔴 QUI DENTRO ORA CI SONO I DATI DELL'AZIENDA (01/09/2026).
+   C'era un elenco di cinque punti sul perche' prenotare da noi: venti
+   righe in fondo alla scheda, sotto il calendario, cioe' dove chi legge
+   ha gia' deciso e cerca un motivo per fidarsi -- non altro testo. Al
+   suo posto nome, sede e recapiti, come sotto il calendario delle
+   landing. Le vecchie regole `.dr-t`, `.dr ul` e `.dr li` non servono
+   piu' e sono state tolte: un foglio di stile pieno di regole senza
+   padrone e' il modo piu' rapido per non capirci piu' niente. */
+.dr-nome{ margin:0 0 2px; font-size:.9rem; font-weight:800; color:var(--ink); }
+.dr-riga{ margin:0 0 2px; font-size:.82rem; line-height:1.55; color:var(--ink-soft); }
+.dr-rec a{
+  color:inherit; font-weight:700;
+  text-decoration:underline; text-underline-offset:2px;
 }
-.dr ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
-.dr li{
-  display:flex; gap:9px; align-items:flex-start;
-  font-size:.82rem; line-height:1.45; color:var(--ink-soft);
-}
-.dr li span{ flex:none; font-size:.95rem; line-height:1.3; }
-.dr li b{ color:var(--ink); font-weight:800; }
-.dr li a{ color:var(--link); font-weight:800; }
+.dr-rec a:hover{ color:var(--orange); }
+.dr-min{ margin:6px 0 0; font-size:.74rem; line-height:1.45; color:var(--ink-soft); opacity:.85; }
 
 /* il rimando a tutti i tour, sotto le dodici schede della home */
 .hm-tutti{ text-align:center; margin:26px 0 0; }
