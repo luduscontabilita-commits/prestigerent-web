@@ -124,31 +124,93 @@ export function postaConfigurata() {
  * l'ufficio gia' avvisato -- ma si scrive nei log, perche' una conferma
  * che non arriva produce la stessa richiesta due volte.
  */
-/* 🔴 SOLO TESTO, E NIENTE HTML. DECISIONE DELLA PROPRIETA'.
+/* 🔴 LA STORIA DELL'HTML SU QUESTE DUE EMAIL, IN ORDINE.
  *
- * Il 01/09/2026 queste email sono state mandate per qualche ora anche in
- * HTML, e poi si e' tornati indietro su richiesta esplicita: "ne' nella
- * invio verso usa e ne' nell'invio al cliente, NO HTML".
+ * 01/09/2026, mattina -- via l'HTML da tutte e due, su richiesta
+ * esplicita: "ne' nell'invio verso usa e ne' nell'invio al cliente, NO
+ * HTML". Motivo vero: quello che arrivava era impaginato male.
  *
- * VA SAPUTO COSA COMPORTA, perche' e' il difetto che l'HTML risolveva.
- * Rispondere a un messaggio di solo testo apre una risposta di solo
- * testo: quando chi risponde prova ad allegare un'immagine o a impaginare
- * un preventivo, il programma di posta chiede "vuoi passare a HTML?
- * altrimenti le tabelle vanno perse". Con WordPress non succedeva perche'
- * quelle email erano HTML.
+ * 01/09/2026, pomeriggio -- torna sulla conferma al cliente, chiesta
+ * meglio fatta, con grassetti e collegamenti.
  *
- * Quella domanda tornera'. Non e' una svista: e' il prezzo di questa
- * scelta, accettato sapendolo. Il giorno che desse fastidio piu' della
- * formattazione, basta rimettere un `html:` accanto al `text:` -- e
- * l'HTML che serve e' fatto di soli paragrafi, non di tabelle: a schermo
- * e' indistinguibile dal testo semplice.
+ * 01/09/2026, sera -- torna anche su questa, quella dell'ufficio. Il
+ * motivo e' esattamente quello che era stato scritto qui come prezzo da
+ * pagare, ed e' arrivato il conto: **il formato della risposta lo decide
+ * il messaggio a cui si risponde**. Se arriva solo testo, "Rispondi"
+ * apre una finestra di solo testo, e li' dentro un grassetto incollato
+ * si appiattisce e un collegamento diventa una riga di caratteri. Chi
+ * scrive a un cliente un preventivo con dentro i link ai tour non puo'
+ * lavorare cosi'.
+ *
+ * QUINDI L'HTML C'E', MA E' FATTO IN UN MODO PRECISO, e va tenuto cosi':
+ * soli paragrafi, nessuna tabella, nessuna immagine, nessuna larghezza
+ * fissa, nessuno sfondo colorato. E' il motivo per cui la prima volta
+ * era venuto male: un'email vestita da volantino, quando ci si risponde
+ * sopra, trascina i suoi stili nella risposta e la fa sembrare rotta.
+ * Un'email di soli paragrafi a schermo e' indistinguibile dal testo
+ * semplice -- ma il programma di posta la conta come HTML, che e'
+ * l'unica cosa che serve.
+ *
+ * Resta anche la versione in solo testo, sempre: chi legge da orologio o
+ * da terminale vede quella. Le due partono insieme nello stesso
+ * messaggio (`multipart/alternative`) e ognuno prende la sua.
  */
+
+/* L'EMAIL PER L'UFFICIO, IMPAGINATA.
+ *
+ * Le stesse informazioni della versione in solo testo, nello stesso
+ * ordine: prima quello che ha scritto il cliente, poi i suoi dati.
+ * Niente di piu' -- questa la legge chi risponde, di corsa, cinquanta
+ * volte al giorno.
+ *
+ * 🔴 GLI STILI SONO POCHISSIMI APPOSTA. Quello che c'e' qui dentro
+ * ricompare citato dentro ogni risposta: piu' se ne mette, piu' la
+ * risposta sembra strana. Nessun carattere dichiarato, nessuna misura,
+ * nessun colore sul testo che si legge -- cosi' la risposta esce con il
+ * carattere che ha scelto chi scrive, non con il nostro.
+ */
+function htmlAllUfficio(r: RichiestaDaAvvisare): string {
+  const e = (t: string) =>
+    t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const br = (t: string) => e(t).replace(/\r?\n/g, '<br>');
+
+  const note = r.messaggio?.trim();
+  const dati: string[] = [];
+  const agg = (k: string, v: string | null | undefined) => {
+    if (v) dati.push(`<div><strong>${e(k)}:</strong> ${v}</div>`);
+  };
+
+  agg('Ref', r.riferimento ? e(r.riferimento) : null);
+  agg('Name', e(r.nome));
+  /* I recapiti sono collegamenti: chi risponde deve poter chiamare dal
+     telefono senza ricopiare il numero a mano. */
+  agg('Email', `<a href="mailto:${e(r.email)}">${e(r.email)}</a>`);
+  agg('Phone', r.telefono ? `<a href="tel:${e(r.telefono.replace(/[^\d+]/g, ''))}">${e(r.telefono)}</a>` : null);
+  agg('Service', r.tour ? e(r.tour) : null);
+  agg('Date', r.quando ? e(r.quando) : null);
+  agg('Guests', r.persone != null ? String(r.persone) : null);
+  agg('Language', e(r.lingua));
+  agg('Page', r.pagina
+    ? `<a href="https://prestigerent.com${e(r.pagina)}">prestigerent.com${e(r.pagina)}</a>`
+    : null);
+
+  return [
+    '<div>',
+    `<p>${note ? br(note) : '<em>(no notes)</em>'}</p>`,
+    '<hr>',
+    '<div>',
+    dati.join(''),
+    '</div>',
+    '</div>',
+  ].join('');
+}
 
 /* L'EMAIL AL CLIENTE, IMPAGINATA.
  *
- * \u🔴 SOLO QUESTA. Quella che arriva all'ufficio resta in solo testo,
- * per decisione della proprieta' del 01/09/2026 -- e con la nota che ne
- * consegue, scritta piu' su.
+ * 🔴 Anche quella per l'ufficio e' impaginata, dalla sera del
+ * 01/09/2026: vedi la nota lunga piu' su. Le due si somigliano ma non
+ * fanno lo stesso mestiere -- questa la legge un cliente che non ci
+ * conosce, quella la legge chi risponde e ci risponde SOPRA.
  *
  * Qui invece la formattazione serve, ed e' stata chiesta: il testo ha due
  * voci che vanno staccate dal resto (Response Time, Our Commitment) e tre
@@ -422,6 +484,12 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       replyTo: `${r.nome} <${r.email}>`,
       subject: oggetto,
       text: righe.join('\n'),
+      /* 🔴 QUESTA RIGA E' IL MOTIVO PER CUI "RISPONDI" FUNZIONA.
+         Il formato della risposta lo decide il messaggio a cui si
+         risponde: senza `html` qui, chi preme Rispondi si ritrova una
+         finestra di solo testo dove i grassetti si appiattiscono e i
+         collegamenti diventano righe di caratteri. */
+      html: htmlAllUfficio(r),
       textEncoding: 'quoted-printable',
     });
     return { ok: true };
