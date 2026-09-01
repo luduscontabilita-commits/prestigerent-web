@@ -978,7 +978,13 @@
 }
 
 /* ---------- footer ---------- */
-.ft{ background:var(--deep); color:rgba(255,255,255,.82); margin-top:40px; }
+/* 🔴 IL FONDO E' UN COLORE FISSO, NON `--deep` (01/09/2026).
+   `--deep` vale #24333F col tema chiaro e #0B0F13 con quello scuro,
+   quindi il piede cambiava tinta insieme al resto della pagina. Il
+   colore chiesto e' #373752 e basta: uno solo, in tutti e due i temi.
+   Le regole qui sotto danno per scontato un fondo scuro (il testo e'
+   bianco a varie opacita'): #373752 lo e', quindi non serve altro. */
+.ft{ background:#373752; color:rgba(255,255,255,.82); margin-top:40px; }
 .ft-band{
   display:flex; flex-wrap:wrap; justify-content:center; gap:10px 30px;
   padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.13);
@@ -994,15 +1000,30 @@
 @media (max-width:900px){ .ft-in{ grid-template-columns:1fr 1fr; gap:26px; } }
 @media (max-width:560px){ .ft-in{ grid-template-columns:1fr; } }
 .ft-col{ display:flex; flex-direction:column; gap:9px; min-width:0; }
+/* 🔴 I TITOLI E I RECAPITI NON SONO PIU' ARANCIONI (01/09/2026).
+   Erano `var(--orange)`, cioe' lo stesso colore dei pulsanti che
+   chiedono di prenotare. Su fondo #373752 quell'arancione grida, e
+   soprattutto insegna l'occhio sbagliato: se "EXPERIENCES" e il numero
+   di telefono hanno il colore del bottone "Book now", il colore smette
+   di voler dire "qui si compra". Adesso #bebec7, che si legge e non
+   compete. L'arancione nel piede resta a niente, ed e' voluto. */
 .ft-t{
   margin:0 0 3px; font-size:.68rem; font-weight:800; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--orange);
+  text-transform:uppercase; color:#bebec7;
 }
 .ft-col a{ color:rgba(255,255,255,.82); text-decoration:none; font-size:.9rem; font-weight:600; }
 .ft-col a:hover{ color:#fff; }
 .ft-about strong{ color:#fff; font-size:1.1rem; font-weight:800; }
 .ft-about p{ margin:0; font-size:.88rem; line-height:1.6; }
-.ft-nap a{ color:var(--orange); font-weight:700; }
+.ft-nap a{ color:#bebec7; font-weight:700; }
+.ft-nap a:hover{ color:#fff; }
+
+/* Le voci del menu Help, con il disegno davanti. `align-items:flex-start`
+   e non `center`: se un titolo va a capo su due righe l'icona deve
+   restare in alto accanto alla prima, non scendere a meta' del blocco. */
+.ft-vo{ display:flex; align-items:flex-start; gap:9px; }
+.ft-vo svg{ flex:0 0 auto; margin-top:2px; opacity:.72; }
+.ft-vo:hover svg{ opacity:1; }
 .ft-wa{
   align-self:flex-start; margin-top:4px; background:#25D366; color:#fff !important;
   padding:9px 15px; border-radius:999px; font-size:.84rem; font-weight:800;
@@ -1018,11 +1039,57 @@
 /* La barra in fondo ha lo sfondo scuro del footer, non quello della
    pagina: `--ink-soft` qui sarebbe testo scuro su scuro. Il colore e' lo
    stesso di `.ft-bottom`, appena piu' spento. */
-.ft-pay{ font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px; }
-@media (max-width:640px){ .ft-pay{ display:block; margin-top:10px; } }
+.ft-pay{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  justify-content:center;
+  font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px;
+}
+.ft-pay-t{ min-width:0; }
+@media (max-width:640px){ .ft-pay{ display:flex; margin-top:10px; } }
 
-.ft-social a{ color:rgba(255,255,255,.75); text-decoration:none; font-weight:700; }
-.ft-social a:hover{ color:#fff; }
+/* Le tessere dei circuiti. `line-height:0` sullo span: senza, il testo
+   invisibile che avvolge l'SVG aggiunge qualche pixel sotto ogni carta e
+   la fila si disallinea rispetto alla riga di testo accanto. */
+.ft-carte{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+.ft-carta{ display:inline-flex; line-height:0; border-radius:4px; }
+/* Un filo di bordo chiaro: su #373752 il blu scuro di Visa e il quasi
+   nero di Mastercard si perderebbero nel fondo. */
+.ft-carta svg{ display:block; box-shadow:0 0 0 1px rgba(255,255,255,.14); border-radius:4px; }
+
+/* I social: solo il disegno, la parola sta in `aria-label` per chi
+   naviga con un lettore di schermo. Cerchio appena accennato, perche'
+   quattro icone nude in fila su fondo scuro sembrano un errore di
+   caricamento. */
+.ft-social a{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:999px;
+  color:rgba(255,255,255,.75); text-decoration:none;
+  background:rgba(255,255,255,.07);
+}
+.ft-social a:hover{ color:#fff; background:rgba(255,255,255,.16); }
+
+/* ---------- footer: la vetrina ---------- */
+.ft-pop{
+  max-width:1180px; margin:0 auto; padding:0 20px 26px;
+}
+.ft-pop-t{ margin-bottom:12px; }
+.ft-pop-in{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+/* Sotto i 720 tre schede affiancate lasciano al titolo una colonna da
+   quattro parole in verticale: meglio una sotto l'altra, con la foto di
+   fianco al testo. */
+@media (max-width:720px){ .ft-pop-in{ grid-template-columns:1fr; gap:10px; } }
+.ft-pop-c{
+  display:flex; align-items:center; gap:12px; min-width:0;
+  color:rgba(255,255,255,.9); text-decoration:none;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09);
+  border-radius:12px; padding:8px; font-size:.86rem; font-weight:700;
+  line-height:1.35;
+}
+.ft-pop-c:hover{ background:rgba(255,255,255,.12); color:#fff; }
+.ft-pop-c img{
+  flex:0 0 auto; width:72px; height:52px; object-fit:cover;
+  border-radius:8px; background:rgba(255,255,255,.08);
+}
 
 /* Sotto i 760px la barra si vede SUBITO, senza aspettare che si scorra.
    Su telefono il pulsante di prenotazione a portata di pollice fin dal primo

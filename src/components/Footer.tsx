@@ -3,6 +3,12 @@ import { ANNO_FONDAZIONE } from '@/lib/anni';
 import { testoBreve } from '@/lib/cifre';
 import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
+import { foto } from '@/lib/foto';
+import {
+  IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta,
+  IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok,
+  CartaVisa, CartaMastercard, CartaAmex, CartaPayPal, CartaStripe,
+} from '@/components/IconeFooter';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
    altre `.ft-*`: `home.css` e' in mano ad altri in questo momento, e due
    persone che scrivono in fondo allo stesso file si scontrano a ogni
@@ -90,20 +96,28 @@ const DESTINAZIONI = [
  * Restano quelle con una destinazione propria. `Meeting point` sta ancora
  * sul vecchio hosting e ci resta (e' la pagina che il cliente apre il
  * giorno del tour); `Payment` e' il link Stripe, esterno e vivo. */
-const AZIENDA = [
+/* Ogni voce porta con se' il suo disegno, come nel footer di WordPress.
+   L'icona non e' decorazione: in una colonna di sei righe tutte lunghe
+   uguali e' l'unica cosa che permette di trovare "Meeting point" senza
+   leggerle tutte. Sta in terza posizione nella tupla, cosi' le due prime
+   restano [testo, indirizzo] come in tutti gli altri elenchi di questo
+   file. */
+type Voce = [string, string, () => React.JSX.Element];
+
+const AZIENDA: Voce[] = [
   /* Le 145 domande. Sul vecchio sito questa voce c'era nel piede di ogni
      pagina, ed e' li' che la gente la cerca: quando ha una domanda pratica
      e non sa dove chiederla. */
-  ['FAQs', '/faqs/'],
-  ['Contact us', '/contact-us/'],
-  ['Meeting point', '/mp/'],
-  ['About us', '/about-us/'],
+  ['FAQs', '/faqs/', IconaFaq],
+  ['Contact us', '/contact-us/', IconaAereo],
+  ['Meeting point', '/mp/', IconaMappa],
+  ['About us', '/about-us/', IconaInfo],
   /* Il footer vecchio diceva "Our Vehicles" e mandava a una pagina sua;
      sul sito nuovo quella pagina e' diventata la sezione della flotta in
      home. Si punta dritto all'ancora invece che all'indirizzo vecchio: il
      redirect funziona, ma ogni salto in piu' e' tempo perso e un pezzo di
      autorevolezza che resta per strada. */
-  ['Our vehicles', '/#fleet'],
+  ['Our vehicles', '/#fleet', IconaMezzo],
 ];
 
 /* 🔴 TRE VOCI DEL FOOTER VECCHIO CHE NON TORNANO.
@@ -116,8 +130,44 @@ const AZIENDA = [
  * cinque anni". */
 
 /* Fuori dal sito: non passano da `p()` perche' non hanno una lingua. */
-const AZIENDA_FUORI = [
-  ['Payment', 'https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ'],
+const AZIENDA_FUORI: Voce[] = [
+  ['Payment', 'https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ', IconaCarta],
+];
+
+/* ── LE TRE ESPERIENZE IN VETRINA, CON LA FOTO ────────────────────────
+ *
+ * Sono i tre `small_group` pubblicati, cioe' l'85% del fatturato. Il
+ * quarto che la categoria contiene -- `siena-...-landing` -- e' in
+ * bozza (`status: draft`) e resta fuori: e' la variante per le campagne,
+ * non una pagina del sito.
+ *
+ * Titoli e foto sono scritti qui e non letti dal database a ogni pagina,
+ * come tutti gli altri elenchi di questo file. Il footer sta su 124
+ * pagine: una query in piu' qui e' una query in piu' ovunque, e queste
+ * tre non cambiano da sole -- e' una scelta editoriale, non un elenco
+ * che si aggiorna.
+ * Le foto sono la prima immagine dei `blocks` di ognuno, lette da
+ * Supabase il 01/09/2026 e verificate una per una (200). Se un giorno
+ * si riordinano le immagini di un tour, questa resta quella di prima:
+ * e' il prezzo di non interrogare il database, ed e' il motivo per cui
+ * l'indirizzo e' scritto per esteso qui sotto invece che ricavato.
+ */
+const IN_VETRINA = [
+  {
+    titolo: 'Siena & San Gimignano with lunch',
+    href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
+    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/caption-14.webp',
+  },
+  {
+    titolo: 'Wine Experience in Tuscany',
+    href: '/tour/wine-experience-in-tuscany/',
+    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/04/TUSCANY-WINE-CELLAR.jpg',
+  },
+  {
+    titolo: 'Wine & Food Experience in Tuscany',
+    href: '/tour/wine-food-experience-in-tuscany/',
+    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/04/TUSCANY-WINE-EXPERIENCE.jpg',
+  },
 ];
 
 const PIU_PRENOTATI = [
@@ -137,17 +187,28 @@ const PIU_PRENOTATI = [
    prenotare.
    Gli indirizzi restano scritti qui sotto: il giorno che si vogliono
    rimettere -- magari solo i social, non i marketplace -- basta
-   riportarli nell'elenco.
+   riportarli nell'elenco. */
 
-   const SOCIAL = [
-     ['Tripadvisor',  'https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html'],
-     ['Instagram',    'https://www.instagram.com/prestigerentitaly'],
-     ['Facebook',     'https://www.facebook.com/prestigerent/'],
-     ['TikTok',       'https://www.tiktok.com/@prestigerentitaly'],
-     ['GetYourGuide', 'https://www.getyourguide.com/prestige-rent-tours-in-italy-s8058/'],
-   ];
-*/
-const SOCIAL: [string, string][] = [];
+/* 🔴 RIMESSI IL 01/09/2026, SU RICHIESTA, MENO UNO.
+ *
+ * Tornano Tripadvisor, Instagram, Facebook e TikTok con gli indirizzi
+ * del footer di WordPress. NON torna GetYourGuide, e non e' una
+ * dimenticanza: e' il marketplace da cui questo sito serve ad
+ * affrancarsi -- un cliente arrivato qui e mandato la' torna a comprare
+ * da loro, e la commissione la paga l'azienda. Tripadvisor invece porta
+ * le recensioni, che sono la prova di cui il cliente ha bisogno prima
+ * di prenotare: e' un marketplace anche lui, ma quello che rimanda
+ * indietro piu' di quanto porti via.
+ *
+ * Sono in fondo, dopo tutto il resto, e con la sola icona: chi li cerca
+ * li trova, chi sta prenotando non ci inciampa.
+ */
+const SOCIAL: Voce[] = [
+  ['Tripadvisor', 'https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html', IconaTripadvisor],
+  ['Instagram', 'https://www.instagram.com/prestigerentitaly', IconaInstagram],
+  ['Facebook', 'https://en-gb.facebook.com/prestigerent/', IconaFacebook],
+  ['TikTok', 'https://www.tiktok.com/@prestigerentitaly', IconaTikTok],
+];
 
 export async function Footer({ locale }: { locale: string }) {
   const p = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
@@ -229,12 +290,48 @@ export async function Footer({ locale }: { locale: string }) {
             frequenti doveva leggere una lista di tour per trovarle. */}
         <div className="ft-col">
           <p className="ft-t">Help</p>
-          {AZIENDA.map(([t, h]) => (
-            <a key={h} href={p(h)}>{t}</a>
+          {AZIENDA.map(([t, h, Ico]) => (
+            <a key={h} className="ft-vo" href={p(h)}>
+              <Ico />
+              <span>{t}</span>
+            </a>
           ))}
-          {AZIENDA_FUORI.map(([t, h]) => (
-            <a key={h} href={h} target="_blank" rel="noopener">
-              {t}
+          {AZIENDA_FUORI.map(([t, h, Ico]) => (
+            <a key={h} className="ft-vo" href={h} target="_blank" rel="noopener">
+              <Ico />
+              <span>{t}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ── LA VETRINA ────────────────────────────────────────────────
+          Tre esperienze con la foto, subito sopra la riga di chiusura.
+          Il footer di WordPress aveva "Popular experiences" come elenco
+          di soli titoli, e in mezzo ad altre quattro colonne di link
+          uguali non lo distingueva niente. Con la miniatura smette di
+          essere la quinta lista della pagina e torna a essere quello
+          che deve: l'ultima occasione di far vedere un prodotto a chi
+          e' arrivato in fondo senza prenotare.
+          Le immagini passano da `foto()`, cioe' dall'ottimizzatore: la
+          piu' pesante delle tre e' un JPEG da 201 KB, che servito com'e'
+          su tutte e 124 le pagine sarebbe il file piu' grosso del
+          footer. A 320px di larghezza ne restano poche decine. */}
+      <div className="ft-pop">
+        <p className="ft-t ft-pop-t">Popular experiences</p>
+        <div className="ft-pop-in">
+          {IN_VETRINA.map((e) => (
+            <a key={e.href} className="ft-pop-c" href={p(e.href)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={foto(e.img, 320)}
+                alt=""
+                width={112}
+                height={74}
+                loading="lazy"
+                decoding="async"
+              />
+              <span>{e.titolo}</span>
             </a>
           ))}
         </div>
@@ -297,20 +394,35 @@ export async function Footer({ locale }: { locale: string }) {
             footer: il contenitore proprio non esiste. */}
         {SOCIAL.length > 0 && (
           <span className="ft-social">
-            {SOCIAL.map(([t, h]) => (
-              <a key={h} href={h} target="_blank" rel="noopener">{t}</a>
+            {SOCIAL.map(([t, h, Ico]) => (
+              <a key={h} href={h} target="_blank" rel="noopener" aria-label={t} title={t}>
+                <Ico />
+              </a>
             ))}
           </span>
         )}
-        {/* I circuiti di pagamento c'erano nel footer di WordPress e qui
-            mancavano. Sono scritti, non disegnati: i loghi ufficiali hanno
-            regole d'uso proprie e un logo rifatto male fa sembrare finto
-            anche un pagamento vero. Il nome basta a fare quello che quella
-            riga deve fare -- dire a chi non ci conosce che i soldi non
-            passano da noi. */}
+        {/* I circuiti di pagamento. Prima erano solo scritti, con questa
+            motivazione: "i loghi ufficiali hanno regole d'uso proprie e un
+            logo rifatto male fa sembrare finto anche un pagamento vero".
+            Il ragionamento vale ancora, e infatti quelle qui sotto non
+            sono i loghi: sono tessere con il nome del circuito, nella sua
+            forma e nel suo colore (vedi IconeFooter.tsx). Si guadagna il
+            riconoscimento a colpo d'occhio -- una fila di carte si legge
+            senza leggerla -- senza spacciare un disegno per il marchio.
+            Il testo resta sotto, per chi usa un lettore di schermo e per
+            chi le immagini non le carica. */}
         <span className="ft-pay">
-          Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
-          PayPal &middot; American Express
+          <span className="ft-carte">
+            <CartaStripe />
+            <CartaVisa />
+            <CartaMastercard />
+            <CartaAmex />
+            <CartaPayPal />
+          </span>
+          <span className="ft-pay-t">
+            Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
+            PayPal &middot; American Express
+          </span>
         </span>
       </div>
 
