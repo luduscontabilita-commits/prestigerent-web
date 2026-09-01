@@ -185,15 +185,26 @@ gtag('set','url_passthrough',true);
   var CSS='#pr-cons{position:fixed;right:18px;bottom:18px;z-index:2147483000;width:380px;max-width:calc(100vw - 28px);'
     +'background:#fff;color:#1e2a32;border:1px solid #dfe3e6;border-radius:12px;padding:18px 18px 16px;'
     +'font:14px/1.55 system-ui,-apple-system,sans-serif;box-shadow:0 10px 40px rgba(20,26,32,.22)}'
-    +'@media (prefers-color-scheme:dark){#pr-cons{background:#1b1917;color:#efeae4;border-color:#312c28;'
-    +'box-shadow:0 10px 40px rgba(0,0,0,.5)}}'
+    /* 🔴 IL TEMA LO DECIDE IL SITO, NON IL SISTEMA OPERATIVO.
+       Qui c'era '@media (prefers-color-scheme:dark)', che guarda
+       l'impostazione di Windows. Ma questo sito ha un interruttore suo, e
+       lo scrive in 'documentElement.dataset.theme' (vedi lo script in
+       testa a layout.tsx). Chi aveva Windows scuro e sceglieva il tema
+       chiaro si ritrovava un riquadro nero in mezzo a una pagina bianca:
+       segnalato con schermata il 01/09/2026.
+       Si guarda l'attributo, ed e' anche piu' corretto: quello script
+       risolve GIA' la preferenza del sistema quando l'utente non ha
+       ancora scelto, quindi non si perde niente e si smette di avere due
+       fonti di verita' che possono contraddirsi. */
+    +'html[data-theme="dark"] #pr-cons{background:#1b1917;color:#efeae4;border-color:#312c28;'
+    +'box-shadow:0 10px 40px rgba(0,0,0,.5)}'
     +'#pr-cons .pr-tit{font-size:15px;font-weight:800;margin:0 0 7px}'
     +'#pr-cons p{margin:0 0 14px}'
     +'#pr-cons a{color:#F5760B;font-weight:600}'
     +'#pr-cons .pr-bot{display:flex;gap:9px}'
     +'#pr-cons button{font:700 14px/1 system-ui,sans-serif;cursor:pointer;padding:11px 16px;'
     +'border-radius:8px;border:1px solid #dfe3e6;background:transparent;color:inherit;flex:1 1 0}'
-    +'@media (prefers-color-scheme:dark){#pr-cons button{border-color:#312c28}}'
+    +'html[data-theme="dark"] #pr-cons button{border-color:#312c28}'
     +'#pr-cons button.pr-si{background:#F5760B;border-color:#F5760B;color:#fff}'
     +'#pr-cons button:hover{border-color:#F5760B}'
     +'#pr-cons button.pr-si:hover{filter:brightness(1.07)}'
