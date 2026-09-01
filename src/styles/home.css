@@ -1033,33 +1033,22 @@
   display:flex; flex-wrap:wrap; justify-content:center; gap:8px 22px;
   font-size:.8rem; color:rgba(255,255,255,.6);
 }
-.ft-social{ display:flex; gap:16px; }
 /* I circuiti di pagamento: una riga sola, sottomessa. Deve farsi
    leggere da chi la cerca, non rubare l'occhio a chi non la cerca. */
 /* La barra in fondo ha lo sfondo scuro del footer, non quello della
    pagina: `--ink-soft` qui sarebbe testo scuro su scuro. Il colore e' lo
    stesso di `.ft-bottom`, appena piu' spento. */
-.ft-pay{
-  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-  justify-content:center;
-  font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px;
-}
-.ft-pay-t{ min-width:0; }
-@media (max-width:640px){ .ft-pay{ display:flex; margin-top:10px; } }
-
-/* Le tessere dei circuiti. `line-height:0` sullo span: senza, il testo
-   invisibile che avvolge l'SVG aggiunge qualche pixel sotto ogni carta e
-   la fila si disallinea rispetto alla riga di testo accanto. */
-.ft-carte{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
-.ft-carta{ display:inline-flex; line-height:0; border-radius:4px; }
-/* Un filo di bordo chiaro: su #373752 il blu scuro di Visa e il quasi
-   nero di Mastercard si perderebbero nel fondo. */
-.ft-carta svg{ display:block; box-shadow:0 0 0 1px rgba(255,255,255,.14); border-radius:4px; }
+.ft-pay{ font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px; }
+@media (max-width:640px){ .ft-pay{ display:block; margin-top:10px; } }
 
 /* I social: solo il disegno, la parola sta in `aria-label` per chi
    naviga con un lettore di schermo. Cerchio appena accennato, perche'
    quattro icone nude in fila su fondo scuro sembrano un errore di
-   caricamento. */
+   caricamento.
+   Da oggi stanno nella colonna dell'identita', sotto la mail, e non piu'
+   nella riga di chiusura: da qui il `margin-top` e l'allineamento a
+   sinistra invece che al centro. */
+.ft-social{ display:flex; gap:8px; margin-top:12px; }
 .ft-social a{
   display:inline-flex; align-items:center; justify-content:center;
   width:34px; height:34px; border-radius:999px;
@@ -1067,29 +1056,6 @@
   background:rgba(255,255,255,.07);
 }
 .ft-social a:hover{ color:#fff; background:rgba(255,255,255,.16); }
-
-/* ---------- footer: la vetrina ---------- */
-.ft-pop{
-  max-width:1180px; margin:0 auto; padding:0 20px 26px;
-}
-.ft-pop-t{ margin-bottom:12px; }
-.ft-pop-in{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-/* Sotto i 720 tre schede affiancate lasciano al titolo una colonna da
-   quattro parole in verticale: meglio una sotto l'altra, con la foto di
-   fianco al testo. */
-@media (max-width:720px){ .ft-pop-in{ grid-template-columns:1fr; gap:10px; } }
-.ft-pop-c{
-  display:flex; align-items:center; gap:12px; min-width:0;
-  color:rgba(255,255,255,.9); text-decoration:none;
-  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09);
-  border-radius:12px; padding:8px; font-size:.86rem; font-weight:700;
-  line-height:1.35;
-}
-.ft-pop-c:hover{ background:rgba(255,255,255,.12); color:#fff; }
-.ft-pop-c img{
-  flex:0 0 auto; width:72px; height:52px; object-fit:cover;
-  border-radius:8px; background:rgba(255,255,255,.08);
-}
 
 /* Sotto i 760px la barra si vede SUBITO, senza aspettare che si scorra.
    Su telefono il pulsante di prenotazione a portata di pollice fin dal primo

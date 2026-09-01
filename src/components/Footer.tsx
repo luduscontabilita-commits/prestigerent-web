@@ -3,11 +3,9 @@ import { ANNO_FONDAZIONE } from '@/lib/anni';
 import { testoBreve } from '@/lib/cifre';
 import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
-import { foto } from '@/lib/foto';
 import {
   IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta,
   IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok,
-  CartaVisa, CartaMastercard, CartaAmex, CartaPayPal, CartaStripe,
 } from '@/components/IconeFooter';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
    altre `.ft-*`: `home.css` e' in mano ad altri in questo momento, e due
@@ -134,41 +132,13 @@ const AZIENDA_FUORI: Voce[] = [
   ['Payment', 'https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ', IconaCarta],
 ];
 
-/* ── LE TRE ESPERIENZE IN VETRINA, CON LA FOTO ────────────────────────
- *
- * Sono i tre `small_group` pubblicati, cioe' l'85% del fatturato. Il
- * quarto che la categoria contiene -- `siena-...-landing` -- e' in
- * bozza (`status: draft`) e resta fuori: e' la variante per le campagne,
- * non una pagina del sito.
- *
- * Titoli e foto sono scritti qui e non letti dal database a ogni pagina,
- * come tutti gli altri elenchi di questo file. Il footer sta su 124
- * pagine: una query in piu' qui e' una query in piu' ovunque, e queste
- * tre non cambiano da sole -- e' una scelta editoriale, non un elenco
- * che si aggiorna.
- * Le foto sono la prima immagine dei `blocks` di ognuno, lette da
- * Supabase il 01/09/2026 e verificate una per una (200). Se un giorno
- * si riordinano le immagini di un tour, questa resta quella di prima:
- * e' il prezzo di non interrogare il database, ed e' il motivo per cui
- * l'indirizzo e' scritto per esteso qui sotto invece che ricavato.
- */
-const IN_VETRINA = [
-  {
-    titolo: 'Siena & San Gimignano with lunch',
-    href: '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/',
-    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/caption-14.webp',
-  },
-  {
-    titolo: 'Wine Experience in Tuscany',
-    href: '/tour/wine-experience-in-tuscany/',
-    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/04/TUSCANY-WINE-CELLAR.jpg',
-  },
-  {
-    titolo: 'Wine & Food Experience in Tuscany',
-    href: '/tour/wine-food-experience-in-tuscany/',
-    img: 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/wp/2021/04/TUSCANY-WINE-EXPERIENCE.jpg',
-  },
-];
+/* 🔴 QUI C'ERA "POPULAR EXPERIENCES" CON LE TRE FOTO, TOLTA IL 01/09/2026.
+   Aggiunta e rimossa lo stesso giorno, su richiesta: la fascia con le
+   tre miniature stava fra le colonne e la riga di chiusura, e in fondo
+   a una pagina che ha gia' un carosello di tour in cima faceva
+   sostanzialmente il lavoro due volte.
+   I tre tour restano nel footer, dove c'erano gia': sono le prime tre
+   voci di `PIU_PRENOTATI`, senza foto. */
 
 const PIU_PRENOTATI = [
   ['Siena & San Gimignano with lunch', '/tour/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence/'],
@@ -256,6 +226,22 @@ export async function Footer({ locale }: { locale: string }) {
             <a href={`tel:${a?.telefono?.replace(/\s/g, '')}`}>{a?.telefono}</a> ·{' '}
             <a href={`mailto:${a?.email}`}>{a?.email}</a>
           </p>
+
+          {/* I social stanno qui, subito sotto la mail, e non piu' nella
+              riga di chiusura: e' la colonna dell'identita' -- chi siamo,
+              dove siamo, come ci si parla -- e i canali sono la stessa
+              cosa detta in un altro modo. In fondo alla pagina, fra il
+              copyright e i circuiti di pagamento, erano quattro cerchi
+              senza contesto. */}
+          {SOCIAL.length > 0 && (
+            <span className="ft-social">
+              {SOCIAL.map(([t, h, Ico]) => (
+                <a key={h} href={h} target="_blank" rel="noopener" aria-label={t} title={t}>
+                  <Ico />
+                </a>
+              ))}
+            </span>
+          )}
           <a className="ft-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
             Message us on WhatsApp
           </a>
@@ -305,37 +291,6 @@ export async function Footer({ locale }: { locale: string }) {
         </div>
       </div>
 
-      {/* ── LA VETRINA ────────────────────────────────────────────────
-          Tre esperienze con la foto, subito sopra la riga di chiusura.
-          Il footer di WordPress aveva "Popular experiences" come elenco
-          di soli titoli, e in mezzo ad altre quattro colonne di link
-          uguali non lo distingueva niente. Con la miniatura smette di
-          essere la quinta lista della pagina e torna a essere quello
-          che deve: l'ultima occasione di far vedere un prodotto a chi
-          e' arrivato in fondo senza prenotare.
-          Le immagini passano da `foto()`, cioe' dall'ottimizzatore: la
-          piu' pesante delle tre e' un JPEG da 201 KB, che servito com'e'
-          su tutte e 124 le pagine sarebbe il file piu' grosso del
-          footer. A 320px di larghezza ne restano poche decine. */}
-      <div className="ft-pop">
-        <p className="ft-t ft-pop-t">Popular experiences</p>
-        <div className="ft-pop-in">
-          {IN_VETRINA.map((e) => (
-            <a key={e.href} className="ft-pop-c" href={p(e.href)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={foto(e.img, 320)}
-                alt=""
-                width={112}
-                height={74}
-                loading="lazy"
-                decoding="async"
-              />
-              <span>{e.titolo}</span>
-            </a>
-          ))}
-        </div>
-      </div>
 
       {/* IL PROMEMORIA. Sta in fondo, e' rosso e ha un link che porta dritto
           dove si spegne. Deve dare fastidio: e' l'unica difesa contro un
@@ -392,37 +347,16 @@ export async function Footer({ locale }: { locale: string }) {
       <div className="ft-bottom">
         {/* Se l'elenco e' vuoto non resta uno spazio vuoto in mezzo al
             footer: il contenitore proprio non esiste. */}
-        {SOCIAL.length > 0 && (
-          <span className="ft-social">
-            {SOCIAL.map(([t, h, Ico]) => (
-              <a key={h} href={h} target="_blank" rel="noopener" aria-label={t} title={t}>
-                <Ico />
-              </a>
-            ))}
-          </span>
-        )}
-        {/* I circuiti di pagamento. Prima erano solo scritti, con questa
-            motivazione: "i loghi ufficiali hanno regole d'uso proprie e un
-            logo rifatto male fa sembrare finto anche un pagamento vero".
-            Il ragionamento vale ancora, e infatti quelle qui sotto non
-            sono i loghi: sono tessere con il nome del circuito, nella sua
-            forma e nel suo colore (vedi IconeFooter.tsx). Si guadagna il
-            riconoscimento a colpo d'occhio -- una fila di carte si legge
-            senza leggerla -- senza spacciare un disegno per il marchio.
-            Il testo resta sotto, per chi usa un lettore di schermo e per
-            chi le immagini non le carica. */}
+        {/* 🔴 LE TESSERE DEI CIRCUITI SONO STATE TOLTE IL 01/09/2026.
+            Aggiunte e rimosse lo stesso giorno, su richiesta. Si torna
+            alla riga scritta, che e' come stava prima e aveva gia' la
+            sua motivazione: i marchi dei circuiti hanno un manuale d'uso
+            che vieta di ridisegnarli, e il nome scritto fa comunque il
+            lavoro che questa riga deve fare -- dire a chi non ci conosce
+            che i soldi non passano da noi. */}
         <span className="ft-pay">
-          <span className="ft-carte">
-            <CartaStripe />
-            <CartaVisa />
-            <CartaMastercard />
-            <CartaAmex />
-            <CartaPayPal />
-          </span>
-          <span className="ft-pay-t">
-            Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
-            PayPal &middot; American Express
-          </span>
+          Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
+          PayPal &middot; American Express
         </span>
       </div>
 

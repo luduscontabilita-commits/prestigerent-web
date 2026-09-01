@@ -149,57 +149,10 @@ export const IconaTikTok = () => (
   </svg>
 );
 
-/* ── Le tessere dei circuiti di pagamento ─────────────────────────────
-   Misura unica 40x26, il rapporto di una carta vera: allineate in riga
-   sembrano un portafoglio, non cinque disegni scollegati. */
-function Tessera({
-  nome,
-  fondo,
-  testo = '#fff',
-  children,
-}: {
-  nome: string;
-  fondo: string;
-  testo?: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <span className="ft-carta" title={nome}>
-      <svg width="40" height="26" viewBox="0 0 40 26" role="img" aria-label={nome}>
-        <rect width="40" height="26" rx="4" fill={fondo} />
-        {children ?? (
-          <text
-            x="20"
-            y="17"
-            textAnchor="middle"
-            fontFamily="system-ui, -apple-system, sans-serif"
-            fontSize="9"
-            fontWeight="800"
-            letterSpacing=".3"
-            fill={testo}
-          >
-            {nome}
-          </text>
-        )}
-      </svg>
-    </span>
-  );
-}
-
-export const CartaVisa = () => <Tessera nome="VISA" fondo="#1A1F71" />;
-export const CartaAmex = () => <Tessera nome="AMEX" fondo="#1F72CD" />;
-export const CartaPayPal = () => <Tessera nome="PayPal" fondo="#003087" />;
-export const CartaStripe = () => <Tessera nome="Stripe" fondo="#635BFF" />;
-
-/* I due cerchi di Mastercard: e' una forma geometrica, si riproduce
-   senza deformare niente. Il rosso e il giallo sono quelli del marchio,
-   e la fascia centrale nasce dalla sovrapposizione, non e' disegnata. */
-export const CartaMastercard = () => (
-  <span className="ft-carta" title="Mastercard">
-    <svg width="40" height="26" viewBox="0 0 40 26" role="img" aria-label="Mastercard">
-      <rect width="40" height="26" rx="4" fill="#16161D" />
-      <circle cx="16.4" cy="13" r="7" fill="#EB001B" />
-      <circle cx="23.6" cy="13" r="7" fill="#F79E1B" fillOpacity=".9" />
-    </svg>
-  </span>
-);
+/* 🔴 QUI C'ERANO LE TESSERE DEI CIRCUITI, TOLTE IL 01/09/2026.
+   Aggiunte e rimosse lo stesso giorno, su richiesta: il piede torna a
+   dire i circuiti a parole, come faceva prima. Il ragionamento sui
+   marchi resta scritto in cima a questo file, perche' vale ancora il
+   giorno in cui qualcuno riproponesse di disegnarli.
+   `IconaCarta` invece resta: non e' un marchio, e' il disegno di una
+   carta qualunque accanto alla voce "Payment" del menu Help. */
