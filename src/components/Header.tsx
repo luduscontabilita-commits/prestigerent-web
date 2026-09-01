@@ -101,6 +101,26 @@ const MIN_RECENSIONI = 20;
  * mostrare. */
 const MIN_VETRINA = 50;
 
+/* 🔴 CHI STA TOCCANDO LO SCHERMO NON PUO' PASSARE SOPRA.
+ *
+ * Il menu grande si apre passandoci sopra col mouse. Su un telefono non
+ * esiste un "sopra": il dito o tocca o non tocca, e il tocco vale come
+ * un clic. Il risultato era che premere "Tours" portava dritti alla
+ * pagina della categoria e il pannello con dentro i tour non si vedeva
+ * mai -- si apriva solo premendo la freccina, che e' larga un dito
+ * scarso e nessuno sa di doverla premere.
+ *
+ * La prova non e' la larghezza dello schermo ma il tipo di puntatore: un
+ * portatile stretto ha il mouse e deve continuare a comportarsi da
+ * mouse, un tablet largo non ce l'ha e deve comportarsi da dito. */
+function conIlMouse(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  );
+}
+
+
 export function Header({
   locale,
   voti = {},
@@ -328,7 +348,34 @@ export function Header({
                 <a
                   className={'hd-top' + (on ? ' is-on' : '')}
                   href={p(s.href)}
-                  onFocus={() => apri(s.testo)}
+                  /* 🔴 SOLO LA TASTIERA APRE COL FUOCO.
+                     Prima bastava il fuoco, e su un telefono il fuoco
+                     arriva col tocco: il pannello si apriva sul `focus` e
+                     il `click` subito dopo lo richiudeva, cosi' non si
+                     apriva mai. `:focus-visible` e' vero quando si arriva
+                     col Tab e falso quando si arriva col dito. */
+                  onFocus={(e) => {
+                    try {
+                      if (!e.currentTarget.matches(':focus-visible')) return;
+                    } catch {
+                      /* browser che non conosce :focus-visible: si tiene
+                         il comportamento di prima, che non fa danni */
+                    }
+                    apri(s.testo);
+                  }}
+                  /* 🔴 COL DITO IL PRIMO TOCCO APRE, NON PORTA VIA.
+                     Sul telefono premere "Tours" apriva la pagina della
+                     categoria e il pannello non si vedeva mai. Ora la
+                     voce si comporta come la freccina: apre e chiude.
+                     Alla pagina della categoria si arriva da dentro il
+                     pannello, dove c'e' gia' "View all". Col mouse non
+                     cambia niente: il pannello e' gia' aperto perche' ci
+                     si sta sopra, e il clic porta alla categoria. */
+                  onClick={(e) => {
+                    if (conIlMouse()) return;
+                    e.preventDefault();
+                    apri(aperta === s.testo ? null : s.testo);
+                  }}
                 >
                   {s.testo}
                 </a>
