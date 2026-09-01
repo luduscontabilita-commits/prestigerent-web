@@ -173,14 +173,17 @@ async function esegui(req: NextRequest) {
   const solo = soloGoogle || soloMeta || soloGa4;
   const perGoogle = solo && !soloGoogle ? [] : daFare('google');
   const perMeta = solo && !soloMeta ? [] : daFare('meta');
-  /* 🔴 GA4 NON GUARDA LA MEMORIA, GUARDA ANALYTICS.
-     Gli altri due si fidano del registro locale: se una riga risulta
-     gia' caricata non riparte. Qui no, e non e' una svista: la
-     domanda non e' "l'ho gia' mandata io?" ma "Analytics ce l'ha
-     gia', magari perche' gliel'ha portata il browser?". Il
-     controllo lo fa `caricaSuGa4` interrogando Analytics, e se
-     Analytics non risponde non manda niente. */
-  const perGa4 = solo && !soloGa4 ? [] : raccolto.righe;
+  /* 🔴 GA4 HA BISOGNO DI DUE CONTROLLI, NON DI UNO.
+     Il primo e' il registro locale, come per gli altri due: se una riga
+     l'abbiamo gia' spedita non riparte.
+     Il secondo lo fa `caricaSuGa4`, e chiede ad Analytics quali ordini
+     ha gia' -- perche' li' la domanda e' un'altra: non "l'ho mandata
+     io?" ma "ce l'ha gia', magari portata dal browser?".
+     Servono TUTTI E DUE. Il 01/09/2026 c'era solo il secondo, e due
+     lanci ravvicinati hanno spedito due volte le stesse quattro righe:
+     i rapporti di Analytics hanno qualche ora di ritardo, quindi
+     un evento appena mandato li' non risulta ancora. */
+  const perGa4 = solo && !soloGa4 ? [] : daFare('ga4');
 
   /* ── 3. I DUE DESTINATARI, INDIPENDENTI ────────────────────────────
      `allSettled` e non `all`: con `all` un'eccezione su Meta butterebbe
