@@ -5,6 +5,12 @@ import { caricaSuGoogle, googleConfigurato } from '@/lib/conversioni-google';
 import { caricaSuMeta, metaConfigurato } from '@/lib/conversioni-meta';
 import { caricaSuGa4, ga4Configurato } from '@/lib/conversioni-ga4';
 import {
+  raccogliRichieste,
+  richiesteConfigurate,
+  EVENTO_GA4,
+  AZIONE_ADS,
+} from '@/lib/conversioni-richieste';
+import {
   giaFatte,
   memoriaConfigurata,
   segnaEsiti,
@@ -235,6 +241,34 @@ async function esegui(req: NextRequest) {
           errore: String(ra.reason).slice(0, 300),
         };
 
+  /* ── 3-bis. LE RICHIESTE DAL MODULO ───────────────────────────────
+     Stesso buco degli acquisti, in proporzione peggiore: dal 27 al 31
+     agosto il modulo ha prodotto 29 richieste e Analytics ne ha viste
+     12. Il fatto pero' ce l'abbiamo in casa -- e' una riga nella nostra
+     tabella -- quindi si recupera con lo stesso lavoro.
+     Va su DUE destinazioni diverse da quelle degli acquisti: l'azione
+     "Richiesta dal modulo" su Ads e l'evento `richiesta_inviata` su
+     Analytics. Per questo anche il registro le segna con nomi propri:
+     una richiesta gia' mandata non deve bloccare l'acquisto dello
+     stesso giorno, e viceversa. */
+  const soloRichieste = q.get('solo') === 'richieste';
+  const vuoleRichieste = !solo || soloRichieste;
+  const racRic = vuoleRichieste
+    ? await raccogliRichieste(giorni)
+    : { righe: [], lette: 0, scarti: {} as Record<string, number> };
+
+  const perAdsRic = racRic.righe.filter(
+    (r) => !fatte.insieme.has(`google_lead:${r.ordine}`),
+  );
+  const perGa4Ric = racRic.righe.filter((r) => !fatte.insieme.has(`ga4_lead:${r.ordine}`));
+
+  const [rar, rgr] = await Promise.allSettled([
+    perAdsRic.length ? caricaSuGoogle(perAdsRic, prova, AZIONE_ADS) : null,
+    perGa4Ric.length ? caricaSuGa4(perGa4Ric, prova, giorni, EVENTO_GA4) : null,
+  ]);
+  const adsRic = rar.status === 'fulfilled' ? rar.value : null;
+  const ga4Ric = rgr.status === 'fulfilled' ? rgr.value : null;
+
   /* ── 4. SI SEGNA SOLO QUELLO CHE E' PASSATO ────────────────────── */
   const valori = new Map(raccolto.righe.map((r) => [r.ordine, r]));
   const daSegnare: Esito[] = [];
@@ -263,6 +297,14 @@ async function esegui(req: NextRequest) {
     if (ga4) {
       aggiungi('ga4', ga4.accettati, 'ok');
       aggiungi('ga4', ga4.rifiutati, 'rifiutata');
+    }
+    if (adsRic) {
+      aggiungi('google_lead', adsRic.accettati, 'ok');
+      aggiungi('google_lead', adsRic.rifiutati, 'rifiutata');
+    }
+    if (ga4Ric) {
+      aggiungi('ga4_lead', ga4Ric.accettati, 'ok');
+      aggiungi('ga4_lead', ga4Ric.rifiutati, 'rifiutata');
     }
   }
 
@@ -350,6 +392,33 @@ async function esegui(req: NextRequest) {
       motivi: ordinati(ga4.motivi),
       errore: ga4.errore,
     },
+    /* Le richieste dal modulo, contate a parte: hanno un'altra azione su
+       Ads e un altro nome su Analytics, e mescolarle agli acquisti
+       renderebbe illeggibili tutti e due i numeri. */
+    richieste: vuoleRichieste
+      ? {
+          configurato: richiesteConfigurate(),
+          lette: racRic.lette,
+          tenute: racRic.righe.length,
+          scarti: ordinati(racRic.scarti),
+          errore: racRic.errore,
+          ads: adsRic && {
+            inviate: adsRic.inviate,
+            accettate: adsRic.accettati.length,
+            rifiutate: adsRic.rifiutati.length,
+            motivi: ordinati(adsRic.motivi),
+            errore: adsRic.errore,
+          },
+          analytics: ga4Ric && {
+            gia_viste_dal_browser: ga4Ric.gia.length,
+            inviate: ga4Ric.inviate,
+            accettate: ga4Ric.accettati.length,
+            rifiutate: ga4Ric.rifiutati.length,
+            motivi: ordinati(ga4Ric.motivi),
+            errore: ga4Ric.errore,
+          },
+        }
+      : null,
     durata_ms: Date.now() - partito,
   };
 

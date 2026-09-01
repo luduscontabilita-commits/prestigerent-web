@@ -107,7 +107,7 @@ function siglaCliente(ordine: string): string {
 /** I numeri d'ordine che Analytics ha gia' registrato nella finestra.
  *  Se non si riesce a chiedere si torna `null`, e chi chiama NON manda
  *  niente: meglio saltare una notte che raddoppiare le vendite. */
-async function ordiniGiaVisti(giorni: number): Promise<Set<string> | null> {
+async function ordiniGiaVisti(giorni: number, evento: string): Promise<Set<string> | null> {
   const c = conf();
   if (!c || !c.refresh || !c.proprieta) return null;
 
@@ -134,7 +134,7 @@ async function ordiniGiaVisti(giorni: number): Promise<Set<string> | null> {
         dimensions: [{ name: 'transactionId' }],
         metrics: [{ name: 'eventCount' }],
         dimensionFilter: {
-          filter: { fieldName: 'eventName', stringFilter: { value: 'purchase' } },
+          filter: { fieldName: 'eventName', stringFilter: { value: evento } },
         },
         limit: 5000,
       }),
@@ -161,7 +161,12 @@ async function ordiniGiaVisti(giorni: number): Promise<Set<string> | null> {
 export async function caricaSuGa4(
   righe: Conversione[],
   prova: boolean,
-  giorni = 3
+  giorni = 3,
+  /* Il nome dell'evento e quello con cui Analytics lo riconosce
+     gia' dal browser: devono coincidere, altrimenti nei rapporti
+     risultano due cose diverse. Per gli acquisti e' `purchase`,
+     per le richieste dal modulo e' `richiesta_inviata`. */
+  evento = 'purchase'
 ): Promise<EsitoGa4> {
   const vuoto: EsitoGa4 = {
     configurato: false,
@@ -183,7 +188,7 @@ export async function caricaSuGa4(
   /* 🔴 IL CONTROLLO CHE VIENE PRIMA DI TUTTO.
      Se Analytics non risponde non si tira a indovinare: si esce senza
      mandare. Una notte saltata si recupera domani, un doppione no. */
-  const gia = await ordiniGiaVisti(giorni);
+  const gia = await ordiniGiaVisti(giorni, evento);
   if (!gia) {
     return {
       ...vuoto,
@@ -219,25 +224,32 @@ export async function caricaSuGa4(
       non_personalized_ads: false,
       events: [
         {
-          name: 'purchase',
+          name: evento,
           params: {
             transaction_id: r.ordine,
-            value: Number(r.valore.toFixed(2)),
-            currency: 'EUR',
+            /* Come per Google: valore 0 vuol dire "non lo so", e un
+               fatturato finto e' peggio di un fatturato mancante. */
+            ...(r.valore > 0
+              ? { value: Number(r.valore.toFixed(2)), currency: 'EUR' }
+              : {}),
             /* Il segno di riconoscimento: in qualsiasi rapporto si puo'
                separare quello che ha portato il browser da quello che
                abbiamo recuperato noi. Senza, fra sei mesi nessuno sa
                piu' da dove viene un numero. */
             sorgente_dato: 'server_regiondo',
             engagement_time_msec: 1,
-            items: [
-              {
-                item_id: r.prodotto,
-                item_name: r.prodotto,
-                quantity: persone,
-                price: Number((r.valore / persone).toFixed(2)),
-              },
-            ],
+            ...(r.valore > 0
+              ? {
+                  items: [
+                    {
+                      item_id: r.prodotto,
+                      item_name: r.prodotto,
+                      quantity: persone,
+                      price: Number((r.valore / persone).toFixed(2)),
+                    },
+                  ],
+                }
+              : { servizio: r.prodotto }),
           },
         },
       ],

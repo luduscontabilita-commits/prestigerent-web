@@ -29,7 +29,18 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
  * per sempre.
  */
 
-export type Destinatario = 'google' | 'meta' | 'ga4';
+/* I nomi con cui il registro distingue le destinazioni.
+ * `_lead` sono le richieste dal modulo: vanno su un'altra azione di
+ * Google Ads e su un altro evento di Analytics, quindi devono avere un
+ * conto loro -- se condividessero il nome con gli acquisti, una
+ * richiesta gia' mandata impedirebbe l'invio dell'acquisto con lo
+ * stesso identificativo, e nessuno capirebbe perche'. */
+export type Destinatario =
+  | 'google'
+  | 'meta'
+  | 'ga4'
+  | 'google_lead'
+  | 'ga4_lead';
 
 export type Esito = {
   ordine: string;

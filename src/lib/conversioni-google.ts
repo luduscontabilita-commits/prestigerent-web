@@ -136,6 +136,11 @@ async function accesso(c: NonNullable<ReturnType<typeof conf>>): Promise<string>
 export async function caricaSuGoogle(
   righe: Conversione[],
   prova: boolean,
+  /* L'azione di destinazione. Senza, si carica dentro "Acquisto":
+     e' il comportamento di sempre e non cambia per nessuno. Serve
+     perche' dal 01/09/2026 lo stesso lavoro carica anche le
+     richieste dal modulo, che sono un'altra azione. */
+  azione?: string,
 ): Promise<EsitoCaricamento> {
   const vuoto: EsitoCaricamento = {
     configurato: false,
@@ -170,7 +175,7 @@ export async function caricaSuGoogle(
       reference: 'prestige-ads',
       loginAccount: { accountType: 'GOOGLE_ADS', accountId: c.mcc },
       operatingAccount: { accountType: 'GOOGLE_ADS', accountId: c.cid },
-      productDestinationId: c.azione,
+      productDestinationId: (azione ?? c.azione).replace(/\D/g, ''),
     },
   ];
 
@@ -191,8 +196,14 @@ export async function caricaSuGoogle(
            e' valida: il fuso vero l'ha gia' applicato `istanteDa`. */
         eventTimestamp: r.quando.toISOString(),
         userData: { userIdentifiers: identificativi },
-        conversionValue: r.valore,
-        currency: 'EUR',
+        /* 🔴 VALORE ZERO VUOL DIRE "NON LO SO", NON "VALE ZERO".
+           Le richieste dal modulo arrivano con valore 0 apposta: quanto
+           vale davvero un preventivo nessuno l'ha mai misurato, e i 100
+           euro sull'azione erano una stima. Mandando 0 si sovrascrive
+           quella stima con una cifra ancora piu' finta; non mandando
+           niente, Google usa il valore impostato sull'azione e il
+           giorno che si sapra' si cambia in un posto solo. */
+        ...(r.valore > 0 ? { conversionValue: r.valore, currency: 'EUR' } : {}),
         /* Sulla strada multi-sorgente e' facoltativo, ma se c'e' deve
            valere WEB: la prenotazione nasce sul sito. */
         eventSource: 'WEB',
