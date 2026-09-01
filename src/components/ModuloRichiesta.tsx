@@ -351,10 +351,18 @@ export function ModuloRichiesta({ locale, tour }: Props) {
        *
        * Sta SOPRA il pulsante: una scelta che compare dopo il gesto che
        * la chiude non e' una scelta. */}
-      <label className="mr-consenso">
-        <input name="marketing" type="checkbox" value="si" />
-        <span>{t.marketing}</span>
-      </label>
+      {/* 🔴 TOLTA IL 01/09/2026, SU RICHIESTA DELLA PROPRIETA'.
+          La casella c'era da poco e serviva a una cosa sola: poter usare
+          l'indirizzo per offerte e novita' DOPO che la richiesta e'
+          chiusa. Senza, `marketing` resta sempre falso e quel consenso
+          non lo si ha mai -- il che vuol dire che a chi scrive da qui
+          NON si possono mandare email promozionali, solo la risposta
+          alla sua richiesta. E' una rinuncia, non una semplificazione.
+          Rispondere resta lecito lo stesso: e' esecuzione di misure
+          precontrattuali (art. 6(1)(b) GDPR), non consenso.
+          Il campo `marketing` resta nella tabella e nel messaggio: il
+          giorno che la casella torna, ricomincia a valorizzarsi da solo
+          senza toccare altro. */}
 
       <div className="mr-fondo">
         <button type="submit" className="mr-invia" disabled={stato === 'invio'}>
