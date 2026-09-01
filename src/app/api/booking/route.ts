@@ -9,6 +9,7 @@ import {
   emailDaScartare,
   emailPerGoogle,
   emailPerMeta,
+  impronta,
   nomePerMeta,
   telefonoPerGoogle,
   telefonoPerMeta,
@@ -120,8 +121,20 @@ export async function POST(req: NextRequest) {
   /* Le email mascherate delle agenzie e quelle interne non servono a
      nessuno: Google non le abbina e sporcano il rapporto. */
   const scarto = c.email ? emailDaScartare(c.email) : null;
-  const emailGoogle = scarto ? null : emailPerGoogle(c.email);
-  const telefonoGoogle = telefonoPerGoogle(c.telefono);
+  /* 🔴 QUI CI VANNO LE IMPRONTE, NON GLI INDIRIZZI.
+     `emailPerGoogle` e compagne NORMALIZZANO soltanto -- minuscolo,
+     niente spazi, i punti tolti su Gmail. La cifratura e' un secondo
+     passaggio, `impronta()`, e saltarlo non da' nessun errore
+     leggibile: Google risponde "The HEX encoded value is malformed"
+     e rifiuta tutto il lotto. Costato mezz'ora il 01/09/2026. */
+  const perGoogle = scarto ? null : emailPerGoogle(c.email);
+  const perMeta = scarto ? null : emailPerMeta(c.email);
+  const telG = telefonoPerGoogle(c.telefono);
+  const telM = telefonoPerMeta(c.telefono);
+  const nomeM = nomePerMeta(c.nome);
+  const cognomeM = nomePerMeta(c.cognome);
+  const emailGoogle = perGoogle ? impronta(perGoogle) : null;
+  const telefonoGoogle = telG ? impronta(telG) : null;
 
   const quando = c.quando ? new Date(c.quando) : new Date();
   const riga: Conversione = {
@@ -129,11 +142,11 @@ export async function POST(req: NextRequest) {
     quando: Number.isNaN(quando.getTime()) ? new Date() : quando,
     valore: numero(c.valore),
     emailGoogle,
-    emailMeta: scarto ? null : emailPerMeta(c.email),
+    emailMeta: perMeta ? impronta(perMeta) : null,
     telefonoGoogle,
-    telefonoMeta: telefonoPerMeta(c.telefono),
-    nomeMeta: nomePerMeta(c.nome),
-    cognomeMeta: nomePerMeta(c.cognome),
+    telefonoMeta: telM ? impronta(telM) : null,
+    nomeMeta: nomeM ? impronta(nomeM) : null,
+    cognomeMeta: cognomeM ? impronta(cognomeM) : null,
     gclid: null,
     fbclid: null,
     prodotto: (c.servizio ?? 'Prenotazione /booking/').slice(0, 120),

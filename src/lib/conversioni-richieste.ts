@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { Conversione } from '@/lib/conversioni';
 import {
   emailDaScartare,
+  impronta,
   emailPerGoogle,
   emailPerMeta,
   nomePerMeta,
@@ -118,8 +119,18 @@ export async function raccogliRichieste(giorni: number): Promise<RaccoltoRichies
       continue;
     }
 
-    const emailGoogle = emailPerGoogle(r.email);
-    const telefonoGoogle = telefonoPerGoogle(r.telefono);
+    /* 🔴 QUI CI VANNO LE IMPRONTE, NON GLI INDIRIZZI.
+     `emailPerGoogle` e compagne NORMALIZZANO soltanto -- minuscolo,
+     niente spazi, i punti tolti su Gmail. La cifratura e' un secondo
+     passaggio, `impronta()`, e saltarlo non da' nessun errore
+     leggibile: Google risponde "The HEX encoded value is malformed"
+     e rifiuta tutto il lotto. Costato mezz'ora il 01/09/2026. */
+    const perG = emailPerGoogle(r.email);
+    const perM = emailPerMeta(r.email);
+    const telG = telefonoPerGoogle(r.telefono);
+    const telM = telefonoPerMeta(r.telefono);
+    const emailGoogle = perG ? impronta(perG) : null;
+    const telefonoGoogle = telG ? impronta(telG) : null;
     /* Senza almeno un identificativo Google non ha niente su cui
        abbinare, e la riga verrebbe scartata dall'altra parte: meglio
        dirlo qui, dove si vede. */
@@ -130,6 +141,8 @@ export async function raccogliRichieste(giorni: number): Promise<RaccoltoRichies
 
     const nome = (r.nome ?? '').trim();
     const spazio = nome.indexOf(' ');
+    const nomeM = nomePerMeta(spazio > 0 ? nome.slice(0, spazio) : nome);
+    const cognomeM = spazio > 0 ? nomePerMeta(nome.slice(spazio + 1)) : null;
     righe.push({
       /* L'identificativo della riga fa da numero d'ordine: e' unico, e'
          stabile, e non svela niente di chi ha scritto. */
@@ -138,11 +151,11 @@ export async function raccogliRichieste(giorni: number): Promise<RaccoltoRichies
       /* 🔴 ZERO, E NON E' UNA DIMENTICANZA: vedi la nota in cima. */
       valore: 0,
       emailGoogle,
-      emailMeta: emailPerMeta(r.email),
+      emailMeta: perM ? impronta(perM) : null,
       telefonoGoogle,
-      telefonoMeta: telefonoPerMeta(r.telefono),
-      nomeMeta: nomePerMeta(spazio > 0 ? nome.slice(0, spazio) : nome),
-      cognomeMeta: spazio > 0 ? nomePerMeta(nome.slice(spazio + 1)) : null,
+      telefonoMeta: telM ? impronta(telM) : null,
+      nomeMeta: nomeM ? impronta(nomeM) : null,
+      cognomeMeta: cognomeM ? impronta(cognomeM) : null,
       gclid: null,
       fbclid: null,
       prodotto: r.tour ?? 'Richiesta dal modulo',
