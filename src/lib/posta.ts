@@ -52,6 +52,10 @@ export type RichiestaDaAvvisare = {
   pagina: string | null;
   lingua: string;
   marketing: boolean;
+  /* Il numero della richiesta, breve e leggibile al telefono. Nasce
+     dall'identificativo della riga su Supabase: chi chiama lo detta e
+     chi risponde ritrova la riga senza cercare per nome. */
+  riferimento?: string | null;
 };
 
 function conf() {
@@ -120,6 +124,50 @@ export function postaConfigurata() {
  * l'ufficio gia' avvisato -- ma si scrive nei log, perche' una conferma
  * che non arriva produce la stessa richiesta due volte.
  */
+/* DA RIGHE DI TESTO A HTML, E PERCHE' SERVE DAVVERO.
+ *
+ * Fino al 01/09/2026 queste email partivano in SOLO TESTO. Sembra una
+ * scelta sobria, e invece ha un effetto pratico che si paga ogni giorno:
+ * rispondere a un messaggio di solo testo apre una risposta di solo
+ * testo. Quando chi risponde prova ad allegare un'immagine o a impaginare
+ * un preventivo, il programma di posta chiede "vuoi passare a HTML?
+ * altrimenti le tabelle vanno perse". Segnalato dall'ufficio: con
+ * WordPress non succedeva, perche' quelle email erano HTML.
+ *
+ * Si manda quindi in tutti e due i modi nello stesso messaggio, che e' lo
+ * standard: chi legge in testo vede il testo, chi risponde parte in HTML
+ * e non gli viene chiesto niente.
+ *
+ * L'HTML e' volutamente povero -- paragrafi e nient'altro. Niente
+ * tabelle, niente immagini, nessun foglio di stile: una email piena di
+ * marcatura si rompe in meta' dei programmi di posta, e qui l'HTML non
+ * serve all'aspetto, serve a far partire la RISPOSTA nel modo giusto.
+ */
+function aHtml(righe: string[]): string {
+  const fuggi = (t: string) =>
+    t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  /* Le righe vuote separano i paragrafi, come nel testo; dentro un
+     paragrafo si va a capo con <br>, cosi' la firma resta incolonnata. */
+  const blocchi: string[][] = [[]];
+  for (const r of righe) {
+    if (r.trim() === '') blocchi.push([]);
+    else blocchi[blocchi.length - 1].push(r);
+  }
+
+  const corpo = blocchi
+    .filter((b) => b.length)
+    .map((b) => `<p>${b.map(fuggi).join('<br>')}</p>`)
+    .join('');
+
+  return (
+    '<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;' +
+    'font-size:14px;line-height:1.5;color:#16130f">' +
+    corpo +
+    '</body></html>'
+  );
+}
+
 export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   const c = conf();
   if (!c) return { ok: false, errore: 'posta non configurata' };
@@ -174,10 +222,28 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
     'Prestige Rent Team',
   ];
 
-  /* Quello che il cliente ci ha scritto, rimandato indietro: e' la prova
-     che e' arrivato davvero, e gli evita di chiedersi se ha premuto. */
+  /* \U0001F534 IL RIEPILOGO, CHIESTO DALLA PROPRIETA' IL 01/09/2026.
+     Prima si rimandava indietro solo il messaggio libero. Ma chi scrive a
+     tre operatori in una sera non ricorda quale data ha chiesto a chi: il
+     riepilogo e' la prova di cosa e' partito, e taglia il giro di email
+     che comincia con "scusate, avevo scritto il 25 o il 26?".
+     Il riferimento sta sopra, da solo: e' la cosa che si detta al
+     telefono. */
+  const riepilogo = [
+    r.riferimento ? `Your reference: ${r.riferimento}` : null,
+    '',
+    'SUMMARY OF YOUR REQUEST',
+    r.tour ? `Service: ${r.tour}` : null,
+    r.quando ? `Date: ${r.quando}` : null,
+    r.persone != null ? `Guests: ${r.persone}` : null,
+    r.telefono ? `Phone: ${r.telefono}` : null,
+    `Email: ${r.email}`,
+  ].filter((x): x is string => x !== null);
+
+  righe.push('', '───────────────', ...riepilogo);
+
   if (r.messaggio && r.messaggio.trim()) {
-    righe.push('', '───────────────', 'This is what you sent us:', '', r.messaggio.trim());
+    righe.push('', 'Your notes:', r.messaggio.trim());
   }
 
   /* LA FIRMA, come la vuole la proprieta'. La licenza e la partita IVA non
@@ -211,8 +277,11 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
          "We received your request - Service you are interested in optional".
          L'oggetto lo leggono tutti prima di aprire: deve essere sempre lo
          stesso e sempre giusto. Il servizio richiesto sta nel corpo. */
-      subject: 'Thank you for contacting Prestige Rent',
+      subject: r.riferimento
+        ? `Thank you for contacting Prestige Rent - ${r.riferimento}`
+        : 'Thank you for contacting Prestige Rent',
       text: righe.join('\n'),
+      html: aHtml(righe),
       /* dichiarato a mano: senza, un accento o un trattino lungo scritto
          dal cliente arriva come un punto interrogativo dentro un rombo */
       textEncoding: 'quoted-printable',
@@ -238,7 +307,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
      adesso o fra un'ora: chi, che servizio, quante persone. Chi risponde
      guarda l'elenco della posta, non apre ogni messaggio. */
   const oggetto =
-    `New request — ${r.nome}` +
+    `New request${r.riferimento ? ` ${r.riferimento}` : ''} — ${r.nome}` +
     (r.tour ? ` · ${r.tour.replace(/\s+/g, ' ').slice(0, 60)}` : '') +
     (r.persone ? ` · ${r.persone} pax` : '');
 
@@ -246,6 +315,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
     r.messaggio?.trim() || '(no notes)',
     '',
     '───────────────',
+    r.riferimento ? `Ref: ${r.riferimento}` : null,
     `${r.nome} · ${r.email}${r.telefono ? ` · ${r.telefono}` : ''}`,
     r.tour ? `Service: ${r.tour}` : null,
     r.quando ? `Date: ${r.quando}` : null,
@@ -253,7 +323,9 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
     `Language: ${r.lingua}`,
     r.pagina ? `Page: https://prestigerent.com${r.pagina}` : null,
     `Marketing consent: ${r.marketing ? 'yes' : 'no'}`,
-  ].filter(Boolean);
+    /* Il filtro con la guardia e non `Boolean`: cosi' il tipo resta
+       `string[]` e il convertitore in HTML lo accetta senza forzature. */
+  ].filter((x): x is string => typeof x === 'string' && x !== '');
 
   try {
     const t = apri(c);
@@ -267,6 +339,7 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       replyTo: `${r.nome} <${r.email}>`,
       subject: oggetto,
       text: righe.join('\n'),
+      html: aHtml(righe),
       textEncoding: 'quoted-printable',
     });
     return { ok: true };

@@ -298,7 +298,9 @@ export async function POST(req: NextRequest) {
   const sub_id = /^[gf]-[\w.-]{10,500}$/.test(clicGrezzo) ? clicGrezzo : null;
 
   /* ── LA SCRITTURA ────────────────────────────────────────────────── */
-  const { error } = await supabase.from('richieste').insert({
+  const { data: creata, error } = await supabase
+    .from('richieste')
+    .insert({
     nome,
     email,
     telefono: telefono || null,
@@ -311,10 +313,26 @@ export async function POST(req: NextRequest) {
     marketing,
     consenso_il: consensoIl,
     sub_id,
-    /* Esplicito, anche se e' il default: la policy pubblica accetta solo
-       'nuova', e vederlo scritto qui spiega perche'. */
-    stato: 'nuova',
-  });
+      /* Esplicito, anche se e' il default: la policy pubblica accetta solo
+         'nuova', e vederlo scritto qui spiega perche'. */
+      stato: 'nuova',
+    })
+    /* Si rilegge l'identificativo appena scritto: serve a costruire il
+       numero di richiesta da dare al cliente. */
+    .select('id')
+    .single();
+
+  /* 🔴 IL NUMERO DELLA RICHIESTA.
+     Chiesto dalla proprieta' il 01/09/2026. Non si mostra
+     l'identificativo intero -- trentasei caratteri che nessuno detta al
+     telefono -- ma le prime sei cifre in maiuscolo, che bastano: con sei
+     richieste al giorno servirebbero secoli perche' due si somiglino, e
+     chi risponde ritrova la riga cercando quel pezzo.
+     Se la rilettura fallisce si va avanti lo stesso: un'email senza
+     numero e' meglio di una richiesta persa. */
+  const riferimento = creata?.id
+    ? 'PR-' + String(creata.id).replace(/-/g, '').slice(0, 6).toUpperCase()
+    : null;
 
   if (error) {
     /* Nel registro il motivo vero, al visitatore una frase che dice cosa
@@ -411,6 +429,7 @@ export async function POST(req: NextRequest) {
           pagina,
           lingua,
           marketing,
+          riferimento,
         });
         if (!esito.ok) console.error('[richieste] email:', esito.errore);
 
@@ -431,6 +450,7 @@ export async function POST(req: NextRequest) {
           pagina,
           lingua,
           marketing,
+          riferimento,
         });
         if (!eco.ok) console.error('[richieste] conferma al cliente:', eco.errore);
       } catch (e) {

@@ -120,7 +120,8 @@
    Campo di notte -- restava un rettangolo quasi nero, e la fotografia non
    si vedeva piu'. Segnalato dalla proprieta': "le foto del menu sono
    troppo scure".
-   Adesso scende a 0,74 e si apre molto prima. Il contrasto che si perde
+   Alleggerita due volte nello stesso giorno: 0,74 non bastava ancora.
+   Adesso il fondo e' 0,55 e a meta' altezza e' gia' quasi finita. Il contrasto che si perde
    viene restituito dall'ombra sul testo qui sotto: prima non c'era,
    perche' il buio bastava. */
 .hd-mega-in .hd-card::after {
@@ -130,11 +131,11 @@
   z-index: 1;
   background: linear-gradient(
     to top,
-    rgba(6, 11, 16, 0.74) 0%,
-    rgba(6, 11, 16, 0.58) 26%,
-    rgba(6, 11, 16, 0.3) 46%,
-    rgba(6, 11, 16, 0.08) 68%,
-    rgba(6, 11, 16, 0) 86%
+    rgba(6, 11, 16, 0.55) 0%,
+    rgba(6, 11, 16, 0.36) 22%,
+    rgba(6, 11, 16, 0.14) 40%,
+    rgba(6, 11, 16, 0.02) 60%,
+    rgba(6, 11, 16, 0) 74%
   );
   pointer-events: none;
 }
@@ -176,7 +177,10 @@
   /* Due ombre invece di una: la prima e' stretta e serve a staccare il
      bordo delle lettere, la seconda e' larga e morbida e fa da alone.
      Con una sola, o si vede il contorno o non si vede niente. */
-  text-shadow: 0 1px 2px rgba(6, 11, 16, 0.85), 0 2px 12px rgba(6, 11, 16, 0.7);
+  text-shadow:
+    0 1px 2px rgba(6, 11, 16, 0.95),
+    0 2px 6px rgba(6, 11, 16, 0.85),
+    0 4px 18px rgba(6, 11, 16, 0.8);
 }
 /* Il punteggio in giallo e non in arancione: sopra una foto l'arancione
    del marchio si confonde con i tetti e i tramonti, che in questo
@@ -193,7 +197,9 @@
   font-size: 0.82rem;
   font-weight: 800;
   color: #ffd27a;
-  text-shadow: 0 1px 2px rgba(6, 11, 16, 0.9), 0 2px 10px rgba(6, 11, 16, 0.75);
+  text-shadow:
+    0 1px 2px rgba(6, 11, 16, 0.95),
+    0 2px 8px rgba(6, 11, 16, 0.9);
 }
 
 .hd-mega-in .hd-card:focus-visible {
