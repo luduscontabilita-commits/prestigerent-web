@@ -144,6 +144,101 @@ export function postaConfigurata() {
  * e' indistinguibile dal testo semplice.
  */
 
+/* L'EMAIL AL CLIENTE, IMPAGINATA.
+ *
+ * \u🔴 SOLO QUESTA. Quella che arriva all'ufficio resta in solo testo,
+ * per decisione della proprieta' del 01/09/2026 -- e con la nota che ne
+ * consegue, scritta piu' su.
+ *
+ * Qui invece la formattazione serve, ed e' stata chiesta: il testo ha due
+ * voci che vanno staccate dal resto (Response Time, Our Commitment) e tre
+ * recapiti su cui si deve poter cliccare. In solo testo diventava un muro
+ * di righe uguali dove l'indirizzo email va copiato a mano.
+ *
+ * COME E' FATTO L'HTML. Stili scritti dentro ogni tag, nessun foglio di
+ * stile e nessuna tabella: i programmi di posta buttano via il <style> in
+ * testa e impaginano le tabelle ognuno a modo suo. Niente immagini e
+ * niente loghi -- un'email che chiede di "scaricare le immagini" per
+ * essere leggibile sembra pubblicita', e questa e' una risposta.
+ */
+function htmlAlCliente(r: RichiestaDaAvvisare, saluto: string): string {
+  const e = (t: string) =>
+    t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const P = 'margin:0 0 14px;';
+  const link = 'color:#C25A00;text-decoration:underline;';
+
+  const righe: string[] = [];
+  const dettaglio = [
+    r.riferimento ? ['Reference', r.riferimento] : null,
+    r.tour ? ['Service', r.tour] : null,
+    r.quando ? ['Date', r.quando] : null,
+    r.persone != null ? ['Guests', String(r.persone)] : null,
+    r.telefono ? ['Phone', r.telefono] : null,
+    ['Email', r.email],
+  ].filter((x): x is string[] => x !== null);
+
+  for (const [k, v] of dettaglio) {
+    righe.push(`<div style="margin:0 0 4px"><strong>${e(k)}:</strong> ${e(v)}</div>`);
+  }
+
+  return [
+    '<!doctype html><html><body style="margin:0;padding:0;background:#ffffff">',
+    '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;',
+    'color:#16130F;max-width:620px;margin:0 auto;padding:22px 18px">',
+
+    `<p style="${P}">Dear ${e(saluto)},</p>`,
+
+    `<p style="${P}">Thank you for contacting Prestige Rent in Italy. We have successfully `,
+    'received your inquiry submitted through our website.</p>',
+
+    `<p style="${P}">Our team is currently reviewing your travel details to curate a `,
+    'tailored, transparent proposal for your inquiry.</p>',
+
+    '<ul style="margin:0 0 14px;padding-left:22px">',
+    '<li style="margin:0 0 10px"><strong>Response Time</strong>: due to the time zone ',
+    'difference between Italy (CET/CEST) and your country, our reply could be delayed a ',
+    'few hours. If you do not hear from us within 24 to 48 hours, please email us at ',
+    `<a href="mailto:usa@prestigerent.com" style="${link}">usa@prestigerent.com</a>.<br>`,
+    'If you need immediate assistance, please call us at ',
+    `<a href="tel:+39055286059" style="${link}">+39 055 286 059</a> or send a WhatsApp to `,
+    `<a href="https://wa.me/393338424047" style="${link}">+39 333 842 4047</a>.</li>`,
+    '<li><strong>Our Commitment</strong>: every request is handled with individual care by ',
+    'a dedicated travel specialist, to ensure executive-level service, flexible payment ',
+    'options and seamless logistics.</li>',
+    '</ul>',
+
+    `<p style="${P}">We look forward to hosting you and crafting an unforgettable Italian `,
+    'travel experience.</p>',
+
+    `<p style="${P}">Warm regards,<br>Prestige Rent Team</p>`,
+
+    /* Il riepilogo: chi scrive a tre operatori in una sera non ricorda
+       quale data ha chiesto a chi. */
+    '<div style="margin:22px 0 0;padding:14px 16px;background:#F7F5F2;border-radius:8px;',
+    'font-size:14px;line-height:1.5">',
+    '<div style="margin:0 0 8px;font-size:11px;font-weight:bold;letter-spacing:1px;',
+    'text-transform:uppercase;color:#847B70">Summary of your request</div>',
+    righe.join(''),
+    r.messaggio && r.messaggio.trim()
+      ? `<div style="margin:10px 0 0;padding-top:10px;border-top:1px solid #DED7CE"><strong>Your notes:</strong><br>${e(r.messaggio.trim()).replace(/\n/g, '<br>')}</div>`
+      : '',
+    '</div>',
+
+    '<div style="margin:24px 0 0;padding-top:16px;border-top:1px solid #DED7CE;font-size:14px;line-height:1.5">',
+    '<div style="font-weight:bold">Prestige Rent</div>',
+    '<div style="font-weight:bold;font-style:italic">Tours, Transfers &amp; Experiences in Italy</div>',
+    '<div style="margin-top:8px">Ph: +39 055 286 059<br>WhatsApp: +39 333 842 4047</div>',
+    `<div><a href="mailto:usa@prestigerent.com" style="${link}">usa@prestigerent.com</a><br>`,
+    `<a href="https://prestigerent.com" style="${link}">www.prestigerent.com</a></div>`,
+    '<div style="margin-top:8px;color:#847B70;font-style:italic">Tour Operator, Travel Agency &amp; Limo Company</div>',
+    '<div style="color:#847B70">Company ID 571489 &mdash; VAT 05745220482</div>',
+    '</div>',
+
+    '</div></body></html>',
+  ].join('');
+}
+
 export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   const c = conf();
   if (!c) return { ok: false, errore: 'posta non configurata' };
@@ -253,10 +348,13 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
          "We received your request - Service you are interested in optional".
          L'oggetto lo leggono tutti prima di aprire: deve essere sempre lo
          stesso e sempre giusto. Il servizio richiesto sta nel corpo. */
-      subject: r.riferimento
-        ? `Thank you for contacting Prestige Rent - ${r.riferimento}`
-        : 'Thank you for contacting Prestige Rent',
+      /* L'oggetto e' quello scritto dalla proprieta'. Il numero della
+         richiesta non ci va: sta nel riepilogo, dentro il messaggio.
+         Un oggetto sempre uguale si riconosce a colpo d'occhio nella
+         posta, e questo lo leggono clienti che non ci conoscono. */
+      subject: 'Thank you for your request. Prestige Rent Italy',
       text: righe.join('\n'),
+      html: htmlAlCliente(r, saluto),
       /* dichiarato a mano: senza, un accento o un trattino lungo scritto
          dal cliente arriva come un punto interrogativo dentro un rombo */
       textEncoding: 'quoted-printable',
