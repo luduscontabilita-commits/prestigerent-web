@@ -473,5 +473,10 @@ export async function POST(req: NextRequest) {
     }
   });
 
-  return NextResponse.json({ ok: true });
+  /* 🔴 IL NUMERO DELLA RICHIESTA TORNA A CHI L'HA MANDATA.
+     Sta gia' nell'email di conferma, ma l'email puo' arrivare fra dieci
+     minuti o finire nella posta indesiderata: chi ha appena premuto
+     "invia" vuole vedere subito qualcosa che dimostri che e' partita.
+     Il modulo delle landing lo scrive nel ringraziamento. */
+  return NextResponse.json({ ok: true, riferimento });
 }
