@@ -160,10 +160,10 @@ export default async function Contatti({
             </span>
           </address>
 
-          <p className="ab-links">
-            <a href={p('/about-us/')}>Who we are</a> &middot;{' '}
-            <a href={p('/')}>All our tours</a>
-          </p>
+          {/* 🔴 TOLTI I DUE LINK "Who we are · All our tours" (01/09/2026).
+              Erano l'ultima cosa della pagina dei contatti, cioe' due
+              porte per uscire messe esattamente dove chi e' arrivato
+              fin li' dovrebbe scrivere. Chiesto dalla proprieta'. */}
         </div>
       </section>
 
