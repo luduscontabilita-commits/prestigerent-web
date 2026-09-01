@@ -75,6 +75,30 @@ export async function generateMetadata({
         'max-video-preview': -1,
       },
     },
+    /* 🔴 LA SPUNTA DEL DOMINIO SU META (01/09/2026).
+     *
+     * Senza questa riga il dominio non e' nostro agli occhi di Meta, e la
+     * conseguenza non e' burocratica: su iPhone, dove sta meta' del
+     * mercato americano, e' Meta a decidere quali otto eventi contano
+     * quando l'utente ha negato il tracciamento. Se il dominio non e'
+     * verificato quella scelta non la facciamo noi -- e Meta puo'
+     * mettere in cima un evento che non ci interessa, tenendo fuori
+     * l'acquisto.
+     *
+     * IL POSTO E' QUESTO E NON UN ALTRO. Meta cerca il tag nel `<head>`
+     * della home servito dal server: un tag scritto da JavaScript dopo il
+     * caricamento non lo trova. Dentro `generateMetadata` Next lo stampa
+     * nell'HTML che parte da Vercel, quindi si vede anche a JavaScript
+     * spento -- e si vede su TUTTE le pagine, che non fa danno.
+     *
+     * Il codice e' quello dato da Gestione eventi il 01/09/2026. Non e' un
+     * segreto: sta scritto nel sorgente di ogni pagina. Non si cambia e
+     * non si toglie -- toglierlo fa perdere la verifica. */
+    verification: {
+      other: {
+        'facebook-domain-verification': '39mufx7k10knnmf08y3wtawsv58vpr',
+      },
+    },
     openGraph: ogDiBase(isLocale(locale) ? locale : DEFAULT_LOCALE),
     twitter: TWITTER,
   };
