@@ -236,7 +236,14 @@ export async function POST(req: NextRequest) {
   let quando: string | null = /^\d{4}-\d{2}-\d{2}$/.test(dataGrezza) ? dataGrezza : null;
   if (quando) {
     const d = new Date(quando + 'T12:00:00Z');
-    if (Number.isNaN(d.getTime())) quando = null;
+    /* 🔴 LA FINESTRA E' DEL DATABASE, NON NOSTRA.
+       Sulla colonna c'e' un vincolo 2020-2100: una data fuori da li'
+       -- un anno digitato male, "1999" invece di "2029" -- farebbe
+       fallire la scrittura e si perderebbe TUTTA la richiesta per un
+       campo solo. Si butta la data e si tiene la richiesta. */
+    const dentro =
+      !Number.isNaN(d.getTime()) && quando >= '2020-01-01' && quando <= '2100-01-01';
+    if (!dentro) quando = null;
   }
 
   /* 🔴 Obbligatorio dal 01/09/2026: senza sapere quanti sono non si
@@ -323,9 +330,12 @@ export async function POST(req: NextRequest) {
     /* Se il numero di persone non era un numero, si allega al messaggio:
        cosi' chi risponde lo vede lo stesso invece di trovare un campo
        vuoto e nessuna spiegazione. */
+    /* Il taglio a 2000 va rifatto DOPO aver aggiunto il numero di
+       persone: un messaggio gia' al limite piu' il prefisso supera il
+       vincolo della colonna, e si perderebbe tutta la richiesta. */
     messaggio:
       (persone === null && personeGrezze
-        ? `[guests: ${personeGrezze}] ${messaggio}`.trim()
+        ? `[guests: ${personeGrezze}] ${messaggio}`.trim().slice(0, 2000)
         : messaggio) || null,
     lingua,
     pagina,
