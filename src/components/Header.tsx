@@ -202,11 +202,42 @@ export function Header({
       }
     };
 
+    /* 🔴 SI CHIUDE ANCHE SCORRENDO, ED E' IL CASO PIU' FREQUENTE.
+       Il pannello si chiudeva solo togliendo il mouse dalla voce o
+       cliccando fuori. Ma il pannello e' alto e largo quanto la pagina:
+       chi lo apre e poi scorre con la rotella non muove il puntatore, il
+       `pointerleave` non arriva mai, e il menu resta li' a coprire il
+       contenuto anche quando l'intestazione e' gia' uscita dallo schermo.
+       Segnalato con due schermate il 01/09/2026.
+       `passive` perche' qui non si annulla niente e lo scorrimento deve
+       restare fluido. */
+    const scorre = () => {
+      chiudi();
+      setMobile(false);
+    };
+
+    /* E si chiude quando il puntatore esce dall'intestazione per davvero
+       -- finestra compresa. `pointerleave` sulla singola voce non scatta
+       se il mouse esce di lato in fretta o va oltre il bordo del
+       browser. */
+    const via = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const b = barra.current;
+      if (!b) return;
+      if (b.contains(e.relatedTarget as Node)) return;
+      chiudi();
+    };
+
     document.addEventListener('keydown', tasto);
     document.addEventListener('pointerdown', fuori);
+    window.addEventListener('scroll', scorre, { passive: true });
+    barra.current?.addEventListener('pointerleave', via);
+    const b = barra.current;
     return () => {
       document.removeEventListener('keydown', tasto);
       document.removeEventListener('pointerdown', fuori);
+      window.removeEventListener('scroll', scorre);
+      b?.removeEventListener('pointerleave', via);
     };
   }, [aperta, lingue, mobile, chiudi]);
 
