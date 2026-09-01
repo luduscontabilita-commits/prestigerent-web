@@ -251,7 +251,13 @@ export async function caricaSuGoogle(
 
     const testo = await res.text();
     if (!res.ok) {
-      const m = `HTTP ${res.status}: ${testo.slice(0, 400)}`;
+      /* Il pezzo che serve davvero (`fieldViolations`) sta in fondo alla
+         risposta di Google, dopo un blocco di intestazioni sempre uguali:
+         tagliando a 400 caratteri si buttava via proprio quello, e per
+         sapere quale campo fosse sbagliato bisognava rifare la chiamata a
+         mano. Se c'e', si tiene solo quello. */
+      const viol = testo.match(/"fieldViolations"[\s\S]*/);
+      const m = `HTTP ${res.status}: ${(viol ? viol[0] : testo).slice(0, 600)}`;
       esito.motivi[m] = (esito.motivi[m] ?? 0) + pezzo.length;
       esito.rifiutati.push(...pezzo.map((r) => r.ordine));
       continue;
