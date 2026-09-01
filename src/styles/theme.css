@@ -23,6 +23,15 @@
 :root{
   --card:  #FFFFFF;
   --ph:    #E9E5DF;
+  /* 🔴 IL FONDO DEL MENU NON E' PIU' QUELLO DELLE FOTO.
+     Usava `--ph`, cioe' il grigio che sta sotto le immagini mentre
+     caricano: #E9E5DF, un beige caldo. Sotto una foto dura mezzo secondo
+     e non lo nota nessuno; dietro il menu ci sta fisso, largo quanto lo
+     schermo, e si legge come un marroncino sporco -- soprattutto sul
+     telefono, dove il pannello aperto e' quasi tutta la pagina.
+     Questo e' un grigio freddo, dello stesso tono del bianco delle
+     schede: si distingue dal fondo senza aggiungere un colore. */
+  --menu:  #F2F4F6;
   --deep:  #24333F;
   --ombra: rgba(20,32,42,.10);
 }
@@ -32,6 +41,8 @@ html[data-theme="dark"]{
   --card:     #1A2128;   /* le superfici, un gradino sopra il fondo */
   --deep:     #0B0F13;   /* footer e fascia: piu' scuri delle schede */
   --ph:       #222B33;
+  /* al buio il grigio dei segnaposto e' gia' freddo: stesso valore */
+  --menu:     #222B33;
 
   --ink:      #E8EEF4;
   --ink-soft: #A6B4C0;

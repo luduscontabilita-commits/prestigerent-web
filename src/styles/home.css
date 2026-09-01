@@ -649,7 +649,7 @@
    perche' non e' un altro elenco -- e' la risposta a "e allora quale
    prendo?". */
 .hd-evid{
-  background:var(--ph); border-radius:14px; padding:16px 18px !important;
+  background:var(--menu); border-radius:14px; padding:16px 18px !important;
   border-left:0 !important;
 }
 .hd-evid .hd-col-t{ border-bottom-color:rgba(140,150,160,.28); }
@@ -737,7 +737,7 @@
   display:block; padding:8px 12px; border-radius:8px; text-decoration:none;
   font-size:.86rem; font-weight:600; color:var(--ink);
 }
-.hd-lang-menu a:hover{ background:var(--ph); }
+.hd-lang-menu a:hover{ background:var(--menu); }
 
 .hd-wa{
   display:inline-flex; align-items:center; gap:7px;
@@ -832,7 +832,7 @@
   .hd-mega{
     position:static; transform:none; min-width:0; width:100%;
     border:0; border-radius:0; box-shadow:none;
-    background:var(--ph);
+    background:var(--menu);
     max-height:0; opacity:1; visibility:visible; pointer-events:auto;
     overflow:hidden; transition:max-height .22s ease;
   }
