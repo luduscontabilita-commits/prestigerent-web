@@ -192,9 +192,17 @@ export async function POST(req: NextRequest) {
     /* Zero non e' un errore: su questa pagina alcune prenotazioni
        tengono solo la carta a garanzia e si pagano in contanti. */
     valore_dichiarato: riga.valore > 0 ? 'incassato' : 'nessun incasso, carta a garanzia',
-    google: google && { accettate: google.accettati.length, rifiutate: google.rifiutati.length, errore: google.errore },
-    meta: meta && { accettate: meta.accettati.length, rifiutate: meta.rifiutati.length, errore: meta.errore },
-    analytics: ga4 && { accettate: ga4.accettati.length, rifiutate: ga4.rifiutati.length, errore: ga4.errore },
+    /* I `motivi` ci sono apposta: un rifiuto senza il perche' costringe
+       a rifare a mano la stessa chiamata per scoprirlo, e succede
+       sempre di notte. */
+    google: google && { accettate: google.accettati.length, rifiutate: google.rifiutati.length, motivi: google.motivi, errore: google.errore },
+    meta: meta && { accettate: meta.accettati.length, rifiutate: meta.rifiutati.length, motivi: meta.motivi, errore: meta.errore },
+    analytics: ga4 && { accettate: ga4.accettati.length, rifiutate: ga4.rifiutati.length, motivi: ga4.motivi, errore: ga4.errore },
+    identita: {
+      email_utilizzabile: !!emailGoogle,
+      telefono_utilizzabile: !!telefonoGoogle,
+      email_scartata_perche: scarto,
+    },
     gia_fatte: {
       google: gia('google_booking'),
       meta: gia('meta_booking'),
