@@ -1051,9 +1051,22 @@
    `line-height:0` sul contenitore, altrimenti il testo invisibile che
    avvolge gli SVG aggiunge qualche pixel sotto e la fila si disallinea
    rispetto a "Secure payments". */
+/* 🔴 IL COLORE DEVE ESSERE PIENO, NON TRASPARENTE (01/09/2026).
+   Qui c'era `rgba(255,255,255,.78)`. Sembra un dettaglio e non lo e':
+   nei disegni `fa-cc-*` la carta e' una superficie piena e le lettere
+   del marchio sono BUCHI, cioe' fondo pagina che passa attraverso. Con
+   un riempimento semitrasparente succedono due cose insieme -- il corpo
+   della carta si slava verso il fondo, e le lettere, che quel fondo lo
+   mostrano al 100%, perdono lo stacco contro un corpo che ormai gli
+   somiglia. Il risultato e' una macchia. Sulle altre quattro si
+   leggeva lo stesso perche' i loro marchi sono grossi; su American
+   Express, che ha "AMERICAN EXPRESS" scritto per esteso dentro la
+   carta, no -- segnalato guardando il sito.
+   Colore pieno, quindi: la carta e' chiara e compatta, le lettere sono
+   il #373752 del piede. E' cosi' che si vedono sul sito vecchio. */
 .ft-carte{
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-  line-height:0; color:rgba(255,255,255,.78);
+  line-height:0; color:#dfe1ea;
 }
 .ft-carte svg{ display:block; }
 
