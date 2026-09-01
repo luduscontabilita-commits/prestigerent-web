@@ -279,17 +279,18 @@ export async function Footer({ locale }: { locale: string }) {
         </div>
       )}
 
-      {/* L'accesso al pannello. Piccolo e in fondo: serve a chi lavora al
-
-
-          sito, non ai clienti. Non e' un segreto -- l'indirizzo si
-
-
-          indovina in un secondo -- ma non deve rubare spazio a niente. */}
-
-
-      <a className="ft-admin" href="/admin/entra/">Staff</a>
-
+      {/* 🔴 QUI C'ERA IL LINK "Staff" AL PANNELLO, TOLTO IL 01/09/2026.
+          Stava nel footer, quindi non su una pagina ma su tutte e 124:
+          ogni scheda tour, ogni categoria, ogni landing pubblicava
+          l'indirizzo della porta di servizio. Il commento di prima
+          diceva "non e' un segreto, l'indirizzo si indovina in un
+          secondo" -- vero, ma indovinarlo e trovarlo scritto in fondo a
+          ogni pagina sono due cose diverse: la seconda lo mette anche
+          nell'indice di Google e nei crawler che raccolgono indirizzi di
+          login per provarli.
+          La pagina continua a esistere e a funzionare: e' raggiungibile
+          scrivendo l'indirizzo, semplicemente non lo dice piu' il sito.
+          Chi ci lavora lo tiene nei segnalibri. */}
 
       <div className="ft-bottom">
         {/* Se l'elenco e' vuoto non resta uno spazio vuoto in mezzo al

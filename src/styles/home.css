@@ -2573,21 +2573,11 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
   .ct-card:hover{ transform:none; }
 }
 
-/* Il link al pannello, in fondo al piede. Deliberatamente sottotono:
-   chi lavora al sito lo trova, un cliente non ci inciampa. */
-.ft-admin {
-  display: block;
-  text-align: center;
-  margin: 22px 0 -6px;
-  font-size: 11px;
-  letter-spacing: .10em;
-  text-transform: uppercase;
-  color: var(--muted, #8b8b8b);
-  opacity: .55;
-  text-decoration: none;
-}
-.ft-admin:hover,
-.ft-admin:focus-visible { opacity: 1; text-decoration: underline; }
+/* Qui stavano le regole di .ft-admin, il link "Staff" al pannello.
+   Tolte insieme al link il 01/09/2026 (vedi Footer.tsx): senza
+   l'elemento erano regole che non vestivano piu' niente, e una classe
+   morta nel foglio fa credere che da qualche parte esista ancora
+   qualcosa da cliccare. */
 
 .ad-opt { font-weight: 400; opacity: .6; text-transform: none; letter-spacing: 0; }
 
