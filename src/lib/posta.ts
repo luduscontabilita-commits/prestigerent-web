@@ -124,42 +124,79 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   const c = conf();
   if (!c) return { ok: false, errore: 'posta non configurata' };
 
-  const nomeBreve = r.nome.trim().split(' ')[0];
+  /* 🔴 IL NOME, SENZA FIGURACCE.
+     Prima si prendeva sempre la prima parola: con un campo compilato male
+     -- successo davvero il 01/09/2026, in una prova con le etichette
+     incollate dentro i campi -- e' partita un'email che diceva
+     "Hello Your,". Ora se la prima parola non sembra un nome si usa il
+     campo intero, e se non sembra niente si saluta senza nome: meglio un
+     "Dear guest" che un "Dear Your". */
+  const nomeIntero = r.nome.trim().replace(/\s+/g, ' ');
+  const primo = nomeIntero.split(' ')[0];
+  const saluto =
+    primo.length >= 2 && /^[\p{L}'-]+$/u.test(primo)
+      ? primo
+      : nomeIntero.length >= 2
+        ? nomeIntero
+        : 'guest';
+
+  /* Il testo e' quello scritto dalla proprieta' il 01/09/2026, parola per
+     parola. Due sole correzioni di grammatica, perche' questa email la
+     legge ogni cliente: "if you will not hear" -> "if you do not hear",
+     e "if your question need" -> "if you need". */
   const righe: string[] = [
-    `Hello ${nomeBreve},`,
+    `Dear ${saluto},`,
     '',
-    r.tour
-      ? `we have received your request about ${r.tour}.`
-      : 'we have received your request.',
-    'A real person from our office in Florence will get back to you,',
-    'usually within a few hours.',
+    'Thank you for contacting Prestige Rent in Italy. We have successfully',
+    'received your inquiry submitted through our website.',
     '',
-    'In a hurry? Write to us on WhatsApp: +39 333 842 4047',
+    'Our team is currently reviewing your travel details to curate a tailored,',
+    'transparent proposal for your inquiry.',
+    '',
+    'RESPONSE TIME',
+    'Due to the time zone difference between Italy (CET/CEST) and your country,',
+    'our reply could be delayed a few hours. If you do not hear from us within',
+    '24 to 48 hours, please email us at usa@prestigerent.com',
+    '',
+    'If you need immediate assistance, please call us at +39 055 286 059 or',
+    'send a WhatsApp to +39 333 842 4047',
+    '',
+    'OUR COMMITMENT',
+    'Every request is handled with individual care by a dedicated travel',
+    'specialist, to ensure executive-level service, flexible payment options',
+    'and seamless logistics.',
+    '',
+    'We look forward to hosting you and crafting an unforgettable Italian',
+    'travel experience.',
+    '',
+    'Warm regards,',
+    '',
+    'Prestige Rent Team',
   ];
 
+  /* Quello che il cliente ci ha scritto, rimandato indietro: e' la prova
+     che e' arrivato davvero, e gli evita di chiedersi se ha premuto. */
   if (r.messaggio && r.messaggio.trim()) {
-    righe.push('', 'This is what you sent us:', '', r.messaggio.trim());
+    righe.push('', '───────────────', 'This is what you sent us:', '', r.messaggio.trim());
   }
 
-  /* LA FIRMA. I dati sono quelli veri della scheda azienda, gli stessi
-     del piede del sito e dei dati strutturati: telefono dell'ufficio,
-     WhatsApp, indirizzo, partita IVA e licenza. La licenza non e'
-     pedanteria -- e' cio' che distingue un operatore autorizzato da un
-     intermediario, ed e' la prima cosa che guarda un cliente che ha
-     appena scritto a uno sconosciuto lasciandogli il suo numero. */
+  /* LA FIRMA, come la vuole la proprieta'. La licenza e la partita IVA non
+     sono pedanteria: sono cio' che distingue un operatore autorizzato da un
+     intermediario, ed e' la prima cosa che guarda un cliente che ha appena
+     scritto a uno sconosciuto lasciandogli il suo numero. */
   righe.push(
     '',
     '--',
-    `Prestige Rent S.R.L. - Tours & Transfers in Italy since ${ANNO_FONDAZIONE}`,
-    'Via Della Saggina 98, 50145 Florence, Italy',
+    'Prestige Rent',
+    'Tours, Transfers & Experiences in Italy',
     '',
-    'Office     +39 055 286059',
-    'WhatsApp   +39 333 842 4047',
-    'Email      usa@prestigerent.com',
-    'Web        https://prestigerent.com',
+    'Ph:        +39 055 286 059',
+    'WhatsApp:  +39 333 842 4047',
+    'Email:     usa@prestigerent.com',
+    'Web:       www.prestigerent.com',
     '',
-    'VAT IT05745220482 - Tuscany Region licensed travel agency and tour operator',
-    'Emergency contacts are on your confirmation voucher, answered 24/7.'
+    `Tour Operator, Travel Agency & Limo Company - since ${ANNO_FONDAZIONE}`,
+    'Company ID 571489 - VAT 05745220482'
   );
 
   try {
@@ -168,9 +205,13 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
       from: `Prestige Rent <${c.user}>`,
       to: r.email,
       replyTo: c.a,
-      subject: r.tour
-        ? `We received your request - ${r.tour}`
-        : 'We received your request - Prestige Rent',
+      /* 🔴 L'OGGETTO NON PORTA PIU' DENTRO IL CAMPO LIBERO.
+         Ci finiva il testo del servizio cosi' com'era scritto, e con un
+         campo compilato male e' partito un
+         "We received your request - Service you are interested in optional".
+         L'oggetto lo leggono tutti prima di aprire: deve essere sempre lo
+         stesso e sempre giusto. Il servizio richiesto sta nel corpo. */
+      subject: 'Thank you for contacting Prestige Rent',
       text: righe.join('\n'),
       /* dichiarato a mano: senza, un accento o un trattino lungo scritto
          dal cliente arriva come un punto interrogativo dentro un rombo */
