@@ -166,7 +166,14 @@ function htmlAlCliente(r: RichiestaDaAvvisare, saluto: string): string {
     t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   const P = 'margin:0 0 14px;';
-  const link = 'color:#C25A00;text-decoration:underline;';
+  /* 🔴 I COLLEGAMENTI NON SI COLORANO A MANO.
+     C'era l'arancione del marchio scritto dentro ogni <a>. Sembra
+     coerente col sito e non lo e': in un'email un collegamento deve
+     somigliare a un collegamento, e la gente riconosce il blu
+     sottolineato senza pensarci. Un link arancione in mezzo al testo
+     nero si legge come una parola in grassetto, e non ci si clicca.
+     Senza `style` ogni programma di posta usa il suo colore standard,
+     che e' anche quello che il lettore si aspetta li' dentro. */
 
   const righe: string[] = [];
   const dettaglio = [
@@ -199,10 +206,10 @@ function htmlAlCliente(r: RichiestaDaAvvisare, saluto: string): string {
     '<li style="margin:0 0 10px"><strong>Response Time</strong>: due to the time zone ',
     'difference between Italy (CET/CEST) and your country, our reply could be delayed a ',
     'few hours. If you do not hear from us within 24 to 48 hours, please email us at ',
-    `<a href="mailto:usa@prestigerent.com" style="${link}">usa@prestigerent.com</a>.<br>`,
+    `<a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a>.<br>`,
     'If you need immediate assistance, please call us at ',
-    `<a href="tel:+39055286059" style="${link}">+39 055 286 059</a> or send a WhatsApp to `,
-    `<a href="https://wa.me/393338424047" style="${link}">+39 333 842 4047</a>.</li>`,
+    `<a href="tel:+39055286059">+39 055 286 059</a> or send a WhatsApp to `,
+    `<a href="https://wa.me/393338424047">+39 333 842 4047</a>.</li>`,
     '<li><strong>Our Commitment</strong>: every request is handled with individual care by ',
     'a dedicated travel specialist, to ensure executive-level service, flexible payment ',
     'options and seamless logistics.</li>',
@@ -229,8 +236,8 @@ function htmlAlCliente(r: RichiestaDaAvvisare, saluto: string): string {
     '<div style="font-weight:bold">Prestige Rent</div>',
     '<div style="font-weight:bold;font-style:italic">Tours, Transfers &amp; Experiences in Italy</div>',
     '<div style="margin-top:8px">Ph: +39 055 286 059<br>WhatsApp: +39 333 842 4047</div>',
-    `<div><a href="mailto:usa@prestigerent.com" style="${link}">usa@prestigerent.com</a><br>`,
-    `<a href="https://prestigerent.com" style="${link}">www.prestigerent.com</a></div>`,
+    `<div><a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a><br>`,
+    `<a href="https://prestigerent.com">www.prestigerent.com</a></div>`,
     '<div style="margin-top:8px;color:#847B70;font-style:italic">Tour Operator, Travel Agency &amp; Limo Company</div>',
     '<div style="color:#847B70">Company ID 571489 &mdash; VAT 05745220482</div>',
     '</div>',
