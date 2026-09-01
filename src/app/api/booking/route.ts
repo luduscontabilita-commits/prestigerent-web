@@ -88,6 +88,11 @@ type Corpo = {
   /** ISO 8601. Se manca si usa adesso: la chiamata arriva nel momento
    *  stesso della prenotazione, quindi lo scarto e' di secondi. */
   quando?: string;
+
+  /* Con `true` si usano gli indirizzi di convalida delle tre
+     piattaforme: rispondono se il pacchetto va bene e NON registrano
+     niente. Serve a collaudare senza inventare vendite. */
+  prova?: boolean;
 };
 
 function numero(v: unknown): number {
@@ -145,12 +150,14 @@ export async function POST(req: NextRequest) {
   const fatte = await giaFatte([ordine]);
   const gia = (d: string) => fatte.insieme.has(`${d}:${ordine}`);
 
+  const prova = c.prova === true;
+
   const [rg, rm, ra] = await Promise.allSettled([
     !gia('google_booking') && (emailGoogle || telefonoGoogle)
-      ? caricaSuGoogle([riga], false, AZIONE_ADS)
+      ? caricaSuGoogle([riga], prova, AZIONE_ADS)
       : null,
-    !gia('meta_booking') ? caricaSuMeta([riga], false) : null,
-    !gia('ga4_booking') ? caricaSuGa4([riga], false, 1) : null,
+    !gia('meta_booking') ? caricaSuMeta([riga], prova) : null,
+    !gia('ga4_booking') ? caricaSuGa4([riga], prova, 1) : null,
   ]);
 
   const val = <T,>(r: PromiseSettledResult<T | null>): T | null =>
@@ -159,6 +166,8 @@ export async function POST(req: NextRequest) {
   const meta = val(rm);
   const ga4 = val(ra);
 
+  /* In prova non si segna niente nel registro: altrimenti la riga
+     risulterebbe gia' fatta e quella vera non partirebbe piu'. */
   const esiti: Esito[] = [];
   const segna = (d: Esito['destinatario'], ok: string[], no: string[]) => {
     for (const o of ok)
@@ -168,13 +177,16 @@ export async function POST(req: NextRequest) {
       esiti.push({ ordine: o, destinatario: d, esito: 'rifiutata', valore: riga.valore,
                    creata_il: riga.quando.toISOString(), motivo: 'respinta dal destinatario' });
   };
-  if (google) segna('google_booking', google.accettati, google.rifiutati);
-  if (meta) segna('meta_booking', meta.accettati, meta.rifiutati);
-  if (ga4) segna('ga4_booking', ga4.accettati, ga4.rifiutati);
+  if (!prova) {
+    if (google) segna('google_booking', google.accettati, google.rifiutati);
+    if (meta) segna('meta_booking', meta.accettati, meta.rifiutati);
+    if (ga4) segna('ga4_booking', ga4.accettati, ga4.rifiutati);
+  }
   const segnate = esiti.length ? await segnaEsiti(esiti) : { ok: true as const, errore: undefined };
 
   return NextResponse.json({
     ok: true,
+    modo: prova ? 'prova - niente registrato' : 'reale',
     ordine,
     valore: riga.valore,
     /* Zero non e' un errore: su questa pagina alcune prenotazioni
