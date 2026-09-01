@@ -91,7 +91,35 @@ function provaSegreto(token: string, segreto: string): string {
  * @param prova con `true` usa `test_event_code` se c'e'; se non c'e',
  *              non chiama Meta e lo dichiara.
  */
-export async function caricaSuMeta(righe: Conversione[], prova: boolean): Promise<EsitoMeta> {
+/* 🔴 IL PREFISSO E' UN PARAMETRO, PERCHE' I CANALI SONO DUE.
+ *
+ * Meta scarta il doppione confrontando (event_name, event_id) fra il
+ * pixel del browser e questa chiamata dal server. Devono combaciare
+ * carattere per carattere -- e i due canali usano due chiavi diverse:
+ *
+ *   Regiondo   il tag "Meta - Purchase Regiondo" manda
+ *              `booking-<numero d'ordine>`
+ *   /booking/  il tag "Meta - Acquisto /booking/" manda
+ *              `<numero della riga di WordPress>`, senza prefisso
+ *
+ * Finche' questa funzione metteva `booking-` a tutti, le prenotazioni
+ * di /booking/ arrivavano a Meta come `booking-482` dal server e come
+ * `482` dal browser: due eventi diversi, la stessa vendita contata due
+ * volte, il ritorno raddoppiato e le campagne ottimizzate su un
+ * guadagno che non esiste. Non si e' mai visto perche' da /booking/ non
+ * e' ancora passata una prenotazione -- verificato su Ads, zero.
+ *
+ * Si allinea QUESTO lato e non GTM per il motivo di sempre: il codice
+ * si pubblica in due minuti, GTM va versionato e pubblicato a mano.
+ *
+ * Nessun rischio di scontro fra i due canali: i numeri d'ordine di
+ * Regiondo sono a 12 cifre (401790450030), le righe di WordPress sono
+ * a tre o quattro. */
+export async function caricaSuMeta(
+  righe: Conversione[],
+  prova: boolean,
+  prefissoEvento = 'booking-',
+): Promise<EsitoMeta> {
   const vuoto: EsitoMeta = {
     configurato: false,
     inviate: 0,
@@ -165,7 +193,7 @@ export async function caricaSuMeta(righe: Conversione[], prova: boolean): Promis
          * Non si e' mai visto il danno solo perche' il pixel era chiuso
          * al 62% del traffico e questo caricamento girava senza
          * `davvero=1`, cioe' a vuoto. Adesso partono tutti e due. */
-        event_id: `booking-${r.ordine}`,
+        event_id: `${prefissoEvento}${r.ordine}`,
         /* La vendita nasce su un sito, anche se il pagamento si conclude
            sul dominio di Regiondo. Meta segnalera' una qualita'
            dell'abbinamento piu' bassa perche' mancano indirizzo IP e

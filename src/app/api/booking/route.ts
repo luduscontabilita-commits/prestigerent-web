@@ -169,7 +169,11 @@ export async function POST(req: NextRequest) {
     !gia('google_booking') && (emailGoogle || telefonoGoogle)
       ? caricaSuGoogle([riga], prova, AZIONE_ADS)
       : null,
-    !gia('meta_booking') ? caricaSuMeta([riga], prova) : null,
+    /* 🔴 SENZA PREFISSO: il tag "Meta - Acquisto /booking/" manda
+       `eventID: '{{DL - booking ordine}}'`, cioe' il numero nudo. Se qui
+       si mandasse `booking-<numero>` Meta non riconoscerebbe il doppione
+       e conterebbe la stessa vendita due volte. */
+    !gia('meta_booking') ? caricaSuMeta([riga], prova, '') : null,
     !gia('ga4_booking') ? caricaSuGa4([riga], prova, 1) : null,
   ]);
 
