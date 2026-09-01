@@ -23,7 +23,6 @@
 
 /* ── la riga in cima al pannello ────────────────────────────────────── */
 .hd-mega-in .hd-mega-top {
-  grid-column: 1 / -1;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -64,7 +63,6 @@
    190px per riquadro non si scende: sotto, il titolo sovrapposto va a
    capo tre volte e non si legge piu'. */
 .hd-mega-in .hd-vetrina {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 14px;

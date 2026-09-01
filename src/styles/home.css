@@ -599,12 +599,30 @@
 }
 .hd-mega.is-open{ opacity:1; visibility:visible; pointer-events:auto; transform:none; }
 
+/* 🔴 DA GRIGLIA A FLESSIBILE, IL 01/09/2026.
+   Era una griglia `repeat(auto-fit, minmax(190px,1fr))`. Sembra giusta e
+   non lo era: la fila delle foto sta su `grid-column: 1 / -1`, quindi
+   occupa TUTTE le tracce -- e `auto-fit` accorpa solo le tracce vuote.
+   Con un pannello largo 1280px nascevano sei colonne da ~200px, e i due
+   o tre elenchi di link si accucciavano nelle prime, lasciando meta'
+   pannello bianco. Segnalato dalla proprieta' con una schermata: "i menu
+   vanno spalmati in orizzontale".
+   Con flex il problema sparisce da solo: le foto prendono la riga intera
+   e gli elenchi si dividono in parti uguali quello che resta, due o sei
+   che siano. */
 .hd-mega-in{
   max-width:1280px; margin:0 auto;
-  display:grid; gap:0; padding:30px 26px 26px;
-  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  align-items:start;
+  display:flex; flex-wrap:wrap; gap:0; padding:30px 26px 26px;
+  align-items:flex-start;
 }
+/* riga intera: il titolo in cima e la fila delle foto */
+.hd-mega-in > .hd-mega-top,
+.hd-mega-in > .hd-vetrina{ flex:0 0 100%; width:100%; }
+/* gli elenchi: stessa larghezza fra loro, e insieme riempiono la riga.
+   `flex-basis:0` e non `auto` perche' con `auto` una colonna con i titoli
+   piu' lunghi si prende piu' spazio delle altre, e le colonne di un menu
+   si leggono meglio se sono uguali. */
+.hd-mega-in > .hd-col{ flex:1 1 0; min-width:190px; }
 /* i filetti fra le colonne: separano senza pesare, e fanno leggere il
    pannello come colonne invece che come un muro di link */
 .hd-col{ padding:0 26px; border-left:1px solid var(--line); min-width:0; }
@@ -819,7 +837,10 @@
     overflow:hidden; transition:max-height .22s ease;
   }
   .hd-mega.is-open{ max-height:1400px; transform:none; }
-  .hd-mega-in{ grid-template-columns:1fr; padding:6px 18px 14px 30px; gap:2px; }
+  /* sul telefono in fila verticale: le colonne affiancate diventano
+     strisce da due parole. */
+  .hd-mega-in{ flex-direction:column; padding:6px 18px 14px 30px; gap:2px; }
+  .hd-mega-in > .hd-col{ flex:0 0 auto; min-width:0; }
   .hd-col-t{ margin-top:10px; }
 
   .hd-burger{ display:block; }
