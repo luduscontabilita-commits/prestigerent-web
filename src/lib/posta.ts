@@ -297,7 +297,10 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
     r.persone != null ? `Guests: ${r.persone}` : null,
     `Language: ${r.lingua}`,
     r.pagina ? `Page: https://prestigerent.com${r.pagina}` : null,
-    `Marketing consent: ${r.marketing ? 'yes' : 'no'}`,
+    /* La riga sul consenso alle comunicazioni non c'e' piu': da quando
+       la casella e' stata tolta dal modulo e' sempre "no", e una riga
+       che dice sempre la stessa cosa non e' informazione -- e' rumore
+       in un'email che si legge di corsa. Il dato resta in tabella. */
     /* Il filtro con la guardia e non `Boolean`: cosi' il tipo resta
        `string[]` e il convertitore in HTML lo accetta senza forzature. */
   ].filter((x): x is string => typeof x === 'string' && x !== '');
