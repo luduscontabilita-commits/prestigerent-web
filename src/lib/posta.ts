@@ -124,49 +124,25 @@ export function postaConfigurata() {
  * l'ufficio gia' avvisato -- ma si scrive nei log, perche' una conferma
  * che non arriva produce la stessa richiesta due volte.
  */
-/* DA RIGHE DI TESTO A HTML, E PERCHE' SERVE DAVVERO.
+/* 🔴 SOLO TESTO, E NIENTE HTML. DECISIONE DELLA PROPRIETA'.
  *
- * Fino al 01/09/2026 queste email partivano in SOLO TESTO. Sembra una
- * scelta sobria, e invece ha un effetto pratico che si paga ogni giorno:
- * rispondere a un messaggio di solo testo apre una risposta di solo
- * testo. Quando chi risponde prova ad allegare un'immagine o a impaginare
+ * Il 01/09/2026 queste email sono state mandate per qualche ora anche in
+ * HTML, e poi si e' tornati indietro su richiesta esplicita: "ne' nella
+ * invio verso usa e ne' nell'invio al cliente, NO HTML".
+ *
+ * VA SAPUTO COSA COMPORTA, perche' e' il difetto che l'HTML risolveva.
+ * Rispondere a un messaggio di solo testo apre una risposta di solo
+ * testo: quando chi risponde prova ad allegare un'immagine o a impaginare
  * un preventivo, il programma di posta chiede "vuoi passare a HTML?
- * altrimenti le tabelle vanno perse". Segnalato dall'ufficio: con
- * WordPress non succedeva, perche' quelle email erano HTML.
+ * altrimenti le tabelle vanno perse". Con WordPress non succedeva perche'
+ * quelle email erano HTML.
  *
- * Si manda quindi in tutti e due i modi nello stesso messaggio, che e' lo
- * standard: chi legge in testo vede il testo, chi risponde parte in HTML
- * e non gli viene chiesto niente.
- *
- * L'HTML e' volutamente povero -- paragrafi e nient'altro. Niente
- * tabelle, niente immagini, nessun foglio di stile: una email piena di
- * marcatura si rompe in meta' dei programmi di posta, e qui l'HTML non
- * serve all'aspetto, serve a far partire la RISPOSTA nel modo giusto.
+ * Quella domanda tornera'. Non e' una svista: e' il prezzo di questa
+ * scelta, accettato sapendolo. Il giorno che desse fastidio piu' della
+ * formattazione, basta rimettere un `html:` accanto al `text:` -- e
+ * l'HTML che serve e' fatto di soli paragrafi, non di tabelle: a schermo
+ * e' indistinguibile dal testo semplice.
  */
-function aHtml(righe: string[]): string {
-  const fuggi = (t: string) =>
-    t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-  /* Le righe vuote separano i paragrafi, come nel testo; dentro un
-     paragrafo si va a capo con <br>, cosi' la firma resta incolonnata. */
-  const blocchi: string[][] = [[]];
-  for (const r of righe) {
-    if (r.trim() === '') blocchi.push([]);
-    else blocchi[blocchi.length - 1].push(r);
-  }
-
-  const corpo = blocchi
-    .filter((b) => b.length)
-    .map((b) => `<p>${b.map(fuggi).join('<br>')}</p>`)
-    .join('');
-
-  return (
-    '<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;' +
-    'font-size:14px;line-height:1.5;color:#16130f">' +
-    corpo +
-    '</body></html>'
-  );
-}
 
 export async function confermaAlCliente(r: RichiestaDaAvvisare) {
   const c = conf();
@@ -281,7 +257,6 @@ export async function confermaAlCliente(r: RichiestaDaAvvisare) {
         ? `Thank you for contacting Prestige Rent - ${r.riferimento}`
         : 'Thank you for contacting Prestige Rent',
       text: righe.join('\n'),
-      html: aHtml(righe),
       /* dichiarato a mano: senza, un accento o un trattino lungo scritto
          dal cliente arriva come un punto interrogativo dentro un rombo */
       textEncoding: 'quoted-printable',
@@ -339,7 +314,6 @@ export async function avvisaRichiesta(r: RichiestaDaAvvisare) {
       replyTo: `${r.nome} <${r.email}>`,
       subject: oggetto,
       text: righe.join('\n'),
-      html: aHtml(righe),
       textEncoding: 'quoted-printable',
     });
     return { ok: true };
