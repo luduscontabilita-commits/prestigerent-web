@@ -184,7 +184,15 @@ export async function caricaSuGoogle(
   for (let i = 0; i < righe.length; i += LOTTO) {
     const pezzo = righe.slice(i, i + LOTTO);
     const eventi = pezzo.map((r) => {
-      const identificativi: Record<string, string>[] = [{ emailAddress: r.emailGoogle! }];
+      /* 🔴 L'EMAIL SI METTE SOLO SE C'E'.
+         Qui c'era `r.emailGoogle!` con il punto esclamativo, cioe' "fidati,
+         c'e' sempre". Con le prenotazioni era vero. Con le richieste dal
+         modulo no: qualcuna lascia solo il telefono, e allora partiva un
+         identificativo vuoto -- che Google rifiuta con un 400 secco su
+         TUTTO il lotto, non solo su quella riga. Undici richieste buttate
+         per una. */
+      const identificativi: Record<string, string>[] = [];
+      if (r.emailGoogle) identificativi.push({ emailAddress: r.emailGoogle });
       /* Il telefono raddoppia le possibilita' di abbinamento e non costa
          niente: chi non ce l'ha in formato internazionale viaggia con la
          sola email. */
