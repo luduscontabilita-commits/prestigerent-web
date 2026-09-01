@@ -40,7 +40,10 @@ export type Destinatario =
   | 'meta'
   | 'ga4'
   | 'google_lead'
-  | 'ga4_lead';
+  | 'ga4_lead'
+  | 'google_booking'
+  | 'meta_booking'
+  | 'ga4_booking';
 
 export type Esito = {
   ordine: string;
