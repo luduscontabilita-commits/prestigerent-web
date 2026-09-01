@@ -6,6 +6,7 @@ import { RiapriPreferenze } from '@/components/Consenso';
 import {
   IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta,
   IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok, IconaWhatsApp,
+  CartaStripe, CartaMastercard, CartaVisa, CartaPayPal, CartaAmex,
 } from '@/components/IconeFooter';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
    altre `.ft-*`: `home.css` e' in mano ad altri in questo momento, e due
@@ -354,16 +355,24 @@ export async function Footer({ locale }: { locale: string }) {
       <div className="ft-bottom">
         {/* Se l'elenco e' vuoto non resta uno spazio vuoto in mezzo al
             footer: il contenitore proprio non esiste. */}
-        {/* 🔴 LE TESSERE DEI CIRCUITI SONO STATE TOLTE IL 01/09/2026.
-            Aggiunte e rimosse lo stesso giorno, su richiesta. Si torna
-            alla riga scritta, che e' come stava prima e aveva gia' la
-            sua motivazione: i marchi dei circuiti hanno un manuale d'uso
-            che vieta di ridisegnarli, e il nome scritto fa comunque il
-            lavoro che questa riga deve fare -- dire a chi non ci conosce
-            che i soldi non passano da noi. */}
+        {/* I circuiti: la scritta "Secure payments" e a destra i cinque
+            marchi, al posto dell'elenco dei nomi che c'era prima. Sono i
+            disegni originali di Font Awesome (vedi IconeFooter.tsx), gli
+            stessi del footer di WordPress.
+            Il nome di ogni circuito non sparisce: vive in `aria-label`
+            su ciascun disegno, quindi un lettore di schermo legge
+            "Secure payments, Stripe, Mastercard, Visa, PayPal, American
+            Express" esattamente come prima. Cambia la forma, non
+            l'informazione. */}
         <span className="ft-pay">
-          Secure payments with Stripe &middot; Visa &middot; Mastercard &middot;
-          PayPal &middot; American Express
+          <span className="ft-pay-t">Secure payments</span>
+          <span className="ft-carte">
+            <CartaStripe />
+            <CartaMastercard />
+            <CartaVisa />
+            <CartaPayPal />
+            <CartaAmex />
+          </span>
         </span>
       </div>
 

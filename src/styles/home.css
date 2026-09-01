@@ -1038,8 +1038,24 @@
 /* La barra in fondo ha lo sfondo scuro del footer, non quello della
    pagina: `--ink-soft` qui sarebbe testo scuro su scuro. Il colore e' lo
    stesso di `.ft-bottom`, appena piu' spento. */
-.ft-pay{ font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px; }
-@media (max-width:640px){ .ft-pay{ display:block; margin-top:10px; } }
+.ft-pay{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  justify-content:center;
+  font-size:.78rem; color:rgba(255,255,255,.5); letter-spacing:.2px;
+}
+@media (max-width:640px){ .ft-pay{ margin-top:10px; } }
+
+/* I cinque marchi. Sono monocromatici e prendono il colore del testo
+   accanto, ma un filo piu' accesi: a .5 di opacita' come la scritta i
+   tracciati sottili di Visa e Amex si sfarinano su fondo scuro.
+   `line-height:0` sul contenitore, altrimenti il testo invisibile che
+   avvolge gli SVG aggiunge qualche pixel sotto e la fila si disallinea
+   rispetto a "Secure payments". */
+.ft-carte{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  line-height:0; color:rgba(255,255,255,.78);
+}
+.ft-carte svg{ display:block; }
 
 /* I social: solo il disegno, la parola sta in `aria-label` per chi
    naviga con un lettore di schermo. Cerchio appena accennato, perche'
