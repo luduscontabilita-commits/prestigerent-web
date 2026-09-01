@@ -5,7 +5,7 @@ import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
 import {
   IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta,
-  IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok,
+  IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok, IconaWhatsApp,
 } from '@/components/IconeFooter';
 /* Le regole `.ft-legale*` stanno qui e non in `home.css` accanto alle
    altre `.ft-*`: `home.css` e' in mano ad altri in questo momento, e due
@@ -178,6 +178,16 @@ const SOCIAL: Voce[] = [
   ['Instagram', 'https://www.instagram.com/prestigerentitaly', IconaInstagram],
   ['Facebook', 'https://en-gb.facebook.com/prestigerent/', IconaFacebook],
   ['TikTok', 'https://www.tiktok.com/@prestigerentitaly', IconaTikTok],
+  /* 🔴 WHATSAPP E' ENTRATO QUI IL 01/09/2026, E IL PULSANTE VERDE E'
+     USCITO. Sotto ai social c'era un bottone verde pieno, "Message us on
+     WhatsApp": l'unico elemento colorato di tutta la colonna, subito
+     sopra una fila di cerchi grigi che facevano la stessa cosa -- dare
+     un modo di scrivere. Due inviti allo stesso gesto, uno accanto
+     all'altro e con due pesi diversi, si annullano invece di sommarsi.
+     Adesso e' il quinto cerchio della fila. Non e' un social e resta
+     l'ultimo: gli altri quattro sono posti dove si guarda l'azienda,
+     questo e' il posto dove le si parla. */
+  ['WhatsApp', 'https://wa.me/393338424047', IconaWhatsApp],
 ];
 
 export async function Footer({ locale }: { locale: string }) {
@@ -242,9 +252,6 @@ export async function Footer({ locale }: { locale: string }) {
               ))}
             </span>
           )}
-          <a className="ft-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
-            Message us on WhatsApp
-          </a>
         </div>
 
         <div className="ft-col">

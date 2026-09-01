@@ -1024,10 +1024,10 @@
 .ft-vo{ display:flex; align-items:flex-start; gap:9px; }
 .ft-vo svg{ flex:0 0 auto; margin-top:2px; opacity:.72; }
 .ft-vo:hover svg{ opacity:1; }
-.ft-wa{
-  align-self:flex-start; margin-top:4px; background:#25D366; color:#fff !important;
-  padding:9px 15px; border-radius:999px; font-size:.84rem; font-weight:800;
-}
+/* Qui stavano le regole di .ft-wa, il pulsante verde "Message us on
+   WhatsApp". Tolte insieme al pulsante il 01/09/2026: WhatsApp e' ora
+   il quinto cerchio della fila dei social, con lo stesso trattamento
+   degli altri quattro. */
 .ft-bottom{
   border-top:1px solid rgba(255,255,255,.13); padding:15px 20px;
   display:flex; flex-wrap:wrap; justify-content:center; gap:8px 22px;

@@ -64,8 +64,11 @@ export const IconaTelefono = () => (
   </svg>
 );
 
+/* 18 e non 16 come le icone del menu: questa sta nella fila dei social,
+   dove tutte le altre sono 18. Una sola piu' piccola in mezzo a quattro
+   uguali si nota, e si nota come un errore. */
 export const IconaWhatsApp = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
     <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.3 4c-.2 0-.5.1-.7.4-.3.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3-1.6-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.1-.2 0-.4.1-.5l.5-.6c.1-.2.2-.3.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4Z" />
   </svg>
 );
