@@ -45,10 +45,22 @@ const POSTI: { titolo: string; href: string; da: string; img?: string; alt: stri
     titolo: 'Florence & Tuscany',
     href: '/destinations/florence-tuscany/',
     da: 'wine-experience-in-tuscany',
-    /* la cantina e' bella ma e' un interno: una destinazione si riconosce
-       dal paesaggio, non da una stanza */
-    img: 'wp/2021/09/tuscany-hills-opt.jpg',
-    alt: 'The rolling hills of the Tuscan countryside',
+    /* 🔴 LE COLLINE NON BASTAVANO (02/09/2026).
+       Prima c'era `tuscany-hills-opt.jpg`, messa per uscire dalla
+       cantina buia della copertina del tour: giusto il ragionamento
+       -- una destinazione si riconosce dal paesaggio, non da una
+       stanza -- ma la cura ha risolto meta' problema. Erano colline
+       verdi senza un segno: potevano essere l'Umbria, le Marche, la
+       Borgogna. E stanno sul riquadro piu' grande della griglia, il
+       solo che occupa due colonne per due righe, sotto un titolo che
+       nomina Firenze.
+       Tutti gli altri riquadri hanno un monumento che si riconosce da
+       lontano -- il Colosseo, il Duomo di Milano, la torre di Pisa --
+       e il piu' importante di tutti era l'unico anonimo.
+       Questa dice le due parole del titolo insieme: la cupola e il
+       campanile, i tetti di Firenze, e dietro le colline toscane. */
+    img: 'wp/2021/09/florence-roofs-view-opt.jpg',
+    alt: 'The dome of Florence over the city roofs, with the Tuscan hills behind',
   },
   {
     titolo: 'Rome',
@@ -82,8 +94,11 @@ const POSTI: { titolo: string; href: string; da: string; img?: string; alt: stri
     href: '/destinations/livorno-port-destinations/',
     da: 'florence-tuscany-from-livorno-port',
     /* La prima foto di quel tour e' la cupola di Firenze, che compare
-       gia' due riquadri sopra: dalla banchina di Livorno si va anche a
-       Pisa, e la torre non si confonde con nient'altro. */
+       gia' nel riquadro grande: dalla banchina di Livorno si va anche a
+       Pisa, e la torre non si confonde con nient'altro.
+       (Quando questa riga e' stata scritta la cupola in realta' NON
+       c'era: il riquadro di Firenze mostrava delle colline. Il
+       ragionamento era giusto lo stesso e da oggi torna anche vero.) */
     img: 'wp/2021/03/pisa-torre.jpg',
     alt: 'The leaning tower of Pisa, a shore excursion from Livorno',
   },
@@ -102,6 +117,31 @@ const POSTI: { titolo: string; href: string; da: string; img?: string; alt: stri
     href: '/destinations/civitavecchia-destinations/',
     da: 'private-tarquinia-from-civitavecchia',
     alt: 'Rome and Etruria from the port of Civitavecchia',
+  },
+  /* 🔴 IL NONO RIQUADRO CHIUDE LA GRIGLIA (02/09/2026).
+     La griglia e' a quattro colonne e il primo riquadro ne occupa due
+     per due righe: con otto destinazioni le celle occupate erano
+     4+7=11, cioe' due righe piene e una terza con un buco in fondo a
+     destra. Il commento nel CSS diceva "otto riquadri su quattro
+     colonne diventano due righe con il primo doppio", e il conto non
+     torna -- il buco si vedeva.
+     Con nove le celle sono 4+8=12: tre righe esatte, nessun vuoto.
+     E il nono non e' un riempitivo scelto per far quadrare i conti:
+     completa la fila dei porti, che erano Livorno, La Spezia e
+     Civitavecchia e adesso sono quattro. La pagina esiste e ha cinque
+     tour dentro (verificato: 200). */
+  {
+    titolo: 'From Naples port',
+    href: '/cruise-port-tours/naples-port/',
+    da: 'sorrento-and-positano-from-naples',
+    /* Il golfo con il porto in primo piano e il Vesuvio dietro: e'
+       letteralmente quello che si vede scendendo dalla nave. La
+       copertina del tour sarebbe Positano, che e' dove si va -- ma il
+       riquadro qui accanto, "Naples & the Amalfi Coast", mostra gia'
+       Pompei e il Vesuvio, e due foto della stessa costa una sopra
+       l'altra si annullano. */
+    img: 'wp/2021/04/napoli-porto.jpg',
+    alt: 'The bay of Naples with the harbour and Vesuvius behind',
   },
 ];
 

@@ -427,7 +427,13 @@ export function Header({
                         const suoTour = r.href === `/tour/${r.tour}/`;
                         const q =
                           suoTour && voto && voto.quante >= MIN_VETRINA ? voto : undefined;
-                        const f = foto[r.tour];
+                        /* `r.img` vince su `foto[r.tour]`: dove la
+                           copertina del tour non mostra il posto che il
+                           riquadro nomina, la foto e' scelta a mano in
+                           menu.ts. Vale per tre riquadri su tutto il
+                           menu, e il perche' e' scritto accanto a
+                           ognuno. */
+                        const f = r.img ?? foto[r.tour];
                         return (
                           <a className="hd-card" key={r.href} href={p(r.href)}>
                             <span className="hd-card-f">

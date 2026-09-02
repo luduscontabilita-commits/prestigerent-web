@@ -49,6 +49,11 @@
 export type Voce = { testo: string; href: string; nota?: string; slug?: string };
 export type Gruppo = { titolo: string; voci: Voce[] };
 
+/* La cartella pubblica delle immagini, per i riquadri che la foto se la
+   scelgono invece di ereditarla dal tour. Stesso indirizzo che usa
+   `Destinazioni.tsx` per la griglia della home. */
+const MEDIA = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/';
+
 /** Un riquadro fotografico del pannello. */
 export type Riquadro = {
   /** il titolo sovrapposto in basso a sinistra */
@@ -58,6 +63,18 @@ export type Riquadro = {
   tour: string;
   /** cosa si vede NELLA FOTO: non ripete il titolo, lo completa */
   alt: string;
+  /* 🔴 LA FOTO SCELTA A MANO, CHE VINCE SU `tour` (02/09/2026).
+     La griglia della home aveva gia' imparato questa lezione (vedi il
+     commento in cima a POSTI dentro Destinazioni.tsx); questo pannello
+     no, e si vedeva: "Florence & Tuscany" mostrava le torri di San
+     Gimignano, "From Livorno port" il Ponte Vecchio -- cioe' Firenze,
+     sotto il nome di un porto che sta a novanta chilometri.
+     La copertina di un tour risponde a "com'e' questa esperienza"; un
+     riquadro di destinazione deve rispondere a "com'e' questo posto", e
+     la seconda non si deduce dalla prima. Dove le due domande hanno la
+     stessa risposta `tour` va benissimo e resta; dove non ce l'hanno si
+     scrive `img`. */
+  img?: string;
 };
 
 export type Sezione = {
@@ -434,7 +451,12 @@ export const SEZIONI: Sezione[] = [
         testo: 'Florence & Tuscany',
         href: '/destinations/florence-tuscany/',
         tour: 'tour-to-san-gimignano-from-florence',
-        alt: 'The medieval towers of San Gimignano over the Tuscan hills',
+        /* Le torri di San Gimignano sono Toscana ma non sono Firenze, e
+           il riquadro dice tutte e due. La facciata del Duomo le dice
+           entrambe: e' Firenze, ed e' il primo motivo per cui ci si
+           viene. */
+        img: MEDIA + 'wp/2021/09/florence-cathedral-opt.jpg',
+        alt: 'The marble facade and bell tower of the Florence Duomo',
       },
       {
         testo: 'Rome',
@@ -452,7 +474,14 @@ export const SEZIONI: Sezione[] = [
         testo: 'From Livorno port',
         href: '/destinations/livorno-port-destinations/',
         tour: 'private-florence-from-livorno-port',
-        alt: 'The Ponte Vecchio and its shops over the Arno',
+        /* La copertina di quel tour e' il Ponte Vecchio: Firenze, sotto
+           il nome di un porto che sta a novanta chilometri -- e la
+           stessa citta' che compare gia' nel primo riquadro. Dalla
+           banchina di Livorno si va anche a Pisa, e la torre non si
+           confonde con nient'altro. Stessa foto della griglia in home,
+           cosi' il porto si riconosce allo stesso modo nei due posti. */
+        img: MEDIA + 'wp/2021/03/pisa-torre.jpg',
+        alt: 'The leaning tower of Pisa, a shore excursion from Livorno',
       },
       {
         testo: 'From La Spezia port',
@@ -464,7 +493,13 @@ export const SEZIONI: Sezione[] = [
         testo: 'From Civitavecchia port',
         href: '/destinations/civitavecchia-destinations/',
         tour: 'private-orvieto-from-civitavecchia',
-        alt: 'Orvieto standing on its cliff of tufa rock',
+        /* Da Civitavecchia si sbarca per andare a Roma: e' quello il
+           motivo del viaggio, e va detto nella foto. San Pietro e non il
+           Colosseo, che sta gia' due riquadri prima sotto "Rome": due
+           immagini della stessa citta' nella stessa fila si leggono come
+           un errore. */
+        img: MEDIA + 'wp/2021/09/rome-vatican-opt.jpg',
+        alt: 'The dome of St Peter at dusk, reached from the port of Civitavecchia',
       },
     ],
     gruppi: [
