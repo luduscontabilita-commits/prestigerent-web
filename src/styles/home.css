@@ -3207,11 +3207,10 @@ button.hd-top{
  *
  * Vale solo quando `vetrina` e' vera in HomeTours.tsx, cioe' quando non
  * si sta filtrando: appena si cerca, la promessa non varrebbe piu'. */
-html[data-theme="dark"] .hm-nobile{
-  background:
-    linear-gradient(180deg, rgba(255,154,77,.06), rgba(255,154,77,0) 62%),
-    rgba(255,255,255,.022);
-}
+/* 🔴 Anche col tema scuro la fascia non ha piu' un fondo suo
+   (02/09/2026): qui c'era la stessa velatura calda della versione
+   chiara, appena accennata. Tolto insieme all'altro, o la sezione
+   sarebbe recintata in un tema e libera nell'altro. */
 
 /* L'OCCHIELLO. Due parole sopra il titolo, in colore vino e spaziate:
    dicono da dove viene la scelta prima ancora che si legga il titolo.
@@ -3247,10 +3246,16 @@ html[data-theme="dark"] .hm-occhiello{ color:var(--orange-hi, #FF9A4D); }
      sta senza litigare. */
   --oro:#B8912F;
   --oro-luce:#E6D2A0;
-  background:
-    linear-gradient(180deg, rgba(110,27,44,.045), rgba(110,27,44,0) 62%),
-    var(--fondo-caldo, #FBF7F1);
-  border-block:1px solid var(--line);
+  /* 🔴 VIA IL FONDO CALDO E LE DUE RIGHE DI SEPARAZIONE (02/09/2026).
+     Qui c'erano un `background` crema con una velatura di vino sopra e
+     un `border-block`, cioe' un filo in alto e uno in basso. Insieme
+     ritagliavano la sezione dei tour dal resto della pagina come una
+     fascia a se'.
+     Restano il `padding-block` e la spaziatura: la sezione continua a
+     respirare, semplicemente non e' piu' recintata. Le schede tengono
+     il bordo oro e l'alone caldo -- erano nati per staccarsi dal fondo
+     crema, ma su bianco funzionano lo stesso e sono l'unica cosa che
+     distingue ancora la vetrina dal resto. */
   padding-block:52px;
 }
 
@@ -3301,10 +3306,12 @@ html[data-theme="dark"] .hm-nobile .hm-card:hover{
     0 16px 38px rgba(0,0,0,.45);
 }
 
-/* Le frecce prendono il fondo della fascia, altrimenti restano due
-   pastiglie bianche appiccicate sopra un fondo che bianco non e'. */
-.hm-nobile .hm-frec{ background:var(--fondo-caldo, #FBF7F1); }
-.hm-nobile .hm-frec:disabled:hover{ background:var(--fondo-caldo, #FBF7F1); }
+/* 🔴 LE FRECCE TORNANO AL FONDO DELLA PAGINA (02/09/2026).
+   Prendevano il crema della fascia, ed era giusto finche' la fascia
+   c'era: due pastiglie bianche sopra un fondo che bianco non e' si
+   vedono. Ora il fondo della sezione E' quello della pagina, quindi
+   forzare il crema le farebbe risaltare per il motivo opposto. Si
+   toglie la regola e valgono di nuovo quelle generali di `.hm-frec`. */
 
 @media (max-width: 720px){
   .hm-nobile{ padding-block:38px; }

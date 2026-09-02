@@ -451,7 +451,12 @@ export function HomeTours({
           </div>
 
           <div className="pr-head" style={{ marginBottom: 18 }}>
-            {vetrina && <p className="hm-occhiello">{OCCHIELLO_CONSIGLIATI}</p>}
+            {/* 🔴 VIA L'OCCHIELLO (02/09/2026).
+                Era la righina arancione sopra il titolo. Sotto di lei
+                c'e' gia' il titolo, e sotto ancora la riga di
+                accompagnamento: tre righe di testo incolonnate prima di
+                arrivare alle schede, e la prima diceva la cosa meno
+                utile delle tre. */}
             <h2 className="pr-title">
               {(() => {
                 const cat = filtro?.tipo || categoria;
@@ -463,16 +468,16 @@ export function HomeTours({
                 return TITOLO_CONSIGLIATI;
               })()}
             </h2>
-            {/* Il conteggio scende sotto il titolo: era lui il titolo, e
-                un numero grande in cima a una sezione non dice di cosa
-                si tratta. Qui fa il suo mestiere, che e' dare la misura. */}
-            {vetrina ? (
-              <p className="pr-lead hm-sotto-nobile">{SOTTO_CONSIGLIATI}</p>
-            ) : (
-              <p className="pr-lead">
-                {visibili.length} {visibili.length === 1 ? 'tour' : 'tours'}
-              </p>
-            )}
+            {/* 🔴 IL CONTEGGIO SOTTO IL TITOLO NON C'E' PIU' (02/09/2026).
+                Quando si sceglie una categoria qui compariva "12 tours".
+                Ma il numero e' gia' scritto DENTRO il bottone che si e'
+                appena premuto -- `{ETICHETTA[k]} <b>{n}</b>`, qualche
+                riga piu' su -- quindi la riga ripeteva a chi aveva
+                appena cliccato un numero che aveva appena letto, e lo
+                faceva nel punto che separa il titolo dalle schede.
+                Resta la riga della vetrina, che non conta niente:
+                racconta. */}
+            {vetrina && <p className="pr-lead hm-sotto-nobile">{SOTTO_CONSIGLIATI}</p>}
             {dalMenu && (
               <span className="hm-chip">
                 In and around {dalMenu}
