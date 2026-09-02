@@ -30,6 +30,10 @@ export default function proxy(req: NextRequest) {
        /en/admin e non esisterebbe. */
     pathname.startsWith('/admin') ||
     pathname.startsWith('/auth') ||
+    /* 🔴 `/michele/` -- il pannello. Escluso qui per lo stesso motivo
+       di /admin: senza questa riga diventa /en/michele/, che non esiste,
+       e risponde 404. Costato la prima pubblicazione del 02/09/2026. */
+    pathname.startsWith('/michele') ||
     /* LE LANDING E LA PAGINA DI CONFERMA NON SONO PAGINE DI QUESTO SITO.
      *
      * `/lp/...` sono le quattro landing su cui atterrano tutte le campagne
