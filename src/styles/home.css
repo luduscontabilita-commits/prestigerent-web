@@ -1719,12 +1719,27 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 
 /* il rimando a tutti i tour, sotto le dodici schede della home */
 .hm-tutti{ text-align:center; margin:26px 0 0; }
+/* 🔴 PIENO A RIPOSO, VUOTO AL PASSAGGIO (02/09/2026).
+   Era il contrario: fondo neutro come una scheda, e solo passandoci
+   sopra prendeva l'arancione. Ma un bottone che si accende quando lo
+   tocchi si accende per chi l'ha gia' trovato -- e su un telefono, dove
+   il passaggio del mouse non esiste, non si accende mai. Questo chiude
+   la sezione dei tour: e' l'unico invito rimasto a chi ha scorso
+   ottantasei schede senza decidere, e deve vedersi da fermo.
+   Il passaggio ora lo svuota: e' il modo di rispondere al gesto senza
+   spingere ancora, dato che di piu' acceso di cosi' non puo' andare.
+   La `transition` sta su entrambe le proprieta' che cambiano, altrimenti
+   il fondo scatta e il bordo scivola. */
 .hm-tutti a{
   display:inline-block; padding:13px 26px; border-radius:12px;
-  border:1px solid var(--line); background:var(--card);
-  text-decoration:none; font-size:.9rem; font-weight:800; color:var(--ink);
+  border:1px solid var(--orange); background:var(--orange);
+  text-decoration:none; font-size:.9rem; font-weight:800; color:#fff;
+  transition:background-color .16s ease, color .16s ease;
 }
-.hm-tutti a:hover{ border-color:var(--orange); color:var(--orange); }
+.hm-tutti a:hover,
+.hm-tutti a:focus-visible{
+  background:transparent; color:var(--orange);
+}
 
 /* ─── le lingue in fondo alla pagina ─────────────────────────────────── */
 .lng{ max-width:1180px; margin:8px auto 40px; padding:0 20px; text-align:center; }
