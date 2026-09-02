@@ -78,7 +78,8 @@ quelli delle AI, ammessi apposta), `sitemap.xml` con 114 URL.
 
 **Due eccezioni volute:**
 
-- **`/lp/*`** — le landing degli annunci, servite dal vecchio host. Hanno
+- **`/lp/*`** — le landing degli annunci, ora servite da Vercel da
+  `public/lp/` (prima stavano sul vecchio host). Hanno
   `X-Robots-Tag: noindex, nofollow` **sempre**, anche a sito pubblicato:
   dicono le stesse cose delle schede tour e senza noindex si
   contenderebbero la stessa ricerca. Il noindex non tocca gli annunci,
@@ -158,14 +159,21 @@ rewrite in `next.config.ts`:
 
 | | |
 |---|---|
-| `/lp/*.html` | le landing degli annunci — **3.977 click negli ultimi 30 giorni** |
+| ~~`/lp/*.html`~~ | **spostate su Vercel il 02/09/2026** — i file stanno in `public/lp/`, i nove video su Supabase Storage (`media/lp/video/`). Il vecchio server non le serve più |
 | `/myb/` | i biglietti dei clienti |
 | `/mp/` | i meeting point |
 | `/wp-content/uploads/**` | le immagini storiche |
 
 Verificato il giorno del passaggio: rispondono tutte, con lo stesso peso
-al byte. **Non si spegne quel server** finche' queste quattro cose non
-sono state portate altrove.
+al byte. **Non si spegne quel server** finche' queste cose non sono state portate
+altrove. Dal 02/09/2026 le landing non sono piu' fra queste: restano
+`/myb/`, `/mp/`, `/wp-content/uploads/`, e — per decisione della
+proprieta' — **`/booking/` e `/guest-albums/`, che restano li' e basta**.
+
+🔴 **Le landing non si pubblicano piu' con `deploy.sh`.** I file veri
+stanno in `public/lp/` e si pubblicano con `git push`. Lo script ora si
+rifiuta di partire senza `FORZA=1`, perche' pubblicare da li' non darebbe
+nessun errore e non cambierebbe niente: si lavorerebbe a vuoto.
 
 ---
 
