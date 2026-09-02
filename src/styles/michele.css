@@ -1,0 +1,120 @@
+/* IL PANNELLO /michele/.
+ *
+ * Foglio suo, non quello del sito: qui non si vende niente, si legge.
+ * Carattere di sistema, numeri allineati, niente animazioni. Chi lo apre
+ * cerca un numero, non un'esperienza.
+ *
+ * I colori sono solo tre: nero sul chiaro, un rosso per le cose che non
+ * vanno, un grigio per le note. Un pannello con dieci colori si guarda;
+ * uno con tre si legge. */
+
+.mi {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  color: #16130f;
+  background: #fff;
+}
+
+.mi-testa h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.mi-testa p { margin: 4px 0 26px; color: #847b70; font-size: 0.86rem; }
+
+.mi-vuoto {
+  margin: 0 0 26px; padding: 14px 16px;
+  background: #fdf6e3; border: 1px solid #e8d9a8; border-radius: 8px;
+  font-size: 0.92rem; line-height: 1.5;
+}
+.mi-vuoto code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.86em; }
+
+/* i tre numeri in cima */
+.mi-tre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 26px; }
+.mi-tre > div {
+  padding: 16px 18px; border: 1px solid #e6e1da; border-radius: 10px; background: #fbfaf8;
+}
+.mi-eti { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #847b70; }
+.mi-tre strong { display: block; margin: 6px 0 2px; font-size: 1.9rem; font-weight: 800;
+  letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.mi-tre em { font-style: normal; font-size: 0.8rem; color: #847b70; }
+
+/* i riquadri */
+.mi-riq { margin-bottom: 22px; border: 1px solid #e6e1da; border-radius: 10px; overflow: hidden; }
+.mi-riq h2 {
+  margin: 0; padding: 11px 16px; background: #f6f4f1; border-bottom: 1px solid #e6e1da;
+  font-size: 0.84rem; font-weight: 800; letter-spacing: 0.01em;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+}
+.mi-riq h2 em { font-style: normal; font-weight: 500; font-size: 0.76rem; color: #847b70; }
+.mi-no { margin: 0; padding: 16px; color: #847b70; font-size: 0.88rem; }
+
+/* tabelle */
+.mi-tab { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.mi-tab th {
+  text-align: left; padding: 8px 16px; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: #847b70;
+  border-bottom: 1px solid #eee9e2;
+}
+.mi-tab td { padding: 9px 16px; border-bottom: 1px solid #f2eee8; }
+.mi-tab tr:last-child td { border-bottom: 0; }
+.mi-n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mi-male { color: #9b2c1e; font-weight: 700; }
+.mi-spenta td { color: #a49b90; }
+
+/* l'imbuto: la barra dice il rapporto meglio di qualsiasi percentuale */
+.mi-imbuto { list-style: none; margin: 0; padding: 14px 16px; }
+.mi-imbuto li {
+  display: grid; grid-template-columns: 150px 1fr 70px 46px;
+  align-items: center; gap: 10px; padding: 5px 0;
+}
+.mi-passo { font-size: 0.82rem; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.mi-barra { height: 9px; background: #f0ece6; border-radius: 5px; overflow: hidden; }
+.mi-barra i { display: block; height: 100%; background: #16130f; border-radius: 5px; }
+.mi-imbuto b { text-align: right; font-variant-numeric: tabular-nums; font-size: 0.88rem; }
+.mi-imbuto em { font-style: normal; text-align: right; font-size: 0.76rem; color: #847b70; }
+
+@media (max-width: 760px) {
+  .mi-tre { grid-template-columns: 1fr; }
+  .mi-imbuto li { grid-template-columns: 110px 1fr 60px 40px; gap: 7px; }
+  .mi-tab { font-size: 0.82rem; }
+  .mi-tab td, .mi-tab th { padding: 8px 10px; }
+}
+
+/* Il pannello si legge anche al buio: chi lo apre di sera non deve
+   prendersi una pagina bianca in faccia. */
+@media (prefers-color-scheme: dark) {
+  .mi { background: #121110; color: #f0ece7; }
+  .mi-tre > div, .mi-riq { border-color: #302c28; }
+  .mi-tre > div { background: #1b1917; }
+  .mi-riq h2 { background: #1b1917; border-bottom-color: #302c28; }
+  .mi-tab th { border-bottom-color: #302c28; color: #a49b90; }
+  .mi-tab td { border-bottom-color: #232120; }
+  .mi-barra { background: #2a2724; }
+  .mi-barra i { background: #f0ece7; }
+  .mi-male { color: #e38070; }
+  .mi-vuoto { background: #2e2513; border-color: #4a3d20; }
+}
+
+/* gli strumenti: un pulsante e un campo, niente altro */
+.mi-str { padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mi-btn {
+  border: 0; border-radius: 7px; padding: 9px 16px; cursor: pointer;
+  background: #16130f; color: #fff; font: inherit; font-weight: 700; font-size: 0.86rem;
+}
+.mi-btn:disabled { opacity: 0.5; cursor: progress; }
+.mi-nota { font-size: 0.82rem; color: #847b70; }
+.mi-form { flex-direction: column; align-items: stretch; }
+.mi-form textarea {
+  width: 100%; font: inherit; font-size: 0.86rem; padding: 10px 12px;
+  border: 1px solid #ddd7ce; border-radius: 7px; resize: vertical;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.mi-form-sotto { display: flex; gap: 10px; align-items: center; }
+.mi-form select {
+  font: inherit; font-size: 0.86rem; padding: 8px 10px;
+  border: 1px solid #ddd7ce; border-radius: 7px; background: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  .mi-btn { background: #f0ece7; color: #121110; }
+  .mi-form textarea, .mi-form select { background: #1b1917; color: #f0ece7; border-color: #302c28; }
+}
