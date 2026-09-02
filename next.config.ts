@@ -59,6 +59,45 @@ const nextConfig: NextConfig = {
      tenere. */
   async redirects() {
     return [
+      /* 🔴 I TRE VECCHI INDIRIZZI DELLE LANDING (02/09/2026).
+       *
+       * Stavano in un `.htaccess` dentro `/lp/` sul vecchio server. Quando
+       * le landing sono passate su Vercel quel file e' rimasto la', inerte:
+       * Apache non le serve piu'. Senza queste tre righe i vecchi indirizzi
+       * -- che stanno ancora in giro, nei link e nella memoria di Google --
+       * risponderebbero 404.
+       *
+       * Perche' esistono, una per una:
+       *   - senza suffisso: era un prototipo grafico rimasto online, bello
+       *     ma SENZA il modulo di prenotazione: i due BOOK NOW erano
+       *     bottoni morti;
+       *   - `-COPIA`: la stessa landing duplicata su un indirizzo
+       *     parallelo, due indirizzi con lo stesso contenuto che si
+       *     tolgono posizioni a vicenda;
+       *   - `-lan`: era TRONCATA A 16.000 BYTE ESATTI dal 20 luglio --
+       *     l'antivirus del vecchio server tagliava i file con immagini
+       *     `data:image/...;base64`. Il taglio cadeva a meta' stringa:
+       *     niente </html>, niente consenso, niente tracciamento, ma un
+       *     <title> valido e un HTTP 200. Da fuori sembrava sana.
+       *
+       * Vanno alla `-lan2` e non alla home: chi cercava Siena e San
+       * Gimignano deve trovare Siena e San Gimignano. */
+      {
+        source: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence.html',
+        destination: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html',
+        permanent: true,
+      },
+      {
+        source: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-COPIA.html',
+        destination: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html',
+        permanent: true,
+      },
+      {
+        source: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan.html',
+        destination: '/lp/small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence-lan2.html',
+        permanent: true,
+      },
+
       /* ════════════════════════════════════════════════════════════════
          IL SITO RISPONDE A DUE INDIRIZZI DIVERSI: SE NE CHIUDE UNO.
          ════════════════════════════════════════════════════════════════

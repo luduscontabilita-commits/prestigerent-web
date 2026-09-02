@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Consent Mode v2 - stato di default, PRIMA di qualsiasi altro tag. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    ad_storage:'granted', ad_user_data:'granted', ad_personalization:'granted',
+    analytics_storage:'granted', functionality_storage:'granted',
+    personalization_storage:'granted', security_storage:'granted'
+  });
+  gtag('consent', 'default', {
+    ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied',
+    analytics_storage:'denied', functionality_storage:'denied',
+    personalization_storage:'denied', security_storage:'granted',
+    wait_for_update: 500,
+    region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU',
+             'IS','IE','IT','LV','LI','LT','LU','MT','NL','NO','PL','PT','RO',
+             'SK','SI','ES','SE','GB','CH']
+  });
+  gtag('set', 'ads_data_redaction', true);
+  gtag('set', 'url_passthrough', true);
+</script>
+<!-- CONSENSO 1/2 - riapplica la scelta gia' fatta, PRIMA di GTM.
+     Sta in pagina apposta: se il file esterno del banner non arrivasse,
+     chi ha gia' scelto continuerebbe comunque a essere misurato bene. -->
+<script>
+(function(){
+  try{
+    var m = document.cookie.match(/(?:^|;\s*)pr_consenso=([^;]*)/);
+    if(!m){ return; }
+    var s = JSON.parse(decodeURIComponent(m[1])), mk = s.mk ? 'granted' : 'denied';
+    gtag('consent','update',{
+      ad_storage: mk, ad_user_data: mk, ad_personalization: mk,
+      analytics_storage: s.an ? 'granted' : 'denied',
+      functionality_storage: s.an ? 'granted' : 'denied',
+      personalization_storage: mk
+    });
+  }catch(e){}
+})();
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TL7VV3RL');</script>
+<!-- End Google Tag Manager -->
+
+<!-- 🔴 QUI C'ERA UN SECONDO IMPIANTO GOOGLE, TOLTO IL 30/08/2026.
+
+     C'era un caricamento diretto della libreria gtag piu' due righe di
+     configurazione, una per GA4 e una per il tag di Google Ads.
+     Ma GTM -- che si carica poche righe piu' sopra -- porta gia' tutti e
+     due: il tag "GA4 - configurazione" e "Ads - remarketing", tutte le
+     pagine. Quindi ogni apertura contava DUE visite GA4 e DUE eventi di
+     remarketing, sulle pagine che ricevono circa 4.000 clic al mese
+     dagli annunci. E' il posto peggiore dove avere numeri gonfi, perche'
+     e' su quelli che si decide il budget.
+
+     Si e' tolto questo e NON GTM, perche' GTM e' governabile: si vede
+     cosa contiene, si cambia da un pannello, rispetta il consenso. Un
+     tag scritto dentro l'HTML non lo guarda piu' nessuno.
+
+     `gtag()` resta definita: la dichiara il blocco del consenso in cima
+     alla pagina, che gira prima di tutto. Niente si rompe. -->
+
+<title>Tasting Experience in Tuscany — Small-Group from Florence</title>
+<link rel="icon" type="image/png" href="img/logo-prestige.png">
+
+<!-- FONT: in WordPress spostare nell'<head> del tema -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560;1,9..144,640&family=Manrope:wght@500;600;800&display=swap" rel="stylesheet">
+
+<!-- CSS Elementor del sito: servono SOLO alla section homepage e al footer 467 in fondo alla pagina -->
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/frontend.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/widget-heading.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/widget-image.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/widget-icon-box.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/css/widget-social-icons.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor-pro/assets/css/widget-nav-menu.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor-pro/assets/css/widget-posts.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/uploads/elementor/css/post-16.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/uploads/elementor/css/post-467.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/uploads/elementor/css/post-739.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/brands.min.css">
+<link rel="stylesheet" href="https://prestigerent.com/wp-content/uploads/elementor/google-fonts/css/opensans.css">
+
+<style>
+:root{
+  --ink:      #24333F;
+  --ink-soft: #55646F;
+  --sienna-1: #A8431F;
+  --sienna-2: #C05A22;
+  --sienna-hi:#E9A15C;
+  --wine:     #7E1F33;
+  --orange:   #F5760B;
+  --orange-d: #DD6803;
+  --teal:     #12A594;
+  --red-logo: #C8102E;
+  --paper:    #FFFFFF;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Manrope', system-ui, sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:26px 20px 0px;
+  background:var(--paper);
+}
+
+/* LOGO — timbro + testo in HTML.
+   In produzione: src = https://prestigerent.com/wp-content/uploads/2022/05/fav-prestigerent-m.png */
+.logo{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:34px;
+  text-decoration:none;
+}
+.logo img{ width:58px; height:58px; display:block; }
+.logo-name{ text-align:left; line-height:1.2; }
+.logo-name strong{
+  display:block;
+  font-size:1.35rem;
+  font-weight:800;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+}
+.logo-name small{
+  display:block;
+  font-size:.66rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(55,55,82,.84);
+}
+
+.eyebrow{
+  display:inline-block;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#fff;
+  background:#6C63D2;
+  padding:8px 14px;
+  border-radius:6px;
+  margin-bottom:26px;
+}
+
+.hero-title{
+  font-size:clamp(2.35rem, 6.4vw, 4.5rem);
+  font-weight:800;
+  line-height:1.12;
+  letter-spacing:-0.02em;
+  max-width:20ch;
+  margin:0 auto;
+}
+/* "Discover the Heart of" resta su una sola riga anche su mobile
+   (niente "of" orfano); il resto del titolo invariato */
+.ht-lead{ display:inline; }
+@media (max-width:640px){
+  .hero-title .ht-lead{ display:inline-block; white-space:nowrap; font-size:min(2.35rem, 8vw); }
+}
+.hl{
+  font-family:'Fraunces', Georgia, serif;
+  font-style:italic;
+  font-weight:640;
+  font-size:1.06em;
+  letter-spacing:-0.01em;
+}
+.hl.place{
+  background:linear-gradient(105deg,
+    var(--sienna-1) 0%, var(--sienna-2) 38%,
+    var(--sienna-hi) 50%,
+    var(--sienna-2) 62%, var(--sienna-1) 100%);
+  background-size:220% 100%;
+  background-position:50% 0;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hl.lunch{
+  position:relative;
+  color:var(--wine);
+  white-space:nowrap;
+}
+.hl.lunch .stroke{
+  position:absolute;
+  left:-2%; bottom:-0.16em;
+  width:104%; height:0.3em;
+  overflow:visible;
+  pointer-events:none;
+}
+.hl.lunch .stroke path{
+  fill:none;
+  stroke:var(--wine);
+  stroke-width:5;
+  stroke-linecap:round;
+  vector-effect:non-scaling-stroke;
+  opacity:.9;
+}
+.amp{ color:var(--ink-soft); font-weight:600; }
+
+.hero-sub{
+  margin-top:22px;
+  font-size:clamp(1rem, 2vw, 1.2rem);
+  font-weight:500;
+  color:var(--ink-soft);
+  max-width:52ch;
+}
+.trust{
+  margin-top:22px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 20px;
+  justify-content:center;
+  align-items:center;
+  font-size:.95rem;
+  font-weight:600;
+}
+.t-item{ display:inline-flex; align-items:center; gap:8px; }
+.trust b{ font-weight:800; }
+.trust .dot{ color:#C6CED4; }
+
+.stars-img{ display:inline-flex; gap:2px; }
+.stars-img .star{
+  width:17px; height:17px;
+  background:url("img/star-green.png") center/contain no-repeat;
+}
+.t-icon{ width:20px; height:20px; color:var(--orange); flex-shrink:0; }
+
+.cta-row{
+  margin-top:34px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.cta{
+  position:relative;
+  overflow:hidden;
+  display:inline-block;
+  background:var(--orange);
+  color:#fff;
+  font-family:inherit;
+  font-size:1.05rem;
+  font-weight:800;
+  letter-spacing:.04em;
+  padding:18px 42px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(245,118,11,.32);
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.cta .cta-price{ font-weight:600; letter-spacing:.01em; }
+.cta:hover{
+  background:var(--orange-d);
+  transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(245,118,11,.38);
+}
+.cta:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
+.cta::after{
+  content:"";
+  position:absolute;
+  top:0; left:-70%;
+  width:45%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform:skewX(-18deg);
+}
+.cta-note{
+  font-size:.85rem;
+  font-weight:600;
+  color:var(--ink-soft);
+}
+/* riga di rassicurazione sotto ogni pulsante BOOK NOW */
+.pr-trustline{ margin:12px auto 0; max-width:660px; font-size:.9rem; font-weight:700;
+  line-height:1.5; color:var(--ink-soft); display:flex; flex-wrap:wrap;
+  gap:6px 12px; justify-content:center; align-items:center; }
+.pr-trustline .pr-tl-sep{ color:#C6CED4; font-weight:400; }
+/* ---------- blocco pitch prenotazione ---------- */
+.pr-book-pitch{ max-width:560px; margin:18px auto 0; text-align:center; }
+.pr-bp-head{ font-size:1.4rem; font-weight:800; color:var(--ink); line-height:1.25; }
+.pr-bp-head em{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:640; color:var(--orange); }
+.pr-bp-body{ margin-top:9px; font-size:1.02rem; line-height:1.62; color:var(--ink-soft); }
+.pr-bp-body strong{ color:var(--ink); font-weight:800; }
+/* ---------- foto team (sezione contatti): cerchio pieno + anello brand ---------- */
+.pr-team-photo{ width:170px; height:170px; border-radius:50%; object-fit:cover; display:block;
+  margin:0 auto 22px; border:4px solid var(--orange); box-shadow:0 8px 24px rgba(36,51,63,.16); }
+@media(max-width:560px){ .pr-team-photo{ width:200px; height:200px; margin-bottom:18px; border-width:4px; } }
+
+/* ============================================================
+   CAROSELLO FULL-WIDTH
+   Scorre da solo verso sinistra (loop infinito), si trascina
+   col mouse e si fa swipe col dito. L'immagine domina: la
+   didascalia è un velo minimo in basso.
+   ============================================================ */
+.film-section{
+  padding:20px 0 40px !important;
+  text-align:center;
+  overflow:hidden;
+}
+.film-head{
+  max-width:760px;
+  margin:0 auto;
+  padding:0 20px;
+}
+.film-title{
+  font-size:clamp(1.85rem, 4.5vw, 2.9rem);
+  font-weight:800;
+  letter-spacing:-0.02em;
+  line-height:1.15;
+  margin-top:18px;
+}
+.film-sub{
+  margin-top:14px;
+  font-size:clamp(.98rem, 1.8vw, 1.12rem);
+  font-weight:500;
+  color:var(--ink-soft);
+}
+
+.film-wrap{ position:relative; margin-top:40px; }
+
+.film{
+  overflow-x:auto;
+  overflow-y:hidden;
+  cursor:grab;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;          /* la barra la sostituisce il progress sotto */
+}
+.film::-webkit-scrollbar{ display:none; }
+.film.dragging{ cursor:grabbing; }
+
+.film-track{
+  display:flex;
+  gap:14px;
+  padding:0 20px;
+  width:max-content;
+}
+
+.slide{
+  position:relative;
+  flex:0 0 auto;
+  width:min(78vw, 880px);
+  height:clamp(320px, 62vh, 560px);
+  border-radius:18px;
+  overflow:hidden;
+  background:#E9E5DF;            /* placeholder mentre l'immagine carica */
+}
+.slide img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+  transform:scale(1.01);
+  transition:transform 1.1s cubic-bezier(.22,1,.36,1);
+}
+.slide:hover img{ transform:scale(1.05); }
+
+/* didascalia: minima, l'immagine resta protagonista */
+.slide figcaption{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:76px 22px 16px;
+  text-align:left;
+  color:#fff;
+  background:linear-gradient(180deg, rgba(15,20,26,0) 0%, rgba(15,20,26,.58) 100%);
+  pointer-events:none;
+}
+.slide figcaption span{
+  display:block;
+  font-size:.64rem;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--sienna-hi);
+  margin-bottom:2px;
+}
+.slide figcaption b{ font-size:.98rem; font-weight:700; text-shadow:0 1px 8px rgba(0,0,0,.3); }
+
+/* frecce (solo desktop con mouse) */
+.film-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:48px; height:48px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.92);
+  color:var(--ink);
+  box-shadow:0 6px 18px rgba(20,30,40,.18);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+  transition:transform .15s ease, background .15s ease;
+}
+.film-btn:hover{ background:#fff; transform:translateY(-50%) scale(1.06); }
+.film-btn svg{ width:20px; height:20px; }
+.film-btn.prev{ left:18px; }
+.film-btn.next{ right:18px; }
+@media (hover: none), (max-width: 760px){
+  .film-btn{ display:none; }
+}
+
+/* pillola-suggerimento: sparisce alla prima interazione */
+.film-hint{
+  position:absolute;
+  bottom:16px; left:50%;
+  transform:translateX(-50%);
+  background:rgba(20,26,33,.72);
+  color:#fff;
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  padding:8px 16px;
+  border-radius:999px;
+  pointer-events:none;
+  transition:opacity .5s ease;
+}
+.film-hint.hide{ opacity:0; }
+
+/* barra di avanzamento */
+.film-progress{
+  width:min(320px, 60vw);
+  height:3px;
+  margin:26px auto 0;
+  background:#ECE7E1;
+  border-radius:2px;
+  overflow:hidden;
+}
+.film-progress i{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg, var(--sienna-1), var(--sienna-hi));
+  border-radius:2px;
+}
+
+.film-cta{ margin-top:44px; }
+
+/* ============================================================
+   ANIMAZIONI
+   ============================================================ */
+.w{
+  display:inline-block;
+  overflow:hidden;
+  padding:0.04em 0.09em 0.17em;
+  margin:-0.04em -0.09em -0.17em;
+}
+.is-split .wi{
+  display:inline-block;
+  transform:translateY(118%) rotate(2.5deg);
+  animation:rise .72s cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay:calc(.15s + var(--i) * .07s);
+}
+@keyframes rise{ to{ transform:translateY(0) rotate(0deg); } }
+
+.is-split .hl.place{
+  background-position:118% 0;
+  animation:shimmer 1.5s ease forwards;
+  animation-delay:1.35s;
+}
+@keyframes shimmer{ to{ background-position:-18% 0; } }
+
+.is-split .hl.lunch .stroke path{
+  stroke-dasharray:1;
+  stroke-dashoffset:1;
+  animation:draw .65s ease forwards;
+  animation-delay:1.15s;
+}
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+
+.is-split ~ .hero-sub,
+.is-split ~ .trust,
+.is-split ~ .cta-row{
+  opacity:0;
+  transform:translateY(14px);
+  animation:fadeUp .6s ease forwards;
+}
+.is-split ~ .hero-sub{ animation-delay:.55s; }
+.is-split ~ .trust{ animation-delay:.75s; }
+.is-split ~ .cta-row{ animation-delay:.95s; }
+@keyframes fadeUp{ to{ opacity:1; transform:translateY(0); } }
+
+.is-split ~ .cta-row .cta::after{ animation:sheen 1.1s ease 2.3s 1; }
+.cta:hover::after{ animation:sheen .9s ease; }
+@keyframes sheen{ from{ left:-70%; } to{ left:130%; } }
+
+/* reveal allo scroll (solo se il JS c'è: html.js) */
+.js .reveal{
+  opacity:0;
+  transform:translateY(26px) scale(.98);
+  transition:
+    opacity .7s ease var(--d, 0ms),
+    transform .8s cubic-bezier(.22,1,.36,1) var(--d, 0ms);
+}
+.js .reveal.in{ opacity:1; transform:none; }
+
+@media (prefers-reduced-motion: reduce){
+  .is-split .wi,
+  .is-split .hl.place,
+  .is-split .hl.lunch .stroke path,
+  .is-split ~ .hero-sub,
+  .is-split ~ .trust,
+  .is-split ~ .cta-row,
+  .cta::after{
+    animation:none !important;
+    transform:none !important;
+    opacity:1 !important;
+    stroke-dashoffset:0 !important;
+    background-position:50% 0 !important;
+  }
+  .js .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+  .slide img{ transition:none !important; }
+}
+
+@media (max-width: 680px){
+  .slide{ width:86vw; height:clamp(300px, 56vh, 480px); }
+  .film-track{ gap:10px; padding:0 14px; }
+  .film-section{ padding:52px 0 60px; }
+}
+
+/* ============================================================
+   CONTRASTI — il tema originale usa --ink-soft #55646F, che sul
+   bianco sta a ~5.5:1: passa l'AA di misura, ma sui testi piccoli
+   (etichette .68rem, didascalie) e' faticoso da leggere. Lo porto
+   a ~7:1 e rinforzo i bordi, che a #EFE7DD erano quasi invisibili.
+   ============================================================ */
+:root{
+  --ink-soft:#48555F;      /* era #55646F -> 6.11:1 diventa 7.66:1 */
+  --line:#E3D7C8;          /* era #EFE7DD: bordi quasi invisibili */
+  --wine:#6E1B2C;          /* 11.3:1 sul bianco */
+
+  /* L'arancione del brand #F5760B col testo bianco sta a 2.81:1, sotto
+     ogni soglia: e' il bottone piu' importante della pagina ed e' il
+     meno leggibile. #C25A02 e' lo stesso arancione, piu' scuro, a
+     4.41:1 — con il testo della CTA portato a 1.2rem bold (testo
+     "grande" per le WCAG, soglia 3:1) passa con margine. */
+  --orange:#C25A02;
+  --orange-d:#A34A01;
+  --link:#A8431F;          /* 6.02:1 — i link erano a 4.44:1 */
+}
+.cta{ font-size:1.2rem; }
+.pr-prose a{ color:var(--link); }
+
+/* ============================================================
+   SPAZIATURE EREDITATE — la landing originale aveva 3 sezioni in
+   croce, quindi si poteva permettere 76-90px di respiro. Ora le
+   sezioni sono 13: quei valori si sommano ai padding delle sezioni
+   vicine e producono buchi da 120px. Qui li comprimo alla fonte.
+   ============================================================ */
+.film-section{ padding:34px 0 40px; }            /* era 76px 0 80px */
+.film-wrap{ margin-top:24px; }                   /* era 40px */
+.film-cta{ margin-top:28px; }                    /* era 44px */
+.film-title{ margin-top:10px; }                  /* era 18px */
+.film-sub{ margin-top:10px; }                    /* era 14px */
+.pr-sec .eyebrow, .film-head .eyebrow{ margin-bottom:12px; }  /* era 26px */
+/* hero compatta: niente vuoti verticali, su ogni schermo */
+.hero .logo{ margin-bottom:16px; }
+.hero .eyebrow{ margin-bottom:14px; }
+.hero-sub{ margin-top:14px; }
+.hero .trust{ margin-top:14px; }
+.hero .cta-row{ margin-top:22px; }
+
+/* due sezioni adiacenti non devono mai sommare i respiri:
+   quella che segue il carosello parte gia' distanziata da lui. */
+.film-section + .pr-sec{ padding-top:18px; }
+
+/* ============================================================
+   SEZIONI CONTENUTO — token e font della landing originale
+   ============================================================ */
+.pr-sec{ padding:44px 20px; }
+.pr-sec.alt{ background:#FFF; border-top:1px solid var(--line); }
+.pr-sec.tight{ padding:22px 20px; }
+/* due sezioni compatte di fila non devono sommare i padding */
+.pr-sec.tight + .pr-sec.tight{ padding-top:0; }
+.pr-sec.tight + .pr-sec.tight.alt{ padding-top:22px; }
+.pr-wrap{ max-width:900px; margin:0 auto; }
+.pr-wrap.wide{ max-width:1120px; }
+.pr-head{ text-align:center; margin-bottom:22px; }
+
+/* ---------- video a tutta pagina (facciata: l'iframe arriva al clic) ---------- */
+.pr-sec.full{ padding:0; }
+.pr-video{
+  position:relative; width:100%; aspect-ratio:16/9; overflow:hidden;
+  background:#0F141A; cursor:pointer; border:none; padding:0; display:block;
+  border-radius:0;                 /* a tutta larghezza gli angoli tondi stonano */
+  max-height:82vh;                 /* su schermi larghi non deve mangiarsi la pagina */
+}
+.pr-video img{ width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .8s cubic-bezier(.22,1,.36,1), filter .3s ease; }
+.pr-video:hover img{ transform:scale(1.03); filter:brightness(.92); }
+.pr-video iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.pr-play{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:78px; height:78px; border-radius:50%;
+  background:var(--orange); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 10px 30px rgba(245,118,11,.45);
+  transition:transform .22s ease, background .22s ease;
+  pointer-events:none;
+}
+.pr-video:hover .pr-play{ transform:translate(-50%,-50%) scale(1.08); background:var(--orange-d); }
+.pr-video:focus-visible{ outline:3px solid var(--ink); outline-offset:4px; }
+.pr-play svg{ width:30px; height:30px; margin-left:4px; fill:currentColor; }
+.pr-video-cap{
+  position:absolute; left:0; right:0; bottom:0; padding:60px 22px 16px; text-align:left;
+  background:linear-gradient(180deg, rgba(15,20,26,0), rgba(15,20,26,.62));
+  color:#fff; pointer-events:none;
+}
+.pr-video-cap span{ display:block; font-size:.64rem; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--sienna-hi); margin-bottom:2px; }
+.pr-video-cap b{ font-size:1rem; font-weight:700; text-shadow:0 1px 8px rgba(0,0,0,.35); }
+
+/* ---------- premi e riconoscimenti ---------- */
+.pr-awards{
+  display:flex; align-items:center; justify-content:center; gap:34px; flex-wrap:wrap;
+}
+.pr-awards img{ display:block; height:auto; }
+.pr-aw-main{ width:min(100%,560px); }
+.pr-aw-ta{ width:104px; opacity:.9; }
+
+/* ---------- garanzie ---------- */
+.pr-guar-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.pr-guar{
+  display:flex; gap:12px; align-items:flex-start; background:#fff;
+  border:1px solid var(--line); border-radius:14px; padding:18px;
+  box-shadow:0 2px 10px rgba(36,51,63,.04);
+}
+.pr-guar b{ display:block; font-size:.94rem; font-weight:800; color:var(--ink); line-height:1.3; }
+.pr-guar p{ margin:5px 0 0; font-size:.85rem; line-height:1.5; color:var(--ink-soft); }
+.pr-gico{ width:24px; height:24px; color:var(--teal); flex-shrink:0; margin-top:1px; }
+
+/* ---------- contatti: telefono, WhatsApp, email ---------- */
+.pr-help-copy{ max-width:620px; margin:0 auto 24px; text-align:center; }
+.pr-hc-head{ font-size:1.3rem; font-weight:800; color:var(--ink); line-height:1.25; }
+.pr-hc-head em{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:640; color:var(--orange); }
+.pr-hc-body{ margin-top:10px; font-size:1.04rem; line-height:1.65; font-weight:500; color:var(--ink-soft); }
+.pr-hc-body strong{ color:var(--ink); font-weight:800; }
+.pr-help{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:720px; margin:0 auto; }
+.pr-help a{
+  display:flex; align-items:center; gap:11px; text-decoration:none;
+  background:#fff; border:1px solid var(--line); border-radius:14px; padding:15px 16px;
+  box-shadow:0 2px 10px rgba(36,51,63,.04);
+  transition:border-color .2s ease, transform .18s ease;
+}
+.pr-help a:hover{ border-color:var(--orange); transform:translateY(-2px); }
+.pr-help a > div{ min-width:0; }
+.pr-help a > div > b{ display:block; font-size:.92rem; font-weight:800; color:var(--ink); line-height:1.25; }
+.pr-help a > div > span{ display:block; font-size:.7rem; font-weight:800; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-soft); margin-top:2px; }
+.pr-help .pr-gico{ width:22px; height:22px; flex-shrink:0; }
+.pr-help .wa{ color:#25D366; }
+.pr-help .tel{ color:var(--orange); }
+.pr-help .mail{ color:var(--ink-soft); }
+
+/* WhatsApp nella barra fissa: la chat sempre raggiungibile su mobile */
+.pr-sticky-wa{
+  flex:0 0 auto; width:50px; height:50px; border-radius:12px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#25D366; color:#fff; text-decoration:none;
+}
+.pr-sticky-wa svg{ width:26px; height:26px; fill:currentColor; }
+
+/* ---------- meeting point: mappa + foto in cima al Timing ---------- */
+.pr-mp{ margin:0 0 28px; }
+.pr-mp iframe{ width:100%; height:300px; border:2px solid var(--line); display:block; }
+.pr-mp-cap{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px; }
+.pr-mp-cap b{ font-size:.98rem; color:var(--ink); }
+.pr-mp-cap a{ font-size:.9rem; font-weight:800; color:var(--link); text-decoration:none; }
+.pr-mp-cap a:hover{ text-decoration:underline; }
+.pr-mp-imgs{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+.pr-mp-imgs figure{ margin:0; }
+.pr-mp-imgs img{ width:100%; height:auto; display:block; border:2px solid var(--line); }
+.pr-mp-imgs figcaption{ font-size:.8rem; font-weight:600; color:var(--ink-soft); margin-top:6px; line-height:1.45; }
+@media (max-width:640px){ .pr-mp-imgs{ grid-template-columns:1fr; } .pr-mp iframe{ height:240px; } }
+
+/* ---------- riga urgenza onesta ---------- */
+.pr-urg{
+  display:inline-flex; align-items:center; gap:9px; margin-top:16px;
+  background:#FFF3E6; border:1px solid #F3D3AE; border-radius:999px;
+  padding:9px 18px; font-size:.86rem; font-weight:700; color:#8A4A08;
+}
+.pr-urg svg{ width:16px; height:16px; flex-shrink:0; }
+
+/* ---------- banner pagamenti ---------- */
+.pr-paybanner{ margin:26px auto 0; max-width:520px; }
+.pr-paybanner img{ width:100%; height:auto; display:block; }
+
+/* ---------- pagamenti ---------- */
+.pr-pay{
+  display:flex; align-items:center; justify-content:center; gap:9px; flex-wrap:wrap;
+  margin-top:20px; font-size:.82rem; font-weight:700; color:var(--ink-soft);
+}
+.pr-pay b{ color:var(--ink); font-weight:800; letter-spacing:.02em; }
+.pr-pay .pr-gico{ width:17px; height:17px; color:var(--ink-soft); }
+.pr-pay-sep{ color:#D8CFC4; }
+.pr-title{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
+.pr-lead{ margin-top:12px; font-size:1.04rem; font-weight:500; color:var(--ink-soft); }
+
+.pr-prose{ font-size:1.01rem; line-height:1.72; color:var(--ink-soft); }
+.pr-prose p{ margin:0 0 15px; }
+.pr-prose strong{ color:var(--ink); font-weight:700; }
+.pr-prose h6{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:640;
+  font-size:1.28rem; color:var(--ink); margin:28px 0 12px; letter-spacing:-0.01em; }
+.pr-prose h6 strong{ font-weight:640; }
+.pr-prose ul{ margin:0 0 16px; padding-left:20px; }
+.pr-prose li{ margin-bottom:8px; }
+.pr-prose a{ color:var(--sienna-2); font-weight:700; }
+.pr-prose > *:last-child{ margin-bottom:0; }
+
+/* ---------- striscia dati rapidi ---------- */
+.pr-facts{ display:grid; grid-template-columns:repeat(6,1fr); gap:12px; max-width:1120px; margin:0 auto; }
+.pr-fact{
+  display:flex; align-items:center; gap:11px; padding:16px 14px;
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  box-shadow:0 2px 10px rgba(36,51,63,.04);
+}
+.pr-fact b{ display:block; font-size:.95rem; font-weight:800; color:var(--ink); line-height:1.25; }
+.pr-fact span{ display:block; font-size:.68rem; font-weight:800; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-soft); margin-top:2px; }
+.pr-ico{ width:22px; height:22px; color:var(--orange); flex-shrink:0; }
+
+/* ---------- highlights ---------- */
+.pr-hl-grid{ list-style:none; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+.pr-hl-item{
+  display:flex; gap:12px; align-items:flex-start; background:#fff;
+  border:1px solid var(--line); border-radius:14px; padding:17px 19px;
+  font-size:.98rem; line-height:1.55; color:var(--ink-soft);
+  box-shadow:0 2px 10px rgba(36,51,63,.04);
+}
+.pr-hl-item strong{ color:var(--ink); }
+.pr-check{ width:20px; height:20px; color:var(--teal); flex-shrink:0; margin-top:3px; }
+
+/* ---------- screenshot reali da Tripadvisor ----------
+   Le schermate hanno altezze diverse: con una griglia normale
+   resterebbero buchi sotto le piu' corte. Le colonne CSS le
+   impacchettano senza vuoti, come una bacheca. */
+.pr-shots{ columns:2 340px; column-gap:26px; max-width:920px; margin:0 auto; }
+.pr-shot{ break-inside:avoid; margin:0 0 26px; }
+.pr-shot img{
+  width:100%; height:auto; display:block;
+  border:none; border-radius:0; box-shadow:none; background:#fff;
+}
+@media (max-width:640px){
+  /* schermate a tutta larghezza: il testo delle recensioni deve leggersi bene */
+  .pr-shots{ columns:1; column-gap:0; margin:0 -18px; }
+  .pr-shot{ margin:0 0 20px; }
+}
+@media (min-width:641px) and (max-width:760px){
+  /* zona a colonna singola: senza limite le schermate (405px reali)
+     verrebbero stirate fino a ~700px e il testo sfocherebbe */
+  .pr-shots{ columns:1; max-width:480px; margin:0 auto; }
+}
+
+/* intestazione: fonte dichiarata + voto aggregato */
+.pr-rev-head{
+  display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;
+  margin-bottom:24px;
+}
+.pr-rev-head img{ width:150px; height:auto; }
+.pr-rev-score{ display:flex; align-items:center; gap:10px; }
+.pr-rev-score b{ font-size:1.7rem; font-weight:800; color:var(--ink); line-height:1; }
+.pr-rev-score small{ display:block; font-size:.8rem; font-weight:600; color:var(--ink-soft); margin-top:3px; }
+.pr-rev-note{ text-align:center; margin-top:22px; font-size:.85rem; color:var(--ink-soft); font-weight:600; }
+.pr-rcard{ break-inside:avoid; margin:0 0 26px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; box-shadow:0 2px 10px rgba(36,51,63,.05); }
+.pr-rcard .pr-rstars{ color:#00AA6C; font-size:.95rem; letter-spacing:2px; }
+.pr-rcard h4{ font-size:1.02rem; font-weight:800; color:var(--ink); margin:7px 0 5px; line-height:1.3; }
+.pr-rcard p{ font-size:.95rem; line-height:1.62; color:var(--ink-soft); }
+.pr-rcard .pr-rname{ display:block; margin-top:11px; font-size:.8rem; font-weight:800; letter-spacing:.02em; color:var(--ink-soft); }
+
+/* ---------- blocchi collassabili con freccia ---------- */
+.pr-acc{ background:#fff; border:1px solid var(--line); border-radius:14px; margin-bottom:10px; overflow:hidden; }
+.pr-acc summary{
+  cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:18px 20px; font-weight:700; font-size:1.02rem; color:var(--ink);
+}
+.pr-acc summary::-webkit-details-marker{ display:none; }
+.pr-acc summary:hover{ background:#FAF7F3; }
+.pr-acc summary:focus-visible{ outline:3px solid var(--ink); outline-offset:-3px; }
+.pr-chev{ width:20px; height:20px; color:var(--orange); flex-shrink:0; transition:transform .22s ease; }
+.pr-acc[open] > summary .pr-chev{ transform:rotate(180deg); }
+.pr-acc[open] > summary{ border-bottom:1px solid var(--line); }
+.pr-acc-body{ padding:18px 20px 22px; }
+
+/* ---------- "mostra tutto" ---------- */
+.pr-clamp{ position:relative; overflow:hidden; transition:max-height .35s ease; }
+.js .pr-clamp:not(.open){ max-height:320px; }
+.js .pr-clamp:not(.open)::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:120px;
+  background:linear-gradient(180deg, rgba(255,255,255,0), #fff 88%); pointer-events:none;
+}
+
+.pr-more{
+  display:inline-flex; align-items:center; gap:8px; margin:18px auto 0;
+  background:none; border:2px solid var(--line); border-radius:999px;
+  padding:11px 22px; font-family:inherit; font-size:.92rem; font-weight:800;
+  color:var(--ink); cursor:pointer; transition:border-color .2s ease, background .2s ease;
+}
+.pr-more:hover{ border-color:var(--orange); background:#FFF7EF; }
+.pr-more .pr-chev{ transition:transform .22s ease; }
+.pr-more[aria-expanded="true"] .pr-chev{ transform:rotate(180deg); }
+.pr-more-row{ text-align:center; }
+html:not(.js) .pr-more-row{ display:none; }
+
+/* ---------- timeline ---------- */
+.pr-time{ list-style:none; padding:0; margin:0; }
+.pr-time li{
+  position:relative; padding:0 0 22px 30px; border-left:2px solid #EFE7DD;
+  font-size:.99rem; line-height:1.6; color:var(--ink-soft);
+}
+.pr-time li:last-child{ border-left-color:transparent; padding-bottom:0; }
+.pr-time li::before{
+  content:""; position:absolute; left:-7px; top:5px; width:12px; height:12px;
+  border-radius:50%; background:var(--orange); box-shadow:0 0 0 3px #FFF7EF;
+}
+.pr-time b{ color:var(--ink); font-weight:800; }
+.pr-time em{ color:var(--ink-soft); }
+
+/* ---------- prezzi ---------- */
+.pr-price-card{
+  background:#fff; border:2px solid var(--orange); border-radius:18px;
+  padding:28px; text-align:center; box-shadow:0 10px 30px rgba(245,118,11,.12);
+  max-width:340px; margin:0 auto;
+}
+.pr-price-big{ font-family:'Manrope', system-ui, sans-serif; font-style:normal; font-weight:800;
+  font-size:3rem; color:var(--wine); line-height:1; }
+.pr-price-lbl{ font-size:.82rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
+
+/* ---------- prenotazione ---------- */
+.pr-book{ padding:46px 20px 54px; background:#FFF; border-top:1px solid var(--line); text-align:center; }
+.pr-widget-holder{
+  margin:30px auto 0; max-width:460px; background:#fff; border-radius:18px; padding:20px;
+  box-shadow:0 14px 40px rgba(36,51,63,.10); border:1px solid var(--line);
+}
+.pr-widget-holder .regiondo-booking-widget{ margin:0 auto; }
+
+a.cta{ text-decoration:none; display:inline-block; }
+
+/* ---------- barra fissa mobile: BOOK sempre a portata di pollice ----------
+   Compare solo sotto i 760px. Si nasconde quando il widget di prenotazione
+   e' gia' a schermo (sarebbe un doppione) e mentre l'hero e' visibile. */
+.pr-sticky{
+  /* stile clonato dalla pagina prodotto: sfondo scuro semi-trasparente,
+     border-top arancione, prezzo a sinistra + BOOK NOW a destra */
+  position:fixed; left:0; right:0; bottom:0; z-index:99;
+  display:none; align-items:center; justify-content:space-between; gap:14px;
+  padding:15px calc(15px + env(safe-area-inset-right))
+          calc(15px + env(safe-area-inset-bottom)) calc(15px + env(safe-area-inset-left));
+  background:rgba(55,55,82,.95);
+  border-top:4px solid #ED6707;
+  box-shadow:0 -6px 24px rgba(36,51,63,.16);
+  transform:translateY(110%);
+  transition:transform .28s cubic-bezier(.22,1,.36,1);
+}
+.pr-sticky.show{ transform:none; }
+.pr-sticky-info{ flex:1 1 auto; min-width:0; line-height:1.2; }
+.pr-sticky-title{ font-size:.92rem; font-weight:800; color:#fff; line-height:1.24; margin-bottom:3px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pr-sticky-price{ line-height:1.2; color:#fff; }
+.pr-sticky-price .from{ font-size:.9rem; font-weight:600; color:rgba(255,255,255,.72); }
+.pr-sticky-price b{ font-size:1.14rem; font-weight:800; color:#fff; }
+.pr-sticky-price .per{ font-size:.9rem; font-weight:600; color:rgba(255,255,255,.72); }
+.pr-sticky .cta{ flex:0 0 auto; text-align:center; padding:14px 22px; font-size:1.05rem;
+  box-shadow:none; white-space:nowrap; }
+
+@media (max-width:1000px){ .pr-guar-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:900px){ .pr-facts{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:760px){
+  .pr-sticky{ display:flex; }
+  /* barra CTA e bolla chat non si sovrappongono: quando la barra e' visibile, sollevo la bolla Chaty sopra di essa */
+  .chaty-widget{ transition:bottom .28s cubic-bezier(.22,1,.36,1); bottom:122px !important; }
+  body{ padding-bottom:78px; }   /* la barra non copre il fondo pagina */
+  .pr-awards{ gap:20px; }
+  .pr-aw-ta{ width:84px; }
+}
+/* i contatti a 3 colonne fisse sfondavano lo schermo sotto i 700px:
+   l'email non ci sta in un terzo di telefono. */
+@media (max-width:700px){ .pr-help{ grid-template-columns:1fr; } }
+@media (max-width:640px){
+  .pr-facts{ grid-template-columns:repeat(2,1fr); }
+  .pr-hl-grid, .pr-guar-grid{ grid-template-columns:1fr; }
+  .pr-sec{ padding:42px 18px; }
+}
+/* rete di sicurezza: nessun elemento deve poter far scorrere la pagina
+   in orizzontale, qualunque cosa succeda a un blocco. */
+html, body{ max-width:100%; overflow-x:hidden; }
+img, iframe{ max-width:100%; }
+@media (prefers-reduced-motion: reduce){
+  .pr-sticky{ transition:none; }
+}
+
+/* ============================================================
+   RESTYLE — brand PrestigeRent #ED6707.
+   Tinte piatte, nessuna sfumatura, contrasti netti: tutti gli
+   accenti diventano arancio o inchiostro, e una fascia arancio
+   piena (dati rapidi) stacca sul bianco. Gli eyebrow restano viola
+   come sulla landing COPIA; la sezione del widget resta bianca.
+   ============================================================ */
+:root{
+  --orange:#ED6707;
+  --orange-d:#C95603;
+  --link:#B35202;         /* arancio scuro leggibile sui testi piccoli */
+  --teal:#ED6707;         /* icone check e garanzie: dal verde al brand */
+  --sienna-1:#ED6707;     /* i vecchi gradienti sienna collassano */
+  --sienna-2:#ED6707;     /* in tinta unita arancio */
+  --sienna-hi:#ED6707;
+  --wine:#24333F;         /* seconda tinta: solo inchiostro */
+}
+/* frontend.min.css imposta html{scroll-behavior:smooth}: qui i salti
+   ai link #book devono restare istantanei (la barra mobile sfarfalla
+   durante lo scroll animato) */
+html{ scroll-behavior:auto; }
+/* bottone: colore pieno, niente riflesso animato */
+.cta::after{ display:none; }
+.cta{ border-radius:6px; box-shadow:0 8px 20px rgba(237,103,7,.30); }
+.cta:hover{ box-shadow:0 10px 24px rgba(237,103,7,.36); }
+.pr-play{ box-shadow:0 10px 30px rgba(237,103,7,.45); }
+/* etichette di sezione: si lasciano viola #6C63D2 con angoli 6px,
+   identiche alla landing COPIA (nessuna sovrascrittura qui) */
+/* titoli: la parola in evidenza e' arancio pieno, non sfumato */
+.hl.place{ background:none; -webkit-background-clip:initial; background-clip:initial; color:var(--orange); }
+.is-split .hl.place{ animation:none; }
+/* veli didascalie: tinta unita, non sfumatura */
+.slide figcaption{ background:rgba(15,20,26,.55); padding:14px 22px; border-radius:0; }
+.pr-video-cap{ background:rgba(15,20,26,.55); padding:14px 22px; }
+.slide figcaption span, .pr-video-cap span{ color:#FFC79E; }
+.film-progress i{ background:var(--orange); }
+/* spigoli vivi sui riquadri, come sul sito */
+.pr-hl-item,.pr-guar,.pr-fact,.pr-acc,.pr-help a,.pr-price-card,.pr-widget-holder,.slide{ border-radius:0; }
+/* fascia arancio 1: la striscia dei dati rapidi
+   (il selettore doppio vince su ".pr-sec.tight + .pr-sec.tight") */
+.pr-sec.band, .pr-sec.tight + .pr-sec.tight.band{ background:var(--orange); padding-top:26px; padding-bottom:26px; }
+.pr-sec.band .pr-fact{ border-color:#fff; box-shadow:none; }
+/* sezione prenotazione: sfondo BIANCO dietro il widget Regiondo
+   (nessuna fascia colorata qui) — resta solo l'accento arancio sul prezzo */
+.pr-price-big{ color:var(--orange); }
+/* box del widget Regiondo: identico alla pagina prodotto del sito
+   (bianco, bordo 2px #5F5F74, spigoli vivi, padding 12px) */
+.pr-widget-holder{ border:2px solid #5F5F74; box-shadow:none; padding:12px; }
+/* ---------- skin Regiondo del sito (stessa resa della pagina prodotto) ---------- */
+.regiondo-widget .regiondo-intro-text{display:none}
+.regiondo-widget .regiondo-calendar{padding-bottom:0 !important}
+.regiondo-widget .DayPicker-Caption{font-size:16px}
+.regiondo-widget .DayPicker-Weekday,.regiondo-widget .regiondo-total__title{font-size:14px}
+.regiondo-widget .DayPicker-Day .day{opacity:.6 !important;background:#f4f4f7}
+.regiondo-widget .DayPicker-Day--green .day{background:#5fb54a;opacity:1 !important;color:#fff !important}
+.regiondo-widget .DayPicker-Day--selected .day{color:#fff;background:#ed6707;border-color:#ed6707}
+.regiondo-widget .regiondo-button,.regiondo-widget .regiondo-addtocart--disabled button{color:#fff !important;font-size:16px !important;padding:12px 24px !important}
+.regiondo-widget .regiondo-time--selected{color:#fff !important}
+.regiondo-widget .regiondo-checkout .regiondo-form-intro{display:none}
+.regiondo-widget .regiondo-totals{width:100% !important}
+.regiondo-widget .regiondo-totals__title{display:flex !important}
+.regiondo-widget .regiondo-qty select{display:inline-block}
+.regiondo-widget .regiondo-checkout-payment{padding:20px 0 0 !important}
+.regiondo-widget .regiondo-method--active{border-width:1px !important}
+.regiondo-widget.regiondo-w-small .regiondo-option__name,.regiondo-widget.regiondo-w-medium-small .regiondo-option__name{flex-direction:row !important;justify-content:space-between !important}
+.regiondo-go-to-cart{display:none!important}
+/* ---------- card "All Small Group Tours" ---------- */
+.pr-tours{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; max-width:940px; margin:0 auto; }
+.pr-tour{ display:flex; flex-direction:column; background:#fff; border:2px solid var(--line); text-decoration:none; transition:border-color .2s ease, transform .18s ease; }
+.pr-tour:hover{ border-color:var(--orange); transform:translateY(-3px); }
+/* altezza immagine FISSA (non aspect-ratio, che come flex-item non tiene):
+   garantisce card di pari altezza su desktop */
+.pr-tour > img{ width:100%; height:260px; object-fit:cover; display:block; flex:0 0 auto; }
+/* il corpo riempie lo spazio residuo -> i pulsanti si allineano in fondo */
+.pr-tour-body{ display:flex; flex-direction:column; gap:8px; padding:18px 20px 20px; text-align:left; flex:1 1 auto; }
+.pr-tour-body > b{ font-size:1.15rem; font-weight:800; color:var(--ink); line-height:1.25; }
+.pr-tour-meta{ font-size:.76rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); }
+.pr-tour-desc{ font-size:.95rem; line-height:1.55; color:var(--ink-soft); }
+.pr-tour-price{ font-size:.95rem; color:var(--ink-soft); margin-top:4px; }
+.pr-tour-price b{ font-size:1.5rem; font-weight:800; color:var(--orange); margin-right:4px; }
+.pr-tour-cta{ margin-top:auto; align-self:flex-start; background:var(--orange); color:#fff; font-size:.95rem; font-weight:800; letter-spacing:.05em; padding:12px 26px; border-radius:6px; transition:background .18s ease; }
+.pr-tour:hover .pr-tour-cta{ background:var(--orange-d); }
+@media (max-width:680px){ .pr-tours{ grid-template-columns:1fr; } }
+</style>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Product",
+ "name": "Tasting Experience in Tuscany",
+ "description": "A small, intimate small-group tour exploring 2 old wineries in Chianti. Live a memorable tasting experience in Tuscany with charming views over the countryside.",
+ "image": [
+  "https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-CELLAR.jpg",
+  "https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-TASTING-ROOM-scaled.jpg"
+ ],
+ "brand": {
+  "@type": "Brand",
+  "name": "Prestige Rent"
+ },
+ "sku": "T-PR193-210790",
+ "offers": {
+  "@type": "Offer",
+  "url": "https://prestigerent.com/lp/wine-experience-in-tuscany-lan.html",
+  "price": "89.00",
+  "priceCurrency": "EUR",
+  "availability": "https://schema.org/InStock",
+  "validFrom": "2026-01-01"
+ },
+ "aggregateRating": {
+  "@type": "AggregateRating",
+  "ratingValue": "5.0",
+  "reviewCount": "13",
+  "bestRating": "5",
+  "worstRating": "1"
+ },
+ "review": [
+  {
+   "@type": "Review",
+   "author": { "@type": "Person", "name": "brandonnichol" },
+   "datePublished": "2025-09-01",
+   "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+   "name": "Wine tour",
+   "reviewBody": "What a great way to see the Tuscan countryside and taste and learn about the wines! Leo was such a great guide full of knowledge with a touch of comedy. He made the tour so enjoyable. 10/10 would recommend."
+  },
+  {
+   "@type": "Review",
+   "author": { "@type": "Person", "name": "Ximeng T" },
+   "datePublished": "2025-08-01",
+   "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+   "name": "Great tour experience",
+   "reviewBody": "Guide is super friendly and knowledgeable. Folks are nice. Wines are tasty. The scenic view is priceless. Highly recommend the tour for people who have a couple of hours to spare in Florence."
+  },
+  {
+   "@type": "Review",
+   "author": { "@type": "Person", "name": "Lucia B" },
+   "datePublished": "2025-07-01",
+   "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+   "name": "Relaxing Wine Tour",
+   "reviewBody": "This was a wonderful trip! Our guide Lorenzo was entertaining and knowledgeable. The scenery was beautiful, the tastings were fun and educational!"
+  }
+ ]
+}
+</script>
+<script type="text/javascript">
+    /* CLARITY SI CARICA SOLO COL CONSENSO.
+   Il suo `consent` governa i cookie, non la registrazione: misurato, dopo
+   un rifiuto continuavano ad arrivare sei POST a a.clarity.ms/collect.
+   L'unico modo perche' non registri e' non caricarlo affatto. */
+window.prCaricaClarity = function () {
+  if (window.__prClarityFatto) { return; }
+  window.__prClarityFatto = 1;
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "xnz5k1hxuh");
+};
+try{
+  var _cc = document.cookie.match(/(?:^|;\s*)pr_consenso=([^;]*)/);
+  if (_cc && JSON.parse(decodeURIComponent(_cc[1])).an === 1) {
+    window.prCaricaClarity();
+  }
+}catch(e){}
+</script>
+<!-- Nudgify -->
+<script>
+    (function(w){
+        var k="nudgify",n=w[k]||(w[k]={});
+        n.uuid="15322a97-04f9-4d7c-ab20-2e0a26ccce1e";
+        var d=document,s=d.createElement("script");
+        s.src="https://pixel.nudgify.com/pixel.js";
+        s.async=1;
+        s.charset="utf-8";
+        d.getElementsByTagName("head")[0].appendChild(s)
+    })(window)
+</script>
+<!-- CONSENSO 2/2 - il banner, per chi non ha ancora scelto.
+     Sostituisce Cookiebot: l'account di prova e' scaduto il 21/08/2026 e
+     da allora il suo script rispondeva solo un errore, lasciando l'Europa
+     a consenso negato per sempre. -->
+<script defer src="/lp/js/consenso.js?v=20260901c"></script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TL7VV3RL"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<section id="top" class="hero">
+
+  <a class="logo" href="https://prestigerent.com/">
+    <img src="img/logo-prestige.png" alt="Prestige Rent Logo" width="58" height="58">
+    <span class="logo-name">
+      <strong>Prestige Rent</strong>
+      <small>Tours &amp; Transfers in Italy</small>
+    </span>
+  </a>
+
+  <span class="eyebrow">Small Group Tour · From Florence</span>
+
+  <h1 class="hero-title" id="heroTitle">
+    <span class="ht-lead">A small, intimate</span><br><em class="hl place">Tasting&nbsp;Experience</em><br>
+    in
+    <em class="hl lunch">Tuscany<svg class="stroke" viewBox="0 0 300 32" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22 C 70 10, 150 7, 205 13 S 284 21, 294 12" pathLength="1"/></svg></em>
+  </h1>
+
+  <p class="hero-sub">Explore 2 old wineries in Chianti and enjoy a generous tasting of wine, extra&nbsp;virgin olive oil and balsamic vinegar &mdash; with charming views over the Tuscan countryside.</p>
+
+  <div class="trust">
+    <span class="t-item">
+      <span class="stars-img" aria-hidden="true"><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i></span>
+      <span><b>5.0</b> · 8167 Reviews</span>
+    </span>
+   </div>
+</section>
+
+<!-- ============================================================
+     GALLERIA ESPERIENZA (carosello, identico a "Scroll through your
+     Tuscan day") - foto reali in /lp/img/tour-siena-san-gimignano/.
+     ============================================================ -->
+<section id="moments" class="film-section">
+ 
+  <div class="film-wrap reveal">
+    <div class="film" aria-label="Tour experience gallery">
+      <div class="film-track">
+
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/SMALL-GROUP-WINE-TOUR-IN-TUSCANY.jpg" alt="A small group enjoying an intimate wine tour in the Tuscan countryside" loading="eager" decoding="async" width="1052" height="790">
+          <figcaption><span>Small group</span><b>An intimate wine tour, max 25 people</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-CELLAR.jpg" alt="Oak barrels aging wine in a historic Chianti cellar" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Ancient cellar</span><b>Barrels aging in a historic estate</b></figcaption>
+        </figure>
+          <figure class="slide">
+          <img src="https://prestigerent.com/lp/img/CORTINE_CIBO_2.jpg" alt="Oak barrels aging wine in a historic Chianti cellar" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption></figcaption>
+        </figure>
+       <figure class="slide">
+          <img src="https://prestigerent.com/lp/img/CORTINE_CIBO_3.jpg" alt="" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-TASTING-ROOM-scaled.jpg" alt="A guided tasting of premium Chianti wines in the tasting room" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Wine tasting</span><b>Premium Chianti wines to taste</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/GUESTS-AT-A-TUSCAN-WINERY.jpg" alt="Guests welcomed at a family-run Tuscan winery" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>The estate</span><b>Welcomed at a family-run winery</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/WINE-TOUR-IN-CHIANTI.jpg" alt="Vineyards and olive groves in the rolling hills of Chianti" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Chianti</span><b>Vineyards and olive groves</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-HILLTOP-WINERY.jpg" alt="A hilltop Tuscan winery with views over the countryside" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Hilltop estate</span><b>Views over the Tuscan hills</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-EXPERIENCE.jpg" alt="Extra virgin olive oil, balsamic vinegar and local Tuscan snacks" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Tuscan flavors</span><b>Olive oil, balsamic and local snacks</b></figcaption>
+        </figure>
+        <figure class="slide">
+          <img src="https://prestigerent.com/wp-content/uploads/2021/04/Wine-bus-at-a-Tuscan-winery-1.jpg" alt="The Prestige Rent vehicle parked at a Tuscan winery" loading="lazy" decoding="async" width="1052" height="790">
+          <figcaption><span>Door to door</span><b>Our vehicle at the winery</b></figcaption>
+        </figure>
+
+      </div>
+    </div>
+    <button class="film-btn prev" type="button" aria-label="Previous photos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="film-btn next" type="button" aria-label="Next photos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <div class="film-hint">‹ &nbsp;drag&nbsp; ›</div>
+  </div>
+  <div class="film-progress" aria-hidden="true"><i></i></div>
+</section>
+
+<!-- ============================================================
+     PREMI — prima delle recensioni: i badge sono il titolo, le
+     recensioni sono la prova. Immagini reali della libreria media
+     del sito, riconvertite in WebP (360 KB -> 53 KB), da /lp/img/.
+     Il badge combinato riporta 4.9 su 1.794 recensioni Viator +
+     Tripadvisor: e' la stessa fonte del dato scritto nell'hero.
+     ============================================================ -->
+<section class="pr-sec tight">
+  <div class="pr-wrap wide">
+    <div class="pr-awards reveal">
+      <img class="pr-aw-main" src="img/awards-viator.webp" width="1120" height="349" loading="lazy" decoding="async"
+           alt="Viator Experience Award Winner 2025 and 2023, rated 4.9 out of 5 based on 1,794 reviews on Viator and Tripadvisor">
+      <img class="pr-aw-ta" src="img/award-tripadvisor.webp" width="300" height="300" loading="lazy" decoding="async"
+           alt="Tripadvisor Travellers' Choice Awards 2025">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIANZE — subito dopo i premi: prima il riconoscimento,
+     poi le voci dei clienti che lo sostengono.
+     PROVVISORIE: sono le 5 recensioni WooCommerce del prodotto
+     1548, le uniche che parlino davvero di Siena/San Gimignano.
+     Sono del 2022 e nel database arrivano troncate a meta' frase
+     (import da TripAdvisor): il testo e' riportato fedelmente.
+     PER SOSTITUIRLE col widget Trustindex del tour Siena:
+     dashboard Trustindex -> nuovo widget -> sorgente = la scheda
+     TripAdvisor DI QUESTO TOUR (non il profilo azienda, altrimenti
+     mostra le recensioni del wine tour, com'e' oggi sul sito).
+     ============================================================ -->
+<section id="reviews" class="pr-sec tight alt">
+  <div class="pr-wrap wide">
+    <div class="pr-head" style="margin-bottom:22px">
+      <span class="eyebrow reveal">Guest reviews</span>
+      <h2 class="pr-title reveal">Travellers who <em class="hl place">were there</em></h2>
+    </div>
+
+    <div class="pr-rev-head reveal">
+      <img src="img/logo-tripadvisor.webp" width="526" height="112" loading="lazy" decoding="async" alt="Tripadvisor">
+      <span class="pr-rev-score">
+        <b>5.0</b>
+        <span><small>8167 verified reviews for this tour</small></span>
+      </span>
+    </div>
+
+    <div class="pr-shots reveal">
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Wine tour</h4>
+        <p>What a great way to see the Tuscan countryside and taste and learn about the wines! Leo was such a great guide full of knowledge with a touch of comedy. He made the tour so enjoyable. 10/10 would recommend.</p>
+        <span class="pr-rname">brandonnichol &middot; verified guest</span>
+      </figure>
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Great tour experience</h4>
+        <p>Guide is super friendly and knowledgeable. Folks are nice. Wines are tasty. The scenic view is priceless. Highly recommend the tour for people who have a couple of hours to spare in Florence.</p>
+        <span class="pr-rname">Ximeng T &middot; verified guest</span>
+      </figure>
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Quality wine, wonderful views and excellent guides</h4>
+        <p>Excellent tour! We were met on time with clear instructions. Very friendly and knowledgeable guide, excellent driver and comfortable bus with A/C.</p>
+        <span class="pr-rname">travelbugLDN &middot; verified guest</span>
+      </figure>
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Great wine tasting trip in picturesque surroundings</h4>
+        <p>Lovely trip to two wineries close to Firenze. The first winery was at a beautiful estate in picturesque surroundings. Tasty wines and olive oil.</p>
+        <span class="pr-rname">aarvingcat &middot; verified guest</span>
+      </figure>
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Relaxing Wine Tour</h4>
+        <p>This was a wonderful trip! Our guide Lorenzo was entertaining and knowledgeable. The scenery was beautiful, the tastings were fun and educational!</p>
+        <span class="pr-rname">Lucia B &middot; verified guest</span>
+      </figure>
+      <figure class="pr-rcard">
+        <div class="pr-rstars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h4>Do this tour!</h4>
+        <p>We just spent the perfect day with Francesca and Antonio. If you like great wine, olive oil, fresh salami and bread, and scenic views in Italy you need to do this tour.</p>
+        <span class="pr-rname">LongTravelingduo &middot; verified guest</span>
+      </figure>
+    </div>
+
+    <p class="pr-rev-note reveal">Real reviews from verified guests of the Tasting Experience in Tuscany.</p>
+  </div>
+</section>
+
+<section id="facts" class="pr-sec tight band">
+  <div class="pr-facts reveal">
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>5 hours</b><span>Duration</span></div></div>
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><div><b>9AM &middot; 2:30PM</b><span>Departure</span></div></div>
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg><div><b>Max 25 people</b><span>Group size</span></div></div>
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div><b>English</b><span>Language</span></div></div>
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 7v5l3 2"/></svg><div><b>Free up to 24h</b><span>Cancellation</span></div></div>
+      <div class="pr-fact"><svg class="pr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><div><b>Florence</b><span>From</span></div></div>
+  </div>
+</section>
+
+<section id="highlights" class="pr-sec">
+  <div class="pr-wrap wide">
+    <div class="pr-head">
+      <span class="eyebrow reveal">Why you'll love it</span>
+      <h2 class="pr-title reveal">The <em class="hl place">highlights</em></h2>
+    </div>
+    <ul class="pr-hl-grid reveal">
+      <li class="pr-hl-item"><svg class="pr-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><strong>Small group, max 25</strong> (or just 8 semiprivate) &mdash; while others pack 50+ people on a bus, we keep it intimate and relaxed, in <strong>English only</strong>: no confusing translations</span></li>
+      <li class="pr-hl-item"><svg class="pr-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><strong>Dual winery experience</strong> &mdash; compare two distinct estates, from ancient cellars to modern family-run vineyards, with a generous tasting of premium Chianti wines</span></li>
+      <li class="pr-hl-item"><svg class="pr-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><strong>Beyond wine</strong> &mdash; taste authentic <strong>extra virgin olive oil</strong> and rare balsamic vinegar, paired with local Tuscan snacks: salami, aged pecorino cheese and crispy bruschetta</span></li>
+      <li class="pr-hl-item"><svg class="pr-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg><span><strong>The perfect half-day escape</strong> &mdash; savor the best of Tuscany in about <strong>4.5 hours</strong>, with charming views over the Chianti countryside and free cancellation up to 24 hours</span></li>
+    </ul>
+  </div>
+</section>
+
+
+<section id="itinerary" class="pr-sec alt">
+  <div class="pr-wrap">
+    <div class="pr-head">
+      <span class="eyebrow reveal">The itinerary</span>
+      <h2 class="pr-title reveal">Your day, <em class="hl place">step by step</em></h2>
+    </div>
+    <div class="pr-prose pr-clamp reveal" id="itinerary">
+<h6><strong>Start your adventure</strong></h6>
+<p>Meet your expert guide in Florence and leave the city bustle behind. As we drive 45 minutes into the rolling hills of Chianti, you&rsquo;ll be introduced to the history and &ldquo;Black Rooster&rdquo; legends of Italy&rsquo;s most famous wine region.</p>
+<h6><strong>Stop 1: The ancient traditions</strong></h6>
+<p>Our first stop takes you into the heart of a historic estate. Walk through age-old barrels, breathe in the scent of aging oak, and learn the secrets of the winemaking process. Your visit concludes with a guided tasting of premium Chianti wines and fresh olive oil.</p>
+<h6><strong>Stop 2: Views &amp; Tuscan flavors</strong></h6>
+<p>A short, scenic drive leads to our second hilltop estate. Here, the focus is on the nuances between different blends. Put your new skills to the test with a second tasting, perfectly paired with a selection of local specialties: savory salami, aged pecorino cheese, and crispy bruschetta.</p>
+<h6><strong>Back to Florence</strong></h6>
+<p>Enjoy the final views of vineyards and olive groves as we head back to Florence, arriving just in time for your lunch (AM tour) or dinner (PM tour).</p>
+<p><em>&ldquo;The perfect balance of sightseeing and sipping. Book your morning or afternoon departure today and see why this is Florence&rsquo;s favorite wine escape!&rdquo;</em></p>
+
+    </div>
+    <div class="pr-more-row">
+      <button class="pr-more" type="button" data-target="itinerary" aria-expanded="false">
+        <span>Show the full itinerary</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="timing" class="pr-sec">
+  <div class="pr-wrap">
+    <div class="pr-head">
+      <span class="eyebrow reveal">Schedule</span>
+      <h2 class="pr-title reveal">Timing at a <em class="hl place">glance</em></h2>
+    </div>
+    <div class="pr-mp reveal">
+      <iframe title="Meeting point map — Piazzale Montelungo, Florence" loading="lazy"
+        src="https://maps.google.com/maps?q=43.7806703,11.2466056&amp;z=16&amp;output=embed"></iframe>
+      <div class="pr-mp-cap">
+        <b>Meeting point: Piazzale Montelungo, Florence — check-in 8:45am (or 2:15pm)</b>
+            </div>
+      <div class="pr-mp-imgs">
+        <figure>
+          <img src="img/Piazzale-Montelungo-2022-3d.jpg" width="1157" height="553" loading="lazy" decoding="async"
+               alt="Aerial map with the walking route from Florence Santa Maria Novella station to the Prestige Rent meeting point at Piazzale Montelungo">
+          <figcaption>8 minutes on foot from Santa Maria Novella station: walk along the side of the station and follow the route to Piazzale Montelungo.</figcaption>
+        </figure>
+        <figure>
+          <img src="img/Piazzale-Montelungo-minibuses-2022.jpg" width="1171" height="683" loading="lazy" decoding="async"
+               alt="Prestige Rent minibuses parked at Piazzale Montelungo with the red CHECK-IN flag">
+          <figcaption>At the square, look for the red Prestige Rent CHECK-IN flag next to our vehicles.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <ul class="pr-time reveal">
+      <li><b>8:45am</b> — Check-in at the meeting point <em>(2:15pm for the afternoon departure)</em></li>
+      <li><b>9:00am</b> — Depart from Florence</li>
+      <li><b>9:45am</b> — Arrive at the first winery</li>
+      <li><b>9:45am to 11:15am</b> — Guided visit and wine tasting</li>
+      <li><b>11:30am</b> — Arrive at the second winery</li>
+      <li><b>11:30am to 1:00pm</b> — Second tasting paired with a Tuscan snack</li>
+      <li><b>1:00pm</b> — Depart</li>
+      <li><b>1:45pm</b> — Back at the meeting point in Florence</li>
+    </ul>
+    <p class="pr-lead" style="font-size:.88rem;margin-top:20px">The afternoon tour departs at 2:30pm and follows the same rhythm, returning to Florence around 7:15pm. Times are indicative and may vary with traffic.</p>
+  </div>
+</section>
+
+<section id="details" class="pr-sec alt">
+  <div class="pr-wrap">
+    <div class="pr-head">
+      <span class="eyebrow reveal">Details</span>
+      <h2 class="pr-title reveal">Everything <em class="hl place">else</em></h2>
+      <p class="pr-lead reveal">Tap any section to open it.</p>
+    </div>
+    <div class="reveal">
+      <details class="pr-acc">
+        <summary><span>What&rsquo;s included, and what&rsquo;s not</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p><strong>Included</strong>:</p>
+<ul>
+<li>Option Small group: max 25 people (standard group tours run with 50+ people)</li>
+<li>Option Semiprivate: max 8 people</li>
+<li>Free Cancellation up to 24 hours in advance</li>
+<li>Professional and informative English speaking driver/guide</li>
+<li>Round trip transportation by AC &amp; fully equipped vehicle with free Wi-Fi</li>
+<li>Guided visit of 2 wineries (one includes the visit of the ancient wine cellar)</li>
+<li>Generous tasting of wine, extra virgin olive oil, balsamic vinegar, etc.</li>
+<li>Salami, cured ham, cheese, and bruschetta will pair the second tasting</li>
+<li>Departure from a centrally located meeting point (close to Florence train station)</li>
+</ul>
+<p><strong>Not Included:</strong></p>
+<ul>
+<li>Hotel pick-up/drop off</li>
+<li>Gratuities (optional and at your complete discretion)</li>
+<li>Lunch or dinner</li>
+</ul></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Prices</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p><strong>Prices below are per person</strong> and vary depending on the option selected:</p>
+<p><strong>Option SMALL GROUP</strong> (max 25 participants):</p>
+<ul>
+<li><strong>Euro 89.00</strong> &mdash; Adult (18+)</li>
+<li><strong>Euro 79.00</strong> &mdash; Youth (12-17)</li>
+<li>Infants and toddlers younger than 12 years old are not allowed on this tour</li>
+</ul>
+<p><strong>Option SEMIPRIVATE</strong> (max 8 participants):</p>
+<ul>
+<li><strong>Euro 129.00</strong> &mdash; Adult (18+). Younger than 18 years old are not allowed on this tour.</li>
+</ul>
+<p>Please contact us for alternative options.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Meeting point, check-in and return</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p><strong>Check-in time:</strong> 8:45am (if booked for the 9:00am tour) or 2:15pm (if booked for the 2:30pm tour). Late arrivals are considered no show.</p>
+<p><strong>Meeting point:</strong> Piazzale Montelungo (Montelungo Square/bus terminal) &ndash; opposite the parking lot. It takes approx. 8 minutes by walk from the Florence Santa Maria Novella Train Station. If you are not familiar with the area, please allow plenty of time.</p>
+<p>Please note: the meeting point is just a bus terminal with no facilities, so if you want a coffee, use the restroom, do it in advance.</p>
+<p><strong>How to recognize your tour:</strong> Look for a red flag/check-in table, with Prestige Rent logo. If you arrive in advance (good idea!) and you cannot recognize your guide, do not panic: your guide will be there at check-in time.</p>
+<p><strong>Return time:</strong> the morning tour ends at the meeting point around 2:00pm and the afternoon tour around 7:00pm. If you book other activities, restaurants, etc., please allow plenty of time.</p>
+<p><span style="color: #ff6600;"><strong>IMPORTANT</strong>:</span> We cannot hold the tour for late arrivals, it would be disrespectful to the other guests. If you need more info, contact us in advance and not at the last minute.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Good to know before you book</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p><strong>Super friendly cancellation policy:</strong> free cancellation up to 24 hours prior departure time.</p>
+<p><strong>Group size:</strong> tour runs with a minimum of 6 participants.</p>
+<p><strong>Age:</strong> infants and younger than 12 are not allowed on the small group option; the semiprivate option is for adults only (over 18). Contact us for alternative options.</p>
+<p><strong>Activity level:</strong> very easy. Limited walking and few stairs. However, due to uneven surfaces and stairs, the tour is not suitable for people with wheelchairs or walking disabilities.</p>
+<p><strong>Driving time:</strong> about 45 mins each way, for a total of 90 mins.</p>
+<p><strong>Sightseeing time:</strong> approx. 3 hours (1.5 hrs at each winery).</p>
+<p><strong>Wines tasted:</strong> reds which are typical of the Chianti region (Chianti vintage, Riserva, Super Tuscan, etc.). As a plus, depending on the time of the year, production, wineries, etc. you may also taste some ros&eacute; or white wine (not guaranteed).</p>
+<p><strong>Dietary friendly:</strong> vegetarian or gluten-free? Just let us know at booking; we&rsquo;ll ensure your snacks are just as delicious.</p>
+<p><strong>Luggage:</strong> you can bring your luggage and store it safely on our vehicle during the tour.</p>
+<p><strong>Restroom:</strong> the bus does not have restrooms, however the longest ride on this tour is approx 45 minutes.</p>
+<p><strong>Language:</strong> the tour is in English only. No confusion with multiple languages.</p>
+<p><strong>What to wear:</strong> tour runs rain or shine, please dress accordingly.</p>
+<p><strong>Wine shipping:</strong> fall in love with a bottle? All wineries offer easy international shipping directly to your doorstep.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="pr-sec">
+  <div class="pr-wrap">
+    <div class="pr-head">
+      <span class="eyebrow reveal">FAQ</span>
+      <h2 class="pr-title reveal">Questions, <em class="hl place">answered</em></h2>
+    </div>
+    <div class="reveal">
+      <details class="pr-acc">
+        <summary><span>What happens if the weather looks bad?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><h6><strong>Rain or Shine Guarantee (Zero Risk)</strong></h6>
+<p>In Tuscany, rainy days are rare, and our tours run beautifully regardless of the weather. Our modern, climate-controlled vehicles are fully enclosed and comfortable, and your wine tastings take place inside cozy, historic cellars.</p>
+<h6><strong>Maximum Flexibility &amp; Peace of Mind</strong></h6>
+<p>We pride ourselves on our flexibility and reasonable approach. Check the forecast up to 24 hours before your departure&mdash;if you see rain and prefer to switch dates, we will do everything possible to accommodate you on another day, completely free of charge. We are humans, not rigid corporations: your peace of mind is our priority.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Is this a &ldquo;Big Bus&rdquo; tour?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>Absolutely not. While standard tours run with 50/60+ people, we keep our groups to a maximum of 25 for the small group option or 8 for the semiprivate one. This ensures a safe, intimate, and comfortable experience.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>How long is the tour?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>This tour takes about 4.5 hours so you can use the balance of the day for other activities in the morning or afternoon. The morning tour ends at approx 1:45pm; the afternoon tour ends at approx 7:00pm.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>How many wineries are we going to visit?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>We will visit 2 of Tuscany&rsquo;s finest wineries: usually Montecchio and Casa Emma. However, in case of unavailability or unforeseeable circumstances, we will visit comparable premium wineries.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Are wine tastings included?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>Yes, all wine tasting fees at the 2 wineries are included on this tour.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Is food included?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>This is a tasting-focused tour. While not a full meal, we provide a generous &ldquo;Tuscan Snack&rdquo; at the second winery (cheese, salami, bruschetta) to perfectly complement the wines.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Do we taste white wines?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>This tour includes 2 different wineries located in the Chianti Classico area, famous for red wines. As a plus, depending on the time of the year, production, etc., you may also taste some ros&eacute; or white wine (not guaranteed).</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>What should I bring?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>A bottle of water, all you think is necessary according to the forecast, and money or a credit card if you want to buy/ship wine, olive oil, etc.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Can I buy or ship wine and olive oil?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>Yes! You can buy a few bottles or a larger quantity to ship home. Make sure you know your country&rsquo;s rules of taking wine back home &ndash; every country has different rules.</p></div>
+      </details>
+      <details class="pr-acc">
+        <summary><span>Can I join the tour with an infant/child younger than 12?</span><svg class="pr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="pr-acc-body pr-prose"><p>Unfortunately, no. We love infants/children however, to maintain a sophisticated atmosphere for all guests, this tour is reserved for travelers aged 12 and up. As an alternative, please have a look at our private version of the Tuscan wine tour.</p>
+<p>You may find additional info on our FAQs page, on the Small Group Tours section.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GARANZIE — ogni voce ha una fonte sul sito, nessuna inventata:
+     policy "Travel Safe & Book With Confidence" (cancellazione,
+     cambio data, credito trasferibile), striscia della pagina
+     prodotto (24h / conferma immediata / supporto 24-7), campo ACF
+     important_info (rimborso se non si raggiungono i 6 partecipanti)
+     e footer del sito per i metodi di pagamento.
+     ============================================================ -->
+<section id="guarantee" class="pr-sec alt">
+  <div class="pr-wrap wide">
+    <div class="pr-head">
+      <span class="eyebrow reveal">Book with confidence</span>
+      <h2 class="pr-title reveal">No risk, <em class="hl place">no small print</em></h2>
+    </div>
+    <div class="pr-guar-grid reveal">
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/></svg><div><b>Free cancellation</b><p>Cancel free of charge up to 24 hours before departure.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><div><b>Reserve now, pay later</b><p>Hold your seats today and pay closer to the date.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg><div><b>Instant confirmation</b><p>Your booking is confirmed straight away, no waiting.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg><div><b>Free date changes</b><p>Plans moved? Change the date of your tour for free.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7A3.5 3.5 0 1 0 8.5 3.5 3.5 3.5 0 0 0 12 7Z"/></svg><div><b>Credit for future tours</b><p>Turn your payment into credit — even give it to a friend, at no extra cost.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg><div><b>Full refund if we can't run</b><p>The tour needs 6 people. If it doesn't run and our alternatives don't suit you, you're fully refunded.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2z"/><path d="M3 19a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2z"/></svg><div><b>24/7 support</b><p>Real people, before and during your trip.</p></div></div>
+      <div class="pr-guar"><svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><div><b>Secure payment</b><p>Visa, Mastercard, Amex, PayPal and Stripe.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="pr-book" id="book">
+  <div class="pr-wrap">
+    <span class="eyebrow reveal">Book your day</span>
+    <h2 class="pr-title reveal">Lock in today's price, <em class="hl lunch">decide&nbsp;later</em></h2>
+       <div class="pr-book-pitch reveal">
+    
+      <p class="pr-bp-body">Book now to secure your seats <strong>before the season fills up</strong>. You can easily <strong>change your date</strong> or <strong>cancel for a 100% refund</strong> up to 24 hours before departure. <strong>Zero risk, total peace of mind.</strong></p>
+    </div>
+    <!-- Urgenza REALE: 25 posti e' il limite dichiarato nei dati del tour.
+         Nessun contatore finto, nessun "3 persone stanno guardando ora":
+         sono bugie che il cliente riconosce e che bruciano la fiducia
+         costruita con i premi veri qui sopra. -->
+    <div class="reveal">
+      <span class="pr-urg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        Only 25 seats per departure
+      </span>
+    </div>
+
+    <div class="pr-price-card reveal" style="margin-top:22px">
+      <div class="pr-price-big">&euro;89</div>
+      <div class="pr-price-lbl" style="letter-spacing:.06em">per person</div>
+    </div>
+     <p class="pr-lead reveal">Free cancellation up to 24 hours before departure.</p>
+     <h2 class="pr-title"><em class="hl place">BOOK NOW</em></h2>
+     
+    <div class="pr-widget-holder reveal">
+      <div class="regiondo-booking-widget" data-locale="en_US" data-provider="PR193" data-product="T-PR193-210790" data-title="Tasting Experience in Tuscany" data-url="https://prestigerent.regiondo.com/" data-width="400px" data-font="Open Sans"></div>
+      <noscript><p style="font-weight:600;color:#55646F">Enable JavaScript to book here, or
+        <a href="https://prestigerent.com/tour/wine-experience-in-tuscany/">book on our website</a>.</p></noscript>
+    </div>
+    <div class="pr-paybanner reveal">
+      <img src="img/payments.webp" width="940" height="188" loading="lazy" decoding="async"
+           alt="Secure payment with Stripe: Visa, Mastercard, Maestro, American Express, Google Pay, Apple Pay, PayPal and WeChat Pay">
+    </div>
+    <div class="pr-pay reveal">
+      <svg class="pr-gico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Encrypted checkout</span><span class="pr-pay-sep">·</span>
+      <span>Free cancellation up to 24h</span><span class="pr-pay-sep">·</span>
+      <span>Instant confirmation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTATTI — telefono, WhatsApp ed email presi dal sito live:
+     sono gli stessi numeri che rispondono davvero. Sulla landing
+     non c'era nessun modo di parlare con un umano: chi ha un dubbio
+     e nessuno a cui chiedere, non prenota — chiude.
+     ============================================================ -->
+<section id="contact" class="pr-sec tight alt">
+  <div class="pr-wrap">
+    <div class="pr-head" style="margin-bottom:22px">
+      <span class="eyebrow reveal">Need a hand?</span>
+      <h2 class="pr-title reveal">Talk to a <em class="hl place">real person</em></h2>
+      <p class="pr-lead reveal">Before you book, or while you travel. We answer.</p>
+    </div>
+    <img class="pr-team-photo reveal" src="img/team-prestige-rent.jpg" width="170" height="170" loading="lazy" decoding="async" alt="The Prestige Rent team at our stand in Italy - real people ready to help you">
+    <div class="pr-help-copy reveal">
+      <p class="pr-hc-head">Have questions? <em>Let&rsquo;s chat!</em></p>
+      <p class="pr-hc-body">Meet our native English-speaking experts, <strong>Violeta and Carrie</strong>. Whether you need custom logistics, dietary adjustments for our Chianti tastings, or simply want to ensure this is the perfect fit for your trip, they are here to help. Drop us a message!</p>
+    </div>
+    <div class="pr-help reveal">
+      <a href="https://wa.me/393338424047" target="_blank" rel="noopener">
+        <svg class="pr-gico wa" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
+        <div><b>WhatsApp</b><span>Chat with us</span></div>
+      </a>
+      <a href="tel:+39055286059">
+        <svg class="pr-gico tel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
+        <div><b>+39 055 286059</b><span>Call us</span></div>
+      </a>
+      <a href="mailto:usa@prestigerent.com">
+        <svg class="pr-gico mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+        <div><b>usa@prestigerent.com</b><span>Email us</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ALL SMALL GROUP TOURS — cross-sell dal catalogo del sito:
+     titoli, prezzi, durate e immagini reali presi da
+     prestigerent.com/small-group-tours/.
+     ============================================================ -->
+<section id="tours" class="pr-sec">
+  <div class="pr-wrap wide">
+    <div class="pr-head">
+      <span class="eyebrow reveal">More from Prestige Rent</span>
+      <h2 class="pr-title reveal">All <em class="hl place">Small Group</em> Tours</h2>
+      <p class="pr-lead reveal">Same small groups, same guarantees — more ways to taste Tuscany.</p>
+    </div>
+    <div class="pr-tours reveal">
+      <a class="pr-tour" href="https://prestigerent.com/tour/wine-food-experience-in-tuscany/" target="_blank" rel="noopener">
+        <img src="https://prestigerent.com/wp-content/uploads/2021/04/TUSCANY-WINE-EXPERIENCE.jpg" width="850" height="567" loading="lazy" decoding="async"
+             alt="Wine and Food Experience in Tuscany — lunch at a Chianti wine estate">
+        <span class="pr-tour-body">
+          <b>Wine &amp; Food Experience in Tuscany</b>
+          <span class="pr-tour-meta">8 hours · Small group · From Florence</span>
+          <span class="pr-tour-desc">Visit 3 Chianti estates with a Tuscan lunch, surrounded by rolling hills, vineyards and olive trees.</span>
+          <span class="pr-tour-price"><b>&euro;149</b> per person</span>
+          <span class="pr-tour-cta">VIEW TOUR</span>
+        </span>
+      </a>
+      <a class="pr-tour" href="https://prestigerent.com/tour/siena-san-gimignano-the-tuscan-countryside-landing/" target="_blank" rel="noopener">
+        <img src="https://prestigerent.com/wp-content/uploads/2021/09/siena-tower-pov-opt.jpg" width="880" height="560" loading="lazy" decoding="async"
+             alt="Siena and San Gimignano small-group tour with winery lunch from Florence">
+        <span class="pr-tour-body">
+          <b>Siena &amp; San Gimignano with Lunch</b>
+          <span class="pr-tour-meta">10 hours · Small group · From Florence</span>
+          <span class="pr-tour-desc">Two medieval gems and a family winery lunch &mdash; a full day trip through the heart of Tuscany.</span>
+          <span class="pr-tour-price"><b>&euro;149</b> per person</span>
+          <span class="pr-tour-cta">VIEW TOUR</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION HOMEPAGE 1f958770 ("Proudly promoting on best platforms")
+     + FOOTER 467 - markup Elementor 1:1 dalla homepage.
+     Il wrapper .elementor-kit-16.elementor attiva variabili globali
+     e reset Elementor solo su questi due blocchi.
+     ============================================================ -->
+<div class="elementor-kit-16 elementor elementor-739">
+<footer data-elementor-type="footer" data-elementor-id="467" class="elementor elementor-467 elementor-location-footer" data-elementor-post-type="elementor_library"><section class="elementor-section elementor-top-section elementor-element elementor-element-2894cc8 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="2894cc8" data-element_type="section" data-e-type="section" id="footer-top" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}"><div class="elementor-container elementor-column-gap-extended"><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-93e351d" data-id="93e351d" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-4634e40 elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="4634e40" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > Travel safe  covid-19 policy </span></h4></div></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-728a6fd" data-id="728a6fd" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-9455000 elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="9455000" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > 24 hours free cancellation </span></h4></div></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-26739fc" data-id="26739fc" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-7b01325 elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="7b01325" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > No credit card or booking fees </span></h4></div></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-bbebbca" data-id="bbebbca" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-abb2781 elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="abb2781" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > Instant booking confirmation </span></h4></div></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-7acc4b8" data-id="7acc4b8" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-e09d85e elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="e09d85e" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > Top rated on Tripadvisor </span></h4></div></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-9be8819" data-id="9be8819" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-147d74a elementor-position-inline-start elementor-view-default elementor-mobile-position-block-start elementor-widget elementor-widget-icon-box" data-id="147d74a" data-element_type="widget" data-e-type="widget" data-widget_type="icon-box.default"><div class="elementor-widget-container"><div class="elementor-icon-box-wrapper"><div class="elementor-icon-box-icon"> <span  class="elementor-icon"> <i aria-hidden="true" class="fas fa-check-circle"></i> </span></div><div class="elementor-icon-box-content"><h4 class="elementor-icon-box-title"> <span  > 24/7 Customer care available </span></h4></div></div></div></div></div></div></div></section><section class="elementor-section elementor-top-section elementor-element elementor-element-459b1c2 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="459b1c2" data-element_type="section" data-e-type="section" id="footer-middle" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}"><div class="elementor-container elementor-column-gap-default"><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-4e0ee7f" data-id="4e0ee7f" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-6719395 elementor-widget elementor-widget-heading" data-id="6719395" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Experiences</h3></div></div><div class="elementor-element elementor-element-124f736 elementor-nav-menu--dropdown-none elementor-widget elementor-widget-nav-menu" data-id="124f736" data-element_type="widget" data-e-type="widget"  data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;/i&gt;&quot;,&quot;library&quot;:&quot;&quot;}}" data-widget_type="nav-menu.default"><div class="elementor-widget-container"><nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-text e--animation-none"><ul id="menu-1-124f736" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-478"><a href="https://prestigerent.com/small-group-tours/" class="elementor-item">Small Group Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-477"><a href="https://prestigerent.com/private-tours/" class="elementor-item">Private Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-476"><a href="https://prestigerent.com/cruise-port-tours/" class="elementor-item">Cruise Port Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-480"><a href="https://prestigerent.com/transfers/direct-transfers/" class="elementor-item">Direct Transfers</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-481"><a href="https://prestigerent.com/transfers/transfers-with-stop-enroute/" class="elementor-item">Transfers with stop enroute</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-479"><a href="https://prestigerent.com/tours-of-italy/" class="elementor-item">Tours of Italy</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-482"><a href="https://prestigerent.com/wine-and-food-experiences/" class="elementor-item">Wine and Food Experiences</a></li></ul></nav><nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true"><ul id="menu-2-124f736" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-478"><a href="https://prestigerent.com/small-group-tours/" class="elementor-item" tabindex="-1">Small Group Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-477"><a href="https://prestigerent.com/private-tours/" class="elementor-item" tabindex="-1">Private Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-476"><a href="https://prestigerent.com/cruise-port-tours/" class="elementor-item" tabindex="-1">Cruise Port Tours</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-480"><a href="https://prestigerent.com/transfers/direct-transfers/" class="elementor-item" tabindex="-1">Direct Transfers</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-481"><a href="https://prestigerent.com/transfers/transfers-with-stop-enroute/" class="elementor-item" tabindex="-1">Transfers with stop enroute</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-479"><a href="https://prestigerent.com/tours-of-italy/" class="elementor-item" tabindex="-1">Tours of Italy</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-482"><a href="https://prestigerent.com/wine-and-food-experiences/" class="elementor-item" tabindex="-1">Wine and Food Experiences</a></li></ul></nav></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-6c7bf61" data-id="6c7bf61" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-1bf7d19 elementor-widget elementor-widget-heading" data-id="1bf7d19" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Destinations</h3></div></div><div class="elementor-element elementor-element-0f2630f elementor-nav-menu--dropdown-none elementor-widget elementor-widget-nav-menu" data-id="0f2630f" data-element_type="widget" data-e-type="widget"  data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;/i&gt;&quot;,&quot;library&quot;:&quot;&quot;}}" data-widget_type="nav-menu.default"><div class="elementor-widget-container"><nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-text e--animation-none"><ul id="menu-1-0f2630f" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-484"><a href="https://prestigerent.com/destinations/florence-tuscany/" class="elementor-item">Florence &amp; Tuscany</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-489"><a href="https://prestigerent.com/destinations/rome-destinations/" class="elementor-item">Rome</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-491"><a href="https://prestigerent.com/destinations/milan-como-destinations/" class="elementor-item">Milan &amp; Como Lake</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-490"><a href="https://prestigerent.com/destinations/venice-destinations/" class="elementor-item">Venice</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-488"><a href="https://prestigerent.com/destinations/naples-amalfi-coast/" class="elementor-item">Naples &amp; Amalfi Coast</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-483"><a href="https://prestigerent.com/destinations/civitavecchia-destinations/" class="elementor-item">Civitavecchia Port</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-486"><a href="https://prestigerent.com/destinations/livorno-port-destinations/" class="elementor-item">Livorno Port</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-1532"><a href="https://prestigerent.com/destinations/" class="elementor-item">See all <i style="margin-left:4px;" aria-hidden="true" class="fas fa-arrow-right"></i></a></li></ul></nav><nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true"><ul id="menu-2-0f2630f" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-484"><a href="https://prestigerent.com/destinations/florence-tuscany/" class="elementor-item" tabindex="-1">Florence &amp; Tuscany</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-489"><a href="https://prestigerent.com/destinations/rome-destinations/" class="elementor-item" tabindex="-1">Rome</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-491"><a href="https://prestigerent.com/destinations/milan-como-destinations/" class="elementor-item" tabindex="-1">Milan &amp; Como Lake</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-490"><a href="https://prestigerent.com/destinations/venice-destinations/" class="elementor-item" tabindex="-1">Venice</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-488"><a href="https://prestigerent.com/destinations/naples-amalfi-coast/" class="elementor-item" tabindex="-1">Naples &amp; Amalfi Coast</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-483"><a href="https://prestigerent.com/destinations/civitavecchia-destinations/" class="elementor-item" tabindex="-1">Civitavecchia Port</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-486"><a href="https://prestigerent.com/destinations/livorno-port-destinations/" class="elementor-item" tabindex="-1">Livorno Port</a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-product_cat menu-item-1532"><a href="https://prestigerent.com/destinations/" class="elementor-item" tabindex="-1">See all <i style="margin-left:4px;" aria-hidden="true" class="fas fa-arrow-right"></i></a></li></ul></nav></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-83dd6f7" data-id="83dd6f7" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-b9e9179 elementor-widget elementor-widget-heading" data-id="b9e9179" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Popular Experiences</h3></div></div><div class="elementor-element elementor-element-28df577 elementor-grid-1 elementor-grid-tablet-1 elementor-posts--thumbnail-left elementor-grid-mobile-1 elementor-widget elementor-widget-posts" data-id="28df577" data-element_type="widget" data-e-type="widget" data-settings="{&quot;classic_columns&quot;:&quot;1&quot;,&quot;classic_columns_tablet&quot;:&quot;1&quot;,&quot;classic_row_gap&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;16&quot;,&quot;sizes&quot;:[]},&quot;classic_columns_mobile&quot;:&quot;1&quot;,&quot;classic_row_gap_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;classic_row_gap_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="posts.classic"><div class="elementor-widget-container"><div class="elementor-posts-container elementor-posts elementor-posts--skin-classic elementor-grid" role="list"><article class="elementor-post elementor-grid-item post-4246 product type-product status-publish has-post-thumbnail product_cat-destinations product_cat-florence product_cat-florence-tuscany product_cat-florence-and-tuscany-small-group-tours product_cat-small-group-tours product_cat-wine-and-food-experiences  instock featured virtual purchasable product-type-simple" role="listitem"> <a class="elementor-post__thumbnail__link" href="https://prestigerent.com/tour/siena-san-gimignano-the-tuscan-countryside-landing/" tabindex="-1" ><div class="elementor-post__thumbnail"><img width="150" height="150" src="https://prestigerent.com/wp-content/uploads/2021/09/siena-tower-pov-opt-150x150.jpg" class="attachment-thumbnail size-thumbnail wp-image-1842" alt="day trip to siena &amp; san gimignano" /></div> </a><div class="elementor-post__text"><h3 class="elementor-post__title"> <a href="https://prestigerent.com/tour/siena-san-gimignano-the-tuscan-countryside-landing/" > Siena &#038; San Gimignano Small-Group Tour with Lunch from Florence </a></h3></div></article><article class="elementor-post elementor-grid-item post-3852 product type-product status-publish has-post-thumbnail product_cat-florence-and-tuscany product_cat-private-tours last instock featured virtual purchasable product-type-simple" role="listitem"> <a class="elementor-post__thumbnail__link" href="https://prestigerent.com/tour/private-tour-to-cinque-terre-and-pisa-from-florence/" tabindex="-1" ><div class="elementor-post__thumbnail"><img width="150" height="150" src="https://prestigerent.com/wp-content/uploads/2021/09/Cinque-Terre5-1-150x150.jpg" class="attachment-thumbnail size-thumbnail wp-image-2014" alt="" /></div> </a><div class="elementor-post__text"><h3 class="elementor-post__title"> <a href="https://prestigerent.com/tour/private-tour-to-cinque-terre-and-pisa-from-florence/" > Private tour to Cinque Terre and Pisa </a></h3></div></article><article class="elementor-post elementor-grid-item post-1566 product type-product status-publish has-post-thumbnail product_cat-florence-tuscany product_cat-florence-and-tuscany product_cat-private-tours first instock featured virtual purchasable product-type-simple" role="listitem"> <a class="elementor-post__thumbnail__link" href="https://prestigerent.com/tour/private-tour-to-siena-san-gimignano-chianti-pisa/" tabindex="-1" ><div class="elementor-post__thumbnail"><img width="150" height="150" src="https://prestigerent.com/wp-content/uploads/2021/03/siena-view-150x150.jpg" class="attachment-thumbnail size-thumbnail wp-image-1483" alt="siena and chianti from livorno" /></div> </a><div class="elementor-post__text"><h3 class="elementor-post__title"> <a href="https://prestigerent.com/tour/private-tour-to-siena-san-gimignano-chianti-pisa/" > Private Tour to Siena, San Gimignano, Chianti and Pisa </a></h3></div></article></div></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-16d6169" data-id="16d6169" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-a4d86a8 elementor-widget elementor-widget-heading" data-id="a4d86a8" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Help</h3></div></div><div class="elementor-element elementor-element-3de5228 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="3de5228" data-element_type="widget" data-e-type="widget" data-widget_type="icon-list.default"><div class="elementor-widget-container"><ul class="elementor-icon-list-items"><li class="elementor-icon-list-item"> <a href="https://prestigerent.com/faqs/"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-question-circle"></i> </span> <span class="elementor-icon-list-text">Faq's</span> </a></li><li class="elementor-icon-list-item"> <a href="mailto:usa@prestigerent.com"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-envelope"></i> </span> <span class="elementor-icon-list-text">usa@prestigerent.com</span> </a></li><li class="elementor-icon-list-item"> <a href="tel:+39055286059"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-phone-alt"></i> </span> <span class="elementor-icon-list-text">+39 055 286059</span> </a></li><li class="elementor-icon-list-item"> <a href="https://wa.me/+393338424047"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-whatsapp"></i> </span> <span class="elementor-icon-list-text">Whatsapp</span> </a></li><li class="elementor-icon-list-item"> <a href="https://prestigerent.com/contact-us/"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-angle-double-right"></i> </span> <span class="elementor-icon-list-text"><span style="cursor:pointer">Quick Request</span></span> </a></li><li class="elementor-icon-list-item"> <a href="https://prestigerent.com/contact-us/"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-paper-plane"></i> </span> <span class="elementor-icon-list-text">Contact Us</span> </a></li><li class="elementor-icon-list-item"> <a href="https://prestigerent.com/mp/"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fas fa-map-marker-alt"></i> </span> <span class="elementor-icon-list-text">Meeting Point</span> </a></li></ul></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-e9c3214" data-id="e9c3214" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-bd86dd1 elementor-widget elementor-widget-heading" data-id="bd86dd1" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Company</h3></div></div><div class="elementor-element elementor-element-e05faf6 elementor-nav-menu--dropdown-none elementor-widget elementor-widget-nav-menu" data-id="e05faf6" data-element_type="widget" data-e-type="widget"  data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;/i&gt;&quot;,&quot;library&quot;:&quot;&quot;}}" data-widget_type="nav-menu.default"><div class="elementor-widget-container"><nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-text e--animation-none"><ul id="menu-1-e05faf6" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-502"><a href="https://prestigerent.com/our-vehicles/" class="elementor-item">Our Vehicles</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-503"><a href="https://prestigerent.com/reviews/" class="elementor-item">Reviews</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-504"><a href="https://prestigerent.com/security/" class="elementor-item">Security</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-505"><a href="https://prestigerent.com/terms-and-conditions/" class="elementor-item">Terms and conditions</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-506"><a href="https://prestigerent.com/affiliate-program/" class="elementor-item">Affiliate Program</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1110"><a href="https://prestigerent.com/covid-19/" class="elementor-item">Covid-19</a></li><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3465"><a target="_blank" href="https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ" class="elementor-item">Payment</a></li></ul></nav><nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true"><ul id="menu-2-e05faf6" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-502"><a href="https://prestigerent.com/our-vehicles/" class="elementor-item" tabindex="-1">Our Vehicles</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-503"><a href="https://prestigerent.com/reviews/" class="elementor-item" tabindex="-1">Reviews</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-504"><a href="https://prestigerent.com/security/" class="elementor-item" tabindex="-1">Security</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-505"><a href="https://prestigerent.com/terms-and-conditions/" class="elementor-item" tabindex="-1">Terms and conditions</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-506"><a href="https://prestigerent.com/affiliate-program/" class="elementor-item" tabindex="-1">Affiliate Program</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1110"><a href="https://prestigerent.com/covid-19/" class="elementor-item" tabindex="-1">Covid-19</a></li><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3465"><a target="_blank" href="https://buy.stripe.com/3cscPw1LA6Gn1yMbIZ" class="elementor-item" tabindex="-1">Payment</a></li></ul></nav></div></div></div></div><div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-581e0a0" data-id="581e0a0" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-46e4014 elementor-widget elementor-widget-heading" data-id="46e4014" data-element_type="widget" data-e-type="widget" data-widget_type="heading.default"><div class="elementor-widget-container"><h3 class="elementor-heading-title elementor-size-default">Secure Payments</h3></div></div><div class="elementor-element elementor-element-e4f661d elementor-icon-list--layout-inline elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="e4f661d" data-element_type="widget" data-e-type="widget" data-widget_type="icon-list.default"><div class="elementor-widget-container"><ul class="elementor-icon-list-items elementor-inline-items"><li class="elementor-icon-list-item elementor-inline-item"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-cc-stripe"></i> </span> <span class="elementor-icon-list-text"></span></li><li class="elementor-icon-list-item elementor-inline-item"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-cc-mastercard"></i> </span> <span class="elementor-icon-list-text"></span></li><li class="elementor-icon-list-item elementor-inline-item"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-cc-visa"></i> </span> <span class="elementor-icon-list-text"></span></li><li class="elementor-icon-list-item elementor-inline-item"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-cc-paypal"></i> </span> <span class="elementor-icon-list-text"></span></li><li class="elementor-icon-list-item elementor-inline-item"> <span class="elementor-icon-list-icon"> <i aria-hidden="true" class="fab fa-cc-amex"></i> </span> <span class="elementor-icon-list-text"></span></li></ul></div></div></div></div></div></section><section class="elementor-section elementor-top-section elementor-element elementor-element-da7ca4d elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="da7ca4d" data-element_type="section" data-e-type="section" id="footer-bottom" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}"><div class="elementor-container elementor-column-gap-default"><div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-35f928d" data-id="35f928d" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><section class="elementor-section elementor-inner-section elementor-element elementor-element-85e2167 elementor-section-content-middle elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="85e2167" data-element_type="section" data-e-type="section"><div class="elementor-container elementor-column-gap-default"><div class="elementor-column elementor-col-16 elementor-inner-column elementor-element elementor-element-5444f1a" data-id="5444f1a" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-3726e6c e-grid-align-tablet-center elementor-shape-rounded elementor-grid-0 elementor-widget elementor-widget-social-icons" data-id="3726e6c" data-element_type="widget" data-e-type="widget" data-widget_type="social-icons.default"><div class="elementor-widget-container"><div class="elementor-social-icons-wrapper elementor-grid" role="list"> <span class="elementor-grid-item" role="listitem"> <a class="elementor-icon elementor-social-icon elementor-social-icon-tripadvisor elementor-repeater-item-25ad474" href="https://www.tripadvisor.com/Attraction_Review-g187895-d2157589-Reviews-Prestige_Rent-Florence_Tuscany.html" target="_blank"> <span class="elementor-screen-only">Tripadvisor</span> <i aria-hidden="true" class="fab fa-tripadvisor"></i> </a> </span> <span class="elementor-grid-item" role="listitem"> <a class="elementor-icon elementor-social-icon elementor-social-icon-instagram elementor-repeater-item-e24c1f2" href="https://www.instagram.com/prestigerentitaly?igsh=OTNwZG55MXlzeDB6&#038;utm_source=qr" target="_blank"> <span class="elementor-screen-only">Instagram</span> <i aria-hidden="true" class="fab fa-instagram"></i> </a> </span> <span class="elementor-grid-item" role="listitem"> <a class="elementor-icon elementor-social-icon elementor-social-icon-facebook elementor-repeater-item-35c4051" href="https://en-gb.facebook.com/prestigerent/" target="_blank"> <span class="elementor-screen-only">Facebook</span> <i aria-hidden="true" class="fab fa-facebook"></i> </a> </span> <span class="elementor-grid-item" role="listitem"> <a class="elementor-icon elementor-social-icon elementor-social-icon-tiktok elementor-repeater-item-cd3baee" href="https://www.tiktok.com/@prestigerentitaly?is_from_webapp=1&#038;sender_device=pc" target="_blank"> <span class="elementor-screen-only">Tiktok</span> <i aria-hidden="true" class="fab fa-tiktok"></i> </a> </span></div></div></div></div></div><div class="elementor-column elementor-col-66 elementor-inner-column elementor-element elementor-element-50cdb50" data-id="50cdb50" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-ccd833d elementor-widget elementor-widget-text-editor" data-id="ccd833d" data-element_type="widget" data-e-type="widget" data-widget_type="text-editor.default"><div class="elementor-widget-container"><p>©2025 Prestige Rent S.r.l. &#8211; Licensed Tour Operator &amp; Travel Agency, Via della Saggina 98, 50145 &#8211; Florence (Italy) – REA: FI 571489 – VAT: 05745220482</p></div></div></div></div><div class="elementor-column elementor-col-16 elementor-inner-column elementor-element elementor-element-a63df77" data-id="a63df77" data-element_type="column" data-e-type="column"><div class="elementor-widget-wrap elementor-element-populated"><div class="elementor-element elementor-element-b106246 elementor-nav-menu__align-center elementor-nav-menu--dropdown-none elementor-widget elementor-widget-nav-menu" data-id="b106246" data-element_type="widget" data-e-type="widget"  data-settings="{&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;\&quot; aria-hidden=\&quot;true\&quot;&gt;&lt;/i&gt;&quot;,&quot;library&quot;:&quot;&quot;},&quot;layout&quot;:&quot;horizontal&quot;}" data-widget_type="nav-menu.default"><div class="elementor-widget-container"><nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-text e--animation-none"><ul id="menu-1-b106246" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-19"><a rel="privacy-policy" href="https://prestigerent.com/privacy-policy/" class="elementor-item">Privacy Policy</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="https://prestigerent.com/cookie-policy/" class="elementor-item">Cookie Policy</a></li><li class="gestione_cookies menu-item menu-item-type-custom menu-item-object-custom menu-item-2150"><a class="elementor-item" data-consenso href="https://prestigerent.com/cookie-policy/">Manage Cookies</a></li></ul></nav><nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true"><ul id="menu-2-b106246" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-19"><a rel="privacy-policy" href="https://prestigerent.com/privacy-policy/" class="elementor-item" tabindex="-1">Privacy Policy</a></li><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="https://prestigerent.com/cookie-policy/" class="elementor-item" tabindex="-1">Cookie Policy</a></li><li class="gestione_cookies menu-item menu-item-type-custom menu-item-object-custom menu-item-2150"><a class="elementor-item" tabindex="-1" data-consenso href="https://prestigerent.com/cookie-policy/">Manage Cookies</a></li></ul></nav></div></div></div></div></div></section></div></div></div></section></footer>
+</div>
+
+<!-- barra fissa mobile (CTA + prezzo) -->
+<div class="pr-sticky" id="prSticky">
+  <div class="pr-sticky-info">
+    <div class="pr-sticky-title">Tasting Experience in Tuscany &mdash; Small-Group</div>
+    <div class="pr-sticky-price"><b>89.00&euro;</b> <span class="per">per person</span></div>
+  </div>
+  <a class="cta" href="#book">BOOK NOW</a>
+</div>
+
+<script defer src="https://cdn.regiondo.net/js/integration/bookingwidget/bookingwidget.js"></script>
+<script>
+(function(){
+  /* "mostra tutto" sull'itinerario */
+  document.querySelectorAll('.pr-more').forEach(function(btn){
+    var box = document.getElementById(btn.dataset.target);
+    if (!box) return;
+    btn.addEventListener('click', function(){
+      var open = box.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+      btn.querySelector('span').textContent = open ? 'Show less' : 'Show the full itinerary';
+      if (!open) box.scrollIntoView({block:'start', behavior:'smooth'});
+    });
+  });
+
+  /* video: il player YouTube nasce solo al clic */
+  var v = document.getElementById('prVideo');
+  if (v) v.addEventListener('click', function(){
+    var f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + v.dataset.id +
+            '?autoplay=1&rel=0&modestbranding=1';
+    f.title = 'Prestige Rent Italy';
+    f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+    f.allowFullscreen = true;
+    v.innerHTML = '';
+    v.appendChild(f);
+    v.style.cursor = 'default';
+  }, {once:true});
+
+  /* barra fissa: fuori dall'hero -> compare; sul widget -> sparisce */
+  var bar = document.getElementById('prSticky');
+  var hero = document.querySelector('.hero');
+  var book = document.getElementById('book');
+  if (!bar || !('IntersectionObserver' in window)) return;
+  var heroOut = false, bookIn = false;
+  function sync(){ bar.classList.toggle('show', heroOut && !bookIn); }
+  new IntersectionObserver(function(e){
+    heroOut = !e[0].isIntersecting; sync();
+  }, {threshold:0}).observe(hero);
+  new IntersectionObserver(function(e){
+    bookIn = e[0].isIntersecting; sync();
+  }, {threshold:0}).observe(book);
+})();
+</script>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.documentElement.classList.add('js');
+
+  /* --- 1. Split del titolo in parole (skip se reduced motion) --- */
+  var title = document.getElementById('heroTitle');
+  if (title && !reduce) {
+    var index = 0;
+    var frag = document.createDocumentFragment();
+
+    var mask = function (content, i) {
+      var w = document.createElement('span');
+      w.className = 'w';
+      var inner = document.createElement('span');
+      inner.className = 'wi';
+      inner.style.setProperty('--i', i);
+      inner.appendChild(content);
+      w.appendChild(inner);
+      return w;
+    };
+
+    Array.prototype.slice.call(title.childNodes).forEach(function (node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent.split(/\s+/).forEach(function (word) {
+          if (!word) return;
+          frag.appendChild(mask(document.createTextNode(word), index++));
+          frag.appendChild(document.createTextNode(' '));
+        });
+      } else if (node.nodeName === 'BR') {
+        frag.appendChild(node.cloneNode());
+      } else {
+        frag.appendChild(mask(node.cloneNode(true), index++));
+        frag.appendChild(document.createTextNode(' '));
+      }
+    });
+
+    title.innerHTML = '';
+    title.appendChild(frag);
+    title.classList.add('is-split');
+  }
+
+  /* --- 2. Reveal allo scroll --- */
+  var items = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+    items.forEach(function (el, i) {
+      el.style.setProperty('--d', (i % 6) * 70 + 'ms');
+      io.observe(el);
+    });
+  }
+
+  /* ============================================================
+     3. CAROSELLO
+     - drift automatico verso sinistra (loop infinito, mai al capolinea)
+     - drag col mouse, swipe nativo col dito
+     - si ferma quando l'utente interagisce o passa sopra col mouse,
+       riparte da solo poco dopo
+     ============================================================ */
+  /* ---- carosello riutilizzabile: stessa logica per OGNI .film ---- */
+  function initFilm(film) {
+    var track = film.querySelector('.film-track');
+    if (!track) return;
+    var wrap = film.closest('.film-wrap') || film.parentNode;
+    var section = film.closest('.film-section');
+    var bar = section ? section.querySelector('.film-progress i') : null;
+    var hint = wrap ? wrap.querySelector('.film-hint') : null;
+    var prev = wrap ? wrap.querySelector('.film-btn.prev') : null;
+    var next = wrap ? wrap.querySelector('.film-btn.next') : null;
+
+    var originalCount = track.children.length;
+    Array.prototype.slice.call(track.children).forEach(function (s) {
+      var clone = s.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+
+    var loopWidth = 0;
+    function measure() {
+      loopWidth = track.children[originalCount].offsetLeft - track.children[0].offsetLeft;
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+
+    var SPEED = reduce ? 0 : 0.55;
+    var paused = false, resumeTimer;
+    function pauseFor(ms) {
+      paused = true;
+      clearTimeout(resumeTimer);
+      if (ms) resumeTimer = setTimeout(function () { paused = false; }, ms);
+    }
+    function wrapScroll() {
+      if (loopWidth <= 0) return;
+      if (film.scrollLeft >= loopWidth) film.scrollLeft -= loopWidth;
+      else if (film.scrollLeft <= 0) film.scrollLeft += loopWidth;
+    }
+    function tick() {
+      if (!paused && SPEED) film.scrollLeft += SPEED;
+      wrapScroll();
+      if (bar && loopWidth > 0) bar.style.width = ((film.scrollLeft % loopWidth) / loopWidth * 100) + '%';
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function hideHint() { if (hint) hint.classList.add('hide'); }
+
+    var isDown = false, startX = 0, startSL = 0;
+    film.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pauseFor(0); });
+    film.addEventListener('pointerleave', function (e) {
+      if (e.pointerType === 'mouse' && !isDown) { clearTimeout(resumeTimer); paused = false; }
+    });
+    film.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse') { pauseFor(3200); return; }
+      e.preventDefault();
+      isDown = true; startX = e.clientX; startSL = film.scrollLeft;
+      film.classList.add('dragging');
+      film.setPointerCapture(e.pointerId);
+      pauseFor(0); hideHint();
+    });
+    film.addEventListener('pointermove', function (e) {
+      if (!isDown) return;
+      film.scrollLeft = startSL - (e.clientX - startX);
+    });
+    ['pointerup', 'pointercancel'].forEach(function (ev) {
+      film.addEventListener(ev, function (e) {
+        if (e.pointerType !== 'mouse') { pauseFor(3200); return; }
+        isDown = false; film.classList.remove('dragging'); pauseFor(2600);
+      });
+    });
+    film.addEventListener('touchstart', function () { pauseFor(0); hideHint(); }, { passive: true });
+    film.addEventListener('touchend', function () { pauseFor(3200); }, { passive: true });
+
+    function slideStep() {
+      var s = track.children[0];
+      return s ? s.getBoundingClientRect().width + 14 : 400;
+    }
+    if (prev) prev.addEventListener('click', function () {
+      pauseFor(3200); hideHint();
+      film.scrollBy({ left: -slideStep(), behavior: reduce ? 'auto' : 'smooth' });
+    });
+    if (next) next.addEventListener('click', function () {
+      pauseFor(3200); hideHint();
+      film.scrollBy({ left: slideStep(), behavior: reduce ? 'auto' : 'smooth' });
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) pauseFor(0); else pauseFor(1200);
+    });
+  }
+  document.querySelectorAll('.film').forEach(initFilm);
+})();
+</script>
+
+<!-- Mobile: compattare gli spazi verticali del menu footer "Popular Experiences" -->
+<style id="pr-mobile-footer-tight">
+@media (max-width:767px){
+  /* meno spazio sopra/sotto il titolo del menu */
+  .elementor-element-b9e9179{ margin-top:0 !important; margin-bottom:6px !important; }
+  .elementor-element-b9e9179 .elementor-heading-title{ margin:0 0 4px !important; }
+  /* riduci lo spazio verticale tra i post della lista */
+  .elementor-element-28df577 .elementor-posts-container{ grid-row-gap:8px !important; }
+  .elementor-element-28df577 .elementor-post{ margin:0 !important; padding:0 !important; }
+  .elementor-element-28df577 .elementor-post__text{ margin:0 !important; padding:0 !important; }
+  .elementor-element-28df577 .elementor-post__title{ margin:0 !important; padding:0 !important; line-height:1.3 !important; }
+  .elementor-element-28df577 .elementor-post__thumbnail__link,
+  .elementor-element-28df577 .elementor-post__thumbnail{ margin-top:0 !important; margin-bottom:0 !important; }
+}
+</style>
+
+
+<!-- ============================================================
+     CHAT WIDGET (Chaty) - clonato 1:1 dalla pagina prodotto.
+     Stesso dominio => stessi asset/config => widget identico.
+     ============================================================ -->
+<script src="https://prestigerent.com/wp-includes/js/jquery/jquery.min.js"></script>
+<link rel="stylesheet" id="chaty-front-css" href="https://prestigerent.com/wp-content/plugins/chaty/css/chaty-front.min.css" media="all">
+<script id="chaty-front-end-js-extra">var chaty_settings = {"ajax_url":"https://prestigerent.com/wp-admin/admin-ajax.php","analytics":"0","capture_analytics":"0","token":"00e3aeb381","chaty_widgets":[{"id":0,"identifier":0,"settings":{"cta_type":"simple-view","cta_body":"","cta_head":"","cta_head_bg_color":"","cta_head_text_color":"","show_close_button":1,"position":"right","custom_position":1,"bottom_spacing":"25","side_spacing":"25","icon_view":"vertical","default_state":"click","cta_text":"","cta_text_color":"#373752","cta_bg_color":"#ffffff","show_cta":"first_click","is_pending_mesg_enabled":"on","pending_mesg_count":"1","pending_mesg_count_color":"#ffffff","pending_mesg_count_bgcolor":"#dd0000","widget_icon":"chat-bubble","widget_icon_url":"","font_family":"","widget_size":"48","custom_widget_size":"48","is_google_analytics_enabled":0,"close_text":"","widget_color":"#FF6060","widget_icon_color":"#ffffff","widget_rgb_color":"255,96,96","has_custom_css":0,"custom_css":"","widget_token":"2c0b9e250c","widget_index":"","attention_effect":""},"triggers":{"has_time_delay":1,"time_delay":"5","exit_intent":0,"has_display_after_page_scroll":0,"display_after_page_scroll":"0","auto_hide_widget":0,"hide_after":0,"show_on_pages_rules":[],"time_diff":0,"has_date_scheduling_rules":0,"date_scheduling_rules":{"start_date_time":"","end_date_time":""},"date_scheduling_rules_timezone":0,"day_hours_scheduling_rules_timezone":0,"has_day_hours_scheduling_rules":[],"day_hours_scheduling_rules":[],"day_time_diff":0,"show_on_direct_visit":0,"show_on_referrer_social_network":0,"show_on_referrer_search_engines":0,"show_on_referrer_google_ads":0,"show_on_referrer_urls":[],"has_show_on_specific_referrer_urls":0,"has_traffic_source":0,"has_countries":0,"countries":[],"has_target_rules":0},"channels":[{"channel":"Whatsapp","value":"393338424047","hover_text":"WhatsApp","chatway_position":"","svg_icon":"\u003Csvg width=\"39\" height=\"39\" viewBox=\"0 0 39 39\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003E\u003Ccircle class=\"color-element\" cx=\"19.4395\" cy=\"19.4395\" r=\"19.4395\" fill=\"#49E670\"/\u003E\u003Cpath d=\"M12.9821 10.1115C12.7029 10.7767 11.5862 11.442 10.7486 11.575C10.1902 11.7081 9.35269 11.8411 6.84003 10.7767C3.48981 9.44628 1.39593 6.25317 1.25634 6.12012C1.11674 5.85403 2.13001e-06 4.39053 2.13001e-06 2.92702C2.13001e-06 1.46351 0.83755 0.665231 1.11673 0.399139C1.39592 0.133046 1.8147 1.01506e-06 2.23348 1.01506e-06C2.37307 1.01506e-06 2.51267 1.01506e-06 2.65226 1.01506e-06C2.93144 1.01506e-06 3.21063 -2.02219e-06 3.35022 0.532183C3.62941 1.19741 4.32736 2.66092 4.32736 2.79397C4.46696 2.92702 4.46696 3.19311 4.32736 3.32616C4.18777 3.59225 4.18777 3.59224 3.90858 3.85834C3.76899 3.99138 3.6294 4.12443 3.48981 4.39052C3.35022 4.52357 3.21063 4.78966 3.35022 5.05576C3.48981 5.32185 4.18777 6.38622 5.16491 7.18449C6.42125 8.24886 7.39839 8.51496 7.81717 8.78105C8.09636 8.91409 8.37554 8.9141 8.65472 8.648C8.93391 8.38191 9.21309 7.98277 9.49228 7.58363C9.77146 7.31754 10.0507 7.1845 10.3298 7.31754C10.609 7.45059 12.2841 8.11582 12.5633 8.38191C12.8425 8.51496 13.1217 8.648 13.1217 8.78105C13.1217 8.78105 13.1217 9.44628 12.9821 10.1115Z\" transform=\"translate(12.9597 12.9597)\" fill=\"#FAFAFA\"/\u003E\u003Cpath d=\"M0.196998 23.295L0.131434 23.4862L0.323216 23.4223L5.52771 21.6875C7.4273 22.8471 9.47325 23.4274 11.6637 23.4274C18.134 23.4274 23.4274 18.134 23.4274 11.6637C23.4274 5.19344 18.134 -0.1 11.6637 -0.1C5.19344 -0.1 -0.1 5.19344 -0.1 11.6637C-0.1 13.9996 0.624492 16.3352 1.93021 18.2398L0.196998 23.295ZM5.87658 19.8847L5.84025 19.8665L5.80154 19.8788L2.78138 20.8398L3.73978 17.9646L3.75932 17.906L3.71562 17.8623L3.43104 17.5777C2.27704 15.8437 1.55796 13.8245 1.55796 11.6637C1.55796 6.03288 6.03288 1.55796 11.6637 1.55796C17.2945 1.55796 21.7695 6.03288 21.7695 11.6637C21.7695 17.2945 17.2945 21.7695 11.6637 21.7695C9.64222 21.7695 7.76778 21.1921 6.18227 20.039L6.17557 20.0342L6.16817 20.0305L5.87658 19.8847Z\" transform=\"translate(7.7758 7.77582)\" fill=\"white\" stroke=\"white\" stroke-width=\"0.2\"/\u003E\u003C/svg\u003E","is_desktop":1,"is_mobile":1,"icon_color":"#49E670","icon_rgb_color":"73,230,112","channel_type":"Whatsapp","custom_image_url":"","order":"","pre_set_message":"","is_use_web_version":"1","is_open_new_tab":"1","is_default_open":"0","has_welcome_message":"0","emoji_picker":"1","input_placeholder":"Write your message...","chat_welcome_message":"\u003Cp\u003EHow can I help you? :)\u003C/p\u003E","wp_popup_headline":"Let&#039;s chat on WhatsApp","wp_popup_nickname":"","wp_popup_profile":"","wp_popup_head_bg_color":"#4AA485","qr_code_image_url":"","mail_subject":"","channel_account_type":"personal","contact_form_settings":[],"contact_fields":[],"url":"https://web.whatsapp.com/send?phone=393338424047","mobile_target":"","desktop_target":"_blank","target":"_blank","is_agent":0,"agent_data":[],"header_text":"","header_sub_text":"","header_bg_color":"","header_text_color":"","widget_token":"2c0b9e250c","widget_index":"","click_event":"","viber_url":""},{"channel":"Facebook_Messenger","value":"https://m.me/prestigerent","hover_text":"Facebook Messenger","chatway_position":"","svg_icon":"\u003Csvg width=\"39\" height=\"39\" viewBox=\"0 0 39 39\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003E\u003Ccircle class=\"color-element\" cx=\"19.4395\" cy=\"19.4395\" r=\"19.4395\" fill=\"#1E88E5\"/\u003E\u003Cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M0 9.63934C0 4.29861 4.68939 0 10.4209 0C16.1524 0 20.8418 4.29861 20.8418 9.63934C20.8418 14.98 16.1524 19.2787 10.4209 19.2787C9.37878 19.2787 8.33673 19.1484 7.42487 18.8879L3.90784 20.8418V17.1945C1.56311 15.3708 0 12.6353 0 9.63934ZM8.85779 10.1604L11.463 13.0261L17.1945 6.90384L12.1143 9.76959L9.37885 6.90384L3.64734 13.0261L8.85779 10.1604Z\" transform=\"translate(9.01854 10.3146)\" fill=\"white\"/\u003E\u003C/svg\u003E","is_desktop":1,"is_mobile":1,"icon_color":"rgb(3, 113, 245)","icon_rgb_color":"3,113,245","channel_type":"Facebook_Messenger","custom_image_url":"","order":"","pre_set_message":"","is_use_web_version":"1","is_open_new_tab":"1","is_default_open":"0","has_welcome_message":"0","emoji_picker":"1","input_placeholder":"Write your message...","chat_welcome_message":"","wp_popup_headline":"","wp_popup_nickname":"","wp_popup_profile":"","wp_popup_head_bg_color":"#4AA485","qr_code_image_url":"","mail_subject":"","channel_account_type":"personal","contact_form_settings":[],"contact_fields":[],"url":"https://m.me/prestigerent","mobile_target":"","desktop_target":"","target":"","is_agent":0,"agent_data":[],"header_text":"","header_sub_text":"","header_bg_color":"","header_text_color":"","widget_token":"2c0b9e250c","widget_index":"","click_event":"","viber_url":""}]}],"data_analytics_settings":"off","lang":{"whatsapp_label":"WhatsApp Message","hide_whatsapp_form":"Hide WhatsApp Form","emoji_picker":"Show Emojis"},"has_chatway":""};</script>
+<script defer id="chaty-front-end-js" src="https://prestigerent.com/wp-content/plugins/chaty/js/cht-front-script.min.js"></script>
+<!-- Il pixel Meta NON sta piu' qui: lo accende GTM, come su tutte le
+     altre pagine del sito. Fino al 01/09/2026 c'erano due copie dello
+     stesso contatore -- una scritta qui e una dentro GTM -- e in GTM
+     serviva un'eccezione "/lp/" per zittire la seconda, altrimenti Meta
+     contava due volte ogni visitatore. Tolta la copia, l'eccezione non
+     serve piu': un contatore solo, in un posto solo. -->
+</body>
+</html>
