@@ -394,7 +394,25 @@ const nextConfig: NextConfig = {
        catch-all /[locale]/[...percorso] -- e' esattamente lui che oggi
        risponde 404 sulle landing, con X-Matched-Path /[locale]/[...percorso]. */
     return [
-      ...inoltra('/lp', '/lp'),
+      /* 🔴 `/lp` NON C'E' PIU', ED E' UNA BUONA NOTIZIA (02/09/2026).
+       *
+       * Le landing stanno in `public/lp/`: le serve Vercel dai propri file,
+       * sono dentro Git, e si cambiano con un push come tutto il resto.
+       * Finiti l'FTP, il `deploy.sh` e il rischio che due persone si
+       * sovrascrivano senza accorgersene.
+       *
+       * I nove video non sono qui ma su Supabase Storage
+       * (`media/lp/video/`), dove stanno gia' gli altri media del sito:
+       * erano 68 MB su 78, cioe' l'87% del peso, e su Vercel avrebbero
+       * mangiato la banda del piano.
+       *
+       * I tre vecchi indirizzi che l'`.htaccess` della cartella
+       * reindirizzava sono diventati tre `redirects()` qui sopra: quel file
+       * e' rimasto sul vecchio server ed e' inerte, perche' Apache le
+       * landing non le serve piu'.
+       *
+       * Sul vecchio host restano solo `/booking/` e `/guest-albums/`, per
+       * decisione della proprieta'. */
       ...inoltra('/myb', '/myb'),
 
       /* 🔴 `/booking/` — SEGNALATO DA VIOLETA IL 30/08/2026, ROTTO.
