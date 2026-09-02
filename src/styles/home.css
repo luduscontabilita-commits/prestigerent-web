@@ -1226,6 +1226,21 @@ html[data-theme="dark"] .rv-b-award{ color:#0B0F13; }
   border-radius:14px; padding:18px;
 }
 .rv-card-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+
+/* 🔴 LE STELLE HANNO UN COLORE LORO (02/09/2026).
+   Prima `.rv-stars` non aveva NESSUNA regola: le cinque stelle
+   ereditavano `--ink`, cioe' lo stesso blu scuro del titolo e del testo
+   della recensione. Erano tre righe dello stesso colore incolonnate, e
+   il voto -- la cosa che si guarda per prima in una recensione -- non
+   si distingueva da niente.
+   Il verde e' quello di Tripadvisor, e non e' un verde qualsiasi
+   scelto adesso: sono gli stessi due valori gia' in uso in questo
+   foglio per `.rv-b-tripadvisor`, uno per tema. Se un domani il marchio
+   cambia tinta, i due posti vanno cambiati insieme.
+   La spaziatura serve: cinque glifi "★" attaccati diventano una banda
+   nera e si smette di contarli. */
+.rv-stars{ color:#00A680; letter-spacing:.09em; }
+html[data-theme="dark"] .rv-stars{ color:#2ED8AC; }
 .rv-card-t{ display:block; color:var(--ink); font-size:.95rem; margin-bottom:6px; }
 .rv-card blockquote{
   margin:0; color:var(--ink); font-size:.92rem; line-height:1.62;
