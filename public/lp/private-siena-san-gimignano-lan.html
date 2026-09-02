@@ -3064,59 +3064,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      Qui si mandano eventi GA4 con nomi parlanti; in GA4 si marcano come
      conversioni e si importano in Google Ads, senza toccare piu' il
      codice quando si cambia idea su cosa conta. -->
-<script>
-(function(){
-  function ev(name, params){
-    try{ if(typeof gtag==='function'){ gtag('event', name, params||{}); } }catch(e){}
-  }
-  /* Conversioni Google Ads: una sola per sessione per etichetta, cosi' chi
-     clicca WhatsApp cinque volte non manda cinque ping. Google conta
-     comunque "Una", questo evita solo rumore inutile. */
-  var AW_ID = 'AW-18130421608';
-  var AW = { whatsapp:'P6hOCJKY198cEOiOocVD', phone:'dQ8fCJWY198cEOiOocVD' };
-  function adsConv(key){
-    try{
-      if(typeof gtag!=='function' || !AW[key]) return;
-      var k = 'pr_conv_' + key;
-      try{ if(sessionStorage.getItem(k)) return; sessionStorage.setItem(k,'1'); }catch(e){}
-      gtag('event','conversion', {send_to: AW_ID + '/' + AW[key]});
-    }catch(e){}
-  }
-  document.addEventListener('click', function(e){
-    var a=e.target && e.target.closest ? e.target.closest('a,button') : null;
-    if(!a) return;
-    var href=(a.getAttribute&&a.getAttribute('href'))||'';
+<!-- 🔴 QUI C'ERA L'ASCOLTATORE DEI CLIC. TOLTO IL 02/09/2026.
+     Una trentina di righe che sentivano i clic e li nominavano:
+     `contact_whatsapp`, `contact_phone`, `contact_email`,
+     `booking_intent`, `select_format`, `add_to_cart_click`,
+     `view_booking_form`. Piu' due righe che sparavano la conversione
+     Google Ads direttamente dalla pagina.
 
-    if(href.indexOf('wa.me')>-1 || href.indexOf('whatsapp')>-1){
-      ev('contact_whatsapp', {method:'whatsapp', placement:a.getAttribute('data-track')||'page'});
-      adsConv('whatsapp');
-    } else if(href.indexOf('tel:')===0){
-      ev('contact_phone', {method:'phone', placement:a.getAttribute('data-track')||'page'});
-      adsConv('phone');
-    } else if(href.indexOf('mailto:')===0){
-      ev('contact_email', {method:'email'});
-    } else if(href==='#bookform'){
-      ev('booking_intent', {placement:a.className||'cta'});
-    }
+     Erano del tempo in cui queste pagine stavano sole sul vecchio server
+     e GTM sopra non c'era: allora era l'unico modo di sapere se qualcuno
+     premeva WhatsApp.
 
-    /* pulsante del widget Regiondo: e' il gesto piu' vicino all'acquisto
-       che la pagina possa osservare */
-    if(a.className && String(a.className).indexOf('regiondo')>-1){
-      ev('add_to_cart_click', {provider:'regiondo'});
-    }
-  }, true);
+     Adesso quel lavoro lo fa GTM con i propri trigger (versione v22 del
+     02/09/2026): clic sui link, clic con selettore CSS, visibilita' di
+     `#bookform`, pagina vista. Tenerli tutti e due voleva dire contare
+     ogni gesto DUE volte.
 
-  /* il calendario e' comparso a schermo: misura quanti arrivano davvero
-     al modulo rispetto a chi apre la pagina */
-  var form=document.getElementById('bookform');
-  if(form && 'IntersectionObserver' in window){
-    var io=new IntersectionObserver(function(en){
-      if(en[0].isIntersecting){ ev('view_booking_form', {}); io.disconnect(); }
-    },{threshold:0.3});
-    io.observe(form);
-  }
-})();
-</script>
+     🔴 QUELLO CHE RESTA SOPRA NON SI TOCCA:
+     lo shim `function gtag(){dataLayer.push(arguments)}` e i due
+     `consent default`. Sembrano avanzi del vecchio tracciamento e non lo
+     sono: quello shim e' il canale attraverso cui il **widget Regiondo**
+     consegna `add_to_cart`, `begin_checkout` e `purchase`. Toglierlo
+     spegne l'imbuto e gli acquisti, senza nessun errore visibile. -->
+
 <!-- Salto ai BOOK NOW -> calendario Regiondo, robusto su mobile.
      Il widget si carica async e la barra fissa in basso cambia altezza:
      con la sola ancora CSS il salto finiva spesso fuori bersaglio, quindi
