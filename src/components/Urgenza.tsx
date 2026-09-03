@@ -161,23 +161,21 @@ export function Urgenza({
         <span><b>Best price</b> &mdash; no booking fee</span>
       </p>
 
-      {/* 🔴 DUE COLONNE FISSE, E LA PRIMA CASELLA SI ALLARGA SE SONO
-          DISPARI (03/09/2026).
-          Prima la griglia era `auto-fit minmax(120px,1fr)`, cioe' erano
-          le colonne a decidersi da sole in base allo SPAZIO. Nella
-          colonna del calendario ce ne stavano tre, quindi quattro voci
-          diventavano 3 + 1 e restava un buco grande come due caselle
-          accanto all'ultima -- si vedeva, ed era il difetto che
-          `auto-fit` doveva evitare: l'avevo messo per il caso di UNA
-          voce sola, e ha creato il caso di quattro.
-          Adesso le colonne sono due, sempre, e a non lasciare buchi
-          pensa la classe `dispari`: quando le voci sono un numero
-          dispari la prima casella occupa tutta la riga. Cosi' il conto
-          torna per QUALUNQUE numero -- 1 su una riga piena, 2 in fila,
-          3 come 1+2, 4 come 2+2, 5 come 1+2+2 -- senza mai un vuoto.
-          Si allarga la PRIMA e non l'ultima perche' e' la piu' forte:
-          quante prenotazioni sono arrivate oggi. */}
-      <div className={'ur-griglia' + (righe.length % 2 ? ' dispari' : '')}>
+      {/* 🔴 LE COLONNE SEGUONO IL CONTO DELLE VOCI (03/09/2026).
+          Prima erano due fisse, e prima ancora `auto-fit`. Nessuna delle
+          due andava: `auto-fit` guarda lo spazio e non le voci -- quattro
+          voci diventavano 3+1 con un buco -- e due fisse costringevano
+          tre voci a stare come 1+2, quando in riga ci stanno benissimo.
+          La disposizione giusta cambia col numero: 3 vanno in fila, 4
+          fanno 2+2, 5 fanno 3+2. Non e' una regola sola che vale sempre,
+          e' una scelta per ogni conto -- quindi la classe dice QUANTE
+          sono (`n3`, `n4`...) e il CSS decide la forma.
+          Sotto, la griglia ha SEI tracce e ogni casella ne occupa 2 o 3:
+          e' il minimo comune multiplo che permette righe da tre e righe
+          da due nella stessa griglia. Senza, il "3+2" sarebbe impossibile
+          -- due caselle in una griglia da tre colonne lasciano un buco,
+          ed e' esattamente il difetto da cui siamo partiti. */}
+      <div className={`ur-griglia n${Math.min(righe.length, 6)}`}>
         {righe.map((r, i) => (
           <div className={'ur-c' + (r.avviso ? ' ur-avviso' : '')} key={i}>
             <b>{r.n}</b>
