@@ -274,9 +274,16 @@ export default async function TourPage({
    * parte nel blocco, e la pagina si contraddiceva da sola: vedi il
    * commento in testa a `src/lib/inclusi.ts`. Se non c'e' niente di vero
    * da dire, il posto resta vuoto. */
-  const usp: { icona: string; testo: string }[] = [
-    { icona: '🛡️', testo: 'Free cancellation up to 24 hours' },
-  ];
+  /* 🔴 LA DISDETTA NON STA PIU' QUI (03/09/2026).
+     C'era `🛡️ Free cancellation up to 24 hours` come primo riquadro.
+     Ma la stessa frase compare gia' negli elenchi della scheda E nella
+     riga di rassicurazione sotto il calendario: tre volte nella stessa
+     pagina. La terza non convince nessuno in piu' -- toglie solo il posto
+     all'unica cosa che quel riquadro puo' dire e che nessun altro dice:
+     cosa distingue QUESTO tour dagli altri.
+     L'elenco parte vuoto e si riempie solo di cose vere: se non c'e'
+     niente da dire, i riquadri non compaiono. */
+  const usp: { icona: string; testo: string }[] = [];
   const compreso = badgeIncluso(tutteLeSchede);
   if (compreso) usp.push(compreso);
   if (tour.kind === 'private' || tour.kind === 'transfer') {
@@ -539,16 +546,14 @@ export default async function TourPage({
                  letto questa riga no. */
               <em className="hero-cambio">{affiancato(prezzo.valore, cambio)}</em>
             )}
-            {product?.durationLabel ? ` · ${product.durationLabel}` : null}
-            {/* 🔴 DA DOVE SI PARTE, nella riga che tutti leggono.
-                "from €89 · 5 hours" non dice la cosa che a un turista
-                interessa quanto il prezzo: se il tour parte dalla citta'
-                in cui dorme. Chi e' a Firenze e legge una scheda che non
-                lo nomina deve andarselo a cercare, e spesso non lo fa.
-                La citta' e' la stessa della barra dei fatti -- calcolata
-                una volta e passata a tutti e due -- quindi non possono
-                dire due cose diverse. */}
-            {partenza ? ` · from ${partenza}` : null}
+            {/* 🔴 DURATA E PARTENZA TOLTE DA QUI (03/09/2026).
+                C'era `from €550 · 8 hours · from Florence`, e tutte e due
+                le informazioni comparivano gia' due centimetri sotto,
+                nella barra dei fatti. Ripetere una cosa nella stessa
+                schermata non la rafforza: allunga la riga del prezzo, che
+                e' quella che si legge per prima e che deve dire UNA cosa.
+                Restano dove stavano gia' -- la barra dei fatti -- e la
+                riga qui torna a essere solo il prezzo e il cambio. */}
             {prezzo.fonte === 'wordpress' ? ' · price on request for your date' : null}
             {/* La spiegazione del cambio scende sotto, piccola: serve a chi
                 la cerca e non ruba spazio a chi guarda il numero. */}
