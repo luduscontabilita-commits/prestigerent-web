@@ -1711,9 +1711,17 @@ html[data-theme="dark"] .ur b{ color:#FFA65C; }
 html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
 
 /* perche' prenotare qui e non su Viator */
+/* 🔴 VIA LA SCATOLA BEIGE (03/09/2026).
+   C'era un riquadro col fondo `--ph` -- il grigio caldo dei segnaposto
+   delle foto -- e un bordo. Chiuso in un rettangolo colorato, un blocco
+   di recapiti sembra una pubblicita' messa in fondo alla pagina: l'occhio
+   lo scarta prima di leggerlo. Ed e' l'opposto di quello che deve fare,
+   che e' dimostrare che dietro c'e' un'azienda vera.
+   Ora e' testo su fondo pagina, separato da una riga sottile in alto e
+   dallo spazio. Nitido, e si legge. */
 .dr{
-  margin-top:14px; padding:14px 16px; border-radius:12px;
-  background:var(--ph); border:1px solid var(--line);
+  margin-top:22px; padding:18px 0 0;
+  border-top:1px solid var(--line);
 }
 /* 🔴 QUI DENTRO ORA CI SONO I DATI DELL'AZIENDA (01/09/2026).
    C'era un elenco di cinque punti sul perche' prenotare da noi: venti
@@ -1723,8 +1731,8 @@ html[data-theme="dark"] .ur-fonte{ color:#C99A66; }
    landing. Le vecchie regole `.dr-t`, `.dr ul` e `.dr li` non servono
    piu' e sono state tolte: un foglio di stile pieno di regole senza
    padrone e' il modo piu' rapido per non capirci piu' niente. */
-.dr-nome{ margin:0 0 2px; font-size:.9rem; font-weight:800; color:var(--ink); }
-.dr-riga{ margin:0 0 2px; font-size:.82rem; line-height:1.55; color:var(--ink-soft); }
+.dr-nome{ margin:0 0 4px; font-size:.9rem; font-weight:800; color:var(--ink); }
+.dr-riga{ margin:0 0 3px; font-size:.82rem; line-height:1.55; color:var(--ink-soft); }
 .dr-rec a{
   color:inherit; font-weight:700;
   text-decoration:underline; text-underline-offset:2px;
