@@ -152,6 +152,37 @@ export default async function Mezzi({
         </p>
       </header>
 
+      {/* %s LA FOTO DELLA FLOTTA INTERA, e non e' decorazione.
+          Chiesta dalla proprieta' -- sul sito vecchio stava in cima a
+          questa pagina -- e vale piu' delle quattro schede messe insieme:
+          dieci mezzi veri, in fila nel loro piazzale, con le targhe. Le
+          quattro foto qui sotto sono immagini di catalogo Mercedes, che
+          chiunque puo' scaricare; questa no, e dice la sola cosa che i
+          concorrenti non possono dire -- che i mezzi sono suoi.
+
+          Sotto il titolo e non dietro, con la scritta sopra: il cielo di
+          questa foto e' bianco, e un testo chiaro sopra un cielo bianco
+          non si legge. Scurirla con un velo per far stare la scritta
+          significherebbe rovinare l'unica cosa che la foto deve fare,
+          cioe' farsi guardare.
+
+          `priority`: e' l'immagine grande in cima, quella che decide
+          quanto la pagina SEMBRA veloce. Senza, Next la carica pigra e
+          resta un rettangolo grigio per mezzo secondo. */}
+      <figure className="vh-flotta">
+        <Image
+          src={BASE + 'wp/2021/09/our-veichles-bg.jpg'}
+          alt="The Prestige Rent fleet lined up: Mercedes V Class, E Class, S Class, Sprinter vans and a minibus"
+          width={1920}
+          height={1080}
+          priority
+          sizes="(max-width: 1180px) 100vw, 1140px"
+        />
+        <figcaption>
+          Our fleet, in our yard in Florence. Every vehicle on this page is one of these.
+        </figcaption>
+      </figure>
+
       <FasciaFiducia dati={d} />
 
       {/* 🔴 LA COSA CHE RISOLVE UN PROBLEMA VERO, e va detta prima delle

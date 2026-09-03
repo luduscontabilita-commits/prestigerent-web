@@ -3585,6 +3585,22 @@ html[data-theme="dark"] .pr-paybanner img{
    veicoli. Un foglio nuovo per quattro schede sarebbe un altro posto da
    tenere allineato. */
 
+/* La foto della flotta: larga quanto la pagina, e senza ritagli.
+   `aspect-ratio` con `object-fit:cover` avrebbe tagliato i mezzi ai due
+   lati -- che sono esattamente il contenuto -- quindi qui l'altezza la
+   decide la foto. Il bordo tondo e la riga sotto bastano a non farla
+   sembrare un banner appiccicato. */
+.vh-flotta{
+  max-width:1140px; margin:26px auto 0; padding:0 20px;
+}
+.vh-flotta img{
+  width:100%; height:auto; display:block; border-radius:14px;
+  background:var(--ph);
+}
+.vh-flotta figcaption{
+  margin:10px 2px 0; font-size:.85rem; line-height:1.5; color:var(--ink-soft);
+}
+
 /* La riga sulle aree pedonali: e' l'unica cosa in pagina che risolve un
    problema vero, e sta prima delle schede. Bordo a sinistra e non una
    scatola: deve pesare come una frase importante, non come un annuncio. */
