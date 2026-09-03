@@ -20,84 +20,44 @@ import type { Conteggio, Disponibilita } from '@/lib/riprova';
 const GIORNI = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MESI = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-/* 🔴 DISEGNI, NON EMOJI (03/09/2026).
+/* 🔴 UN DISEGNO SOLO, E NON UN'EMOJI (03/09/2026).
  *
- * Qui c'erano 🔥 👥 📆 🚐 ⚠️ 🚫 📅. Un'emoji non e' un'icona: e' un
- * carattere a colori FISSI, disegnato dal sistema operativo. Non prende
- * il colore del marchio perche' non prende nessun colore -- e cambia
- * faccia a ogni dispositivo: la fiamma di Windows non e' quella
- * dell'iPhone, che non e' quella di Android. In una colonna di quattro
- * righe accanto al calendario diventavano quattro macchie colorate
- * scoordinate, ognuna col suo verde, giallo e rosso, dentro un sito che
- * ha un arancione solo.
+ * Prima ogni riga aveva la sua emoji: 🔥 👥 📆 🚐 ⚠️ 🚫 📅. Un'emoji non
+ * e' un'icona -- e' un carattere a colori FISSI disegnato dal sistema
+ * operativo, quindi non prende il colore del marchio e cambia faccia a
+ * ogni dispositivo. Erano quattro macchie scoordinate in un sito che ha
+ * un arancione solo.
  *
- * Questi sono SVG con `currentColor`: prendono il colore che la regola
- * CSS decide, quindi l'arancione del marchio, e sono identici ovunque.
- * Stesso `viewBox` e stesso tratto per tutte, cosi' in colonna nessuna
- * pesa piu' delle altre.
+ * Poi sono diventate SVG in colore di marchio, ed era meglio. Ma in una
+ * griglia dove il protagonista e' la CIFRA, sette disegni sono sette
+ * cose in piu' da guardare prima del numero: l'icona aiuta a scorrere
+ * un elenco di righe, non a leggere quattro numeri grandi.
+ *
+ * Ne resta uno, sulla fascetta del prezzo garantito: quella non ha un
+ * numero, quindi il disegno e' l'unica cosa che la fa riconoscere a
+ * colpo d'occhio. `currentColor`, cosi' prende l'arancione dal CSS.
  */
-const svg = {
-  width: 15,
-  height: 15,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.9,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  'aria-hidden': true,
-};
+const IconaPrezzo = () => (
+  <svg
+    width="13" height="13" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2.1"
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+  >
+    <path d="M20.6 13.3 13.3 20.6a2 2 0 0 1-2.8 0l-7.1-7.1a2 2 0 0 1-.6-1.4V4.4a2 2 0 0 1 2-2h7.7a2 2 0 0 1 1.4.6l7.1 7.1a2 2 0 0 1 0 2.8Z" />
+    <path d="M7.3 7.3h.01" />
+  </svg>
+);
 
-const ICONE = {
-  /* la fiamma: quante prenotazioni oggi o negli ultimi sette giorni */
-  fuoco: (
-    <svg {...svg}>
-      <path d="M12 3c.6 2.4-.5 3.9-1.8 5.2C8.6 9.8 7 11.3 7 14a5 5 0 0 0 10 0c0-2.2-1-3.7-2.1-5.2" />
-      <path d="M12 21a2.6 2.6 0 0 0 2.6-2.6c0-1.6-1.6-2.3-2.6-3.9-1 1.6-2.6 2.3-2.6 3.9A2.6 2.6 0 0 0 12 21Z" />
-    </svg>
-  ),
-  /* le persone: quanti ospiti questa settimana */
-  ospiti: (
-    <svg {...svg}>
-      <path d="M15.5 20v-1.7a3.4 3.4 0 0 0-3.4-3.4H6.4A3.4 3.4 0 0 0 3 18.3V20" />
-      <circle cx="9.2" cy="7.4" r="3.4" />
-      <path d="M21 20v-1.7a3.4 3.4 0 0 0-2.6-3.3" />
-      <path d="M15.7 4.2a3.4 3.4 0 0 1 0 6.5" />
-    </svg>
-  ),
-  /* il calendario: la prossima partenza, o su quante date si parte */
-  data: (
-    <svg {...svg}>
-      <rect x="3" y="5" width="18" height="16" rx="2.5" />
-      <path d="M3 10h18M8 3v4M16 3v4" />
-    </svg>
-  ),
-  /* il triangolo: pochi posti rimasti. E' l'unica che avverte, ed e'
-     anche l'unica che cambia colore (vedi .ur-avviso nel CSS). */
-  pochi: (
-    <svg {...svg}>
-      <path d="M12 3.7 2.6 19.4a1.4 1.4 0 0 0 1.2 2.1h16.4a1.4 1.4 0 0 0 1.2-2.1L12 3.7Z" />
-      <path d="M12 9.6v4.2M12 17.4h.01" />
-    </svg>
-  ),
-  /* il cerchio sbarrato: date gia' al completo */
-  piene: (
-    <svg {...svg}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="m5.6 5.6 12.8 12.8" />
-    </svg>
-  ),
-  /* il minibus: quanti ospiti al massimo per partenza */
-  mezzo: (
-    <svg {...svg}>
-      <path d="M3 16V8.5A1.5 1.5 0 0 1 4.5 7h9.2v9" />
-      <path d="M13.7 10.2h2.9a1.5 1.5 0 0 1 1.2.6l2.3 3a1.5 1.5 0 0 1 .3.9V16" />
-      <circle cx="7.4" cy="17" r="1.9" />
-      <circle cx="16.6" cy="17" r="1.9" />
-      <path d="M9.3 17h5.4" />
-    </svg>
-  ),
-};
+/* La data della prossima partenza sta in una casella accanto a dei
+   numeri: "Thursday 27 August" la farebbe andare a capo tre volte.
+   Qui diventa "27 Aug", che e' la stessa informazione nella misura di
+   una cifra. Il giorno della settimana si perde, e va bene: chi guarda
+   il calendario due centimetri sotto lo vede da se'. */
+const MESI_BREVI = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dataBreve(iso: string) {
+  const d = new Date(iso + 'T12:00:00');
+  return `${d.getDate()} ${MESI_BREVI[d.getMonth()]}`;
+}
 
 function quandoParte(iso: string) {
   const d = new Date(iso + 'T12:00:00');
@@ -113,26 +73,29 @@ export function Urgenza({
   posti?: number | null;
   disp?: Disponibilita | null;
 }) {
-  if (!conta && !disp) return null;
 
-  const righe: { icona: React.ReactNode; testo: React.ReactNode; avviso?: boolean }[] = [];
+  const righe: { n: string; t: string; avviso?: boolean }[] = [];
+
+  /* Ogni voce e' una cifra con la sua etichetta, e l'etichetta e'
+     corta: sta in una casella larga meta' colonna, in maiuscoletto.
+     "Runs on 18 dates in the next 30 days" diventa 18 +
+     "dates in next 30 days" -- si perdono le parole di raccordo, non
+     l'informazione, e due voci stanno sulla stessa riga invece di una. */
 
   if (conta && conta.oggi >= 3) {
     righe.push({
-      icona: ICONE.fuoco,
-      testo: (
-        <>
-          <b>{conta.oggi}</b> booked today
-          {conta.ieri >= 3 ? <>, <b>{conta.ieri}</b> yesterday</> : null}
-        </>
-      ),
+      n: String(conta.oggi),
+      /* Il dato di ieri non merita una casella sua -- sarebbe una cifra
+         grande per un'informazione di contorno -- ma dentro l'etichetta
+         regge, e dice che non e' stato un giorno fortunato. */
+      t: conta.ieri >= 3 ? `booked today, ${conta.ieri} yesterday` : 'booked today',
     });
   } else if (conta && conta.ultimi_7 >= 10) {
-    righe.push({ icona: ICONE.fuoco, testo: <><b>{conta.ultimi_7}</b> booked in the last 7 days</> });
+    righe.push({ n: String(conta.ultimi_7), t: 'booked in the last 7 days' });
   }
 
   if (conta && conta.persone_7 >= 20) {
-    righe.push({ icona: ICONE.ospiti, testo: <><b>{conta.persone_7}</b> guests joined this week</> });
+    righe.push({ n: String(conta.persone_7), t: 'guests this week' });
   }
 
   /* LA SCARSITA' VERA, e solo dove esiste davvero.
@@ -158,56 +121,54 @@ export function Urgenza({
     disp?.prima_libera != null && disp.prima_libera < new Date().toISOString().slice(0, 10);
 
   if (disp?.prima_libera && !scaduta) {
-    const pochi = disp.posti_prima != null && disp.posti_prima <= 12;
-    righe.push({
-      icona: pochi ? ICONE.pochi : ICONE.data,
-      avviso: pochi,
-      testo: (
-        <>
-          Next departure <b>{quandoParte(disp.prima_libera)}</b>
-          {pochi ? <> — only <b>{disp.posti_prima}</b> seats left</> : null}
-        </>
-      ),
-    });
+    righe.push({ n: dataBreve(disp.prima_libera), t: 'next departure' });
+    /* I posti rimasti prendono una casella LORO invece di finire in coda
+       all'etichetta della data: e' l'unico numero che deve mettere
+       fretta, e in coda a un'altra frase non lo leggerebbe nessuno. */
+    if (disp.posti_prima != null && disp.posti_prima <= 12) {
+      righe.push({ n: String(disp.posti_prima), t: 'seats left on that date', avviso: true });
+    }
   }
 
   if (disp && disp.esaurite_30gg > 0) {
     righe.push({
-      icona: ICONE.piene,
-      testo: (
-        <>
-          <b>{disp.esaurite_30gg}</b> of the next {disp.date_totali_30gg} dates are
-          already full
-        </>
-      ),
+      n: String(disp.esaurite_30gg),
+      t: `of ${disp.date_totali_30gg} dates already full`,
     });
   } else if (disp && disp.date_totali_30gg > 0 && disp.date_totali_30gg < 25) {
     /* Non parte tutti i giorni: e' scarsita' anche questa, e nessuno la
        dice mai. 18 date su 30 significa che dodici giorni non si va. */
-    righe.push({
-      icona: ICONE.data,
-      testo: (
-        <>
-          Runs on <b>{disp.date_totali_30gg}</b> dates in the next 30 days
-        </>
-      ),
-    });
+    righe.push({ n: String(disp.date_totali_30gg), t: 'dates in next 30 days' });
   }
 
   if (posti) {
-    righe.push({ icona: ICONE.mezzo, testo: <>Never more than <b>{posti}</b> guests</> });
+    righe.push({ n: String(posti), t: 'guests max, never more' });
   }
-
-  if (!righe.length) return null;
 
   return (
     <div className="ur">
-      {righe.map((r, i) => (
-        <span key={i} className={r.avviso ? 'ur-avviso' : undefined}>
-          <i aria-hidden="true">{r.icona}</i>
-          {r.testo}
-        </span>
-      ))}
+      {/* 🔴 LA FASCETTA DEL PREZZO STA DENTRO QUESTO BLOCCO (03/09/2026).
+          Prima era un <div className="pr-tguar"> a se', scritto nella
+          pagina del tour subito sopra questo componente: un riquadro con
+          la sua emoji 🏷️, il suo fondo e i suoi margini, appoggiato
+          sopra una colonna di righe che parlava un'altra lingua. Due
+          blocchi diversi per la stessa cosa -- le ragioni per comprare
+          adesso -- separati solo da uno stacco.
+          Adesso e' la prima riga di un blocco solo: stesso contenitore,
+          stesso filo di separazione, stesso arancione. */}
+      <p className="ur-prezzo">
+        <IconaPrezzo />
+        <span><b>Best price</b> &mdash; no booking fee</span>
+      </p>
+
+      <div className="ur-griglia">
+        {righe.map((r, i) => (
+          <div className={'ur-c' + (r.avviso ? ' ur-avviso' : '')} key={i}>
+            <b>{r.n}</b>
+            <span>{r.t}</span>
+          </div>
+        ))}
+      </div>
       {/* 🔴 QUI C'ERA "Live figures from Regiondo, our booking system".
           Tolta il 29/08/2026. La riga voleva dare provenienza al dato --
           e la tesi non era sbagliata -- ma stava a due centimetri dal

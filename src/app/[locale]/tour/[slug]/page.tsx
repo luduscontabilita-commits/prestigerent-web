@@ -420,9 +420,14 @@ export default async function TourPage({
           conferma stavano scritte due volte a quindici centimetri di
           distanza, e ripetere una promessa non la raddoppia -- la
           indebolisce. */}
-      <div className="pr-tguar">
-        <span><i aria-hidden="true">🏷️</i><b>Best price</b> &mdash; no booking fee</span>
-      </div>
+      {/* 🔴 LA FASCETTA DEL PREZZO E' PASSATA DENTRO `Urgenza` (03/09/2026).
+          Qui c'era un <div className="pr-tguar"> con la sua emoji, il suo
+          fondo e i suoi margini, appoggiato sopra la colonna dei fatti:
+          due blocchi separati che dicono la stessa cosa -- perche'
+          prenotare adesso, e perche' prenotare qui. Ora sono un blocco
+          solo, con un contenitore e una regola di stile sola.
+          `pr-tguar` continua a esistere e a servire piu' sotto, nel
+          riassunto della giornata, dove sta con le altre due garanzie. */}
       {/* L'ultimo centimetro prima della decisione: quante prenotazioni
           oggi, quante questa settimana, quanti posti per partenza. Tutto
           da Regiondo, niente inventato. */}
