@@ -1265,25 +1265,57 @@ html[data-theme="dark"] .rv-src-viator      { background:#211C46; color:#A99CF3;
 html[data-theme="dark"] .rv-src-getyourguide{ background:#3A2005; color:#FFA65C; }
 
 /* ─── FASCIA DI FIDUCIA (riprova sociale riutilizzabile) ─────────────── */
+/* 🔴 RIDISEGNATA IL 03/09/2026.
+ *
+ * COM'ERA. Una griglia con `background:var(--line)` e `gap:2px`: il
+ * fondo passava fra le celle e disegnava i divisori, il tutto chiuso in
+ * un bordo con angoli tondi. Con due voci sole -- ed e' il caso normale,
+ * le altre cinque sono spente da `TUTTI = false` -- diventava un
+ * rettangolo lunghissimo, quasi vuoto, con una stanghetta in mezzo e
+ * due numeri piccoli persi dentro.
+ *
+ * Un numero come "1.1M+" non ha bisogno di una scatola per essere
+ * importante: ha bisogno di essere GRANDE. La scatola faceva il
+ * contrario, gli dava un limite.
+ *
+ * COM'E'. Niente bordo, niente divisori, niente fondo: i numeri stanno
+ * sulla pagina. Il corpo passa da 2.05rem a 3.4rem -- e' il salto che
+ * rende la cifra la prima cosa che si legge -- e l'etichetta gli resta
+ * sotto, piccola e in maiuscoletto spaziato, cosi' si capisce a colpo
+ * d'occhio chi comanda fra le due righe.
+ * `max-width` sulla colonna e `justify-content:center`: con due voci
+ * restano vicine al centro invece di allontanarsi ai due bordi di uno
+ * schermo largo, che era l'origine di tutto quel bianco in mezzo.
+ */
 .rp-band{
-  display:grid; gap:2px; margin:34px auto; max-width:1120px;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  background:var(--line); border:1px solid var(--line);
-  border-radius:16px; overflow:hidden;
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:14px 72px; margin:30px auto; max-width:1120px; padding:0 20px;
 }
-.rp-item{
-  background:var(--card); padding:20px 14px; text-align:center;
-}
+.rp-item{ text-align:center; min-width:150px; }
 .rp-item b{
   display:block; font-family:Fraunces,Georgia,serif; font-style:italic;
-  font-size:2.05rem; font-weight:640; color:var(--ink); line-height:1;
+  font-size:3.4rem; font-weight:640; color:var(--ink); line-height:1;
+  letter-spacing:-.01em;
 }
 .rp-item span{
-  display:block; margin-top:7px; font-size:.76rem; font-weight:700;
+  display:block; margin-top:9px; font-size:.7rem; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase;
   color:var(--ink-soft); line-height:1.4;
 }
-.rp-compatta .rp-item{ padding:14px 10px; }
-.rp-compatta .rp-item b{ font-size:1.5rem; }
+/* Sul telefono 3.4rem e' troppo: due cifre grandi una sotto l'altra
+   riempirebbero mezzo schermo prima di dire qualunque altra cosa. */
+@media (max-width:560px){
+  .rp-band{ gap:20px 40px; margin:22px auto; }
+  .rp-item b{ font-size:2.6rem; }
+}
+/* La variante stretta (dentro una colonna, non a tutta pagina): stessa
+   idea, un gradino piu' piccola. La riga `font-size:1.5rem` che stava
+   qui sotto e' stata tolta -- arrivava DOPO e vinceva, quindi nella
+   variante compatta il numero sarebbe rimasto piccolo come prima
+   mentre in quella larga cresceva: due misure diverse per lo stesso
+   dato nella stessa pagina. */
+.rp-compatta{ gap:12px 52px; margin:20px auto; }
+.rp-compatta .rp-item b{ font-size:2.4rem; }
 
 .rp-riga{
   display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
@@ -1686,20 +1718,51 @@ a.ps-in:hover .ps-testo b{ color:var(--orange); }
 html[data-theme="dark"] .pr-caldo{ background:#3A2005; color:#FFA65C; }
 
 /* la riga dei fatti sopra il calendario */
+/* 🔴 RIDISEGNATA IL 03/09/2026.
+ *
+ * COM'ERA. Un riquadro pesca (#FFF4EC) con bordo arancione slavato
+ * (#FFD9BC), testo marrone (#8A4A08) e numeri in un secondo marrone
+ * (#B34A02), con dentro sette emoji a colori fissi. Tre problemi che si
+ * sommavano:
+ *
+ *  - il pastello. Nessun'altra superficie del sito ha quel colore: la
+ *    scheda accanto e' bianca, il calendario sotto e' bianco. Il
+ *    riquadro sembrava incollato sopra da qualcun altro.
+ *  - i due marroni. Non stanno nel tema: sono due colori scritti a
+ *    mano che non compaiono da nessun'altra parte, e nessuno dei due e'
+ *    l'arancione del marchio.
+ *  - le emoji. Colori fissi, quindi quattro macchie scoordinate --
+ *    fiamma rossa, triangolo giallo, divieto rosso -- in un sito che ha
+ *    un arancione solo.
+ *
+ * COM'E'. Niente riquadro: le righe stanno sulla stessa superficie del
+ * resto della colonna, separate da un filo sottile. Un solo corpo di
+ * carattere per tutto (.82rem): a distinguere il numero e' il PESO,
+ * come nel resto del sito, non una misura diversa. L'unico colore e'
+ * l'arancione del marchio, e ce l'hanno le icone e i numeri.
+ */
 .ur{
-  display:flex; flex-direction:column; gap:7px;
-  margin:0 0 12px; padding:12px 14px; border-radius:12px;
-  background:#FFF4EC; border:1px solid #FFD9BC;
+  display:flex; flex-direction:column;
+  margin:0 0 14px; padding:0;
 }
 .ur span{
-  display:flex; align-items:center; gap:9px;
-  font-size:.85rem; font-weight:600; color:#8A4A08; line-height:1.35;
+  display:flex; align-items:center; gap:10px;
+  padding:9px 2px; border-top:1px solid var(--line);
+  font-size:.82rem; font-weight:600; color:var(--ink-soft); line-height:1.35;
 }
-.ur b{ font-weight:800; color:#B34A02; }
-.ur i{ font-style:normal; font-size:.95rem; }
-html[data-theme="dark"] .ur{ background:#2E1A06; border-color:#4A2C0C; }
-html[data-theme="dark"] .ur span{ color:#FFC79E; }
-html[data-theme="dark"] .ur b{ color:#FFA65C; }
+/* Il filo separa, non incornicia: sopra la prima riga non serve, perche'
+   sopra c'e' gia' la riga del prezzo garantito. */
+.ur span:first-child{ border-top:0; padding-top:2px; }
+.ur b{ font-weight:800; color:var(--ink); }
+.ur i{
+  display:inline-flex; flex:0 0 auto;
+  font-style:normal; color:var(--orange);
+}
+/* L'avviso dei pochi posti e' l'unica riga che deve fermare l'occhio:
+   il numero prende l'arancione pieno invece del blu del testo. Una sola
+   riga accesa in una colonna spenta si vede; quattro righe accese non
+   si vede piu' nessuna. */
+.ur .ur-avviso b{ color:var(--orange); }
 
 /* da dove vengono i numeri: piccolo, ma nel punto esatto in cui uno dubita */
 .ur-fonte{
