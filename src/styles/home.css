@@ -3563,3 +3563,16 @@ html[data-theme="dark"] .hm-nobile .hm-card:hover{
    larghezza si scrive meno. */
 .mr .mr-largo{ grid-column:1 / -1; }
 .mr .mr-largo textarea{ min-height:96px; }
+
+/* 🔴 LA STRISCIA DELLE CARTE, sotto il calendario.
+   Larghezza contenuta e opacita' bassa apposta: e' una rassicurazione, non
+   un richiamo. Se pesasse come il pulsante di prenotazione ruberebbe
+   l'occhio proprio a chi aveva gia' deciso.
+   Al buio si schiarisce: l'immagine ha i loghi scuri su fondo chiaro, e
+   sul tema scuro sparirebbero. */
+.pr-paybanner{ margin:14px auto 0; max-width:340px; text-align:center; }
+.pr-paybanner img{ width:100%; height:auto; opacity:.72; }
+.pr-paybanner img:hover{ opacity:1; }
+html[data-theme="dark"] .pr-paybanner img{
+  opacity:.9; filter:invert(1) hue-rotate(180deg) brightness(1.05);
+}

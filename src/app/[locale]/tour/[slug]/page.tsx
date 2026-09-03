@@ -449,6 +449,34 @@ export default async function TourPage({
         <span className="pr-pay-sep">·</span>
         <span>Instant confirmation</span>
       </div>
+      {/* 🔴 I LOGHI DELLE CARTE, SUBITO SOTTO. Chiesto dalla
+          proprieta' il 03/09/2026: la stessa striscia che sta gia' sulle
+          landing, cosi' chi arriva da un annuncio e chi arriva dal sito
+          vedono la stessa cosa nello stesso punto.
+
+          🔴 E VA SISTEMATA. La striscia mostra otto modi di pagare --
+          Visa, Mastercard, Maestro, American Express, Google Pay, Apple
+          Pay, PayPal, WeChat -- ma alla cassa Regiondo ne accetta DUE:
+          carta e Alipay. Verificato. Chi cerca PayPal, che e' il modo
+          preferito da chi compra dall'estero perche' non lascia la carta a
+          uno sconosciuto, lo vede disegnato e non lo trova.
+          La proprieta' lo sa e ha scelto di metterla lo stesso, per
+          sistemarla dopo. Le due strade sono: abilitare PayPal e Apple Pay
+          su Regiondo (meglio -- Apple Pay su iPhone toglie di mezzo la
+          digitazione della carta, che e' dove su telefono si molla),
+          oppure rifare l'immagine con i soli metodi veri.
+          Il footer promette gia' la stessa cosa su tutte le pagine: il
+          giorno che si sistema, si sistemano insieme. */}
+      <div className="pr-paybanner">
+        <img
+          src="/img/payments.webp"
+          width={940}
+          height={188}
+          loading="lazy"
+          decoding="async"
+          alt="Secure payment: Visa, Mastercard, Maestro, American Express, Google Pay, Apple Pay, PayPal"
+        />
+      </div>
       {/* SOTTO il calendario, non sopra: chi ha gia' scelto la data non
           va interrotto. Serve a chi arriva in fondo senza decidersi, ed
           e' li' che il confronto con Viator si vince o si perde. */}
