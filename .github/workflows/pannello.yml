@@ -1,0 +1,46 @@
+# Riempie il pannello /michele/ una volta al giorno.
+#
+# PERCHE' QUI E NON SU VERCEL
+# Il piano Hobby di Vercel ammette UN SOLO cron, e quell'unico e' gia'
+# preso dal caricamento notturno delle conversioni (`vercel.json`, 3:20).
+# GitHub Actions invece i lavori pianificati li fa gratis e senza tetto,
+# ed e' gia' in casa: le pubblicazioni passano di qui.
+#
+# QUANDO
+# 4:40, cioe' VENTI MINUTI DOPO il caricamento delle conversioni. Non e'
+# un orario a caso: il pannello mostra anche le conversioni caricate, e
+# leggerlo mentre quel lavoro e' ancora in corso darebbe una fotografia a
+# meta'.
+#
+# SE FALLISCE
+# Non succede niente di grave: resta la fotografia del giorno prima, con
+# la sua data scritta accanto a ogni riquadro. Un pannello vecchio di un
+# giorno si legge lo stesso; uno vuoto no.
+name: Pannello
+
+on:
+  schedule:
+    # GitHub usa UTC. 4:40 UTC = 6:40 in Italia d'estate, 5:40 d'inverno.
+    - cron: '40 4 * * *'
+  # Si puo' lanciare anche a mano dalla scheda Actions, senza aspettare.
+  workflow_dispatch:
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chiedi al sito di rileggere le quattro fonti
+        run: |
+          # --max-time 290: Regiondo su trenta giorni pagina 250 righe per
+          # volta e ci mette un paio di minuti. Il tetto della rotta e' 300.
+          codice=$(curl -s -o risposta.json -w '%{http_code}' --max-time 290 \
+            "https://prestigerent.com/api/pannello/?chiave=${{ secrets.CRON_SECRET }}")
+          echo "HTTP $codice"
+          cat risposta.json
+          echo
+          # 404 vuol dire chiave sbagliata: la rotta risponde cosi' apposta,
+          # per non confermare a un estraneo che esiste.
+          if [ "$codice" != "200" ]; then
+            echo "::error::Il pannello non si e' aggiornato (HTTP $codice)."
+            exit 1
+          fi
