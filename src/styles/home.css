@@ -1771,40 +1771,51 @@ html[data-theme="dark"] .pr-caldo{ background:#3A2005; color:#FFA65C; }
 /* La fascetta del prezzo: prima riga del blocco, non un riquadro a se'.
    E' l'unica voce senza un numero, quindi si distingue col disegno e col
    colore invece che con la misura. */
+/* Centrata come il titolo "Book this tour" che le sta sopra: era
+   allineata a sinistra mentre tutto il resto della colonna e' al
+   centro, e da sola bastava a far sembrare il blocco storto. */
 .ur-prezzo{
-  display:flex; align-items:center; gap:8px;
-  margin:0 0 12px; padding:0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin:0 0 14px; padding:0;
   font-size:.78rem; font-weight:700; line-height:1.3;
-  color:var(--orange);
+  color:var(--orange); text-align:center;
 }
 .ur-prezzo svg{ flex:0 0 auto; }
 .ur-prezzo b{ font-weight:800; }
 
-/* `auto-fit` e non `repeat(2,1fr)`: le voci sono da una a cinque a
-   seconda del tour e di cosa Regiondo riporta quel giorno. Con due
-   colonne fisse, un tour con una sola voce mostrerebbe una casella e
-   mezza colonna vuota accanto; cosi' la casella unica si allarga e
-   riempie la riga. */
+/* 🔴 DUE COLONNE, SEMPRE. Non `auto-fit`: quello guarda lo SPAZIO e non
+   il numero di voci, e nella colonna del calendario ci stavano tre
+   colonne -- quindi quattro voci diventavano 3 + 1, con un buco grosso
+   come due caselle. Due colonne fisse sono anche piu' leggibili: a tre,
+   in 400px, ogni etichetta andava a capo due volte. */
 .ur-griglia{
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  display:grid; grid-template-columns:repeat(2,1fr);
   gap:1px; background:var(--line);
   border:1px solid var(--line); border-radius:12px; overflow:hidden;
 }
+/* Il numero dispari non lascia un vuoto: la prima casella prende tutta
+   la riga. 1 -> una riga piena, 3 -> 1+2, 5 -> 1+2+2. Mai un buco. */
+.ur-griglia.dispari > .ur-c:first-child{ grid-column:1 / -1; }
+
 /* Il fondo della griglia passa fra le caselle e disegna i fili di
    separazione: un solo colore invece di quattro bordi da tenere
    allineati. */
 .ur-c{
-  background:var(--card); padding:11px 12px 10px; text-align:center;
+  background:var(--card); padding:16px 12px 15px; text-align:center;
+  display:flex; flex-direction:column; justify-content:center;
 }
 .ur-c b{
-  display:block; font-size:1.5rem; font-weight:800; line-height:1;
+  display:block; font-size:1.65rem; font-weight:800; line-height:1;
   color:var(--ink); letter-spacing:-.01em;
 }
 .ur-c span{
-  display:block; margin-top:5px;
-  font-size:.62rem; font-weight:800; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--ink-soft); line-height:1.3;
+  display:block; margin-top:7px;
+  font-size:.63rem; font-weight:800; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--ink-soft); line-height:1.35;
 }
+/* La casella allargata ha piu' spazio in orizzontale e nessuna vicina
+   che le imponga l'altezza: la cifra puo' crescere. */
+.ur-griglia.dispari > .ur-c:first-child b{ font-size:1.9rem; }
 /* L'avviso dei pochi posti e' l'unica casella che deve fermare l'occhio:
    prende l'arancione. Una sola accesa in una griglia spenta si vede;
    quattro accese non si vede piu' nessuna. */

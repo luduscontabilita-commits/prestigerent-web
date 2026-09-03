@@ -161,7 +161,23 @@ export function Urgenza({
         <span><b>Best price</b> &mdash; no booking fee</span>
       </p>
 
-      <div className="ur-griglia">
+      {/* 🔴 DUE COLONNE FISSE, E LA PRIMA CASELLA SI ALLARGA SE SONO
+          DISPARI (03/09/2026).
+          Prima la griglia era `auto-fit minmax(120px,1fr)`, cioe' erano
+          le colonne a decidersi da sole in base allo SPAZIO. Nella
+          colonna del calendario ce ne stavano tre, quindi quattro voci
+          diventavano 3 + 1 e restava un buco grande come due caselle
+          accanto all'ultima -- si vedeva, ed era il difetto che
+          `auto-fit` doveva evitare: l'avevo messo per il caso di UNA
+          voce sola, e ha creato il caso di quattro.
+          Adesso le colonne sono due, sempre, e a non lasciare buchi
+          pensa la classe `dispari`: quando le voci sono un numero
+          dispari la prima casella occupa tutta la riga. Cosi' il conto
+          torna per QUALUNQUE numero -- 1 su una riga piena, 2 in fila,
+          3 come 1+2, 4 come 2+2, 5 come 1+2+2 -- senza mai un vuoto.
+          Si allarga la PRIMA e non l'ultima perche' e' la piu' forte:
+          quante prenotazioni sono arrivate oggi. */}
+      <div className={'ur-griglia' + (righe.length % 2 ? ' dispari' : '')}>
         {righe.map((r, i) => (
           <div className={'ur-c' + (r.avviso ? ' ur-avviso' : '')} key={i}>
             <b>{r.n}</b>
