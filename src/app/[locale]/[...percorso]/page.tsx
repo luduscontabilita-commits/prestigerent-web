@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { fotoVere, provaDi } from '@/lib/galleria';
 import { affiancato, cambi } from '@/lib/cambi';
 import { foto as ottimizza, fotoSet } from '@/lib/foto';
 import { notFound } from 'next/navigation';
@@ -247,7 +248,8 @@ export default async function Categoria_({
               tabs?: Record<string, string>;
             };
             const nome = testo(b.name ?? r.slug.replace(/-/g, ' '));
-            const foto = b.gallery?.[0]?.src ?? b.images?.[0];
+            /* Stesso filtro della home e della scheda: vedi lib/galleria.ts. */
+            const foto = b.gallery?.[0]?.src ?? fotoVere(b.images, provaDi(r.slug, b))[0];
             const q = voti[r.slug];
             const rg = daRegiondo.get(r.slug);
             /* Le stesse due o tre righe della home, dalla stessa funzione:

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
+import { fotoVere, provaDi } from '@/lib/galleria';
 import { notFound } from 'next/navigation';
 import { DEFAULT_LOCALE, getLocale, isLocale, LOCALES } from '@/lib/locales';
 import { ogDiBase, TWITTER } from '@/lib/og';
 import { SITE } from '@/lib/schema';
 import { NoindexBadge } from '@/components/NoindexBadge';
-import { RichiestaModale } from '@/components/RichiestaModale';
 import { Header } from '@/components/Header';
 import { votiPerTour } from '@/lib/recensioni';
 import { ultimePrenotazioni } from '@/lib/riprova';
@@ -139,18 +139,32 @@ export default async function LocaleLayout({
      menu sta su tutte le pagine del sito e una query per riquadro
      sarebbero ventidue letture per aprire una tendina.
 
-     Solo la PRIMA immagine di ogni tour: dalla seconda in poi
-     `tour_content.images` contiene i riempitivi condivisi (le Mercedes,
-     le foto della degustazione), identici su decine di tour. Il ritaglio
-     e la ricompressione li fa `miniatura()` in src/lib/menu.ts. */
+     Solo la PRIMA immagine di ogni tour, e passata dal filtro: dalla
+     seconda in poi `tour_content.images` contiene i riempitivi condivisi
+     (le Mercedes, le foto della degustazione), identici su decine di
+     tour. Dal 03/09/2026 quei riempitivi li toglie `fotoVere` per tutto
+     il sito -- vedi src/lib/galleria.ts -- ma anche la PRIMA foto ne
+     aveva bisogno: su `tour-florence-tuscany-from-la-spezia` era
+     `bg-sunshine.jpg`, un fondale, e nel menu si vedeva un rettangolo
+     giallo. Il ritaglio e la ricompressione li fa `miniatura()` in
+     src/lib/menu.ts. */
   const foto: Record<string, string> = {};
   for (const r of (schede.data ?? []) as unknown as {
     slug: string;
     tour_content?: { locale: string; blocks: Record<string, unknown> }[];
   }[]) {
     const c = r.tour_content?.find((x) => x.locale === locale) ?? r.tour_content?.[0];
-    const b = (c?.blocks ?? {}) as { gallery?: { src: string }[]; images?: string[] };
-    const src = b.gallery?.[0]?.src ?? b.images?.[0];
+    /* Il tipo elenca anche i campi di testo: non si usano qui, ma
+       `provaDi` legge da li' per decidere se una foto c'entra col tour. */
+    const b = (c?.blocks ?? {}) as {
+      gallery?: { src: string }[];
+      images?: string[];
+      name?: string;
+      description?: string;
+      highlights?: string[];
+      tabs?: Record<string, string>;
+    };
+    const src = b.gallery?.[0]?.src ?? fotoVere(b.images, provaDi(r.slug, b))[0];
     if (src) foto[r.slug] = src;
   }
 
@@ -254,12 +268,6 @@ export default async function LocaleLayout({
             proprio a quello -- il link deve restare nella lingua che si
             sta leggendo. */}
         <ProvaSociale avvisi={avvisi} locale={locale} />
-        {/* IL POPUP DELLE RICHIESTE, una volta sola per tutto il sito.
-            Sta qui e non nelle pagine perche' lo apre il "Quick Request"
-            in cima, che e' in ogni pagina: se vivesse dentro le schede
-            tour, dalla home o da una categoria non ci sarebbe niente da
-            aprire. Chi lo apre lancia un evento, non tocca questo nodo. */}
-        <RichiestaModale locale={locale} />
         <NoindexBadge />
       </body>
     </html>

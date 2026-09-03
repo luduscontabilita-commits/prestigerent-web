@@ -2876,75 +2876,7 @@ html[data-theme="dark"] .hm-fatti > * + *::before{ color:var(--ink-soft); opacit
   .cu-via:hover{ transform:none; }
 }
 
-/* ---------- il "Quick request" della scheda tour ---------- */
-/* Il pulsante e' volutamente SECONDARIO: bordo e niente riempimento.
-   Accanto ha il calendario, che e' l'azione principale; se fossero due
-   pulsanti pieni uno accanto all'altro nessuno dei due sarebbe la
-   risposta ovvia, e chi ha gia' deciso di prenotare esiterebbe. */
-.qr-apri{
-  display:flex; align-items:center; justify-content:center; gap:9px;
-  width:100%; margin-top:12px; padding:13px 16px;
-  border:1.5px solid var(--line); border-radius:11px; background:var(--card);
-  color:var(--ink); font:inherit; font-size:.98rem; font-weight:700;
-  cursor:pointer;
-  transition:border-color .18s ease, color .18s ease, background .18s ease;
-}
-.qr-apri:hover, .qr-apri:focus-visible{
-  border-color:var(--orange,#FF7D1F); color:var(--orange,#FF7D1F);
-}
-.qr-apri:focus-visible{ outline:2px solid var(--orange,#FF7D1F); outline-offset:2px; }
-.qr-apri svg{ flex:0 0 18px; }
-
-/* Il dialogo nativo: si stilizza l'elemento, non un finto sfondo. */
-.qr-dlg{
-  padding:0; border:0; background:transparent;
-  max-width:none; max-height:none; width:100%; height:100%;
-  /* `inset:0` invece di `margin:auto`: cosi' l'area cliccabile fuori dal
-     riquadro appartiene al <dialog>, ed e' quella che chiude. */
-  inset:0;
-  overflow-y:auto; overscroll-behavior:contain;
-}
-.qr-dlg::backdrop{ background:rgba(10,16,22,.62); backdrop-filter:blur(3px); }
-.qr-box{
-  width:min(660px, calc(100% - 28px));
-  margin:min(6vh, 48px) auto;
-  background:var(--paper,#fff); color:var(--ink);
-  border-radius:16px; box-shadow:0 24px 70px rgba(0,0,0,.35);
-  overflow:hidden;
-}
-.qr-testa{
-  display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
-  padding:20px 22px 16px; border-bottom:1px solid var(--line);
-  position:sticky; top:0; background:var(--paper,#fff); z-index:2;
-}
-.qr-testa h2{ margin:0; font-size:1.18rem; font-weight:800; color:var(--ink); }
-/* Il nome del tour sotto il titolo: chi apre il popup deve vedere subito
-   che la richiesta partira' per QUESTO, non per un tour qualunque. */
-.qr-serv{
-  margin:5px 0 0; font-size:.92rem; line-height:1.4; color:var(--orange,#FF7D1F);
-  font-weight:700;
-}
-.qr-chiudi{
-  flex:0 0 auto; display:grid; place-items:center;
-  width:38px; height:38px; padding:0; margin:-4px -6px 0 0;
-  border:0; border-radius:9px; background:transparent; color:var(--ink-soft);
-  cursor:pointer; transition:background .15s ease, color .15s ease;
-}
-.qr-chiudi:hover{ background:var(--ph); color:var(--ink); }
-.qr-chiudi:focus-visible{ outline:2px solid var(--orange,#FF7D1F); outline-offset:2px; }
-.qr-corpo{ padding:18px 22px 24px; }
-/* Dentro il popup il modulo non ha bisogno della sua fascia: il riquadro
-   e' gia' il contenitore. */
-.qr-corpo .pr-sec,
-.qr-corpo .pr-wrap{ padding:0; margin:0; max-width:none; }
-
-@media (max-width:560px){
-  .qr-box{ width:100%; margin:0; min-height:100%; border-radius:0; }
-  .qr-corpo{ padding:16px 16px 30px; }
-}
-@media (prefers-reduced-motion: reduce){
-  .qr-apri{ transition:none; }
-}
+/* ---------- il pulsante "Quick Request" della testata ---------- */
 
 /* "Quick Request" e' tornato un <a>: adesso porta al modulo in fondo
    alla pagina invece di aprire un popup. La regola per la versione
@@ -3583,4 +3515,55 @@ html[data-theme="dark"] .hm-nobile .hm-card:hover{
 .pr-paybanner img:hover{ opacity:1; }
 html[data-theme="dark"] .pr-paybanner img{
   opacity:.9; filter:invert(1) hue-rotate(180deg) brightness(1.05);
+}
+
+/* ─── LA PAGINA DEI MEZZI ────────────────────────────────────────────
+   Riusa l'impianto di "chi siamo" (.ab-*) e aggiunge solo le schede dei
+   veicoli. Un foglio nuovo per quattro schede sarebbe un altro posto da
+   tenere allineato. */
+
+/* La riga sulle aree pedonali: e' l'unica cosa in pagina che risolve un
+   problema vero, e sta prima delle schede. Bordo a sinistra e non una
+   scatola: deve pesare come una frase importante, non come un annuncio. */
+.vh-nota{ max-width:820px; margin:22px auto 0; padding:0 20px; }
+.vh-nota p{
+  margin:0; padding:14px 18px; font-size:.95rem; line-height:1.6;
+  border-left:3px solid var(--orange); background:transparent;
+  color:var(--ink-soft);
+}
+.vh-nota b{ color:var(--ink); }
+
+.vh-mezzi{
+  max-width:1080px; margin:26px auto 0; padding:0 20px;
+  display:grid; grid-template-columns:repeat(2,1fr); gap:22px;
+}
+.vh-card{ display:flex; flex-direction:column; }
+/* Le foto dei mezzi sono PNG con lo sfondo trasparente e l'auto scura:
+   su fondo chiaro si vedono, e al buio sparirebbero. Il fondo grigio
+   tenue le tiene leggibili in tutti e due i temi senza doverle rifare. */
+.vh-foto{
+  border-radius:14px; overflow:hidden; background:var(--ph);
+  display:flex; align-items:center; justify-content:center; padding:10px;
+}
+.vh-foto img{ width:100%; height:auto; display:block; }
+.vh-tipo{
+  margin:14px 0 2px; font-size:.72rem; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-soft);
+}
+.vh-card h2{ margin:0; font-size:1.15rem; font-weight:800; letter-spacing:-.01em; }
+/* I tre numeri in fila: chi guarda questa pagina ha una domanda sola --
+   ci stiamo? -- e la risposta deve stare in una riga. */
+.vh-dati{
+  list-style:none; margin:10px 0 0; padding:0;
+  display:flex; gap:20px; flex-wrap:wrap;
+}
+.vh-dati li{ font-size:.84rem; color:var(--ink-soft); }
+.vh-dati b{
+  display:block; font-size:1.3rem; font-weight:800; color:var(--ink);
+  line-height:1.1; font-variant-numeric:tabular-nums;
+}
+.vh-consiglio{ margin:10px 0 0; font-size:.8rem; line-height:1.5; color:var(--ink-soft); }
+
+@media (max-width:760px){
+  .vh-mezzi{ grid-template-columns:1fr; gap:26px; }
 }

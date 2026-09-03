@@ -246,7 +246,14 @@ const nextConfig: NextConfig = {
          nella home -- undici minibus, dieci Mercedes, le foto dei
          veicoli, con l'ancora #fleet gia' in pagina. Si manda li'
          direttamente al punto, non in cima. */
-      { source: '/our-vehicles/', destination: '/#fleet', permanent: true },
+      /* 🔴 `/our-vehicles/` NON e' piu' un rimando: e' una pagina.
+         Rimandava alla sezione "fleet" della home perche' al passaggio del
+         28/08 la pagina non era stata rifatta, e un 308 verso un pezzo di
+         home era meglio di un 404. Il 03/09/2026 la pagina e' stata
+         rifatta per davvero (`/our-vehicles/`, quattro Mercedes con le
+         capienze), quindi il rimando adesso la coprirebbe: un redirect in
+         Next vince SEMPRE sulla pagina, e la pagina non si vedrebbe mai.
+         Il rimando andava tolto nello stesso commit che crea la pagina. */
 
       /* Il programma di affiliazione non esiste piu' come prodotto: chi
          ci arriva vuole parlare con qualcuno, e su /about-us/ c'e' il

@@ -11,6 +11,7 @@ import { PrimoAlMondo } from '@/components/PrimoAlMondo';
 import { FasciaNumeri, FattiHero } from '@/components/FasciaNumeri';
 import { Destinazioni } from '@/components/Destinazioni';
 import { Cerca } from '@/components/Cerca';
+import { fotoVere, provaDi } from '@/lib/galleria';
 import { prezzoDi } from '@/lib/prezzi';
 import { puntiScheda } from '@/lib/punti';
 import { ContactSection } from '@/components/ContactSection';
@@ -189,7 +190,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       href: locale === DEFAULT_LOCALE ? `/tour/${r.slug}/` : `/${locale}/tour/${r.slug}/`,
       nome: c?.name ?? r.slug.replace(/-/g, ' '),
       kind: r.kind,
-      foto: c?.images?.[0] ?? null,
+      /* La copertina passa dal filtro come la galleria: su un tour la
+         prima foto era `bg-sunshine.jpg`, cioe' un fondale di pagina --
+         un rettangolo giallo al posto del posto. */
+      foto: fotoVere(c?.images, provaDi(r.slug, c))[0] ?? null,
       /* NON `c.highlights`: quello e' l'elenco lungo di WordPress, che
          comincia con la riga sulla sanificazione dei veicoli. `puntiScheda`
          ne ricava due o tre righe corte su cosa si vede e si fa in QUESTA

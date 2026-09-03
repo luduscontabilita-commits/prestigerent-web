@@ -10,7 +10,6 @@ import { PhotoStrip, type Foto } from '@/components/PhotoStrip';
 import { Videos } from '@/components/Videos';
 import { videoDi } from '@/lib/video';
 import { StickyBook } from '@/components/StickyBook';
-import { BottoneRichiesta } from '@/components/RichiestaModale';
 import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
@@ -21,6 +20,7 @@ import { Premi } from '@/components/Premi';
 import { punteggiDi, recensioniDi } from '@/lib/recensioni';
 import { pulisci, testo, utile, spezzaTitolo } from '@/lib/prosa';
 import { ripulisciPunti, senzaCovid } from '@/lib/punti';
+import { fotoVere, fotoAttinente, provaDi } from '@/lib/galleria';
 import { badgeIncluso } from '@/lib/inclusi';
 import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
@@ -144,7 +144,7 @@ export async function generateMetadata({
     openGraph: ogDiPagina({
       locale,
       path: pathFor(locale, slug),
-      foto: res.contenuto.images?.[0],
+      foto: fotoVere(res.contenuto.images, provaDi(slug, res.contenuto))[0],
     }),
   };
 }
@@ -225,7 +225,13 @@ export default async function TourPage({
   ]);
 
   const nome = testo(contenuto.name) || slug.replace(/-/g, ' ');
-  const foto = contenuto.images ?? [];
+  /* 🔴 LE FOTO, PASSATE DAL FILTRO. Erano `contenuto.images` cosi'
+     com'erano, e su 46 tour su 87 quell'elenco era stato pareggiato a
+     quattro con le stesse tre immagini per tutti: le Mercedes su fondo
+     bianco e una vigna toscana. Su questa pagina si vedevano tutte.
+     Cosa toglie e perche' sta in src/lib/galleria.ts. */
+  const prova = provaDi(slug, contenuto);
+  const foto = fotoVere(contenuto.images, prova);
   /* Qui l'elenco resta lungo -- chi e' su questa pagina ha gia' scelto e
      legge anche le condizioni -- ma passa da `ripulisciPunti`, che toglie
      due cose:
@@ -263,9 +269,12 @@ export default async function TourPage({
      La striscia si costruisce sempre -- con le didascalie dove sono state
      scritte a mano, con le sole foto altrimenti. */
   const striscia: Foto[] =
+    /* Anche la galleria scritta a mano passa dal filtro: e' piu' curata
+       di `images`, ma nessuno garantisce che domani non ci finisca dentro
+       una Mercedes come e' successo all'altra. */
     contenuto.gallery?.length
-      ? contenuto.gallery
-      : (contenuto.images ?? []).map((src) => ({ src, alt: contenuto.name ?? '' }));
+      ? contenuto.gallery.filter((g) => fotoAttinente(g.src, prova))
+      : foto.map((src) => ({ src, alt: contenuto.name ?? '' }));
   /* I tre punti dell'hero, ricavati dai dati e non scritti a mano.
    *
    * Il secondo -- quello che promette qualcosa di compreso nel prezzo --
@@ -842,13 +851,23 @@ export default async function TourPage({
 
       <aside className="pg-rail" id="prRail" aria-label="Book this tour">
         <div className="pg-rail-in" id="bookform">{calendario}</div>
-        {/* SOTTO IL CALENDARIO, non al posto suo.
-            Chi ha la data e il numero di persone prenota da solo; questo
-            e' per l'altra meta' -- quelli che devono chiedere una cosa
-            prima ("veniamo da Livorno", "siamo in sei con un passeggino")
-            e senza una risposta non prenotano. Su WordPress il "Quick
-            Request" stava esattamente qui, nella colonna di destra. */}
-        <BottoneRichiesta servizio={nome} etichetta={testiModulo(locale).pulsanteRapido} />
+        {/* 🔴 QUI C'ERA IL PULSANTE "Quick request", TOLTO IL 03/09/2026
+            su richiesta della proprieta' ("levamelo dappertutto quello che
+            c'e' nella colonna").
+
+            Non era solo di troppo: si sovrapponeva alla striscia delle
+            carte di credito messa lo stesso giorno poche righe sopra --
+            due riquadri uno sull'altro, illeggibili entrambi. E la
+            richiesta la colonna ce l'aveva comunque doppia, perche' sotto
+            c'e' `Diretto` col numero e WhatsApp, e in fondo alla pagina
+            c'e' il modulo intero in `ContactSection`.
+
+            Con questo pulsante e' sparito l'ultimo modo di aprire il
+            popup, quindi il popup stesso e' stato smontato dal layout e
+            `RichiestaModale.tsx` cancellato: un dialogo che nessuno puo'
+            aprire e' JavaScript spedito a ogni pagina per niente. Se
+            domani serve di nuovo, il modulo vero e' `ModuloRichiesta` e si
+            rimette in un popup in mezz'ora. */}
       </aside>
 
       <div className="pg-main-b">

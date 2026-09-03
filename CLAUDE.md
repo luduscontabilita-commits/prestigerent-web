@@ -120,15 +120,40 @@ GTM**, non nel codice del sito: per questo nei bundle non si trovano.
 Un solo componente (`ModuloRichiesta`) usato ovunque, in due modi:
 
 - **in fondo a ogni pagina**, dentro `ContactSection`;
-- **nel popup "Quick Request"**, un `<dialog>` che vive una volta sola nel
-  layout. Chi vuole aprirlo lancia l'evento `pr-richiesta-apri`. Prima era
-  un link a `/#contact`, cioe' un salto alla home: chi lo premeva da una
-  scheda tour perdeva la pagina.
+- ~~**nel popup "Quick Request"**~~ — **tolto il 03/09/2026.** Il pulsante
+  stava nella colonna della scheda tour, sotto il calendario, e si
+  sovrapponeva alla striscia delle carte di credito aggiunta lo stesso
+  giorno. La colonna la richiesta ce l'aveva comunque doppia (`Diretto`
+  col numero e WhatsApp), e il modulo intero e' in fondo a ogni pagina.
+  Tolto il pulsante nessuno poteva piu' aprire il `<dialog>`, quindi sono
+  stati tolti anche il montaggio nel layout e `RichiestaModale.tsx`.
 
 Il campo si chiama **"Service"**, non "Tour": il modulo sta anche sulle
 pagine dei transfer, e un transfer per l'aeroporto non e' un tour. Arriva
 gia' compilato — nome del tour sulle schede, titolo sulle categorie,
 "Contact page" sui contatti — e finisce nell'oggetto dell'email.
+
+---
+
+## Le foto dei tour
+
+**Non si mostra `blocks.images` cosi' com'e'.** Su WordPress le gallerie
+erano state pareggiate a quattro foto tappando i buchi con le stesse
+immagini per tutti: le Mercedes su fondo bianco stanno su 44 tour su 87,
+`TUSCANY-HILLTOP-WINERY.jpg` su 42. Il risultato erano vigne toscane sulle
+pagine dei transfer per Venezia e per Roma.
+
+Il filtro sta in **`src/lib/galleria.ts`** e lo usano tutti e quattro i
+posti che leggono quelle foto (scheda, home, categorie, vetrina del menu).
+La regola e' a due livelli: i **mezzi e gli sfondi** escono sempre; una
+foto di **luogo** resta se il luogo e' nominato da qualche parte nella
+pagina, itinerario compreso; una **vigna generica** resta solo se il vino
+e' nel *titolo* del tour. Provata su tutti gli 87 prima di scriverla: 156
+foto tolte, 285 tenute, nessun tour resta senza foto.
+
+🔴 Se un tour perde una foto che doveva tenere, **non si tocca il
+database**: si aggiunge il posto in `LUOGHI`, o lo si nomina nella
+descrizione del tour.
 
 ---
 

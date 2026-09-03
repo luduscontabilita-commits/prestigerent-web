@@ -116,7 +116,9 @@ const AZIENDA: Voce[] = [
      home. Si punta dritto all'ancora invece che all'indirizzo vecchio: il
      redirect funziona, ma ogni salto in piu' e' tempo perso e un pezzo di
      autorevolezza che resta per strada. */
-  ['Our vehicles', '/#fleet', IconaMezzo],
+  /* Puntava a `/#fleet`, un pezzo di home, perche' la pagina non
+     c'era. Dal 03/09/2026 c'e': quattro Mercedes con le capienze. */
+  ['Our vehicles', '/our-vehicles/', IconaMezzo],
 ];
 
 /* 🔴 TRE VOCI DEL FOOTER VECCHIO CHE NON TORNANO.
