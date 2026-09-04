@@ -355,7 +355,32 @@ export type VotoTour = {
   quante: number;
   /** dove sta quel numero, preposizione compresa: "on Viator" */
   dove: string;
+  /** il premio, gia' accorciato per starci su una fascia */
+  premio?: string;
 };
+
+/* IL PREMIO, TIRATO FUORI DAL DISTINTIVO.
+ *
+ * In `valutazioni_tour.distintivo` sta una riga intera, fatta di pezzi
+ * separati da un punto medio: "Viator Experience Award 2025 ·
+ * recommended by 99% of travellers", oppure "Rated 5.0/5 on Tripadvisor
+ * · Viator Experience Award 2025 & 2023". Su una fascia sopra una foto
+ * ci sta un pezzo solo, e non e' sempre il primo -- nel secondo esempio
+ * il premio e' in coda.
+ *
+ * Si prende quindi IL PEZZO CHE PARLA DI UN PREMIO, non il primo. Se non
+ * ce n'e' uno la fascia non compare: "Certified by GetYourGuide" e'
+ * vero ma e' un bollino che ha chiunque venda li', e una fascia che
+ * hanno tutti non dice niente.
+ */
+function premioDa(distintivo: string | null): string | undefined {
+  if (!distintivo) return undefined;
+  const pezzo = distintivo
+    .split('·')
+    .map((x) => x.trim())
+    .find((x) => /\baward\b/i.test(x));
+  return pezzo && pezzo.length <= 40 ? pezzo : undefined;
+}
 
 /* SOTTO LE TRE RECENSIONI NON SI MOSTRA NIENTE.
    "5,0 su 1 recensione" e' vero e sembra inventato: e' l'effetto opposto a
@@ -382,7 +407,7 @@ export async function votiPerTour(): Promise<Record<string, VotoTour>> {
      stessa piattaforma invece di dipendere da come tornano le righe */
   const { data } = await supabase
     .from('valutazioni_tour')
-    .select('tour_slug,fonte,voto,quante')
+    .select('tour_slug,fonte,voto,quante,distintivo')
     .order('quante', { ascending: false })
     .order('fonte', { ascending: true });
 
@@ -395,6 +420,7 @@ export async function votiPerTour(): Promise<Record<string, VotoTour>> {
       voto: Math.round(Number(r.voto) * 10) / 10,
       quante: r.quante,
       dove: DOVE[r.fonte] ?? `on ${r.fonte}`,
+      premio: premioDa(r.distintivo),
     };
   }
   return out;

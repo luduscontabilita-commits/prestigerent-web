@@ -436,6 +436,14 @@ export function Header({
                         const f = r.img ?? foto[r.tour];
                         return (
                           <a className="hd-card" key={r.href} href={p(r.href)}>
+                            {/* LA FASCIA. Compare solo dove e' meritata, ed
+                                e' meritata da due tour su tutto il menu:
+                                quelli che hanno vinto un premio Viator. Una
+                                fascia su ogni foto e' una fascia su
+                                nessuna -- e sui privati, dove le recensioni
+                                stanno fra zero e diciassette, non c'e'
+                                niente da dichiarare. */}
+                            {q?.premio && <span className="hd-premio">{q.premio}</span>}
                             <span className="hd-card-f">
                               {viste.includes(s.testo) && f && (
                                 /* eslint-disable-next-line @next/next/no-img-element */

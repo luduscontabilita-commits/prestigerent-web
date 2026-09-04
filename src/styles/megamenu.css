@@ -138,6 +138,30 @@
   pointer-events: none;
 }
 
+/* LA FASCIA DEL PREMIO.
+   Sta in alto a sinistra, dove la sfumatura del titolo non arriva: per
+   quello ha un fondo suo invece di appoggiarsi al buio come fa il
+   titolo. Arancione pieno perche' deve staccare dalla fotografia in un
+   colpo d'occhio -- e' l'unica cosa del pannello che urla, e puo'
+   permetterselo perche' compare due volte in tutto il menu. */
+.hd-mega-in .hd-premio {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  max-width: calc(100% - 20px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  line-height: 1.25;
+  box-shadow: 0 2px 8px rgba(6, 11, 16, 0.3);
+}
+
 .hd-mega-in .hd-card-t {
   position: absolute;
   z-index: 2;
