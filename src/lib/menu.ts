@@ -63,6 +63,24 @@ export type Riquadro = {
   tour: string;
   /** cosa si vede NELLA FOTO: non ripete il titolo, lo completa */
   alt: string;
+  /** LA FASCIA SCRITTA A MANO.
+   *
+   * Sulla foto puo' comparire una fascia, e ci sono due modi di
+   * meritarsela. Il primo e' un premio vero, letto da
+   * `valutazioni_tour.distintivo`: quello VINCE SEMPRE su questo campo,
+   * perche' l'ha dato qualcun altro e vale piu' di qualunque cosa
+   * scriviamo noi. Il secondo e' questo -- una nostra scelta,
+   * dichiarata come tale e disegnata piu' sommessa apposta.
+   *
+   * "Most popular" e' vero per costruzione: questi riquadri SONO i tour
+   * che mettiamo avanti, ed e' la parola con cui il sito vecchio
+   * intitolava esattamente questi tre ("Popular Private Tours").
+   *
+   * NON e' un dato di vendita e non deve diventarlo: sui privati le
+   * prenotazioni passano quasi tutte da richiesta diretta e i contatori
+   * ne vedono una al mese, quindi un "best seller" qui sarebbe una
+   * cifra che non possiamo mostrare a nessuno. */
+  fascia?: string;
   /* 🔴 LA FOTO SCELTA A MANO, CHE VINCE SU `tour` (02/09/2026).
      La griglia della home aveva gia' imparato questa lezione (vedi il
      commento in cima a POSTI dentro Destinazioni.tsx); questo pannello
@@ -163,18 +181,21 @@ export const SEZIONI: Sezione[] = [
         testo: 'Chianti & the wineries',
         href: '/tour/private-tour-to-chianti-wineries/',
         tour: 'private-tour-to-chianti-wineries',
+        fascia: 'Most popular',
         alt: 'A winemaker in front of the great oak barrels of his Chianti cellar',
       },
       {
         testo: 'Siena & San Gimignano',
         href: '/tour/private-tour-siena-and-san-gimignano/',
         tour: 'private-tour-siena-and-san-gimignano',
+        fascia: 'Most popular',
         alt: 'The brick front of the church of San Domenico in Siena',
       },
       {
         testo: 'Cinque Terre',
         href: '/tour/private-cinque-terre-from-florence/',
         tour: 'private-cinque-terre-from-florence',
+        fascia: 'Most popular',
         alt: 'Coloured houses stacked above the sea in the Cinque Terre',
       },
       {

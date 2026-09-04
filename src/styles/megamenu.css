@@ -162,6 +162,19 @@
   box-shadow: 0 2px 8px rgba(6, 11, 16, 0.3);
 }
 
+/* LA FASCIA NOSTRA, PIU' SOMMESSA DI QUELLA DEL PREMIO.
+   Stesso posto e stessa forma, ma vetro scuro invece di arancione
+   pieno: il premio l'ha dato Viator, "most popular" l'abbiamo scelto
+   noi, e le due cose non devono pesare uguale sull'occhio. Chi guarda
+   non ci pensa, ma la differenza la sente -- ed e' l'unico modo di
+   tenerle tutte e due senza che la prima perda valore. */
+.hd-mega-in .hd-premio-nostra {
+  background: rgba(6, 11, 16, 0.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow: none;
+}
+
 .hd-mega-in .hd-card-t {
   position: absolute;
   z-index: 2;

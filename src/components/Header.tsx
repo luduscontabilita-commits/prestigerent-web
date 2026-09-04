@@ -443,7 +443,13 @@ export function Header({
                                 nessuna -- e sui privati, dove le recensioni
                                 stanno fra zero e diciassette, non c'e'
                                 niente da dichiarare. */}
-                            {q?.premio && <span className="hd-premio">{q.premio}</span>}
+                            {(q?.premio ?? r.fascia) && (
+                              <span
+                                className={q?.premio ? 'hd-premio' : 'hd-premio hd-premio-nostra'}
+                              >
+                                {q?.premio ?? r.fascia}
+                              </span>
+                            )}
                             <span className="hd-card-f">
                               {viste.includes(s.testo) && f && (
                                 /* eslint-disable-next-line @next/next/no-img-element */
