@@ -153,7 +153,7 @@ export const SEZIONI: Sezione[] = [
   {
     testo: 'Private Tours',
     href: '/private-tours/',
-    pannello: 'Private tours — your party only, your own hours',
+    pannello: 'Private tours — half day or full day, your party only',
     tutti: 'All private tours',
     /* I tour privati non hanno pagine di sottocategoria: la divisione per
        zona esiste solo nella testa di chi cerca. Quindi i riquadri portano
@@ -196,40 +196,81 @@ export const SEZIONI: Sezione[] = [
         alt: 'The entrance to the Ferrari museum at Maranello',
       },
     ],
+    /* 🔴 DIVISI PER DURATA, IL 04/09/2026.
+       Erano quattro colonne per tema -- vino, Siena, citta', lontano --
+       e mancava la domanda che la gente si fa per prima: "ho mezza
+       giornata, cosa ci faccio?". Sul sito vecchio quella risposta
+       c'era, in due colonne intitolate Full Day e Half Day, e Violeta
+       ha fatto notare che li' i mezza giornata si trovavano meglio.
+       Aveva ragione, ma il motivo non era il disegno: SEI DEI SETTE
+       TOUR DA MEZZA GIORNATA NON ERANO NEL MENU. Firenze, Siena, San
+       Gimignano, Pisa, Lucca e The Mall non comparivano da nessuna
+       parte -- c'era solo il Chianti mezza giornata. Nessuna grafica
+       poteva far trovare tour che non c'erano.
+
+       Qui ci sono tutti e ventotto i privati, e la durata sta nel
+       titolo della colonna. "Full day" ripetuto quattro volte non e'
+       una svista: e' quello che fa saltare all'occhio l'unica colonna
+       che dice Half day. I temi restano, perche' l'85% del fatturato e'
+       vino e "Wine & Chianti" deve continuare a leggersi.
+
+       I sette mezza giornata durano quattro ore, e lo dicono da soli:
+       hanno "half day" nel titolo e "up to 4 hours" nel testo. Nei
+       blocchi importati da WordPress sei di loro portano anche una riga
+       "Duration: 10 hours", che e' un residuo del modello Elementor:
+       il sito NON la mostra -- la scheda in cima alla pagina calcola le
+       4 ore giuste -- ma sta nei dati e prima o poi va tolta. */
     gruppi: [
       {
-        titolo: 'Wine & Chianti',
+        titolo: 'Half day — back by lunch',
         voci: [
-          { testo: 'Chianti & wineries', href: '/tour/private-tour-to-chianti-wineries/', slug: 'private-tour-to-chianti-wineries' },
-          { testo: 'Chianti, half day', href: '/tour/private-half-day-tour-of-chianti/' },
-          { testo: 'Montalcino & Brunello', href: '/tour/montalcino-brunello-wine-tour/' },
-          { testo: 'Montepulciano & Pienza', href: '/tour/private-tour-to-montepulciano-pienza/' },
+          { testo: 'Florence', href: '/tour/private-tour-of-florence-half-day/' },
+          { testo: 'Chianti wine country', href: '/tour/private-half-day-tour-of-chianti/' },
+          { testo: 'Siena', href: '/tour/private-tour-of-siena-from-florence/' },
+          { testo: 'San Gimignano', href: '/tour/tour-to-san-gimignano-from-florence/' },
+          { testo: 'Pisa', href: '/tour/private-tour-pisa-from-florence/' },
+          { testo: 'Lucca', href: '/tour/private-tour-of-lucca-from-florence/' },
+          { testo: 'The Mall outlet', href: '/tour/private-outlet-shopping-at-the-mall/' },
         ],
       },
       {
-        titolo: 'Siena & San Gimignano',
+        titolo: 'Full day — wine & Chianti',
+        voci: [
+          { testo: 'Chianti & wineries', href: '/tour/private-tour-to-chianti-wineries/', slug: 'private-tour-to-chianti-wineries' },
+          { testo: 'Montalcino & Brunello', href: '/tour/montalcino-brunello-wine-tour/' },
+          { testo: 'Montepulciano & Pienza', href: '/tour/private-tour-to-montepulciano-pienza/' },
+          { testo: 'Montalcino, Pienza & Montepulciano', href: '/tour/montalcino-pienza-and-montepulciano/' },
+          { testo: 'Montepulciano & Cortona', href: '/tour/tour-to-montepulciano-and-cortona/' },
+          { testo: 'The Mall & a Chianti winery', href: '/tour/tour-the-mall-and-chianti-winery/' },
+        ],
+      },
+      {
+        titolo: 'Full day — Siena & San Gimignano',
         voci: [
           { testo: 'Siena & San Gimignano', href: '/tour/private-tour-siena-and-san-gimignano/' },
           { testo: 'Siena & Chianti', href: '/tour/private-tour-to-siena-and-chianti/' },
+          { testo: 'Siena, San Gimignano & Chianti', href: '/tour/tour-to-siena-san-gimignano-chianti/' },
           { testo: 'Siena, San Gimignano, Chianti & Pisa', href: '/tour/private-tour-to-siena-san-gimignano-chianti-pisa/' },
           { testo: 'San Gimignano & Volterra', href: '/tour/tour-san-gimignano-and-volterra/' },
         ],
       },
       {
-        titolo: 'Cities & coast',
+        titolo: 'Full day — cities & coast',
         voci: [
           { testo: 'Cinque Terre', href: '/tour/private-cinque-terre-from-florence/' },
+          { testo: 'Cinque Terre & Pisa', href: '/tour/private-tour-to-cinque-terre-and-pisa-from-florence/' },
           { testo: 'Pisa & Lucca', href: '/tour/private-tour-to-pisa-and-lucca/' },
           { testo: 'Florence & Fiesole', href: '/tour/private-tour-of-florence-and-fiesole/' },
           { testo: 'Portofino & Santa Margherita', href: '/tour/tour-to-portofino-santa-margherita/' },
         ],
       },
       {
-        titolo: 'Further afield',
+        titolo: 'Full day — further afield',
         voci: [
           { testo: 'Rome for the day', href: '/tour/private-tour-to-rome-from-florence/' },
           { testo: 'Venice for the day', href: '/tour/private-tour-to-venice-from-florence/' },
           { testo: 'Perugia & Assisi', href: '/tour/private-tour-to-perugia-and-assisi/' },
+          { testo: 'Orvieto & Civita di Bagnoregio', href: '/tour/private-tour-to-orvieto-bagnoregio/' },
           { testo: 'Ferrari & Lamborghini', href: '/tour/tour-to-ferrari-and-lamborghini/' },
         ],
       },
