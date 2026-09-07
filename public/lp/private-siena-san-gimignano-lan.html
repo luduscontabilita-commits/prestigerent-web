@@ -898,6 +898,20 @@ body{
    impacchettano senza vuoti, come una bacheca. */
 .pr-shots{ columns:2 340px; column-gap:26px; max-width:920px; margin:0 auto; }
 .pr-shot{ break-inside:avoid; margin:0 0 26px; }
+
+    /* LE RECENSIONI DI CHI HA PRENOTATO QUI. Le altre sono schermate di
+       Tripadvisor e stanno sotto il loro logo; queste vengono dalle
+       prenotazioni diritte del sito, quindi hanno un blocco loro e
+       un'etichetta loro. Attribuirle a Tripadvisor sarebbe la stessa
+       imprecisione che stiamo togliendo dalla pagina. */
+    .pr-dirette{ max-width:920px; margin:26px auto 0; display:grid; gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+    .pr-dirette-capo{ grid-column:1/-1; margin:0; font-size:.9rem; color:#7a736a; }
+    .pr-dirette figure{ margin:0; background:#fff; border:1px solid #e6e1da;
+      border-radius:12px; padding:18px 20px; }
+    .pr-dirette blockquote{ margin:0; font-size:1rem; line-height:1.55; color:#16130f; }
+    .pr-dirette figcaption{ margin-top:10px; font-size:.82rem; color:#7a736a; }
+
 .pr-shot img{
   width:100%; height:auto; display:block;
   border:none; border-radius:0; box-shadow:none; background:#fff;
@@ -2576,6 +2590,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <img src="img/review-annabel-scott-sharon.webp" width="415" height="521" loading="lazy" decoding="async" alt="Three Tripadvisor reviews, 5 out of 5. Annabel_N, June 2026: Lorenzo was an excellent tour guide, tour well organised, plenty of free time to explore Siena and San Gimignano, lunch at the winery was lovely. Scott_T, June 2026: Lorenzo was very informative, we never felt rushed, everything was well planned. Sharon_F, May 2026: the day was thoroughly wonderful, Michael was a safe and thoughtful driver, the winery lunch was delicious.">
       </figure>
     </div>
+    <div class="pr-dirette reveal">
+      <p class="pr-dirette-capo">From guests who booked the <strong>private tour</strong> on this site</p>
+      <figure>
+        <blockquote>&ldquo;Loved the personalized service and avoiding the large tour buses.&rdquo;</blockquote>
+        <figcaption>George K. &middot; May 2026</figcaption>
+      </figure>
+      <figure>
+        <blockquote>&ldquo;What is great about a private tour is that you are able to beat the large crowds ahead of time and have the freedom to adjust to your trip needs.&rdquo;</blockquote>
+        <figcaption>Daniel G. &middot; July 2023</figcaption>
+      </figure>
+      <figure>
+        <blockquote>&ldquo;It was great to have the tour van to ourselves. Our guide recommended a winery, called ahead and reserved the tasting for us.&rdquo;</blockquote>
+        <figcaption>Sara &middot; April 2024</figcaption>
+      </figure>
+      <figure>
+        <blockquote>&ldquo;We booked a private tour because we had my elderly parents with us, in their 80s. Donatello was a real gentleman: professional, thoughtful and so kind with them.&rdquo;</blockquote>
+        <figcaption>Alison F. &middot; August 2023</figcaption>
+      </figure>
+    </div>
+
 
     <p class="pr-rev-note reveal">Real reviews left by Prestige Rent guests on Tripadvisor, April&ndash;June 2026. We run private and shared departures to Siena and San Gimignano with the same team and the same vehicles.</p>
   </div>
