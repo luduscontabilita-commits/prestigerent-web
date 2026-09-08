@@ -456,6 +456,57 @@ const nextConfig: NextConfig = {
         destination: `https://${hostLegacy}/wp-json/fluentform/:path*`,
       },
 
+      /* 🔴 IL TERZO PEZZO DELLA STESSA CATENA: STRIPE RISPONDE QUI.
+         Il modulo di /booking/ si paga con Stripe, e Stripe avvisa
+         dell'esito chiamando l'indirizzo che FluentForms gli ha dato
+         quando e' stato configurato:
+
+           prestigerent.com/index.php?fluentform_payment_api_notify=1
+                                     &payment_method=stripe
+
+         Quel nome adesso e' questo sito, che `index.php` non ce l'ha:
+         verificato il 08/09/2026, HTTP 404. Sul vecchio host lo stesso
+         indirizzo risponde 200. Stripe ha riprovato 46 volte dal
+         02/09/2026 e ha annunciato che smette l'11/09.
+
+         🔴 NON SI E' PERSA NESSUNA PRENOTAZIONE, E VA DETTO PERCHE'.
+         Controllato il 08/09/2026 sul database del vecchio WordPress
+         (`3tsjz_fluentform_submissions`): tutte le prenotazioni dal
+         02/09 in poi risultano `paid`. FluentForms non si affida al
+         webhook per chiudere l'ordine -- lo chiude quando il cliente
+         TORNA sul sito dopo aver pagato, verificando il pagamento
+         contro Stripe. Il webhook e' il canale di riserva, ed e' per
+         questo che e' stato rotto sei giorni senza che se ne
+         accorgesse nessuno.
+
+         Quello che resta scoperto finche' non si ripara e' il caso che
+         solo il webhook copre: il cliente che paga e chiude il browser
+         senza tornare indietro -- prenotazione incassata su Stripe e
+         inesistente su WordPress, invisibile a chiunque. Piu' rimborsi
+         e contestazioni, che arrivano solo da qui perche' non hanno
+         nessun "ritorno sul sito".
+
+         🔴 SI INOLTRA SOLO CON `fluentform_payment_api_notify`, non
+         `/index.php` e basta. Provato il 08/09/2026: `index.php` nudo
+         sul vecchio host risponde 200 e serve la HOME del vecchio
+         WordPress. Senza la condizione, `prestigerent.com/index.php`
+         diventerebbe una seconda home fatta col sito vecchio — non
+         collegata da nessuna parte, ma raggiungibile, e nessuno se ne
+         accorgerebbe. Con la condizione passano solo le chiamate di
+         Stripe e tutto il resto resta 404, com'e' adesso.
+
+         Dev'essere un rewrite e NON un redirect: Stripe non segue i
+         3xx sui webhook, li conta come consegna fallita. Qui la
+         richiesta viene presa e inoltrata, e a Stripe risponde il 200
+         di WordPress. Il metodo e il corpo passano interi — e' la
+         stessa cosa che gia' fa `admin-ajax.php` per il POST del
+         modulo di /booking/ dal 30/08/2026. */
+      {
+        source: '/index.php',
+        has: [{ type: 'query', key: 'fluentform_payment_api_notify' }],
+        destination: `https://${hostLegacy}/index.php`,
+      },
+
       /* 🔴 LE FOTO. Tutte e 794 le immagini dei tour -- 87 schede su 87,
          piu' la home e ogni griglia di categoria -- hanno l'indirizzo
          scritto per esteso su prestigerent.com/wp-content/. Non passano da
