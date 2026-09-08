@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { EVENTI, dichiara } from '@/lib/eventi';
 
 /* IL TRACCIAMENTO. UN MESTIERE SOLO.
@@ -77,6 +77,10 @@ import { EVENTI, dichiara } from '@/lib/eventi';
  */
 
 const GTM = 'GTM-TL7VV3RL';
+/* Lo stesso progetto delle landing statiche, apposta: due progetti sullo
+   stesso dominio spezzano la registrazione a meta' proprio dove serve
+   intera -- dalla landing alla prenotazione. */
+const CLARITY = 'xnyy7tvk9t';
 
 /* Gli identificatori di clic delle quattro reti. Stanno in una costante
    sola perche' vengono percorsi due volte -- per scrivere e per
@@ -121,6 +125,22 @@ export function Tracciamento() {
      smontato, quindi senza questo un `view_booking_form` uscirebbe solo
      sulla prima pagina aperta e mai su quelle raggiunte cliccando. */
   const percorso = usePathname();
+
+  /* ── CLARITY PARTE SOLO DOPO UN "SI" ALLE STATISTICHE ──────────────
+     Registra il movimento del mouse e il contenuto della pagina: e' un
+     dato personale, non un contatore, e non si carica prima che la
+     persona abbia risposto al banner. Se cambia idea dopo, `pr-consenso`
+     rivaluta e il tag compare o resta fuori. */
+  const [clarity, setClarity] = useState(false);
+  useEffect(() => {
+    const guarda = () => {
+      const c = window.prConsenso;
+      setClarity(!!c?.consent?.statistics && c.hasResponse !== false);
+    };
+    guarda();
+    window.addEventListener('pr-consenso', guarda);
+    return () => window.removeEventListener('pr-consenso', guarda);
+  }, []);
 
   /* ── IL gclid: SI LEGGE SUBITO, SI SCRIVE QUANDO IL CONSENSO PARLA ── */
   useEffect(() => {
@@ -300,6 +320,37 @@ export function Tracciamento() {
      suo `gtag('consent','default',...)` resta nel dataLayer prima che
      gtm.js parta. Se si sposta uno dei due, si rompe questo. */
   return (
+    <>
+    {/* ── CLARITY: LE REGISTRAZIONI DI SESSIONE ────────────────────────
+        Clarity era gia' sulle landing statiche in `public/lp/`, e NON sul
+        sito: due mondi separati, e la domanda che conta -- una persona
+        arriva sulla landing, poi va su /tour/, poi prenota? -- non si
+        poteva nemmeno formulare. Stesso identificativo qui, cosi' la
+        registrazione e' una sola dall'inizio alla fine.
+
+        NON e' un doppione delle landing: quelle sono file statici serviti
+        fuori da React, questo componente li' non gira proprio.
+
+        ── PERCHE' DIETRO IL CONSENSO, E DIETRO "statistics"
+        Clarity registra il movimento del mouse e il contenuto della
+        pagina: e' un dato personale, non un contatore. Va sotto le
+        statistiche, non sotto il marketing -- non serve a inseguire
+        nessuno -- e non parte finche' la persona non ha risposto al
+        banner. Se cambia idea dopo, `pr-consenso` lo rivaluta.
+
+        La guardia sul dominio e' la stessa di GTM e per la stessa
+        ragione: le anteprime di Vercel inquinerebbero le registrazioni
+        vere con sessioni di collaudo. */}
+    {clarity && (
+      <Script id="clarity" strategy="afterInteractive">
+        {`(function(c,l,a,r,i,t,y){
+if(!/(^|\\.)prestigerent\\.com$/i.test(location.hostname)) return;
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "${CLARITY}");`}
+      </Script>
+    )}
     <Script id="gtm" strategy="beforeInteractive">
       {`(function(w,d,s,l,i){
 /* SOLO SUL DOMINIO VERO.
@@ -321,5 +372,6 @@ var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+
 j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','${GTM}');`}
     </Script>
+    </>
   );
 }
