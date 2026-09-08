@@ -77,10 +77,19 @@ import { EVENTI, dichiara } from '@/lib/eventi';
  */
 
 const GTM = 'GTM-TL7VV3RL';
-/* Lo stesso progetto delle landing statiche, apposta: due progetti sullo
-   stesso dominio spezzano la registrazione a meta' proprio dove serve
-   intera -- dalla landing alla prenotazione. */
-const CLARITY = 'xnyy7tvk9t';
+/* 🔴 QUESTO DEVE RESTARE UGUALE A QUELLO DELLE LANDING.
+   Le cinque pagine in `public/lp/` hanno lo snippet scritto dentro, con
+   `xnz5k1hxuh`. Ci ho messo un identificativo diverso per un giro solo, e
+   il risultato era l'opposto di quello che serviva: la stessa persona che
+   arriva sulla landing e poi va sul sito diventava due mezze sessioni in
+   due pannelli, cioe' proprio il passaggio che vogliamo guardare
+   spezzato a meta'.
+
+   Se un giorno si cambia progetto, si cambia QUI E NEI CINQUE FILE
+   INSIEME -- non c'e' modo di accorgersi da soli che sono diversi: i due
+   pannelli funzionano tutti e due, semplicemente raccontano meta' storia
+   ciascuno. */
+const CLARITY = 'xnz5k1hxuh';
 
 /* Gli identificatori di clic delle quattro reti. Stanno in una costante
    sola perche' vengono percorsi due volte -- per scrivere e per
