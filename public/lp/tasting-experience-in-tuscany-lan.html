@@ -1073,6 +1073,20 @@ window.prCaricaClarity = function () {
     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "xnz5k1hxuh");
+  /* DA QUALE CAMPAGNA E DA QUALE GRUPPO ARRIVA QUESTA PERSONA.
+     Servono a filtrare le registrazioni per campagna dentro Clarity,
+     senza l'integrazione con Google Ads -- che vuole un login e non
+     porta niente che non si possa mettere qui. I valori sono gli
+     identificativi numerici: la legenda con i nomi sta nel pannello. */
+  try {
+    var _q = new URLSearchParams(location.search);
+    var _camp = _q.get('utm_campaign'), _grup = _q.get('utm_content');
+    if (_camp) { window.clarity('set', 'campagna', _camp); }
+    if (_grup) { window.clarity('set', 'gruppo', _grup); }
+    if (_q.get('gclid') || _q.get('gbraid') || _q.get('wbraid')) {
+      window.clarity('set', 'fonte', 'google-ads');
+    }
+  } catch (e) {}
 };
 try{
   var _cc = document.cookie.match(/(?:^|;\s*)pr_consenso=([^;]*)/);

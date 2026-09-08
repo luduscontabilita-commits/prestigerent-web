@@ -357,6 +357,19 @@ if(!/(^|\\.)prestigerent\\.com$/i.test(location.hostname)) return;
 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+/* DA QUALE CAMPAGNA E DA QUALE GRUPPO ARRIVA QUESTA PERSONA.
+   Con queste due etichette le registrazioni si filtrano per campagna
+   dentro Clarity, SENZA l'integrazione con Google Ads -- che vuole un
+   collegamento dell'account e non porta niente che non si possa mettere
+   qui. I valori sono gli identificativi numerici che le UTM gia'
+   portano: la legenda coi nomi sta nel pannello. */
+try{
+  var q=new URLSearchParams(location.search);
+  var camp=q.get('utm_campaign'), grup=q.get('utm_content');
+  if(camp){ c[a]('set','campagna',camp); }
+  if(grup){ c[a]('set','gruppo',grup); }
+  if(q.get('gclid')||q.get('gbraid')||q.get('wbraid')){ c[a]('set','fonte','google-ads'); }
+}catch(e){}
 })(window, document, "clarity", "script", "${CLARITY}");`}
       </Script>
     )}
