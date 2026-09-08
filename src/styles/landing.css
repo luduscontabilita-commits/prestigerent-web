@@ -1665,6 +1665,29 @@ html{ scroll-behavior:auto; }
    comandi, che e' esattamente dove si preme play. */
 .slide-vid figcaption{ top:0; bottom:auto; padding:12px 16px 34px; border-radius:0;
   background:linear-gradient(180deg, rgba(15,20,26,.72) 0%, rgba(15,20,26,0) 100%); }
+
+/* 🔴 UNA FOTO SOLA: RIEMPIE, NON SCORRE.
+   Quaranta schede su 121 hanno una foto e basta -- quasi tutti transfer
+   e tour privati. Li' la diapositiva restava larga 760px dentro una
+   colonna piu' larga, con lo spazio a destra vuoto.
+   Stessa ragione di posizione della regola dei video qui sopra: sta DOPO
+   `.pg-main .slide{width:min(760px,100%)}` ed e' scritta con due classi,
+   altrimenti quella vincerebbe per specificita' e la foto resterebbe
+   stretta -- cioe' il difetto che questa regola toglie.
+   `width:auto` su un <figure> di blocco vuol dire "tutta la colonna"; i
+   20px di margine rifanno il padding che nella striscia sta su
+   `.film-track`, cosi' il bordo resta allineato alle altre sezioni. */
+.slide.slide-solo{ width:auto; margin:0 20px; height:clamp(320px, 62vh, 560px); }
+/* Senza striscia non c'e' niente da trascinare: l'ingrandimento al
+   passaggio del mouse prometterebbe un'interazione che non esiste. */
+.slide.slide-solo:hover img{ transform:scale(1.01); }
+@media (max-width:760px){
+  /* Sul telefono la striscia usa 82vw per far intravedere la foto
+     successiva: qui non ce n'e' una, quindi si prende tutta la larghezza
+     e si tiene il 4:3 della striscia per non cambiare proporzioni. */
+  .slide.slide-solo{ margin:0 14px; height:auto; aspect-ratio:4/3; }
+}
+
 .film-vids{ scroll-snap-type:none; }
 /* Play grande al centro: i comandi nativi sono una barra sottile in fondo
    al riquadro, poco visibile su un poster e scomoda da centrare. */

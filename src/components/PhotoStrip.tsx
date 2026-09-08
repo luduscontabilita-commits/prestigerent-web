@@ -6,6 +6,68 @@ import { testo } from '@/lib/prosa';
 
 export type Foto = { src: string; alt?: string; label?: string; caption?: string };
 
+/* CHI DECIDE COSA MOSTRARE.
+ *
+ * La scelta sta QUI e non nella pagina: cosi' vale per ogni chiamante,
+ * quello di oggi e quelli che verranno, e nessuno deve ricordarsi di
+ * contare le foto prima di usare questo componente. */
+export function PhotoStrip({ foto }: { foto: Foto[] }) {
+  if (!foto.length) return null;
+  if (foto.length === 1) return <FotoSola foto={foto[0]} />;
+  return <Striscia foto={foto} />;
+}
+
+/* 🔴 UNA FOTO SOLA NON E' UNA STRISCIA.
+ *
+ * Contate sul sito pubblicato l'08/09/2026: su 121 pagine, QUARANTA
+ * hanno una foto e basta -- quasi tutti transfer e tour privati. Su
+ * quelle la striscia mostrava proprio quello che non doveva: una foto
+ * larga 760px dentro un contenitore piu' largo, con lo spazio a destra
+ * vuoto, le due frecce che non portano da nessuna parte e il
+ * suggerimento "drag" che invita a trascinare il nulla.
+ *
+ * Qui il carosello non si nasconde col CSS: non lo si costruisce. Niente
+ * `useFilm`, nessun ascoltatore di scorrimento, nessun clone, e
+ * soprattutto nessun `aria-roledescription="carousel"` -- un carosello
+ * con una diapositiva sola non e' un carosello, e dirlo a un lettore di
+ * schermo e' una bugia che costa una promessa non mantenuta.
+ *
+ * L'immagine si chiede grande. Nella striscia il `sizes` dice 460px
+ * perche' le diapositive stanno affiancate; qui la foto riempie la
+ * colonna, e con 460px arriverebbe sgranata proprio sull'unica immagine
+ * della pagina. Le larghezze del `srcSet` sono solo quelle che
+ * l'ottimizzatore di Vercel conosce (vedi MISURE in lib/foto.ts): una
+ * misura inventata non e' una foto piu' piccola, e' un 400. */
+function FotoSola({ foto }: { foto: Foto }) {
+  const descrizione = testo(foto.alt || foto.caption || '');
+  return (
+    <div className="film-section hero-film">
+      <div className="film-wrap">
+        <figure className="slide slide-solo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ottimizza(foto.src, 1200)}
+            srcSet={fotoSet(foto.src, [640, 828, 1200, 1920])}
+            sizes="(max-width: 760px) 92vw, 800px"
+            alt={descrizione}
+            /* E' l'LCP della pagina e non c'e' niente sopra di lei:
+               non ha senso rimandarla. */
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+          {(foto.label || foto.caption) && (
+            <figcaption>
+              {foto.label && <span>{foto.label}</span>}
+              {foto.caption && <b>{foto.caption}</b>}
+            </figcaption>
+          )}
+        </figure>
+      </div>
+    </div>
+  );
+}
+
 /* La striscia foto, con il markup ESATTO della landing (.film-wrap / .film /
  * .film-track / .slide), non una mia versione.
  *
@@ -32,13 +94,11 @@ export type Foto = { src: string; alt?: string; label?: string; caption?: string
  * markup, cosi' stanno gia' nell'HTML servito e la striscia non cambia
  * lunghezza sotto le mani un istante dopo il caricamento.
  */
-export function PhotoStrip({ foto }: { foto: Foto[] }) {
+function Striscia({ foto }: { foto: Foto[] }) {
   const { proprieta, scorri, fermo, alterna, motoRidotto } = useFilm({
     auto: true,
     originali: foto.length,
   });
-
-  if (!foto.length) return null;
 
   /* Si clona solo se c'e' qualcosa da far scorrere. Con una o due foto la
      striscia non arriva a riempire lo schermo: i cloni si vedrebbero tutti
