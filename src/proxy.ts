@@ -66,6 +66,17 @@ export default function proxy(req: NextRequest) {
        questa riga il proxy ci mette davanti `/en/` e il POST muore. */
     pathname === '/wp-admin/admin-ajax.php' ||
     pathname.startsWith('/wp-json/fluentform/') ||
+    /* 🔴 L'indirizzo da cui Stripe conferma il pagamento di /booking/.
+       Terzo pezzo della stessa catena, e stessa lezione di due righe
+       piu' su: il 08/09/2026 il rewrite era stato messo in
+       next.config senza questa riga, e non serviva a niente -- il
+       proxy prendeva `/index.php` prima, ci metteva davanti `/en/`, e
+       la richiesta finiva nel catch-all delle lingue. Verificato
+       dall'header di risposta: `X-Matched-Path: /[locale]/[...percorso]`.
+       Qui si esclude il percorso e basta: la condizione sul parametro
+       `fluentform_payment_api_notify` sta in next.config, ed e' quella
+       a decidere se inoltrare davvero o rispondere 404. */
+    pathname === '/index.php' ||
     pathname.startsWith('/booking/') ||
     pathname === '/booking' ||
     pathname.startsWith('/mp/') ||
