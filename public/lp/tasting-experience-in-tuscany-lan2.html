@@ -1234,7 +1234,15 @@ html:not(.js) .pr-more-row{ display:none; }
 .lp-rvs-grid::-webkit-scrollbar{ height:6px; }
 .lp-rvs-grid::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.18); border-radius:99px; }
 .lp-rv{ scroll-snap-align:start; margin:0; padding:14px; background:#FFF;
-  border:1px solid var(--line); border-radius:14px; text-align:left; }
+  border:1px solid var(--line); border-radius:14px; text-align:left;
+  /* la firma va in fondo: le schede sono alte uguali ma i testi no, e in
+     quella corta il nome restava a mezz'aria con un vuoto sotto */
+  display:flex; flex-direction:column; }
+.lp-rv blockquote{ flex:0 1 auto; }
+.lp-rv figcaption{ margin-top:auto; }
+/* mentre scorrono da sole l'aggancio va spento, altrimenti il movimento
+   e lo scatto dello snap si combattono e la fila trema */
+.lp-rvs-grid.va-da-sola{ scroll-snap-type:none; }
 .lp-rv-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 .lp-rv-ini{ width:26px; height:26px; flex:none; border-radius:50%; background:var(--orange);
   color:#FFF; font-weight:800; font-size:.82rem; display:flex; align-items:center;

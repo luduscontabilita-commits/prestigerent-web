@@ -99,6 +99,76 @@
     return fig;
   }
 
+  /* ── LE SCHEDE SI MUOVONO DA SOLE ─────────────────────────────────
+   *
+   * Ferme, una fila che "sborda" a destra chiede di essere trascinata --
+   * e quasi nessuno lo fa: sul telefono forse, col mouse quasi mai.
+   * Muovendosi dicono da sole che ce n'e' delle altre.
+   *
+   * VANNO NEL SENSO OPPOSTO alla striscia delle foto, che scorre gia' e
+   * sposta il contenuto verso sinistra (`scrollLeft += velocita`). Due
+   * fasce che scivolano nello stesso verso sembrano una ripetizione; in
+   * senso contrario sembrano due cose diverse, ed e' quello che sono.
+   *
+   * L'anello e' senza cuciture perche' le schede si CLONANO una volta:
+   * arrivati alla fine dell'originale si torna a zero e nessuno vede il
+   * salto. I cloni sono nascosti ai lettori di schermo, altrimenti le
+   * recensioni verrebbero lette due volte.
+   *
+   * E SI FERMA QUANDO SERVE: col mouse sopra, appena qualcuno trascina o
+   * gira la rotellina, e sempre con `prefers-reduced-motion`. Sopra un
+   * testo da leggere, un movimento che non si lascia interrompere e'
+   * peggio del non muoversi affatto.
+   */
+  function muovi() {
+    var fermo = false;
+    try { fermo = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (fermo) return;
+
+    var carte = [].slice.call(griglia.children);
+    if (carte.length < 3) return;          /* poche: non c'e' niente da scorrere */
+
+    for (var i = 0; i < carte.length; i++) {
+      var c = carte[i].cloneNode(true);
+      c.setAttribute('aria-hidden', 'true');
+      griglia.appendChild(c);
+    }
+    griglia.classList.add('va-da-sola');
+
+    var giro = 0;
+    function misura() {
+      giro = carte.length ? griglia.children[carte.length].offsetLeft
+                          - griglia.children[0].offsetLeft : 0;
+    }
+    misura();
+    addEventListener('resize', misura);
+
+    /* Si parte da meta' anello: andando all'indietro, da zero il primo
+       fotogramma sarebbe gia' un salto. */
+    griglia.scrollLeft = giro;
+
+    var VELOCITA = 0.4;   /* piu' lenta delle foto: qui si legge */
+    var pausa = false, ridai;
+    function sospendi(ms) {
+      pausa = true;
+      clearTimeout(ridai);
+      if (ms) ridai = setTimeout(function () { pausa = false; }, ms);
+    }
+    griglia.addEventListener('pointerenter', function () { sospendi(0); });
+    griglia.addEventListener('pointerleave', function () { pausa = false; });
+    griglia.addEventListener('pointerdown', function () { sospendi(6000); });
+    griglia.addEventListener('wheel', function () { sospendi(6000); }, { passive: true });
+    griglia.addEventListener('touchstart', function () { sospendi(6000); }, { passive: true });
+
+    (function battito() {
+      if (!pausa && giro > 0) {
+        griglia.scrollLeft -= VELOCITA;
+        if (griglia.scrollLeft <= 0) griglia.scrollLeft += giro;
+      }
+      requestAnimationFrame(battito);
+    })();
+  }
+
   fetch('/api/recensioni/?tour=' + encodeURIComponent(MIO) + '&n=6', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (j) {
@@ -106,14 +176,20 @@
       /* Meno di quattro non vale il cambio: si finirebbe per svuotare un
          blocco pieno per rimpiazzarlo con due carte, che sembra un guasto
          anche quando non lo e'. */
-      if (!v || v.length < 4) return;
-      var nuovo = document.createDocumentFragment();
-      for (var i = 0; i < v.length; i++) nuovo.appendChild(carta(v[i]));
-      griglia.textContent = '';
-      griglia.appendChild(nuovo);
+      if (v && v.length >= 4) {
+        var nuovo = document.createDocumentFragment();
+        for (var i = 0; i < v.length; i++) nuovo.appendChild(carta(v[i]));
+        griglia.textContent = '';
+        griglia.appendChild(nuovo);
+      }
+      /* Il movimento parte DOPO aver deciso il contenuto: partendo prima
+         si clonerebbero le schede statiche e poi si sostituirebbero,
+         lasciando in fila i cloni di recensioni che non ci sono piu'. */
+      muovi();
     })
     .catch(function () {
-      /* Restano le carte statiche. Nessun errore in console: non e'
-         successo niente di male, e' solo non successo niente. */
+      /* Restano le carte statiche, e si muovono lo stesso: la rete caduta
+         non e' un motivo per lasciare ferma la pagina. */
+      muovi();
     });
 })();
