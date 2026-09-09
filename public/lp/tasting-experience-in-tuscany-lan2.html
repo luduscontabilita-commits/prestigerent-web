@@ -1211,10 +1211,22 @@ html:not(.js) .pr-more-row{ display:none; }
 .pr-promo-off{ display:none; }
 .promo-finita .pr-promo-off{ display:inline; }
 
-.pr-timer{ display:inline-flex; align-items:baseline; gap:5px; padding:3px 10px;
-  border-radius:999px; background:#7A2016; color:#FFF; font-weight:800;
-  font-size:.82rem; letter-spacing:.02em; }
-.pr-timer b{ font-variant-numeric:tabular-nums; }
+/* IL CONTATORE, A CASELLE. Una pastiglia con "21d 7h" sembra un'etichetta
+   morta; tre caselle con i numeri grandi si leggono in un colpo e si
+   vedono cambiare. I minuti scorrono davvero -- il difetto dei contatori
+   finti non e' mai stato il movimento, e' il RIPARTIRE da capo a ogni
+   visita. Questo conta verso il 30 settembre e basta. */
+.pr-timer{ display:inline-flex; align-items:stretch; gap:6px; vertical-align:middle; }
+.pr-timer span.q{ display:flex; flex-direction:column; align-items:center;
+  min-width:46px; padding:5px 7px 4px; border-radius:9px;
+  background:#7A2016; color:#FFF; line-height:1; }
+.pr-timer span.q b{ font-size:1.18rem; font-weight:900; font-variant-numeric:tabular-nums; }
+.pr-timer span.q i{ font-style:normal; font-size:.56rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.09em; opacity:.8; margin-top:3px; }
+@media (max-width:560px){
+  .pr-timer span.q{ min-width:40px; padding:4px 6px 3px; }
+  .pr-timer span.q b{ font-size:1rem; }
+}
 .pr-promo-lab{ display:inline-block; padding:3px 10px; border-radius:999px;
   background:var(--orange); color:#FFF; font-size:.7rem; font-weight:800;
   text-transform:uppercase; letter-spacing:.08em; }
@@ -1818,8 +1830,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li><span aria-hidden="true">💳</span><span>Free cancellation 24h &middot; no booking fee &middot; instant confirmation</span></li>
     </ul>
     <p class="pr-offer-urg">
-      <span class="pr-timer" data-fine="2026-09-30T21:59:59Z">
-        <b class="pr-timer-n">&mdash;</b><span class="pr-timer-t">left</span>
+      <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
+        <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
+        <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
+        <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
       </span>
       <span><b>September offer, only on this page.</b> It ends on <b>30 September</b>
       and the price goes back to &euro;89 &mdash; you won&rsquo;t find this on the booking
@@ -3123,15 +3137,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   if (!t) return;
   var fine = Date.parse(t.getAttribute('data-fine'));
   if (!fine) return;
+  var q = {
+    g: t.querySelector('[data-q="g"]'),
+    o: t.querySelector('[data-q="o"]'),
+    m: t.querySelector('[data-q="m"]')
+  };
+  function due(n){ return n < 10 ? '0' + n : '' + n; }
   function batti(){
-    var m = Math.floor((fine - Date.now()) / 60000);
-    if (m <= 0) { document.documentElement.classList.add('promo-finita'); return; }
-    var g = Math.floor(m / 1440), o = Math.floor((m % 1440) / 60);
-    t.querySelector('.pr-timer-n').textContent = g > 0 ? (g + 'd ' + o + 'h') : (o + 'h ' + (m % 60) + 'm');
-    t.querySelector('.pr-timer-t').textContent = g > 0 ? 'left' : 'left today';
+    var ms = fine - Date.now();
+    if (ms <= 0) { document.documentElement.classList.add('promo-finita'); return; }
+    var tot = Math.floor(ms / 60000);
+    q.g.textContent = Math.floor(tot / 1440);
+    q.o.textContent = due(Math.floor((tot % 1440) / 60));
+    q.m.textContent = due(tot % 60);
   }
   batti();
-  setInterval(batti, 60000);
+  /* ogni dieci secondi: i minuti cambiano quando devono, senza che la
+     pagina lavori sessanta volte al minuto per niente */
+  setInterval(batti, 10000);
 })();
 </script>
 <script defer src="https://cdn.regiondo.net/js/integration/bookingwidget/bookingwidget.js"></script>
