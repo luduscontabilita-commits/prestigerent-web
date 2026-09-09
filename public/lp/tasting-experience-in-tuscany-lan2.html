@@ -416,7 +416,7 @@ body{
 .pr-opts{ display:none !important; }
 
 .pr-incl{ max-width:900px; margin:0 auto; display:grid; gap:22px; text-align:left; }
-@media (min-width:760px){ .pr-incl{ grid-template-columns:1.35fr 1fr; } }
+/* una riga sola: la griglia a due colonne non serve piu' */
 .pr-incl h3{ margin:0 0 10px; font-size:1rem; }
 .pr-incl ul{ margin:0; padding:0; list-style:none; display:grid; gap:9px; }
 .pr-incl li{ display:flex; gap:10px; align-items:flex-start; font-size:.92rem;
@@ -2185,25 +2185,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- L'ELENCO AL POSTO DELLE CARTE. Stesse parole della scheda
          "Included" di questa pagina: non si inventa niente. -->
     <div class="pr-incl reveal">
-      <div class="si">
-        <h3>What&rsquo;s included</h3>
-        <ul>
-          <li><i>&#10003;</i><span><b>Small group, max 25</b> &mdash; or semi&#8209;private, max 8. Never 50 or 60 on a coach.</span></li>
-          <li><i>&#10003;</i><span>Air&#8209;conditioned minivan, minibus or small bus, with <b>free Wi&#8209;Fi</b> on board</span></li>
-          <li><i>&#10003;</i><span>A professional <b>English&#8209;speaking driver&#8209;guide</b> with you all day &mdash; no translations</span></li>
-          <li><i>&#10003;</i><span>Guided visit to <b>two different family wine estates</b>, from an ancient cellar to a modern vineyard</span></li>
-          <li><i>&#10003;</i><span><b>Four wines and olive oil</b> tasted at each estate</span></li>
-          <li><i>&#10003;</i><span>Local Tuscan specialities &mdash; cheeses, cured meats, prosciutto and bruschetta &mdash; at the second winery</span></li>
-          <li><i>&#10003;</i><span><b>Free cancellation</b> up to 24 hours before departure</span></li>
-        </ul>
-      </div>
-      <div class="no">
-        <h3>Not included</h3>
-        <ul>
-          <li><i>&times;</i><span>Gratuities &mdash; optional, entirely at your discretion</span></li>
-          <li><i>&times;</i><span>Hotel pick&#8209;up and drop&#8209;off <span class="muted">(the meeting point is in central Florence)</span></span></li>
-        </ul>
-      </div>
+      <!-- I due elenchi incluso/non incluso erano qui. Tolti: la sezione
+           a schede piu' in basso ha una scheda "Included" con lo stesso
+           contenuto e piu' completo. Due elenchi uguali nella stessa
+           pagina non rinforzano, insegnano a saltare.
+           La riga dei prezzi invece RESTA: 89/79/129 non e' scritto in
+           nessun altro punto visibile -- sta nella scheda "Prices", che
+           e' chiusa, e dentro il calendario, che e' un widget. Il prezzo
+           dietro un clic manda a controllare su Viator, dove si vede
+           subito. -->
       <p class="pr-incl-prezzi">
         <b>&euro;89</b> per adult &middot; <b>&euro;79</b> ages 12&ndash;17 &middot;
         semi&#8209;private <b>&euro;129</b> per person. Pick the option you want in the
@@ -2392,15 +2382,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <div class="pr-tabs reveal" role="tablist" aria-label="Shared departures &mdash; everything you need to know">
-      <button type="button" class="pr-tab is-on" role="tab" id="tb-hl" aria-controls="tp-hl" aria-selected="true">Highlights</button>
-      <button type="button" class="pr-tab" role="tab" id="tb-incl" aria-controls="tp-incl" aria-selected="false">Included</button>
+      <button type="button" class="pr-tab" role="tab" id="tb-hl" aria-controls="tp-hl" aria-selected="false">Highlights</button>
+      <button type="button" class="pr-tab is-on" role="tab" id="tb-incl" aria-controls="tp-incl" aria-selected="true">Included</button>
       <button type="button" class="pr-tab" role="tab" id="tb-pric" aria-controls="tp-pric" aria-selected="false">Prices</button>
       <button type="button" class="pr-tab" role="tab" id="tb-info" aria-controls="tp-info" aria-selected="false">Important info</button>
       <button type="button" class="pr-tab" role="tab" id="tb-loc" aria-controls="tp-loc" aria-selected="false">Time &amp; location</button>
       <button type="button" class="pr-tab" role="tab" id="tb-sched" aria-controls="tp-sched" aria-selected="false">Tour schedule</button>
     </div>
 
-    <div class="pr-tabp reveal" id="tp-hl" role="tabpanel" aria-labelledby="tb-hl">
+    <div class="pr-tabp reveal" id="tp-hl" role="tabpanel" aria-labelledby="tb-hl" hidden>
     <ul class="hl2-grid reveal">
       <li class="hl2-item"><svg class="hl2-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Max 25, never 60 or 80</strong> (or just 8 semiprivate) &mdash; while others pack 50+ people on a bus, we keep it intimate and relaxed, in <strong>English only</strong>: no confusing translations</span></li>
       <li class="hl2-item"><svg class="hl2-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="m6.8 12.3 3.3 3.3 7-7.2" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Dual estate experience</strong> &mdash; compare two distinct properties, from ancient cellars to modern family-run vineyards, with a generous tasting of premium Chianti selections</span></li>
@@ -2410,7 +2400,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     </div>
 
-    <div class="pr-tabp reveal" id="tp-incl" role="tabpanel" aria-labelledby="tb-incl" hidden>
+    <div class="pr-tabp reveal" id="tp-incl" role="tabpanel" aria-labelledby="tb-incl">
 <div class="pr-acc-body pr-prose"><p><strong>Included</strong>:</p>
 <ul>
 <li>Option Small group: max 25 people (standard group tours run with 50+ people)</li>
