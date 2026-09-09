@@ -1202,6 +1202,23 @@ html:not(.js) .pr-more-row{ display:none; }
   display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
 .lp-rv figcaption{ margin-top:8px; font-size:.74rem; font-weight:700; color:var(--ink); }
 @media (max-width:560px){ .lp-rvs-grid{ grid-auto-columns:minmax(238px,260px); } }
+/* LA PROMOZIONE FINITA SPARISCE DA SOLA. Una sola classe sulla radice
+   spegne tutto quello che parla di sconto: il blocco, le righe del
+   codice, il prezzo barrato nella barra fissa. Cosi' non resta niente da
+   ricordarsi di togliere -- ed e' l'unico modo perche' una promozione
+   scaduta non resti in pagina per mesi. */
+.promo-finita .pr-promo{ display:none !important; }
+.pr-promo-off{ display:none; }
+.promo-finita .pr-promo-off{ display:inline; }
+
+.pr-timer{ display:inline-flex; align-items:baseline; gap:5px; padding:3px 10px;
+  border-radius:999px; background:#7A2016; color:#FFF; font-weight:800;
+  font-size:.82rem; letter-spacing:.02em; }
+.pr-timer b{ font-variant-numeric:tabular-nums; }
+.pr-promo-lab{ display:inline-block; padding:3px 10px; border-radius:999px;
+  background:var(--orange); color:#FFF; font-size:.7rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.08em; }
+
 /* L'URGENZA, e le due regole che la tengono onesta:
    1. niente conto alla rovescia che riparte a ogni visita -- chi lo
       riconosce smette di credere anche a quello che e' vero;
@@ -1778,9 +1795,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </a>
    </div>
 
-  <div class="pr-offer reveal">
+  <div class="pr-offer pr-promo reveal">
    <div class="pr-offer-txt">
     <div class="pr-offer-top">
+      <span class="pr-promo-lab">September offer</span>
       <span class="pr-offer-lab">Book direct, just here:</span>
       <span class="pr-offer-now">&minus;10%</span>
       <span class="pr-offer-lab">on your whole booking &mdash; any tour, any format</span>
@@ -1800,9 +1818,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li><span aria-hidden="true">💳</span><span>Free cancellation 24h &middot; no booking fee &middot; instant confirmation</span></li>
     </ul>
     <p class="pr-offer-urg">
-      <span aria-hidden="true">⏳</span>
-      <span><b>Only on this page, and not for long.</b> You won&rsquo;t find this price on the
-      booking platforms &mdash; when the offer closes it goes back to full.</span>
+      <span class="pr-timer" data-fine="2026-09-30T21:59:59Z">
+        <b class="pr-timer-n">&mdash;</b><span class="pr-timer-t">left</span>
+      </span>
+      <span><b>September offer, only on this page.</b> It ends on <b>30 September</b>
+      and the price goes back to &euro;89 &mdash; you won&rsquo;t find this on the booking
+      platforms.</span>
     </p>
    </div>
 
@@ -2779,7 +2800,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              cima e non la ritrova al momento di prenotare paga pieno, e
              se ne accorge dopo. E' il modo peggiore di perdere un
              cliente che era gia' contento. -->
-        <p class="pr-code-here reveal">
+        <p class="pr-code-here pr-promo reveal">
           Pick your date, then at checkout paste
           <button type="button" class="pr-copy" data-code="DIRECT10"
              aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
@@ -3038,7 +3059,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- data-base = parte fissa del titolo; il nome della formula scelta
          viene aggiunto dallo script insieme al prezzo giusto. -->
     <div class="pr-sticky-title" data-base="Tasting Experience in Tuscany">Tasting Experience in Tuscany</div>
-    <div class="pr-sticky-price"><b>&minus;10%</b> <span class="per">direct &middot; DIRECT10</span></div>
+    <div class="pr-sticky-price"><span class="pr-promo"><b>&minus;10%</b> <span class="per">direct &middot; DIRECT10</span></span><span class="pr-promo-off"><b>&euro;89</b> <span class="per">per person</span></span></div>
   </div>
   <a class="cta" href="#bookform">SECURE YOUR SPOT</a>
 </div>
@@ -3081,6 +3102,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       } catch (err) {}
     }
   }, true);
+})();
+</script>
+<script>
+/* IL CONTO ALLA ROVESCIA, VERO.
+   Conta verso un istante fisso -- il 30 settembre alle 23:59 ora di Roma,
+   cioe' le 21:59 UTC -- non verso "fra 24 ore": chiudi il portatile e
+   torni domani, e mancano ventiquattro ore in meno.
+
+   Giorni e ore, mai i secondi: i secondi che scorrono sono il segno di
+   riconoscimento dei contatori finti, e chi li riconosce smette di
+   credere anche al resto della pagina.
+
+   E quando finisce, SPEGNE TUTTO: una classe sulla radice fa sparire il
+   blocco, le righe del codice e il prezzo barrato. Un contatore in
+   negativo e' peggio di nessun contatore, ed e' quello che succede alle
+   promozioni che nessuno si ricorda di togliere. */
+(function(){
+  var t = document.querySelector('.pr-timer');
+  if (!t) return;
+  var fine = Date.parse(t.getAttribute('data-fine'));
+  if (!fine) return;
+  function batti(){
+    var m = Math.floor((fine - Date.now()) / 60000);
+    if (m <= 0) { document.documentElement.classList.add('promo-finita'); return; }
+    var g = Math.floor(m / 1440), o = Math.floor((m % 1440) / 60);
+    t.querySelector('.pr-timer-n').textContent = g > 0 ? (g + 'd ' + o + 'h') : (o + 'h ' + (m % 60) + 'm');
+    t.querySelector('.pr-timer-t').textContent = g > 0 ? 'left' : 'left today';
+  }
+  batti();
+  setInterval(batti, 60000);
 })();
 </script>
 <script defer src="https://cdn.regiondo.net/js/integration/bookingwidget/bookingwidget.js"></script>
