@@ -286,12 +286,46 @@ async function conRipiego(
   return [...prime, ...inglesi.filter((r) => !gia.has(r.id))].slice(0, quante);
 }
 
-/* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
- * (tour_slug nullo) per non lasciare vuoto un tour che ancora non ne ha.
+/* 🔴 `in_evidenza` NON ORDINA PIU' QUESTE. ECCO PERCHE'.
  *
- * L'ordine resta in evidenza e poi le piu' recenti. NON si ordina per voto:
- * ordinando per voto i cinque stelle occuperebbero tutti e sei i posti e la
- * soglia a quattro non servirebbe a niente. */
+ * L'ordine era `in_evidenza` e POI la data. Sembra innocuo, e invece e' un
+ * fermo-immagine: il flag non scade mai, quindi finche' ci sono almeno sei
+ * recensioni segnate, le sei segnate sono quelle che si vedono -- per
+ * sempre, qualunque cosa arrivi dopo.
+ *
+ * Misurato il 09/09/2026 sul tour del vino: otto recensioni segnate, la
+ * piu' recente del 28 luglio. In tabella c'era Fred P. del 22 agosto,
+ * pubblicata, cinque stelle, e non e' mai comparsa da nessuna parte --
+ * ne' sulla scheda ne' sulla landing, che da li' copia. La pagina
+ * raccontava giugno e luglio a settembre inoltrato, e nessuno aveva
+ * sbagliato niente: era il flag a fare il suo lavoro troppo bene.
+ *
+ * E' il difetto peggiore che possa avere una prova sociale, perche' non
+ * somiglia a un guasto: le recensioni ci sono, sono vere, sono belle. Solo
+ * che hanno una data, e la data dice a chi legge da quanto tempo nessuno
+ * si occupa di questa pagina.
+ *
+ * ── COSA COMANDA ADESSO: LA DATA ────────────────────────────────────
+ * Con un'avvertenza, perche' la sola data farebbe risalire "Excellent" di
+ * ventitre caratteri -- fresca e inutile: una recensione che non racconta
+ * niente non convince nessuno, occupa un posto e basta. Quindi si legge
+ * piu' largo e si tengono le piu' recenti FRA QUELLE CHE HANNO QUALCOSA
+ * DA DIRE. `in_evidenza` resta in tabella e resta utile: adesso separa le
+ * pari-data, e continua a decidere l'ordine di `inEvidenza()`, che e'
+ * un'altra cosa e sta sull'home.
+ *
+ * NON si ordina per voto: ordinando per voto i cinque stelle occuperebbero
+ * tutti e sei i posti e la soglia a quattro non servirebbe a niente.
+ */
+const TESTO_MINIMO = 80;
+
+/* Quante leggerne per averne `quante` di buone. Cinque volte: sul tour del
+ * vino le corte sono circa una su sei, e chiedere trenta righe per usarne
+ * sei costa niente -- una lettura sola, gia' filtrata dal database. */
+const LARGHEZZA = 5;
+
+/* Le recensioni di un tour, piu' quelle che parlano dell'azienda in generale
+ * (tour_slug nullo) per non lasciare vuoto un tour che ancora non ne ha. */
 export async function recensioniDi(
   slug: string,
   quante = 6,
@@ -300,10 +334,16 @@ export async function recensioniDi(
   const leggi = async (l: string) => {
     const { data } = await SOLO(base(), l)
       .or(`tour_slug.eq.${slug},tour_slug.is.null`)
-      .order('in_evidenza', { ascending: false })
       .order('data', { ascending: false })
-      .limit(quante);
-    return (data ?? []) as Recensione[];
+      .order('in_evidenza', { ascending: false })
+      .limit(quante * LARGHEZZA);
+
+    const righe = (data ?? []) as Recensione[];
+    const piene = righe.filter((r) => (r.testo ?? '').trim().length >= TESTO_MINIMO);
+    /* Se la soglia svuotasse il blocco si torna a quelle che ci sono: un
+       riquadro vuoto sembra un guasto del sito, ed e' peggio di una
+       recensione breve. */
+    return (piene.length >= quante ? piene : righe).slice(0, quante);
   };
   return conRipiego(lingua, quante, leggi);
 }
