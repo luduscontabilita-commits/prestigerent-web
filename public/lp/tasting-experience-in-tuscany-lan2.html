@@ -1141,10 +1141,16 @@ html:not(.js) .pr-more-row{ display:none; }
 .pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
   max-height:290px; object-fit:cover; }
 @media (min-width:900px){
-  /* il video segue l'altezza del testo, non il contrario */
-  .pr-offer-vid{ display:flex; flex-direction:column; }
-  .pr-offer-vid video{ flex:1 1 auto; height:0; min-height:220px; max-height:none;
-    aspect-ratio:auto; }
+  /* 🔴 IL VIDEO SEGUE L'ALTEZZA DEL TESTO, NON IL CONTRARIO.
+     `min-height:0` non e' un dettaglio: in flexbox un elemento NON scende
+     mai sotto la propria altezza naturale a meno che non glielo si dica.
+     Con un minimo di 220px il video restava piu' alto del testo, la riga
+     della griglia si allungava per contenerlo, e sotto il testo restava
+     un buco. Con 0 il video si adatta, e il riquadro finisce dove
+     finisce quello che c'e' da leggere. */
+  .pr-offer-vid{ display:flex; flex-direction:column; height:100%; }
+  .pr-offer-vid video{ flex:1 1 0; min-height:0; height:auto; max-height:none;
+    aspect-ratio:auto; object-fit:cover; }
 }
 .pr-offer-vid figcaption{ padding:9px 11px; background:#FFF; font-size:.78rem;
   line-height:1.4; }
