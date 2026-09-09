@@ -1115,9 +1115,25 @@ html:not(.js) .pr-more-row{ display:none; }
    18-21% della pagina: quello che sta sotto non lo vede quasi nessuno.
    Nessun conto alla rovescia: la scadenza e' una data vera, scritta.
    ============================================================ */
-.pr-offer{ max-width:760px; margin:22px auto 0; padding:18px 20px;
+.pr-offer{ max-width:900px; margin:22px auto 0; padding:18px 20px;
   background:#FFF8F2; border:2px solid var(--orange); border-radius:16px;
-  text-align:left; }
+  text-align:left; display:grid; gap:16px; align-items:start; }
+/* Sopra i 900px il video sta accanto: la prova e la promessa si leggono
+   con un colpo d'occhio solo. Sotto, va SOTTO -- l'offerta e il codice
+   devono restare la prima cosa, il video e' la conferma. */
+@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 240px; } }
+.pr-offer-vid{ margin:0; position:relative; border-radius:12px; overflow:hidden;
+  border:2px solid var(--line); background:#0F141A; }
+.pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
+  object-fit:cover; }
+.pr-offer-vid figcaption{ padding:9px 11px; background:#FFF; font-size:.78rem;
+  line-height:1.4; }
+.pr-offer-vid figcaption span{ display:block; font-weight:700; color:var(--ink-soft);
+  font-size:.72rem; }
+.pr-offer-vid figcaption b{ color:var(--ink); }
+@media (max-width:899px){
+  .pr-offer-vid{ max-width:260px; margin:0 auto; }
+}
 .pr-offer-top{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
   margin-bottom:12px; }
 .pr-offer-was{ font-size:1.05rem; color:var(--ink-soft); text-decoration:line-through; }
@@ -1671,6 +1687,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
        Le quattro righe sono cose che l'azienda fa gia' e non vendeva.
        ============================================================ -->
   <div class="pr-offer reveal">
+   <div class="pr-offer-txt">
     <div class="pr-offer-top">
       <span class="pr-offer-lab">Book direct, just here:</span>
       <span class="pr-offer-now">&minus;10%</span>
@@ -1702,6 +1719,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       and when this one closes the price goes back to &euro;89.</span>
     </p>
     <p class="pr-offer-when">Enter <b>DIRECT10</b> at checkout.</p>
+   </div>
+
+   <!-- LA PROVA ACCANTO ALLA PROMESSA. Stesso file del video piu' in
+        basso: il browser lo scarica una volta sola, e solo se qualcuno
+        preme play (`preload="none"`). La classe `slide-vid` serve al
+        pulsante grande, gestito dallo script che c'e' gia'. -->
+   <figure class="pr-offer-vid slide-vid">
+     <video controls preload="none" playsinline poster="video/testimonial-t3.jpg"
+            aria-label="A guest talking to camera about their day with Prestige Rent">
+       <source src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/video/testimonial-t3.mp4" type="video/mp4">
+       Your browser cannot play this video.
+     </video>
+     <button class="vid-play" type="button" aria-label="Play this video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button>
+     <figcaption><span>A guest, in his words</span><b>&ldquo;Prestige was really great&rdquo;</b></figcaption>
+   </figure>
   </div>
 
   <div class="trust">
