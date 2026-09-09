@@ -182,6 +182,37 @@
         griglia.textContent = '';
         griglia.appendChild(nuovo);
       }
+      /* IL PUNTEGGIO: SCRITTO DAL DATABASE, NON A MANO.
+         In pagina c'era "8,167", che nel frattempo era diventato 8.250 in
+         tabella e 8.306 su Viator: il numero piu' importante della pagina
+         invecchiava da solo. E stava sotto il logo Tripadvisor mentre e'
+         di Viator -- attribuire la credenziale piu' forte alla
+         piattaforma sbagliata e' un errore che, se qualcuno lo verifica,
+         si porta dietro tutto il resto.
+         Il ripiego in pagina resta "8,000+": vero comunque, e non
+         invecchia. Meglio dire meno del vero che un numero preciso e
+         sbagliato. */
+      var pu = j && j.punteggio;
+      if (pu && pu.quante > 0) {
+        var NOMI = { viator:'Viator', tripadvisor:'Tripadvisor', google:'Google',
+                     getyourguide:'GetYourGuide', regiondo:'direct bookings' };
+        var quanti = String(pu.quante).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        [].forEach.call(document.querySelectorAll('[data-quante]'), function (el) {
+          el.textContent = quanti;
+        });
+        [].forEach.call(document.querySelectorAll('[data-voto]'), function (el) {
+          el.textContent = String(pu.voto);
+        });
+        var nome = NOMI[pu.fonte] || pu.fonte;
+        [].forEach.call(document.querySelectorAll('[data-fonte]'), function (el) {
+          el.textContent = ' on ' + nome;
+        });
+        /* Il logo si spegne se non e' la piattaforma giusta: un marchio
+           sbagliato accanto a un numero vero e' peggio di nessun marchio. */
+        var logo = document.querySelector('[data-logo]');
+        if (logo && pu.fonte !== 'tripadvisor') logo.hidden = true;
+      }
+
       /* Il movimento parte DOPO aver deciso il contenuto: partendo prima
          si clonerebbero le schede statiche e poi si sostituirebbero,
          lasciando in fila i cloni di recensioni che non ci sono piu'. */

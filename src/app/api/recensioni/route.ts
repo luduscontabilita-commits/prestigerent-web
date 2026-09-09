@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { recensioniDi } from '@/lib/recensioni';
+import { supabase } from '@/lib/supabase';
 
 /* LE RECENSIONI PER LE LANDING, DALLA STESSA FONTE DELLA SCHEDA.
  *
@@ -82,8 +83,32 @@ export async function GET(req: Request) {
     };
   });
 
+  /* IL PUNTEGGIO, DALLA STESSA TABELLA DELLA SCHEDA E DELLA HOME.
+     Serve perche' sulla landing quel numero era scritto a mano e
+     invecchiava: 8.167 in pagina contro 8.250 in tabella. E perche' era
+     attribuito a Tripadvisor mentre e' di Viator -- la piattaforma la
+     dice la riga, non un logo scelto una volta.
+     Si prende la riga con PIU' recensioni e si usa il SUO voto: sommare
+     piattaforme che si sovrappongono (Viator include Tripadvisor) darebbe
+     un totale piu' alto delle recensioni dell'azienda intera. */
+  let punteggio: { fonte: string; voto: number; quante: number; distintivo: string | null } | null = null;
+  try {
+    const { data } = await supabase
+      .from('valutazioni_tour')
+      .select('fonte,voto,quante,distintivo')
+      .eq('tour_slug', tour)
+      .order('quante', { ascending: false })
+      .limit(1);
+    const r = data?.[0];
+    if (r?.voto != null && r?.quante != null) {
+      punteggio = { fonte: r.fonte, voto: Number(r.voto), quante: Number(r.quante), distintivo: r.distintivo ?? null };
+    }
+  } catch {
+    /* il punteggio e' un di piu': se manca, in pagina resta il ripiego */
+  }
+
   return NextResponse.json(
-    { recensioni },
+    { recensioni, punteggio },
     {
       headers: {
         /* Le recensioni nuove arrivano con i giorni, non con i minuti:
