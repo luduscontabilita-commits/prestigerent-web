@@ -1155,8 +1155,23 @@ html:not(.js) .pr-more-row{ display:none; }
   background:#FFF8F2; border:2px solid var(--orange); border-radius:16px;
   text-align:left; display:grid; gap:16px; align-items:start; }
 /* Sopra i 900px il video sta accanto: la prova e la promessa si leggono
-   con un colpo d'occhio solo. Sotto, va SOTTO -- l'offerta e il codice
-   devono restare la prima cosa, il video e' la conferma. */
+   con un colpo d'occhio solo.
+
+   🔴 SOTTO, IL VIDEO VA PRIMA -- ed e' il contrario di quello che avevo
+   scritto qui ("l'offerta e il codice devono restare la prima cosa").
+   Quella regola vale su una pagina che si legge; su una pagina che si
+   scorre col pollice arrivavano 140 parole in grassetto rosso e nemmeno
+   un'immagine, cioe' nessun motivo per fermarsi. Il video e' una persona
+   che dice che e' andata bene: anche da fermo e' una faccia, ed e' pure
+   l'ordine giusto -- prima uno che racconta, poi io che chiedo.
+   L'offerta non si perde: il codice e' ripetuto accanto al calendario e
+   nella barra fissa, che su telefono resta sempre a schermo. */
+@media (max-width:899px){
+  .pr-offer-vid{ order:-1; }
+  /* verticale e alto quanto un pollice, non una striscia: deve leggersi
+     come un video, non come un'immagine di riempimento */
+  .pr-offer-vid video{ max-height:340px; }
+}
 @media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 208px; align-items:stretch; } }
 .pr-offer-vid{ margin:0; position:relative; border-radius:12px; overflow:hidden;
   border:2px solid var(--line); background:#0F141A; }
@@ -1893,7 +1908,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <p class="pr-copy-how">
       Shared departure <b>&euro;89 &rarr; &euro;80</b> &middot; private tours, same 10%.
-      At checkout click <b>&ldquo;Redeem value voucher or discount code&rdquo;</b>, paste it, press Apply.
     </p>
     <ul>
       <li><span aria-hidden="true">🛡️</span><span><b>Not worth it? Tell your guide before you step off &mdash; full refund, no questions asked.</b></span></li>
@@ -1908,9 +1922,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
         <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
       </span>
-      <span><b>September offer &mdash; available just here.</b> Not on the booking
-      platforms, not anywhere else. It ends on <b>30 September</b>, then the price
-      goes back to &euro;89.</span>
+      <span><b>Only here &mdash; not on the booking platforms.</b> Ends
+      <b>30 September</b>, then back to &euro;89.</span>
     </p>
    </div>
 
