@@ -1163,16 +1163,25 @@ html:not(.js) .pr-more-row{ display:none; }
 .pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
   max-height:290px; object-fit:cover; }
 @media (min-width:900px){
-  /* 🔴 IL VIDEO SEGUE L'ALTEZZA DEL TESTO, NON IL CONTRARIO.
-     `min-height:0` non e' un dettaglio: in flexbox un elemento NON scende
-     mai sotto la propria altezza naturale a meno che non glielo si dica.
-     Con un minimo di 220px il video restava piu' alto del testo, la riga
-     della griglia si allungava per contenerlo, e sotto il testo restava
-     un buco. Con 0 il video si adatta, e il riquadro finisce dove
-     finisce quello che c'e' da leggere. */
-  .pr-offer-vid{ display:flex; flex-direction:column; height:100%; }
-  .pr-offer-vid video{ flex:1 1 0; min-height:0; height:auto; max-height:none;
-    aspect-ratio:auto; object-fit:cover; }
+  /* 🔴 IL VIDEO ESCE DAL FLUSSO, COSI' NON PUO' DECIDERE L'ALTEZZA.
+     Ci ho provato due volte con flexbox -- prima con un minimo di 220px
+     (sbagliato: un minimo impedisce di rimpicciolire), poi con
+     min-height:0 -- e il video restava comunque piu' alto del testo,
+     perche' un <video> porta con se' le proprie proporzioni naturali e
+     se lo lasci nel flusso quelle vincono sempre.
+     Messo in posizione assoluta dentro il riquadro, il video NON ha piu'
+     un'altezza propria: riempie lo spazio che la riga gli da', e la riga
+     la decide il testo. Che e' il verso giusto -- comanda quello che si
+     deve leggere. La didascalia va sopra il video, in basso, invece di
+     stargli sotto e allungare tutto. */
+  .pr-offer-vid{ display:block; position:relative; min-height:230px; }
+  .pr-offer-vid video{ position:absolute; inset:0; width:100%; height:100%;
+    max-height:none; aspect-ratio:auto; object-fit:cover; }
+  .pr-offer-vid figcaption{ position:absolute; left:0; right:0; bottom:0;
+    background:linear-gradient(transparent, rgba(15,20,26,.86) 42%);
+    color:#FFF; padding:22px 11px 9px; }
+  .pr-offer-vid figcaption span{ color:rgba(255,255,255,.78); }
+  .pr-offer-vid figcaption b{ color:#FFF; }
 }
 .pr-offer-vid figcaption{ padding:9px 11px; background:#FFF; font-size:.78rem;
   line-height:1.4; }
@@ -1856,10 +1865,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
         <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
         <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
+        <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
       </span>
-      <span><b>September offer, only on this page.</b> It ends on <b>30 September</b>
-      and the price goes back to &euro;89 &mdash; you won&rsquo;t find this on the booking
-      platforms.</span>
+      <span><b>September offer &mdash; available just here.</b> Not on the booking
+      platforms, not anywhere else. It ends on <b>30 September</b>, then the price
+      goes back to &euro;89.</span>
     </p>
    </div>
 
@@ -2865,6 +2875,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              cima e non la ritrova al momento di prenotare paga pieno, e
              se ne accorge dopo. E' il modo peggiore di perdere un
              cliente che era gia' contento. -->
+        <!-- IL CONTATORE ANCHE QUI. Chi e' arrivato al calendario ha
+             gia' deciso di guardare le date: e' il momento in cui sapere
+             che l'offerta finisce vale di piu', non di meno. -->
+        <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
+          <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
+            <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
+            <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
+            <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
+            <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
+          </span>
+          <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
+        </p>
         <p class="pr-code-here pr-promo reveal">
           Pick your date, then at checkout paste
           <button type="button" class="pr-copy" data-code="DIRECT10"
@@ -3184,28 +3206,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    negativo e' peggio di nessun contatore, ed e' quello che succede alle
    promozioni che nessuno si ricorda di togliere. */
 (function(){
-  var t = document.querySelector('.pr-timer');
-  if (!t) return;
-  var fine = Date.parse(t.getAttribute('data-fine'));
+  /* PIU' DI UN CONTATORE, UN SOLO OROLOGIO. Uno sta in cima
+     nell'offerta, uno accanto al calendario: se ognuno avesse il suo
+     ciclo, prima o poi mostrerebbero due secondi diversi nella stessa
+     schermata -- ed e' il genere di dettaglio che fa sospettare che il
+     tempo sia finto. Un ciclo solo li aggiorna tutti insieme. */
+  var tt = document.querySelectorAll('.pr-timer');
+  if (!tt.length) return;
+  var fine = Date.parse(tt[0].getAttribute('data-fine'));
   if (!fine) return;
-  var q = {
-    g: t.querySelector('[data-q="g"]'),
-    o: t.querySelector('[data-q="o"]'),
-    m: t.querySelector('[data-q="m"]')
-  };
   function due(n){ return n < 10 ? '0' + n : '' + n; }
   function batti(){
     var ms = fine - Date.now();
     if (ms <= 0) { document.documentElement.classList.add('promo-finita'); return; }
-    var tot = Math.floor(ms / 60000);
-    q.g.textContent = Math.floor(tot / 1440);
-    q.o.textContent = due(Math.floor((tot % 1440) / 60));
-    q.m.textContent = due(tot % 60);
+    var s = Math.floor(ms / 1000);
+    var g = Math.floor(s / 86400), o = Math.floor((s % 86400) / 3600),
+        m = Math.floor((s % 3600) / 60), sec = s % 60;
+    Array.prototype.forEach.call(tt, function(t){
+      var a = t.querySelector('[data-q="g"]'); if (a) a.textContent = g;
+      var b = t.querySelector('[data-q="o"]'); if (b) b.textContent = due(o);
+      var c = t.querySelector('[data-q="m"]'); if (c) c.textContent = due(m);
+      var d = t.querySelector('[data-q="s"]'); if (d) d.textContent = due(sec);
+    });
   }
   batti();
-  /* ogni dieci secondi: i minuti cambiano quando devono, senza che la
-     pagina lavori sessanta volte al minuto per niente */
-  setInterval(batti, 10000);
+  setInterval(batti, 1000);
 })();
 </script>
 <script defer src="https://cdn.regiondo.net/js/integration/bookingwidget/bookingwidget.js"></script>
