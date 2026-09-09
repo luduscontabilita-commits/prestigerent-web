@@ -196,7 +196,14 @@
       if (pu && pu.quante > 0) {
         var NOMI = { viator:'Viator', tripadvisor:'Tripadvisor', google:'Google',
                      getyourguide:'GetYourGuide', regiondo:'direct bookings' };
-        var quanti = String(pu.quante).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        /* 🔴 COL PIU'. La riga `viator` in tabella non la aggiorna nessuno
+           -- solo `regiondo` ha un ricalcolo -- quindi quel numero e'
+           sempre un po' indietro: 8.250 qui contro 8.306 su Viator.
+           Ma le recensioni non diminuiscono mai: un numero vecchio non e'
+           sbagliato, e' vero per difetto. Scritto "8,250+" resta onesto
+           per sempre anche senza toccarlo, e sale da solo il giorno che
+           qualcuno aggiorna la riga. */
+        var quanti = String(pu.quante).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '+';
         [].forEach.call(document.querySelectorAll('[data-quante]'), function (el) {
           el.textContent = quanti;
         });
