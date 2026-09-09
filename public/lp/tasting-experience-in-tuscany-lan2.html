@@ -395,6 +395,20 @@ body{
 .pr-opt.is-sel .pr-opt-how::before{ content:"\2713  Selected"; color:var(--orange); }
 
 /* riassunto della giornata privata: accordion sotto gli highlights */
+/* ============================================================
+   IL PRIVATO NON STA SULLA PAGINA DEL PICCOLO GRUPPO.
+   Si nasconde e non si cancella: dentro queste sezioni ci sono ancore,
+   pulsanti con data-book-tab e schede che il codice della pagina cerca
+   per nome. Togliendo il markup quel codice troverebbe il vuoto e
+   smetterebbe di funzionare altrove, in silenzio.
+   Il privato ha la sua pagina: /lp/private-tasting-experience-in-tuscany-lan
+   ============================================================ */
+#info-private, #private{ display:none !important; }
+/* la carta del privato fra le formule, e la sua riga di prezzo */
+.pr-opt[data-opt="private"]{ display:none !important; }
+/* due carte invece di tre: la griglia si riadatta */
+.pr-opts{ grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+
 .pr-acc-priv{ max-width:880px; margin:24px auto 0; border:2px solid var(--line); background:#FFF; }
 .pr-acc-priv summary{ cursor:pointer; }
 .pr-priv-tag{ display:inline-block; margin-right:9px; font-size:.6rem; font-weight:800; letter-spacing:.1em;
@@ -1987,7 +2001,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="pr-step reveal">Choose your format
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
       </span>
-      <h2 class="pr-title reveal">Three ways to <em class="hl place">visit our wineries</em> in Tuscany, Italy &mdash; by minivan, minibus or small bus, never a coach</h2>
+      <h2 class="pr-title reveal">Two ways to <em class="hl place">visit our wineries</em> in Tuscany, Italy &mdash; by minivan, minibus or small bus, never a coach</h2>
     </div>
     <div class="pr-opts reveal">
 
