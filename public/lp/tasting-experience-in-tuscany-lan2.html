@@ -1121,11 +1121,17 @@ html:not(.js) .pr-more-row{ display:none; }
 /* Sopra i 900px il video sta accanto: la prova e la promessa si leggono
    con un colpo d'occhio solo. Sotto, va SOTTO -- l'offerta e il codice
    devono restare la prima cosa, il video e' la conferma. */
-@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 240px; } }
+@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 208px; align-items:stretch; } }
 .pr-offer-vid{ margin:0; position:relative; border-radius:12px; overflow:hidden;
   border:2px solid var(--line); background:#0F141A; }
 .pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
-  object-fit:cover; }
+  max-height:290px; object-fit:cover; }
+@media (min-width:900px){
+  /* il video segue l'altezza del testo, non il contrario */
+  .pr-offer-vid{ display:flex; flex-direction:column; }
+  .pr-offer-vid video{ flex:1 1 auto; height:0; min-height:220px; max-height:none;
+    aspect-ratio:auto; }
+}
 .pr-offer-vid figcaption{ padding:9px 11px; background:#FFF; font-size:.78rem;
   line-height:1.4; }
 .pr-offer-vid figcaption span{ display:block; font-weight:700; color:var(--ink-soft);
@@ -1143,9 +1149,9 @@ html:not(.js) .pr-more-row{ display:none; }
   border-radius:999px; background:#FFF; border:2px dashed var(--orange);
   font-size:.92rem; font-weight:900; letter-spacing:.06em; color:var(--orange);
   user-select:all; }
-.pr-offer ul{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
-.pr-offer li{ display:flex; gap:9px; align-items:flex-start;
-  font-size:.92rem; line-height:1.5; }
+.pr-offer ul{ margin:0; padding:0; list-style:none; display:grid; gap:5px; }
+.pr-offer li{ display:flex; gap:8px; align-items:flex-start;
+  font-size:.88rem; line-height:1.45; }
 .pr-offer li b{ font-weight:800; }
 .pr-offer-when{ margin:12px 0 0; font-size:.78rem; color:var(--ink-soft); }
 
@@ -1203,11 +1209,34 @@ html:not(.js) .pr-more-row{ display:none; }
   .pr-offer-now{ font-size:1.5rem; }
   .pr-offer li{ font-size:.87rem; }
 }
+/* VIA LE SCHEDE. Si nascondono e non si cancellano: il codice che le
+   gestisce e' agganciato anche alle tre carte piu' in alto, e togliendo
+   gli elementi troverebbe il vuoto -- le carte smetterebbero di
+   funzionare senza dare nessun segnale. */
+#bookform .bk-head, #bookform .bk-tabs{ display:none !important; }
+/* il pannello scelto resta visibile e largo; l'altro sta parcheggiato
+   fuori schermo come prima, cosi' il widget puo' misurarsi */
+#bookform .bk-panel:not([hidden]){ display:block; }
+
+/* Il link al privato: laterale, non un pulsante. Un pulsante grande
+   accanto al calendario invita a fermarsi e riconsiderare tutto proprio
+   quando la persona stava per scegliere una data. */
+.bk-priv{ display:block; max-width:560px; margin:0 auto 12px; text-align:center;
+  font-size:.84rem; color:var(--ink-soft); }
+.bk-priv a{ color:var(--orange); font-weight:800; text-decoration:underline;
+  text-underline-offset:3px; }
+
 /* la riga del codice accanto al calendario: il campo coupon di Regiondo
    compare solo dopo "Proceed to checkout", e chi non lo sa paga pieno */
-.pr-code-here{ max-width:560px; margin:0 auto 14px; padding:11px 14px;
-  background:#FFF8F2; border:2px dashed var(--orange); border-radius:12px;
-  font-size:.9rem; font-weight:700; color:var(--ink); text-align:center; }
+.pr-code-here{ max-width:560px; margin:0 auto 12px; padding:9px 12px;
+  background:#FFF8F2; border:1px dashed var(--orange); border-radius:10px;
+  font-size:.8rem; font-weight:600; color:var(--ink-soft); text-align:center;
+  line-height:1.55; }
+.pr-code-here b{ color:var(--ink); font-weight:800; }
+/* dentro la riga il pulsante e' piccolo: e' un promemoria, non l'offerta */
+.pr-code-here .pr-copy{ padding:3px 4px 3px 9px; vertical-align:middle; }
+.pr-code-here .pr-copy .cod{ font-size:.82rem; }
+.pr-code-here .pr-copy .lab{ font-size:.6rem; padding:3px 7px; }
 .pr-code-here b{ color:var(--orange); letter-spacing:.06em; user-select:all; }
 
 /* prezzo barrato "solo per oggi" (il prezzo reale resta €89) */
@@ -2731,11 +2760,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              se ne accorge dopo. E' il modo peggiore di perdere un
              cliente che era gia' contento. -->
         <p class="pr-code-here reveal">
-          <b>1.</b> Pick your date below &nbsp;&middot;&nbsp;
-          <b>2.</b> Press <i>Proceed to checkout</i> &nbsp;&middot;&nbsp;
-          <b>3.</b> Paste <button type="button" class="pr-copy" data-code="DIRECT10"
+          Pick your date, then at checkout paste
+          <button type="button" class="pr-copy" data-code="DIRECT10"
              aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-          in the field <i>&ldquo;Discount code&rdquo;</i> &mdash; <b>10% off your total</b>
+          in <i>&ldquo;Discount code&rdquo;</i> &mdash; <b>10% off</b>
+        </p>
+        <p class="bk-priv reveal">
+          Travelling as a couple or a family?
+          <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
         </p>
 
         <div class="bk-tabs" role="tablist" aria-label="Choose how you want to book">
