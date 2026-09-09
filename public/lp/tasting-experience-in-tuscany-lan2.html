@@ -1470,6 +1470,7 @@ a.cta{ text-decoration:none; display:inline-block; }
 .pr-sticky-info{ flex:1 1 auto; min-width:0; line-height:1.2; }
 .pr-sticky-title{ font-size:.92rem; font-weight:800; color:#fff; line-height:1.24; margin-bottom:3px;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pr-sticky-price s{ opacity:.62; font-weight:600; margin-right:3px; }
 .pr-sticky-price{ line-height:1.2; color:#fff; }
 .pr-sticky-price .from{ font-size:.9rem; font-weight:600; color:rgba(255,255,255,.72); }
 .pr-sticky-price b{ font-size:1.14rem; font-weight:800; color:#fff; }
@@ -2327,6 +2328,149 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 </section>
 
+<!-- 🔴 DA QUI IN GIU' E' STATO SPOSTATO IN `.pg-main-b` (09/09/2026).
+     Sul telefono il calendario cadeva al 73% della pagina, dopo le FAQ,
+     mentre la profondita' media di scorrimento e' il 20%. Viator e
+     GetYourGuide hanno il riquadro di prenotazione nella PRIMA
+     schermata. Spostando questo blocco sotto l'`aside`, sul telefono il
+     calendario sale subito dopo i video.
+     Sopra i 1400px non cambia niente: la griglia usa posizioni
+     esplicite (`.pg-main` riga 1, `.pg-main-b` riga 2, `.pg-rail`
+     colonna 2 su entrambe), e con quelle l'ordine nel documento non
+     conta. -->
+</div><!-- /.pg-main -->
+
+<aside class="pg-rail" id="prRail" aria-label="Book this tour">
+  <div class="pg-rail-in">
+      <!-- id="bookform" avvolge titolo + schede + calendario: i pulsanti
+           devono atterrare sulla SCELTA, non sul calendario gia' aperto su
+           una formula che l'utente non ha selezionato. -->
+      <div id="bookform">
+        <div class="bk-head reveal">
+          <h3 class="bk-title">First, choose how you want to travel</h3>
+          <p class="bk-sub">Then pick your date in the calendar below.</p>
+        </div>
+
+        <!-- IL CODICE, RIPETUTO QUI. Il campo coupon di Regiondo compare
+             solo DOPO "Proceed to checkout": chi ha letto l'offerta in
+             cima e non la ritrova al momento di prenotare paga pieno, e
+             se ne accorge dopo. E' il modo peggiore di perdere un
+             cliente che era gia' contento. -->
+        <!-- IL CONTATORE ANCHE QUI. Chi e' arrivato al calendario ha
+             gia' deciso di guardare le date: e' il momento in cui sapere
+             che l'offerta finisce vale di piu', non di meno. -->
+        <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
+          <span class="pr-here-off"><b>&minus;10%</b><i>on your whole booking</i></span>
+          <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
+            <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
+            <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
+            <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
+            <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
+          </span>
+          <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
+        </p>
+        <!-- I TRE PASSI STANNO SOTTO IL CALENDARIO, non sopra.
+             Sono istruzioni per DOPO aver scelto la data: messe prima si
+             leggevano quando non servivano ancora, e si prendevano la
+             parte alta della colonna fissa -- l'unica che si vede senza
+             scorrere. -->
+        <div class="pr-passi pr-promo reveal">
+          <p class="pr-passi-t">How to get your 10% off</p>
+          <ol>
+            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
+            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
+              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
+            <li><span>Paste
+              <button type="button" class="pr-copy" data-code="DIRECT10"
+                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
+              and press <i>Apply</i>
+              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
+          </ol>
+        </div>
+        <p class="bk-priv reveal">
+          Travelling as a couple or a family?
+          <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
+        </p>
+
+        <div class="bk-tabs" role="tablist" aria-label="Choose how you want to book">
+          <button type="button" class="bk-tab is-on" id="bk-tab-shared" role="tab" aria-selected="true" aria-controls="bk-shared">
+            <b>Small group &mdash; you join others</b><span class="bk-price">&euro;89 <i>pp</i></span><small>Max 25 guests &middot; licensed guide, two estates</small>
+          </button>
+          <!-- 🔴 IL SEMI-PRIVATO HA UNA SCHEDA SUA (01/09/2026).
+               Prima stava nascosto in una riga piccola sotto "Small group"
+               -- "or semi-private, 8 guests" -- e chi cercava qualcosa di
+               piu' intimo del pullman senza arrivare ai 590 del privato non
+               sapeva che esisteva. Vale 587 biglietti al mese a 129 euro:
+               non e' una postilla.
+               Apre lo STESSO calendario del gruppo, perche' su Regiondo
+               sono due varianti dello stesso prodotto e la scelta vera si
+               fa al passo 3. La scheda serve a far sapere che c'e' e
+               quanto costa. -->
+          <button type="button" class="bk-tab" id="bk-tab-semi" role="tab" aria-selected="false" aria-controls="bk-shared">
+            <b>Semi-private &mdash; a small table</b><span class="bk-price">&euro;129 <i>pp</i></span><small>Max 8 guests &middot; same wineries, fewer people</small>
+          </button>
+
+          <button type="button" class="bk-tab" id="bk-tab-private" role="tab" aria-selected="false" aria-controls="bk-private">
+            <b>Private &mdash; only your group</b><span class="bk-price"><i>from</i> &euro;590 <i>per party</i></span><small>Up to 8 guests &middot; your own driver and timings</small>
+          </button>
+        </div>
+
+
+
+      <div class="pr-widget-holder reveal">
+        <div class="bk-panel" id="bk-shared" role="tabpanel" aria-labelledby="bk-tab-shared">
+          <div class="regiondo-booking-widget" data-locale="en_US" data-provider="PR193" data-product="T-PR193-210790" data-title="Tasting Experience in Tuscany" data-url="https://prestigerent.regiondo.com/" data-width="400px" data-font="Open Sans"></div>
+        </div>
+        <div class="bk-panel" id="bk-private" role="tabpanel" aria-labelledby="bk-tab-private" hidden>
+          <div class="regiondo-booking-widget" data-locale="en_US" data-provider="PR193" data-product="T-PR193-225131" data-title="Private tour to Chianti &amp; Wineries" data-url="https://prestigerent.regiondo.com/" data-width="400px" data-font="Open Sans"></div>
+        </div>
+        <noscript><p style="font-weight:600;color:#55646F">Enable JavaScript to book here, or
+          <a href="https://prestigerent.com/tour/wine-experience-in-tuscany/">book on our website</a>.</p></noscript>
+      </div>
+
+      <!-- Le garanzie SOTTO il calendario (01/09/2026): chieste li'
+           dalla proprieta'. Sopra rubavano la riga a ridosso delle
+           schede della formula; sotto si leggono quando la data e'
+           gia' scelta e resta il dubbio 'e se poi non posso venire?'. -->
+      <!-- Le garanzie subito prima del calendario, dove nasce l'esitazione:
+           nella colonna ne restano visibili due, le altre le nasconde il CSS. -->
+      <div class="pr-tguar reveal">
+        <span><i aria-hidden="true">&#128737;&#65039;</i><b>Free cancellation &amp; date changes</b> up to 24h &mdash; 100% refund</span>
+        <span><i aria-hidden="true">&#9889;</i><b>Instant confirmation</b></span>
+        <span><i aria-hidden="true">&#127991;&#65039;</i><b>Best price</b> when you book direct</span>
+        <span><i aria-hidden="true">&#128222;</i><b>Direct line</b> to our team, not a call centre</span>
+      </div>
+      </div><!-- /#bookform -->
+
+      <!-- Sicurezza del pagamento subito sotto il calendario: e' li' che
+           si tira fuori la carta, non in fondo alla pagina. -->
+      <div class="pr-paybanner reveal">
+        <img src="img/payments.webp" width="940" height="188" loading="lazy" decoding="async"
+             alt="Secure payment with Stripe: Visa, Mastercard, Maestro, American Express, Google Pay, Apple Pay, PayPal and WeChat Pay">
+      </div>
+      <!-- CHI E' CHE INCASSA, SOTTO IL CALENDARIO (01/09/2026).
+           Qui c'era "Encrypted checkout · Free cancellation · Instant
+           confirmation", tolto perche' ripeteva le garanzie che adesso
+           stanno sopra. Al suo posto la proprieta' ha chiesto i dati veri:
+           chi sta per lasciare la carta a un sito che non conosce guarda
+           se dietro c'e' un'azienda con un indirizzo e un telefono, non
+           un'altra promessa. La licenza e la partita IVA sono cio' che
+           distingue un operatore autorizzato da un intermediario. -->
+      <div class="pr-chisiamo reveal">
+        <b>Prestige Rent S.r.l.</b><br>
+        Via della Saggina 98, 50145 Florence, Italy<br>
+        <a href="tel:+39055286059">+39 055 286 059</a>
+        <span class="pr-pay-sep">&middot;</span>
+        <a href="https://wa.me/393338424047" target="_blank" rel="noopener">WhatsApp +39 333 842 4047</a>
+        <span class="pr-pay-sep">&middot;</span>
+        <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a><br>
+        <span class="pr-chisiamo-min">Tour Operator, Travel Agency &amp; Limo Company &mdash; VAT 05745220482</span>
+      </div>
+  </div>
+</aside>
+
+<div class="pg-main-b">
+
 <!-- ============================================================
      PREMI — prima delle recensioni: i badge sono il titolo, le
      recensioni sono la prova. Immagini reali della libreria media
@@ -3022,138 +3166,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      titoli, prezzi, durate e immagini reali presi da
      prestigerent.com/small-group-tours/.
      ============================================================ -->
-</div><!-- /.pg-main -->
 
-<aside class="pg-rail" id="prRail" aria-label="Book this tour">
-  <div class="pg-rail-in">
-      <!-- id="bookform" avvolge titolo + schede + calendario: i pulsanti
-           devono atterrare sulla SCELTA, non sul calendario gia' aperto su
-           una formula che l'utente non ha selezionato. -->
-      <div id="bookform">
-        <div class="bk-head reveal">
-          <h3 class="bk-title">First, choose how you want to travel</h3>
-          <p class="bk-sub">Then pick your date in the calendar below.</p>
-        </div>
-
-        <!-- IL CODICE, RIPETUTO QUI. Il campo coupon di Regiondo compare
-             solo DOPO "Proceed to checkout": chi ha letto l'offerta in
-             cima e non la ritrova al momento di prenotare paga pieno, e
-             se ne accorge dopo. E' il modo peggiore di perdere un
-             cliente che era gia' contento. -->
-        <!-- IL CONTATORE ANCHE QUI. Chi e' arrivato al calendario ha
-             gia' deciso di guardare le date: e' il momento in cui sapere
-             che l'offerta finisce vale di piu', non di meno. -->
-        <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
-          <span class="pr-here-off"><b>&minus;10%</b><i>on your whole booking</i></span>
-          <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
-            <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
-            <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
-            <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
-            <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
-          </span>
-          <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
-        </p>
-        <!-- I TRE PASSI STANNO SOTTO IL CALENDARIO, non sopra.
-             Sono istruzioni per DOPO aver scelto la data: messe prima si
-             leggevano quando non servivano ancora, e si prendevano la
-             parte alta della colonna fissa -- l'unica che si vede senza
-             scorrere. -->
-        <div class="pr-passi pr-promo reveal">
-          <p class="pr-passi-t">How to get your 10% off</p>
-          <ol>
-            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
-            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
-              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
-            <li><span>Paste
-              <button type="button" class="pr-copy" data-code="DIRECT10"
-                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-              and press <i>Apply</i>
-              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
-          </ol>
-        </div>
-        <p class="bk-priv reveal">
-          Travelling as a couple or a family?
-          <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
-        </p>
-
-        <div class="bk-tabs" role="tablist" aria-label="Choose how you want to book">
-          <button type="button" class="bk-tab is-on" id="bk-tab-shared" role="tab" aria-selected="true" aria-controls="bk-shared">
-            <b>Small group &mdash; you join others</b><span class="bk-price">&euro;89 <i>pp</i></span><small>Max 25 guests &middot; licensed guide, two estates</small>
-          </button>
-          <!-- 🔴 IL SEMI-PRIVATO HA UNA SCHEDA SUA (01/09/2026).
-               Prima stava nascosto in una riga piccola sotto "Small group"
-               -- "or semi-private, 8 guests" -- e chi cercava qualcosa di
-               piu' intimo del pullman senza arrivare ai 590 del privato non
-               sapeva che esisteva. Vale 587 biglietti al mese a 129 euro:
-               non e' una postilla.
-               Apre lo STESSO calendario del gruppo, perche' su Regiondo
-               sono due varianti dello stesso prodotto e la scelta vera si
-               fa al passo 3. La scheda serve a far sapere che c'e' e
-               quanto costa. -->
-          <button type="button" class="bk-tab" id="bk-tab-semi" role="tab" aria-selected="false" aria-controls="bk-shared">
-            <b>Semi-private &mdash; a small table</b><span class="bk-price">&euro;129 <i>pp</i></span><small>Max 8 guests &middot; same wineries, fewer people</small>
-          </button>
-
-          <button type="button" class="bk-tab" id="bk-tab-private" role="tab" aria-selected="false" aria-controls="bk-private">
-            <b>Private &mdash; only your group</b><span class="bk-price"><i>from</i> &euro;590 <i>per party</i></span><small>Up to 8 guests &middot; your own driver and timings</small>
-          </button>
-        </div>
-
-
-
-      <div class="pr-widget-holder reveal">
-        <div class="bk-panel" id="bk-shared" role="tabpanel" aria-labelledby="bk-tab-shared">
-          <div class="regiondo-booking-widget" data-locale="en_US" data-provider="PR193" data-product="T-PR193-210790" data-title="Tasting Experience in Tuscany" data-url="https://prestigerent.regiondo.com/" data-width="400px" data-font="Open Sans"></div>
-        </div>
-        <div class="bk-panel" id="bk-private" role="tabpanel" aria-labelledby="bk-tab-private" hidden>
-          <div class="regiondo-booking-widget" data-locale="en_US" data-provider="PR193" data-product="T-PR193-225131" data-title="Private tour to Chianti &amp; Wineries" data-url="https://prestigerent.regiondo.com/" data-width="400px" data-font="Open Sans"></div>
-        </div>
-        <noscript><p style="font-weight:600;color:#55646F">Enable JavaScript to book here, or
-          <a href="https://prestigerent.com/tour/wine-experience-in-tuscany/">book on our website</a>.</p></noscript>
-      </div>
-
-      <!-- Le garanzie SOTTO il calendario (01/09/2026): chieste li'
-           dalla proprieta'. Sopra rubavano la riga a ridosso delle
-           schede della formula; sotto si leggono quando la data e'
-           gia' scelta e resta il dubbio 'e se poi non posso venire?'. -->
-      <!-- Le garanzie subito prima del calendario, dove nasce l'esitazione:
-           nella colonna ne restano visibili due, le altre le nasconde il CSS. -->
-      <div class="pr-tguar reveal">
-        <span><i aria-hidden="true">&#128737;&#65039;</i><b>Free cancellation &amp; date changes</b> up to 24h &mdash; 100% refund</span>
-        <span><i aria-hidden="true">&#9889;</i><b>Instant confirmation</b></span>
-        <span><i aria-hidden="true">&#127991;&#65039;</i><b>Best price</b> when you book direct</span>
-        <span><i aria-hidden="true">&#128222;</i><b>Direct line</b> to our team, not a call centre</span>
-      </div>
-      </div><!-- /#bookform -->
-
-      <!-- Sicurezza del pagamento subito sotto il calendario: e' li' che
-           si tira fuori la carta, non in fondo alla pagina. -->
-      <div class="pr-paybanner reveal">
-        <img src="img/payments.webp" width="940" height="188" loading="lazy" decoding="async"
-             alt="Secure payment with Stripe: Visa, Mastercard, Maestro, American Express, Google Pay, Apple Pay, PayPal and WeChat Pay">
-      </div>
-      <!-- CHI E' CHE INCASSA, SOTTO IL CALENDARIO (01/09/2026).
-           Qui c'era "Encrypted checkout · Free cancellation · Instant
-           confirmation", tolto perche' ripeteva le garanzie che adesso
-           stanno sopra. Al suo posto la proprieta' ha chiesto i dati veri:
-           chi sta per lasciare la carta a un sito che non conosce guarda
-           se dietro c'e' un'azienda con un indirizzo e un telefono, non
-           un'altra promessa. La licenza e la partita IVA sono cio' che
-           distingue un operatore autorizzato da un intermediario. -->
-      <div class="pr-chisiamo reveal">
-        <b>Prestige Rent S.r.l.</b><br>
-        Via della Saggina 98, 50145 Florence, Italy<br>
-        <a href="tel:+39055286059">+39 055 286 059</a>
-        <span class="pr-pay-sep">&middot;</span>
-        <a href="https://wa.me/393338424047" target="_blank" rel="noopener">WhatsApp +39 333 842 4047</a>
-        <span class="pr-pay-sep">&middot;</span>
-        <a href="mailto:usa@prestigerent.com">usa@prestigerent.com</a><br>
-        <span class="pr-chisiamo-min">Tour Operator, Travel Agency &amp; Limo Company &mdash; VAT 05745220482</span>
-      </div>
-  </div>
-</aside>
-
-<div class="pg-main-b">
 
 <!-- ============================================================
      TESTIMONIANZE — subito dopo i premi: prima il riconoscimento,
@@ -3425,7 +3438,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- data-base = parte fissa del titolo; il nome della formula scelta
          viene aggiunto dallo script insieme al prezzo giusto. -->
     <div class="pr-sticky-title" data-base="Tasting Experience in Tuscany">Tasting Experience in Tuscany</div>
-    <div class="pr-sticky-price"><span class="pr-promo"><b>&minus;10%</b> <span class="per">direct &middot; DIRECT10</span></span><span class="pr-promo-off"><b>&euro;89</b> <span class="per">per person</span></span></div>
+    <div class="pr-sticky-price"><span class="pr-promo"><s>&euro;89</s> <b>&euro;80</b> <span class="per">per person &middot; DIRECT10</span></span><span class="pr-promo-off"><b>&euro;89</b> <span class="per">per person</span></span></div>
   </div>
   <a class="cta" href="#bookform">CHECK AVAILABILITY</a>
 </div>
