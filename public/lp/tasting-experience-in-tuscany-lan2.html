@@ -1343,6 +1343,16 @@ html:not(.js) .pr-more-row{ display:none; }
   line-height:1.55; }
 .pr-code-here b{ color:var(--ink); font-weight:800; }
 
+/* LA CIFRA, IN CIMA AL RIQUADRO DEL CALENDARIO.
+   Prima la ragione, poi il tempo che resta: al contrario non funziona,
+   perche' il tempo che resta DI CHE COSA non si sa ancora. */
+.pr-here-off{ display:block; margin:0 0 9px; line-height:1; }
+.pr-here-off b{ font-size:2.3rem; font-weight:900; letter-spacing:-.02em;
+  color:var(--orange); }
+.pr-here-off i{ display:block; margin-top:6px; font-style:normal;
+  font-size:.76rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--ink-soft); }
+
 /* I TRE PASSI, ACCANTO AL CALENDARIO E SOLO LI'.
    Numerati davvero (<ol>): sono azioni in ordine, e il numero dice
    quante ne mancano. L'attesa dopo "Apply" e' scritta come parte del
@@ -2931,6 +2941,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              gia' deciso di guardare le date: e' il momento in cui sapere
              che l'offerta finisce vale di piu', non di meno. -->
         <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
+          <span class="pr-here-off"><b>&minus;10%</b><i>on your whole booking</i></span>
           <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
             <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
             <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
