@@ -1132,6 +1132,17 @@ html:not(.js) .pr-more-row{ display:none; }
   font-size:.92rem; line-height:1.5; }
 .pr-offer li b{ font-weight:800; }
 .pr-offer-when{ margin:12px 0 0; font-size:.78rem; color:var(--ink-soft); }
+/* L'URGENZA, e le due regole che la tengono onesta:
+   1. niente conto alla rovescia che riparte a ogni visita -- chi lo
+      riconosce smette di credere anche a quello che e' vero;
+   2. si dice solo quello che si puo' sostenere. "I gruppi piccoli si
+      riempiono" e' un fatto del prodotto, non una promessa inventata. */
+.pr-offer-urg{ display:flex; align-items:center; gap:9px; margin:12px 0 0;
+  padding:9px 13px; border-radius:10px; background:#FFF0EE; border:1px solid #F6C9C2;
+  font-size:.86rem; font-weight:700; color:#7A2016; line-height:1.45; }
+.pr-offer-only{ margin:10px 0 0; font-size:.86rem; font-weight:800; color:var(--ink);
+  line-height:1.5; }
+.pr-offer-only b{ color:var(--orange); }
 @media (max-width:560px){
   .pr-offer{ padding:15px 14px; margin-top:18px; }
   .pr-offer-now{ font-size:1.5rem; }
@@ -1661,7 +1672,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <li><span aria-hidden="true">✅</span><span><b>Guaranteed departure.</b> We run the tour even when the group is small. We don&rsquo;t cancel on you the night before.</span></li>
       <li><span aria-hidden="true">💳</span><span>Free cancellation and date changes up to 24h &mdash; 100% refund. No booking fee. Instant confirmation.</span></li>
     </ul>
-    <p class="pr-offer-when">Same tour, same guide, same two family wineries. The code works only on this page &mdash; enter it at checkout.</p>
+    <p class="pr-offer-only">
+      <b>This price exists only on this page.</b> You won&rsquo;t find it on the booking
+      platforms &mdash; same tour, same guide, same two family wineries.
+    </p>
+    <p class="pr-offer-urg">
+      <span aria-hidden="true">⏳</span>
+      <span><b>Limited offer.</b> Small groups fill up &mdash; autumn dates are going first,
+      and when this one closes the price goes back to &euro;89.</span>
+    </p>
+    <p class="pr-offer-when">Enter <b>DIRECT10</b> at checkout.</p>
   </div>
 
   <div class="trust">
