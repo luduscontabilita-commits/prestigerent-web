@@ -1749,9 +1749,21 @@ html{ scroll-behavior:auto; }
 
   .pg-rail-in{ position:sticky; top:8px; max-width:none; max-height:calc(100vh - 16px);
     overflow-y:auto; overscroll-behavior:contain; padding:8px 10px 14px; }
-  .pg-rail-in::-webkit-scrollbar{ width:9px; }
-  .pg-rail-in::-webkit-scrollbar-thumb{ background:#D3DAE0; border-radius:5px; }
-  .pg-rail-in::-webkit-scrollbar-track{ background:transparent; }
+  /* 🔴 LA BARRA SPARISCE, LO SCORRIMENTO NO.
+     Due barre affiancate -- quella della pagina e quella di questa
+     colonna -- si vedono e danno l'idea di una pagina rotta. Togliere
+     `overflow` pero' taglierebbe il calendario sugli schermi bassi, e
+     il codice del widget usa `inner.scrollTop` per portare in vista il
+     campo giusto dopo il cambio di scheda.
+     Quindi si nasconde la barra e si mette una sfumatura in fondo
+     quando c'e' ancora contenuto sotto: e' l'avviso che la barra dava,
+     e senza sarebbe roba nascosta senza nessun segnale. */
+  .pg-rail-in{ scrollbar-width:none; -ms-overflow-style:none; }
+  .pg-rail-in::-webkit-scrollbar{ width:0; height:0; }
+  .pg-rail{ position:relative; }
+  .pg-rail::after{ content:""; position:sticky; display:block; z-index:2;
+    bottom:0; height:38px; margin-top:-38px; pointer-events:none;
+    background:linear-gradient(transparent, #FFF); }
 
   .pg-rail .bk-head{ margin-top:0; text-align:center; }
   .pg-rail .bk-title{ font-size:.98rem; }
@@ -2983,6 +2995,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </span>
           <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
         </p>
+        <!-- I TRE PASSI STANNO SOTTO IL CALENDARIO, non sopra.
+             Sono istruzioni per DOPO aver scelto la data: messe prima si
+             leggevano quando non servivano ancora, e si prendevano la
+             parte alta della colonna fissa -- l'unica che si vede senza
+             scorrere. -->
         <div class="pr-passi pr-promo reveal">
           <p class="pr-passi-t">How to get your 10% off</p>
           <ol>
