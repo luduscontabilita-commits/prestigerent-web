@@ -1313,6 +1313,33 @@ html:not(.js) .pr-more-row{ display:none; }
   font-size:.8rem; font-weight:600; color:var(--ink-soft); text-align:center;
   line-height:1.55; }
 .pr-code-here b{ color:var(--ink); font-weight:800; }
+
+/* I TRE PASSI, ACCANTO AL CALENDARIO E SOLO LI'.
+   Numerati davvero (<ol>): sono azioni in ordine, e il numero dice
+   quante ne mancano. L'attesa dopo "Apply" e' scritta come parte del
+   passo, non come nota a pie' di pagina: una nota la legge chi ha gia'
+   un problema, e a quel punto ha gia' ripremuto tre volte. */
+.pr-passi{ max-width:560px; margin:0 auto 12px; padding:12px 14px;
+  background:#FFF8F2; border:1px dashed var(--orange); border-radius:10px;
+  text-align:left; }
+.pr-passi-t{ margin:0 0 8px; font-size:.78rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.05em; color:var(--orange); }
+.pr-passi ol{ margin:0; padding:0; list-style:none; counter-reset:p;
+  display:grid; gap:7px; }
+.pr-passi li{ counter-increment:p; display:flex; gap:9px; align-items:flex-start;
+  font-size:.82rem; line-height:1.5; color:var(--ink-soft); }
+.pr-passi li::before{ content:counter(p); flex:0 0 auto; width:17px; height:17px;
+  margin-top:2px; border-radius:50%; background:var(--orange); color:#FFF;
+  font-size:.64rem; font-weight:800; display:flex; align-items:center;
+  justify-content:center; }
+.pr-passi b{ color:var(--ink); font-weight:800; }
+.pr-passi i{ font-style:normal; background:#FFF; border:1px solid var(--line);
+  border-radius:5px; padding:1px 5px; font-size:.76rem; font-weight:700;
+  color:var(--ink); white-space:nowrap; }
+.pr-passi .att{ display:block; margin-top:2px; font-size:.76rem; opacity:.9; }
+.pr-passi .pr-copy{ padding:3px 4px 3px 9px; vertical-align:middle; }
+.pr-passi .pr-copy .cod{ font-size:.82rem; }
+.pr-passi .pr-copy .lab{ font-size:.6rem; padding:3px 7px; }
 /* dentro la riga il pulsante e' piccolo: e' un promemoria, non l'offerta */
 .pr-code-here .pr-copy{ padding:3px 4px 3px 9px; vertical-align:middle; }
 .pr-code-here .pr-copy .cod{ font-size:.82rem; }
@@ -1852,7 +1879,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <p class="pr-copy-how">
       Shared departure <b>&euro;89 &rarr; &euro;80</b> &middot; private tours, same 10%.
-      Paste it in <b>&ldquo;Discount code&rdquo;</b> at checkout.
+      At checkout click <b>&ldquo;Redeem value voucher or discount code&rdquo;</b>, paste it, press Apply.
     </p>
     <ul>
       <li><span aria-hidden="true">🛡️</span><span><b>Not worth it? Tell your guide before you step off &mdash; full refund, no questions asked.</b></span></li>
@@ -2887,12 +2914,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </span>
           <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
         </p>
-        <p class="pr-code-here pr-promo reveal">
-          Pick your date, then at checkout paste
-          <button type="button" class="pr-copy" data-code="DIRECT10"
-             aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-          in <i>&ldquo;Discount code&rdquo;</i> &mdash; <b>10% off</b>
-        </p>
+        <div class="pr-passi pr-promo reveal">
+          <p class="pr-passi-t">How to get your 10% off</p>
+          <ol>
+            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
+            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
+              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
+            <li><span>Paste
+              <button type="button" class="pr-copy" data-code="DIRECT10"
+                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
+              and press <i>Apply</i>
+              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
+          </ol>
+        </div>
         <p class="bk-priv reveal">
           Travelling as a couple or a family?
           <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
@@ -3025,7 +3059,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     Book direct and save <b>10%</b> &mdash; paste
     <button type="button" class="pr-copy" data-code="DIRECT10"
             aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-    in <i>&ldquo;Discount code&rdquo;</i> at checkout. Only on this page.
+    at checkout, under <i>&ldquo;Redeem value voucher or discount code&rdquo;</i>. Only on this page.
   </p>
   <a class="cta" href="#bookform">CHECK AVAILABILITY</a>
 </section>
@@ -4201,5 +4235,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 })();
 </script>
 
+<!-- I riquadri delle prenotazioni vere: stessa fonte del sito
+     (/api/prenotazioni/, cioe' Regiondo). Vedi riprova.js. -->
+<script defer src="/lp/riprova.js" data-tour="wine-experience-in-tuscany"></script>
 </body>
 </html>
