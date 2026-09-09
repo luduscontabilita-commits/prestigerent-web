@@ -1140,6 +1140,17 @@ html:not(.js) .pr-more-row{ display:none; }
 .pr-offer-urg{ display:flex; align-items:center; gap:9px; margin:12px 0 0;
   padding:9px 13px; border-radius:10px; background:#FFF0EE; border:1px solid #F6C9C2;
   font-size:.86rem; font-weight:700; color:#7A2016; line-height:1.45; }
+.pr-copy{ display:inline-flex; align-items:center; gap:9px; padding:7px 8px 7px 14px;
+  border-radius:999px; background:#FFF; border:2px dashed var(--orange);
+  font:inherit; cursor:pointer; }
+.pr-copy .cod{ font-size:1rem; font-weight:900; letter-spacing:.08em; color:var(--orange); }
+.pr-copy .lab{ font-size:.74rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.06em; padding:4px 10px; border-radius:999px;
+  background:var(--orange); color:#FFF; }
+.pr-copy.fatto .lab{ background:#1F7A3A; }
+.pr-copy:hover{ box-shadow:0 4px 14px -6px rgba(237,103,7,.6); }
+.pr-copy-how{ margin:8px 0 0; font-size:.86rem; line-height:1.5; color:var(--ink); }
+.pr-copy-how b{ font-weight:800; }
 .pr-offer-only{ margin:10px 0 0; font-size:.86rem; font-weight:800; color:var(--ink);
   line-height:1.5; }
 .pr-offer-only b{ color:var(--orange); }
@@ -1662,10 +1673,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="pr-offer reveal">
     <div class="pr-offer-top">
       <span class="pr-offer-lab">Book direct, just here:</span>
-      <span class="pr-offer-was">&euro;89</span>
-      <span class="pr-offer-now">&euro;80</span>
-      <span class="pr-offer-code">DIRECT10</span>
+      <span class="pr-offer-now">&minus;10%</span>
+      <span class="pr-offer-lab">on your whole booking &mdash; any tour, any format</span>
+      <button type="button" class="pr-copy" data-code="DIRECT10"
+              aria-label="Copy the discount code DIRECT10">
+        <span class="cod">DIRECT10</span><span class="lab">Copy</span>
+      </button>
     </div>
+    <p class="pr-copy-how">
+      Shared departure <b>&euro;89 &rarr; &euro;80</b> per person &middot;
+      semi&#8209;private and private tours get the same <b>10% off</b>.<br>
+      <b>Copy the code now</b> &mdash; at checkout you&rsquo;ll paste it in the field
+      called <b>&ldquo;Discount code&rdquo;</b>, right before you pay.
+    </p>
     <ul>
       <li><span aria-hidden="true">🛡️</span><span><b>If it wasn&rsquo;t worth it, tell your guide before you step off the van &mdash; we refund you.</b> Not a form to fill weeks later: you say it, that day, to the person who was with you.</span></li>
       <li><span aria-hidden="true">📸</span><span><b>Your photo album, free.</b> Taken during the day and sent the morning after &mdash; so you go home with the day, not with 200 blurry phone photos.</span></li>
@@ -2578,7 +2598,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
              se ne accorge dopo. E' il modo peggiore di perdere un
              cliente che era gia' contento. -->
         <p class="pr-code-here reveal">
-          Enter <b>DIRECT10</b> at checkout &mdash; &euro;89 becomes &euro;80 per person
+          <b>1.</b> Pick your date below &nbsp;&middot;&nbsp;
+          <b>2.</b> Press <i>Proceed to checkout</i> &nbsp;&middot;&nbsp;
+          <b>3.</b> Paste <button type="button" class="pr-copy" data-code="DIRECT10"
+             aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
+          in the field <i>&ldquo;Discount code&rdquo;</i> &mdash; <b>10% off your total</b>
         </p>
 
         <div class="bk-tabs" role="tablist" aria-label="Choose how you want to book">
@@ -2820,11 +2844,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- data-base = parte fissa del titolo; il nome della formula scelta
          viene aggiunto dallo script insieme al prezzo giusto. -->
     <div class="pr-sticky-title" data-base="Tasting Experience in Tuscany">Tasting Experience in Tuscany</div>
-    <div class="pr-sticky-price"><s style="opacity:.55;font-weight:600">&euro;89</s> <b>&euro;80</b> <span class="per">direct</span></div>
+    <div class="pr-sticky-price"><b>&minus;10%</b> <span class="per">direct &middot; DIRECT10</span></div>
   </div>
   <a class="cta" href="#bookform">SECURE YOUR SPOT</a>
 </div>
 
+<script>
+/* COPIA IL CODICE. Su un telefono selezionare un testo dentro una
+   pastiglia riesce a meta' della gente; un pulsante riesce sempre.
+   Il ripiego serve davvero: `navigator.clipboard` non esiste sui
+   browser vecchi, e senza di esso il pulsante non farebbe NIENTE --
+   che e' peggio di non averlo. Selezionando il testo, almeno il gesto
+   resta possibile. */
+(function(){
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('.pr-copy') : null;
+    if (!b) return;
+    var cod = b.getAttribute('data-code') || '';
+    var lab = b.querySelector('.lab');
+    function fatto(){
+      b.classList.add('fatto');
+      if (lab) { lab.textContent = 'Copied'; }
+      setTimeout(function(){ b.classList.remove('fatto'); if (lab) lab.textContent = 'Copy'; }, 2200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cod).then(fatto, seleziona);
+    } else { seleziona(); }
+    function seleziona(){
+      try {
+        var n = b.querySelector('.cod'), r = document.createRange();
+        r.selectNodeContents(n);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        if (document.execCommand) { document.execCommand('copy'); fatto(); }
+      } catch (err) {}
+    }
+  }, false);
+})();
+</script>
 <script defer src="https://cdn.regiondo.net/js/integration/bookingwidget/bookingwidget.js"></script>
 <script>
 (function(){
