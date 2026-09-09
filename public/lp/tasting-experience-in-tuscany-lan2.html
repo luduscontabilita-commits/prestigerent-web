@@ -1172,7 +1172,7 @@ html:not(.js) .pr-more-row{ display:none; }
      come un video, non come un'immagine di riempimento */
   .pr-offer-vid video{ max-height:340px; }
 }
-@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 208px; align-items:stretch; } }
+@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 232px; align-items:stretch; } }
 .pr-offer-vid{ margin:0; position:relative; border-radius:12px; overflow:hidden;
   border:2px solid var(--line); background:#0F141A; }
 .pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
@@ -1675,6 +1675,48 @@ html{ scroll-behavior:auto; }
 .vid-play:hover{ transform:translate(-50%,-50%) scale(1.07); background:#fff; }
 .vid-play:focus-visible{ outline:3px solid var(--ink); outline-offset:3px; }
 .slide-vid.is-playing .vid-play{ opacity:0; pointer-events:none; }
+
+/* 🔴 LA CORNICE DEL VIDEO NELL'OFFERTA, SCRITTA DOPO E CON DUE CLASSI.
+   `.pr-offer-vid` da sola pesa quanto `.slide-vid`, che pero' e' scritta
+   qui sopra: a parita' di peso vince l'ultima, e per tre volte ho
+   corretto regole che non entravano mai in vigore. Due classi insieme
+   pesano di piu', e stanno dopo: adesso comandano queste.
+   Quando una correzione al CSS "non fa niente", il sospetto va a chi
+   dice il contrario piu' in basso, non alla regola. */
+.pr-offer-vid.slide-vid{ width:auto; aspect-ratio:auto; background:#0F141A;
+  border-radius:12px; overflow:hidden; }
+
+@media (min-width:900px){
+  /* La cornice si allunga quanto il testo, e il video ci sta dentro in
+     posizione assoluta: il buco in basso non puo' esistere PER
+     COSTRUZIONE, qualunque lunghezza prenda il testo domani.
+     Il ritaglio parte dall'alto perche' in un video verticale la faccia
+     sta nel terzo superiore: tagliando dal centro si perde proprio lei. */
+  .pr-offer-vid.slide-vid{ position:relative; min-height:260px; height:100%; }
+  .pr-offer-vid.slide-vid video{ position:absolute; inset:0;
+    width:100%; height:100%; max-height:none; aspect-ratio:auto;
+    object-fit:cover; object-position:center 32%; }
+  .pr-offer-vid.slide-vid figcaption{ position:absolute; top:auto; bottom:0;
+    left:0; right:0; padding:26px 12px 10px; border-radius:0; background:
+    linear-gradient(transparent, rgba(15,20,26,.88) 45%); }
+  .pr-offer-vid.slide-vid figcaption span{ color:rgba(255,255,255,.8); }
+  .pr-offer-vid.slide-vid figcaption b{ color:#FFF; }
+}
+
+@media (max-width:899px){
+  /* Verticale come e' stato girato. Schiacciare un 9:16 dentro un
+     riquadro basso e' quello che lasciava scoperto il fondo nero. */
+  .pr-offer-vid.slide-vid{ position:relative; width:min(260px, 72vw);
+    margin:0 auto; aspect-ratio:9/16; }
+  .pr-offer-vid.slide-vid video{ position:absolute; inset:0;
+    width:100%; height:100%; max-height:none; aspect-ratio:auto;
+    object-fit:cover; object-position:center 32%; }
+  .pr-offer-vid.slide-vid figcaption{ position:absolute; top:auto; bottom:0;
+    left:0; right:0; padding:24px 11px 9px; border-radius:0; background:
+    linear-gradient(transparent, rgba(15,20,26,.88) 45%); }
+  .pr-offer-vid.slide-vid figcaption span{ color:rgba(255,255,255,.8); }
+  .pr-offer-vid.slide-vid figcaption b{ color:#FFF; }
+}
 /* su touch il browser disegna gia' il suo play al centro del poster */
 @media (hover:none), (pointer:coarse){ .vid-play{ display:none; } }
 
