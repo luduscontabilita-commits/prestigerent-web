@@ -113,6 +113,19 @@ export type Raccolto = {
    dall'elenco dello script a mano ed e' rientrato qui: una prenotazione
    rifiutata caricata come conversione insegna alle campagne a cercare
    clienti la cui carta viene rifiutata. */
+/* I NOSTRI CODICI SCONTO: quelli che nascono sulla landing per far
+   prenotare in diretto invece che su una piattaforma. Sono l'opposto di
+   un accordo con un partner -- quella vendita viene dal clic
+   sull'annuncio, ed e' la piu' importante da rimandare a Google.
+
+   Scritti a mano e in maiuscolo, apposta: un elenco corto che si legge in
+   un secondo vale piu' di una regola furba (tipo "tutti i codici che
+   cominciano per DIRECT"), perche' il giorno che qualcuno crea un codice
+   per un partner chiamandolo DIRECTPARTNER non se ne accorge nessuno. */
+const CODICI_NOSTRI = new Set([
+  'DIRECT10',
+]);
+
 /* I domini delle agenzie che prenotano dal sito. Vedi il commento nel
    setaccio: sono clienti veri per l'azienda, ma non sono conversioni
    pubblicitarie. Elenco a mano, e va allungato quando ne spunta una. */
@@ -331,9 +344,27 @@ export async function raccogli(
          promozione mandata via email: la vendita c'e', il clic
          sull'annuncio no. Sono un terzo delle dirette, quindi il numero
          va guardato: il giorno che si decide di tenerle basta
-         `?coupon=si`. */
-      conta(scarti, 'ha un codice sconto');
-      continue;
+         `?coupon=si`.
+
+         🔴 MA I NOSTRI CODICI SONO L'ECCEZIONE, E VANNO TENUTI.
+         Un codice che nasce sulla landing per far prenotare in diretto --
+         invece che su Viator -- e' l'opposto di un accordo con un
+         partner: quella vendita viene proprio dal clic sull'annuncio, ed
+         e' la piu' importante da rimandare a Google.
+
+         Senza questa eccezione, il giorno che si accende uno sconto sul
+         sito ogni vendita che lo usa sparisce dal caricamento: si lancia
+         una promozione e si perde la capacita' di misurarla, che e' il
+         modo peggiore di lanciarla. Si scoprirebbe mesi dopo, guardando
+         un calo di conversioni che non c'e' stato. */
+      const nostri = (b.coupon_codes as unknown[])
+        .map((c) => String(c).trim().toUpperCase())
+        .filter((c) => CODICI_NOSTRI.has(c));
+      if (!nostri.length) {
+        conta(scarti, 'ha un codice sconto');
+        continue;
+      }
+      conta(scarti, '(tenuta) codice nostro: ' + nostri[0]);
     }
 
     const valore = Math.round(numero(b.total_amount) * 100) / 100;
