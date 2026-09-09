@@ -1258,6 +1258,20 @@ html:not(.js) .pr-more-row{ display:none; }
   .pr-timer span.q{ min-width:40px; padding:4px 6px 3px; }
   .pr-timer span.q b{ font-size:1rem; }
 }
+
+/* 🔴 SU TELEFONO IL CONTATORE E LA FRASE NON STANNO AFFIANCATI.
+   Le quattro caselle sono larghe circa 210px e non si comprimono: alla
+   frase restavano centocinquanta pixel, cioe' undici righe da due parole
+   in grassetto rosso. Impilati, la frase torna a quattro righe intere.
+   Il contatore si prende la riga che ha: caselle in parti uguali invece
+   che piccole e schiacciate a sinistra -- deve sembrare una cosa decisa,
+   non una cosa avanzata. Vale solo per il blocco dell'offerta: quello
+   accanto al calendario e' gia' impilato e sta in un riquadro stretto. */
+@media (max-width:620px){
+  .pr-offer-urg{ flex-direction:column; align-items:stretch; gap:10px; }
+  .pr-offer-urg .pr-timer{ display:flex; width:100%; }
+  .pr-offer-urg .pr-timer span.q{ flex:1 1 0; min-width:0; }
+}
 .pr-promo-lab{ display:inline-block; padding:3px 10px; border-radius:999px;
   background:var(--orange); color:#FFF; font-size:.7rem; font-weight:800;
   text-transform:uppercase; letter-spacing:.08em; }
