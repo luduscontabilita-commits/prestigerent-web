@@ -405,7 +405,29 @@ body{
    ============================================================ */
 #info-private, #private{ display:none !important; }
 /* la carta del privato fra le formule, e la sua riga di prezzo */
-.pr-opt[data-opt="private"]{ display:none !important; }
+/* ============================================================
+   VIA LE CARTE DI SCELTA. Chiedevano di scegliere il formato prima di
+   aver visto una data: una domanda travestita da informazione. Al loro
+   posto un elenco -- cosa c'e' e cosa non c'e' -- come fa Viator sulla
+   stessa esperienza. La scelta vera si fa nel calendario, dove sta gia'.
+   Si nascondono e non si cancellano: il codice che le gestisce e'
+   agganciato anche alle schede del calendario.
+   ============================================================ */
+.pr-opts{ display:none !important; }
+
+.pr-incl{ max-width:900px; margin:0 auto; display:grid; gap:22px; text-align:left; }
+@media (min-width:760px){ .pr-incl{ grid-template-columns:1.35fr 1fr; } }
+.pr-incl h3{ margin:0 0 10px; font-size:1rem; }
+.pr-incl ul{ margin:0; padding:0; list-style:none; display:grid; gap:9px; }
+.pr-incl li{ display:flex; gap:10px; align-items:flex-start; font-size:.92rem;
+  line-height:1.5; }
+.pr-incl li i{ font-style:normal; flex:0 0 auto; font-weight:900; line-height:1.35; }
+.pr-incl .si i{ color:#1F7A3A; }
+.pr-incl .no i{ color:#A03828; }
+.pr-incl .no li{ color:var(--ink-soft); }
+.pr-incl-prezzi{ grid-column:1/-1; margin:2px 0 0; padding-top:14px;
+  border-top:1px solid var(--line); font-size:.92rem; line-height:1.6; }
+.pr-incl-prezzi b{ color:var(--orange); }
 /* due carte invece di tre: la griglia si riadatta */
 .pr-opts{ grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
 
@@ -2044,6 +2066,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </span>
       <h2 class="pr-title reveal">Two ways to <em class="hl place">visit our wineries</em> in Tuscany, Italy &mdash; by minivan, minibus or small bus, never a coach</h2>
     </div>
+    <!-- L'ELENCO AL POSTO DELLE CARTE. Stesse parole della scheda
+         "Included" di questa pagina: non si inventa niente. -->
+    <div class="pr-incl reveal">
+      <div class="si">
+        <h3>What&rsquo;s included</h3>
+        <ul>
+          <li><i>&#10003;</i><span><b>Small group, max 25</b> &mdash; or semi&#8209;private, max 8. Never 50 or 60 on a coach.</span></li>
+          <li><i>&#10003;</i><span>Air&#8209;conditioned minivan, minibus or small bus, with <b>free Wi&#8209;Fi</b> on board</span></li>
+          <li><i>&#10003;</i><span>A professional <b>English&#8209;speaking driver&#8209;guide</b> with you all day &mdash; no translations</span></li>
+          <li><i>&#10003;</i><span>Guided visit to <b>two different family wine estates</b>, from an ancient cellar to a modern vineyard</span></li>
+          <li><i>&#10003;</i><span><b>Four wines and olive oil</b> tasted at each estate</span></li>
+          <li><i>&#10003;</i><span>Local Tuscan specialities &mdash; cheeses, cured meats, prosciutto and bruschetta &mdash; at the second winery</span></li>
+          <li><i>&#10003;</i><span><b>Free cancellation</b> up to 24 hours before departure</span></li>
+        </ul>
+      </div>
+      <div class="no">
+        <h3>Not included</h3>
+        <ul>
+          <li><i>&times;</i><span>Lunch or dinner</span></li>
+          <li><i>&times;</i><span>Gratuities &mdash; optional, entirely at your discretion</span></li>
+          <li><i>&times;</i><span>Hotel pick&#8209;up and drop&#8209;off <span class="muted">(the meeting point is in central Florence)</span></span></li>
+        </ul>
+      </div>
+      <p class="pr-incl-prezzi">
+        <b>&euro;89</b> per adult &middot; <b>&euro;79</b> ages 12&ndash;17 &middot;
+        semi&#8209;private <b>&euro;129</b> per person. Pick the option you want in the
+        calendar below &mdash; the price is shown before you pay.
+      </p>
+    </div>
     <div class="pr-opts reveal">
 
       <button type="button" class="pr-opt is-pick is-sel" data-opt="shared" aria-pressed="true">
@@ -2370,8 +2421,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          calendario. `data-book-tab` apre la scheda giusta, cosi' non si
          atterra sul privato dopo aver letto del gruppo, o viceversa. -->
     <div class="film-cta reveal solo-largo" style="text-align:center;margin-top:26px">
-      <a class="cta" href="#bookform" data-book-tab="shared">BOOK A SHARED DEPARTURE</a>
-      <p class="pr-lead" style="font-size:.86rem;margin-top:10px">Opens the shared calendar &mdash; &euro;89 per person, small group or semi-private.</p>
+      <a class="cta" href="#bookform" data-book-tab="shared">SEE DATES &amp; BOOK</a>
+      <p class="pr-lead" style="font-size:.86rem;margin-top:10px">Opens the calendar &mdash; from &euro;89 per person, small group or semi&#8209;private.</p>
       <p class="pr-cta-guar reveal">💳 Reserve now, pay later <span class="pr-tl-sep">|</span> 🛡️ Free date changes &amp; full refund — up to 24h before departure</p>
     </div>
   </div>
