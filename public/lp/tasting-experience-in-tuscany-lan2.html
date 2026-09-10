@@ -1265,8 +1265,14 @@ html:not(.js) .pr-more-row{ display:none; }
 @media (min-width:900px){
   /* due pastiglie incolonnate: WhatsApp e il numero fisso. Il fisso
      stava solo nell'hero, quindi spariva appena si scorreva. */
-  .lp-contatti{ position:fixed; top:14px; right:16px; z-index:100;
-    display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  /* 🔴 IN RIGA, NON IN COLONNA. Affiancate occupano meta' altezza:
+     la striscia riservata in cima scende da 62 a 46 pixel e tutta la
+     pagina sale. Su una pagina che si scorre al 20%, sedici pixel in
+     cima valgono piu' di cento in fondo.
+     E si leggono come UNA cosa -- "come ci contatti" -- invece che come
+     due pulsanti impilati, dove il secondo sembra il ripiego del primo. */
+  .lp-contatti{ position:fixed; top:9px; right:16px; z-index:100;
+    display:flex; flex-direction:row; align-items:center; gap:8px; }
   .lp-wa{ position:static; top:auto; right:auto; z-index:auto;
     display:inline-flex; align-items:center; gap:9px;
     padding:9px 15px 9px 12px; border-radius:999px;
@@ -1279,7 +1285,7 @@ html:not(.js) .pr-more-row{ display:none; }
      margini: la pagina comincia 62px piu' in basso e quella striscia e'
      delle pastiglie. Cosi' nessun titolo, per quanto lungo, potra' mai
      finirci sotto -- e non si riapre il problema a ogni testo nuovo. */
-  body{ padding-top:62px; }
+  body{ padding-top:46px; }   /* una riga sola di pastiglie, non due */
   .lp-tel{ display:inline-flex; align-items:center; gap:8px;
     padding:8px 14px 8px 11px; border-radius:999px; text-decoration:none;
     background:#FFF; color:var(--ink); border:1px solid var(--line);
