@@ -1981,6 +1981,19 @@ html{ scroll-behavior:auto; }
   border:1px dashed var(--orange); border-radius:999px; padding:4px 11px; }
 .promo-finita .hero-prezzo .sc{ display:none; }
 @media (max-width:440px){ .hero-prezzo .n{ font-size:2.15rem; } }
+
+/* LA GARANZIA SI DEVE VEDERE. Il testo c'era e non risaltava: tre righe
+   dello stesso peso, con la promessa affogata in mezzo. Con 48 secondi
+   attivi a sessione, quello che non risalta non viene letto.
+   L'etichetta si riconosce senza leggere; il rosso dice all'occhio dove
+   fermarsi. */
+.gar-tag{ display:inline-block; margin-bottom:5px; padding:3px 9px;
+  border-radius:6px; background:#9B2C1E; color:#FFF;
+  font-size:.72rem; font-weight:900; letter-spacing:.07em;
+  text-transform:uppercase; }
+.gar-forte{ font-weight:800; color:#9B2C1E;
+  text-decoration:underline; text-decoration-color:#9B2C1E;
+  text-decoration-thickness:2px; text-underline-offset:3px; }
 </style>
 <script type="application/ld+json">
 {
@@ -2170,10 +2183,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="pr-forti">
       <div class="pr-forte">
         <i aria-hidden="true">🛡️</i>
-        <span><b>We are so sure of this day that we guarantee it.</b>
+        <span><span class="gar-tag">100% money-back guarantee</span>
+        <b>We are so sure of this day that we guarantee it.</b>
         If the experience isn&rsquo;t worth it, just tell your guide before you
-        step off the bus: we refund you in full, on the spot. No questions,
-        no forms, no arguing.</span>
+        step off the bus: <span class="gar-forte">we refund you in full, on the
+        spot</span>. No questions, no forms, no arguing.</span>
       </div>
       <div class="pr-forte">
         <i aria-hidden="true">📸</i>
