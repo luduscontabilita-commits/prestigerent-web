@@ -63,14 +63,23 @@
     if (scrollY > 400) haGuardato = true;
   }, { passive: true });
 
-  /* regola 4: se il calendario e' a schermo, la persona sta gia' facendo
-     quello che vorremmo dirle. Si guarda al momento, non prima. */
-  function staPrenotando() {
-    var el = document.getElementById('bookform') || document.querySelector('.pr-widget-holder');
-    if (!el) return false;
-    var r = el.getBoundingClientRect();
-    return r.top < innerHeight && r.bottom > 0;
-  }
+  /* 🔴 REGOLA 4, RISCRITTA. Prima guardava se il calendario era A SCHERMO.
+     Sbagliato: sopra i 1400px quella colonna e' APPICCICATA
+     (`.pg-rail-in{position:sticky}`), quindi il calendario si vede sempre
+     -- e il popup non poteva comparire mai, su tutti i desktop larghi.
+     Provato dalla proprieta' e infatti non e' mai uscito.
+
+     Quello che conta non e' vedere il calendario: e' AVERLO TOCCATO.
+     Chi ha cliccato dentro l'area di prenotazione, o ha copiato il
+     codice, sta gia' facendo quello che il popup direbbe -- e quello va
+     lasciato in pace. Chi lo ha solo di fianco mentre legge no. */
+  var haToccato = false;
+  document.addEventListener('pointerdown', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('#bookform, .pr-widget-holder, .pr-copy, .pr-passi')) haToccato = true;
+  }, true);
+  function staPrenotando() { return haToccato; }
 
   var css = document.createElement('style');
   css.textContent = [
