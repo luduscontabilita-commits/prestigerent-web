@@ -1701,6 +1701,102 @@ html{ scroll-behavior:auto; }
 @media (max-width:900px){ .pr-veh{ grid-template-columns:repeat(2,1fr); gap:12px; } }
 @media (max-width:400px){ .pr-veh-card{ padding:10px 8px 12px; } .pr-veh-name{ font-size:.9rem; }
   .pr-veh-pax{ font-size:.86rem; } }
+
+
+/* ═══ PORTATO DALLA LANDING DEL VINO, 10/09/2026 ═══
+   Solo il necessario: prezzo in alto, garanzia, facce e contatti.
+   Niente offerta e niente contatore -- vedi il commento nel
+   markup. Copiato come fetta continua, cosi' nessuna regola
+   puo' finirci due volte. ═══ */
+/* IL CONTATTO IN CIMA, IN LINEA. Viator sul telefono lo mette sopra le
+   foto: "Prenota online o chiama" piu' "Avvia la chat". Qui sta subito
+   sotto le stelle -- al 3% della pagina, quindi lo vedono tutti -- e
+   nel FLUSSO, non appiccicato: sul telefono c'e' gia' la barra in basso
+   e una terza cosa fissa coprirebbe la pagina da tre lati. */
+/* LE FACCE, ACCANTO AI PULSANTI. Chi prenota dall'altra parte del mondo
+   compra anche la certezza che qualcuno parlera' la sua lingua se
+   qualcosa va storto. Due volti e due nomi lo dicono in mezzo secondo;
+   una riga in fondo alla pagina non lo dice a nessuno.
+   Stanno INSIEME ai pulsanti: la faccia dice chi risponde, i pulsanti
+   dicono come si fa. Separate valgono meta'. */
+.hero-team{ display:flex; align-items:center; justify-content:center; gap:10px;
+  margin:14px auto 0; max-width:430px; text-align:left; }
+.hero-team img{ width:46px; height:46px; flex:none; border-radius:50%;
+  object-fit:cover; border:2px solid var(--orange); }
+.hero-team span{ font-size:.83rem; line-height:1.45; color:var(--ink-soft); }
+.hero-team b{ color:var(--ink); font-weight:800; }
+@media (max-width:420px){ .hero-team{ gap:9px; } .hero-team span{ font-size:.79rem; } }
+
+.hero-cont{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center;
+  gap:8px 10px; margin:12px auto 0; }
+.hero-cont a{ display:inline-flex; align-items:center; gap:7px;
+  padding:7px 13px; border-radius:999px; text-decoration:none;
+  font-size:.84rem; font-weight:800; line-height:1.15;
+  border:1px solid var(--line); background:#FFF; color:var(--ink); }
+.hero-cont a:hover{ border-color:var(--orange); color:var(--orange); }
+.hero-cont .wa{ background:#128C7E; border-color:#128C7E; color:#FFF; }
+.hero-cont .wa:hover{ background:#0F7A6C; border-color:#0F7A6C; color:#FFF; }
+.hero-cont svg{ width:17px; height:17px; flex:none; }
+@media (max-width:420px){ .hero-cont a{ font-size:.8rem; padding:7px 11px; } }
+
+/* LE DUE COSE CHE NESSUNO TI DA'. Erano due punti elenco fra quattro,
+   cioe' dichiarate uguali a "conferma immediata". Non lo sono: il
+   rimborso e le foto della giornata non li vende nessuna piattaforma.
+   Con 48 secondi attivi a sessione, quattro righe uguali si leggono come
+   una media -- e la media di quattro cose buone e' meno del meglio. */
+.pr-forti{ display:grid; gap:10px; margin:12px 0 10px; }
+@media (min-width:620px){ .pr-forti{ grid-template-columns:1fr 1fr; } }
+.pr-forte{ display:flex; gap:11px; align-items:flex-start;
+  padding:12px 13px; border-radius:12px; background:#FFF;
+  border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+.pr-forte i{ font-style:normal; font-size:1.25rem; line-height:1.1; flex:none; }
+.pr-forte b{ display:block; font-size:.96rem; font-weight:900; color:var(--ink);
+  line-height:1.3; margin-bottom:3px; }
+.pr-forte span{ display:block; font-size:.84rem; line-height:1.5; color:var(--ink-soft); }
+/* le due normali: restano scritte perche' tolgono un dubbio, ma non
+   devono rubare l'occhio alle due di sopra */
+.pr-normali{ margin:0; font-size:.82rem; line-height:1.55; color:var(--ink-soft); }
+.pr-normali b{ color:var(--ink); font-weight:800; }
+
+/* IL PREZZO IN ALTO. E' la prima domanda che si fa chiunque, e una pagina
+   che non risponde manda a cercare la risposta dove il prezzo si vede.
+   Viator e GetYourGuide lo mettono subito sotto le recensioni: qui idem.
+   "From" e non un prezzo secco: le formule sono tre e i ragazzi pagano
+   meno, quindi e' l'unica forma vera -- e un prezzo che al calendario
+   diventa un altro brucia la fiducia appena presa. */
+.hero-prezzo{ display:flex; flex-wrap:wrap; align-items:baseline;
+  justify-content:center; gap:6px 12px; margin:14px auto 0; }
+.hero-prezzo .da{ font-size:.95rem; font-weight:600; color:var(--ink-soft); }
+.hero-prezzo .n{ font-size:2.6rem; font-weight:900; color:var(--orange); line-height:1;
+  letter-spacing:-.02em; }
+.hero-prezzo .pp{ font-size:.95rem; font-weight:600; color:var(--ink-soft); }
+.hero-prezzo .sc{ font-size:.82rem; font-weight:800; color:var(--orange);
+  border:1px dashed var(--orange); border-radius:999px; padding:4px 11px; }
+.promo-finita .hero-prezzo .sc{ display:none; }
+@media (max-width:440px){ .hero-prezzo .n{ font-size:2.15rem; } }
+
+/* LA GARANZIA SI DEVE VEDERE. Il testo c'era e non risaltava: tre righe
+   dello stesso peso, con la promessa affogata in mezzo. Con 48 secondi
+   attivi a sessione, quello che non risalta non viene letto.
+   L'etichetta si riconosce senza leggere; il rosso dice all'occhio dove
+   fermarsi. */
+/* 🔴 ERA UNA PASTIGLIA PICCOLA: 0,72rem, maiuscolo, bianco su rosso
+   pieno. Maiuscolo + corpo piccolo + fondo pieno e' la combinazione che
+   si legge peggio -- il maiuscolo toglie il profilo alle parole, e a
+   quel corpo il profilo e' l'unica cosa che le rende riconoscibili.
+   Ed era un errore di gerarchia: la garanzia e' la cosa piu' forte del
+   riquadro e stava scritta piu' piccola di tutto il resto.
+   Adesso e' un titolo. Il contrasto sale invece di scendere: rosso scuro
+   su bianco sta molto sopra la soglia, bianco su rosso a quel corpo ci
+   stava appena. */
+.gar-tag{ display:block; margin:0 0 4px; font-size:1.15rem; font-weight:900;
+  color:#9B2C1E; letter-spacing:-.01em; line-height:1.2; }
+.gar-sott{ display:block; font-size:.9rem; margin-bottom:2px; }
+.gar-forte{ font-weight:800; color:#9B2C1E;
+  text-decoration:underline; text-decoration-color:#9B2C1E;
+  text-decoration-thickness:2px; text-underline-offset:3px; }
+
+/* La riga che introduce il modulo. Non e' un titolo: sopra c'e' gia'
 </style>
 <script type="application/ld+json">
 {
@@ -1944,6 +2040,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </span>
 
   </div>
+
+  <!-- Il prezzo in alto: chi arriva qui dal link della landing del vino
+       viene da una pagina da 89 euro e deve sapere subito che si e'
+       spostato di categoria. Il numero in fondo lo scopre troppo tardi. -->
+  <p class="hero-prezzo">
+    <span class="n">&euro;550</span><span class="pp">per party, up to 8 guests</span>
+  </p>
+<!-- Le facce prima dei pulsanti: chi risponde, poi come si fa. -->
+  <div class="hero-team">
+    <img src="img/team-prestige-rent.jpg" width="46" height="46" loading="eager" decoding="async"
+         alt="Violeta and Carrie, our English-speaking team in Florence">
+    <span><b>Violeta &amp; Carrie</b>, in our Florence office.
+    If you need anything before or during your trip, they answer in English.</span>
+  </div>
+  <div class="hero-cont">
+    <a class="wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
+      Ask on WhatsApp</a>
+    <a href="tel:+39055286059">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
+      +39 055 286059</a>
+  </div>
+
+  <!-- 🔴 GARANZIA E FOTO ANCHE QUI, MA NIENTE OFFERTA E NIENTE CONTATORE.
+       Il coupon copre anche i privati, ma un -10% su 590 sono 59 euro
+       regalati a un cliente che questa pagina la vede solo perche' ce
+       l'abbiamo mandato noi dal calendario del vino: non e' traffico da
+       conquistare, e' traffico gia' nostro.
+       Rimborso e foto invece valgono per tutti i tour: non dirli qui
+       vorrebbe dire che chi spende di piu' riceve di meno. -->
+  <div class="pr-offer" style="border-color:var(--line)">
+   <div class="pr-offer-txt">
+<div class="pr-forti">
+      <div class="pr-forte">
+        <i aria-hidden="true">🛡️</i>
+        <span><span class="gar-tag">100% money back guarantee</span>
+        <b class="gar-sott">We are so sure of this day that we guarantee it.</b>
+        If the experience isn&rsquo;t worth it, just tell your guide before you
+        step off the bus: <span class="gar-forte">we refund you in full, on the
+        spot</span>. No questions, no forms, no arguing.</span>
+      </div>
+      <div class="pr-forte">
+        <i aria-hidden="true">📸</i>
+        <span><b>You will get the photos of your day &mdash; free.</b>
+        Someone photographs you during your day, and the morning after
+        we send you the link on WhatsApp or by email: yours to download and keep.</span>
+      </div>
+    </div>
+   </div>
+  </div>
+
 
   <!-- premi compatti, sotto il rating -->
   <div class="pr-awards hero-awards reveal">
