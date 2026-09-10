@@ -1895,10 +1895,18 @@ html{ scroll-behavior:auto; }
      e senza sarebbe roba nascosta senza nessun segnale. */
   .pg-rail-in{ scrollbar-width:none; -ms-overflow-style:none; }
   .pg-rail-in::-webkit-scrollbar{ width:0; height:0; }
-  .pg-rail{ position:relative; }
-  .pg-rail::after{ content:""; position:sticky; display:block; z-index:2;
-    bottom:0; height:38px; margin-top:-38px; pointer-events:none;
-    background:linear-gradient(transparent, #FFF); }
+  /* 🔴 QUI C'ERA UNA SFUMATURA BIANCA, TOLTA IL 10/09/2026.
+     Doveva dire "sotto c'e' ancora roba", il lavoro che faceva la
+     barra di scorrimento nascosta. Era pero' attaccata a `.pg-rail`,
+     la COLONNA alta quanto la pagina, invece che a `.pg-rail-in` che
+     e' il riquadro che scorre: con sticky e bottom:0 il velo restava
+     incollato al fondo dello schermo e scivolava SOPRA il contenuto,
+     sbiadendo il titolo "How to get your 10% off".
+     Non spostata: tolta. Da quando il calendario e' salito e i tre
+     passi sono scesi sotto il widget, quella colonna quasi non supera
+     piu' l'altezza dello schermo -- annuncerebbe uno scorrimento che
+     spesso non c'e'. Un velo sopra un titolo e' un danno certo; il
+     segnale che doveva dare era eventuale. */
 
   .pg-rail .bk-head{ margin-top:0; text-align:center; }
   .pg-rail .bk-title{ font-size:.98rem; }
