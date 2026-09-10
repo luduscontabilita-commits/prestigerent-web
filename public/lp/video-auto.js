@@ -96,11 +96,21 @@
   if (cornice) {
     cornice.appendChild(suono);
     var st = document.createElement('style');
-    st.textContent = '.vid-audio{position:absolute;left:8px;bottom:8px;z-index:4;'
-      + 'display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:0;'
-      + 'border-radius:999px;background:rgba(15,20,26,.78);color:#FFF;cursor:pointer;'
-      + 'font:inherit;font-size:.78rem;font-weight:800;}'
-      + '.vid-audio:hover{background:rgba(15,20,26,.92);}';
+    /* 🔴 GRANDE E CENTRATO. Era una pastiglia da 0,78rem incollata
+       all'angolo in basso a sinistra: su una colonna da 232px
+       spariva contro il video. Il pulsante dell'audio non e' un
+       dettaglio -- e' l'unico modo di sentire quello che la persona
+       nel video sta dicendo, cioe' tutto il motivo per cui il video
+       sta li'. Centrato in basso e piu' grande si vede subito, e il
+       dito lo prende al primo colpo anche su uno schermo tattile. */
+    st.textContent = '.vid-audio{position:absolute;left:50%;bottom:14px;z-index:4;'
+      + 'transform:translateX(-50%);white-space:nowrap;'
+      + 'display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border:0;'
+      + 'border-radius:999px;background:rgba(15,20,26,.85);color:#FFF;cursor:pointer;'
+      + 'font:inherit;font-size:1rem;font-weight:800;letter-spacing:.02em;'
+      + 'box-shadow:0 6px 18px rgba(0,0,0,.35);}'
+      + '.vid-audio:hover{background:rgba(15,20,26,.96);}'
+      + '@media (max-width:520px){.vid-audio{font-size:.9rem;padding:10px 18px;}}';
     document.head.appendChild(st);
   }
 
