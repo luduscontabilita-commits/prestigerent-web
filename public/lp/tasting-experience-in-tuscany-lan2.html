@@ -555,7 +555,10 @@ body{
   padding:0 20px;
 }
 .film-title{
-  font-size:clamp(1.85rem, 4.5vw, 2.9rem);
+  /* 🔴 ERA clamp(1.85rem, 4.5vw, 2.9rem) = fino a 46px: il testo
+     PIU' GRANDE della pagina era il titolo di una galleria, piu dell'H1.
+     Su una pagina che si scorre al 20% e' spazio comprato caro. */
+  font-size:clamp(1.3rem, 2.6vw, 1.95rem);
   font-weight:800;
   letter-spacing:-0.02em;
   line-height:1.15;
