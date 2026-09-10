@@ -818,8 +818,14 @@ body{
 /* La citta' di partenza deve leggersi nella prima schermata: e' la prima
    cosa che chi cerca "tour from Florence" vuole vedere confermata. Prima
    stava nell'occhiello viola, sparito con quelle pillole. */
+/* 🔴 NON E' UN PULSANTE. Aveva bordo, sfondo e angoli tondi a 999px:
+   la forma esatta dei pulsanti veri di questa pagina, ma non si preme --
+   e' un'informazione, non un comando. Clarity conta dead click nel 4,42%
+   delle sessioni, e chi preme una cosa che non risponde non pensa "non e'
+   cliccabile": pensa che la pagina sia rotta, e da li' tocca meno anche
+   quello che funziona. Resta il testo con lo spillo. */
 .hero-loc{ display:inline-flex; align-items:center; gap:7px; margin-bottom:16px;
-  padding:7px 15px; border:1px solid var(--line); border-radius:999px; background:#FFF;
+  padding:0;
   font-size:.76rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
   color:var(--ink-soft); }
 .hero-loc b{ color:var(--ink); font-weight:800; letter-spacing:.06em; }
