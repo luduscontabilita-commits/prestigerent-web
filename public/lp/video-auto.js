@@ -33,8 +33,19 @@
 (function () {
   'use strict';
 
-  var v = document.querySelector('video');
+  /* 🔴 NON "il primo video della pagina": QUELLO DICHIARATO.
+     La regola comoda era sbagliata -- su tre landing su quattro il primo
+     video e' una scheda della striscia che scorre, e quella striscia
+     clona le schede per l'anello infinito: partiva un filmato dentro un
+     carosello in movimento, o un clone fuori schermo. */
+  var v = document.querySelector('video[data-auto]');
   if (!v) return;
+
+  /* 🔴 E NON SU TELEFONO. Questo mancava, ed era il difetto piu' caro:
+     un video da 7 MB che parte da solo dove arriva il 79% del traffico e
+     i dati li paga chi guarda. Su un telefono il filmato lo si avvia
+     quando lo si vuole. */
+  try { if (!matchMedia('(min-width: 900px)').matches) return; } catch (e) { return; }
 
   try {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
