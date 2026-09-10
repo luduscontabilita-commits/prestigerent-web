@@ -96,14 +96,21 @@
   if (cornice) {
     cornice.appendChild(suono);
     var st = document.createElement('style');
-    /* 🔴 GRANDE E CENTRATO. Era una pastiglia da 0,78rem incollata
+    /* 🔴 GRANDE, CENTRATO, E IN CIMA AL VIDEO.
+       In cima e non in fondo: sotto ci sono gia' la didascalia col suo
+       velo scuro e, su schermo stretto, i comandi del video. Sovrapporre
+       tre cose nello stesso angolo vuol dire che la piu' importante --
+       l'audio -- diventa la piu' difficile da prendere.
+       In alto lo spazio e' libero, e l'occhio ci passa comunque appena
+       il filmato parte.
+       Prima era una pastiglia da 0,78rem incollata
        all'angolo in basso a sinistra: su una colonna da 232px
        spariva contro il video. Il pulsante dell'audio non e' un
        dettaglio -- e' l'unico modo di sentire quello che la persona
        nel video sta dicendo, cioe' tutto il motivo per cui il video
        sta li'. Centrato in basso e piu' grande si vede subito, e il
        dito lo prende al primo colpo anche su uno schermo tattile. */
-    st.textContent = '.vid-audio{position:absolute;left:50%;bottom:14px;z-index:4;'
+    st.textContent = '.vid-audio{position:absolute;left:50%;top:12px;bottom:auto;z-index:5;'
       + 'transform:translateX(-50%);white-space:nowrap;'
       + 'display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border:0;'
       + 'border-radius:999px;background:rgba(15,20,26,.85);color:#FFF;cursor:pointer;'
