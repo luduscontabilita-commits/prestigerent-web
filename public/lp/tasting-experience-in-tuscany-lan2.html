@@ -1964,6 +1964,23 @@ html{ scroll-behavior:auto; }
   }
 }
 @media (prefers-reduced-motion:reduce){ .pg-rail.is-flash .pg-rail-in{ animation:none; } }
+
+/* IL PREZZO IN ALTO. E' la prima domanda che si fa chiunque, e una pagina
+   che non risponde manda a cercare la risposta dove il prezzo si vede.
+   Viator e GetYourGuide lo mettono subito sotto le recensioni: qui idem.
+   "From" e non un prezzo secco: le formule sono tre e i ragazzi pagano
+   meno, quindi e' l'unica forma vera -- e un prezzo che al calendario
+   diventa un altro brucia la fiducia appena presa. */
+.hero-prezzo{ display:flex; flex-wrap:wrap; align-items:baseline;
+  justify-content:center; gap:6px 12px; margin:14px auto 0; }
+.hero-prezzo .da{ font-size:.95rem; font-weight:600; color:var(--ink-soft); }
+.hero-prezzo .n{ font-size:2.6rem; font-weight:900; color:var(--orange); line-height:1;
+  letter-spacing:-.02em; }
+.hero-prezzo .pp{ font-size:.95rem; font-weight:600; color:var(--ink-soft); }
+.hero-prezzo .sc{ font-size:.82rem; font-weight:800; color:var(--orange);
+  border:1px dashed var(--orange); border-radius:999px; padding:4px 11px; }
+.promo-finita .hero-prezzo .sc{ display:none; }
+@media (max-width:440px){ .hero-prezzo .n{ font-size:2.15rem; } }
 </style>
 <script type="application/ld+json">
 {
@@ -2063,13 +2080,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <section id="top" class="hero">
 
-  <a class="logo" href="https://prestigerent.com/" target="_blank" rel="noopener">
+  <!-- 🔴 NON E' PIU' UN LINK. Era l'uscita piu' grande della pagina:
+       143 visite alla home in trenta giorni, tutte da qui. Chi vuole
+       sapere chi siamo ha le facce di Violeta e Carrie in cima e la
+       riga legale nel footer. -->
+  <span class="logo">
     <img src="img/logo-prestige.png" alt="Prestige Rent Logo" width="58" height="58">
     <span class="logo-name">
       <strong>Prestige Rent</strong>
       <small>Tours &amp; Transfers in Italy</small>
     </span>
-  </a>
+  </span>
 
 
   <!-- Il titolo diceva solo "small group": la pagina vende tre formule,
@@ -2101,6 +2122,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="rev-pop-txt"><b data-quante>8,000+</b><small>reviews</small></span>
     </a>
    </div>
+
+  <!-- Il prezzo, subito sotto le recensioni: e' dove lo mettono Viator e
+       GetYourGuide, ed e' la prima domanda che si fa chiunque. -->
+  <p class="hero-prezzo">
+    <span class="da">from</span><span class="n">&euro;89</span><span class="pp">per person</span>
+    <span class="sc pr-promo">&minus;10% with DIRECT10 in September</span>
+  </p>
 
   <!-- Il contatto in cima, come fa Viator sul telefono: sopra le foto,
        non in fondo alla pagina. WhatsApp fa 55 contatti al mese su
