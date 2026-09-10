@@ -802,7 +802,7 @@ body{
 .pr-pay b{ color:var(--ink); font-weight:800; letter-spacing:.02em; }
 .pr-pay .pr-gico{ width:17px; height:17px; color:var(--ink-soft); }
 .pr-pay-sep{ color:#D8CFC4; }
-.pr-title{ font-size:clamp(1.32rem,2.5vw,1.9rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
+.pr-title{ font-size:clamp(1.7rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.02em; line-height:1.15; margin-top:16px; }
 .pr-lead{ margin-top:12px; font-size:1.04rem; font-weight:500; color:var(--ink-soft); }
 
 .pr-prose{ font-size:1.01rem; line-height:1.72; color:var(--ink-soft); }
@@ -1661,340 +1661,6 @@ html{ scroll-behavior:auto; }
    Si sposta a sinistra della colonna: resta a vista e non copre l'unica
    cosa che deve essere premuta. */
 @media (min-width:1400px){ .lp-wa{ right:calc(428px + 18px); } }
-
-
-/* ═══ PORTATO DALLA LANDING DEL VINO, 10/09/2026 ═══
-   Copiato come UNA fetta continua di righe, non blocco per blocco:
-   cosi' nessuna regola puo' finirci dentro due volte, e domani si
-   puo' riprendere identica. ═══ */
-.pr-price-lbl{ font-size:.82rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); }
-
-/* ============================================================
-   L'OFFERTA DIRETTA. Sta sopra la piega perche' la gente scorre il
-   18-21% della pagina: quello che sta sotto non lo vede quasi nessuno.
-   Nessun conto alla rovescia: la scadenza e' una data vera, scritta.
-   ============================================================ */
-.pr-offer{ max-width:900px; margin:22px auto 0; padding:18px 20px;
-  background:#FFF8F2; border:2px solid var(--orange); border-radius:16px;
-  text-align:left; display:grid; gap:16px; align-items:start; }
-/* Sopra i 900px il video sta accanto: la prova e la promessa si leggono
-   con un colpo d'occhio solo.
-
-   🔴 SOTTO, IL VIDEO VA PRIMA -- ed e' il contrario di quello che avevo
-   scritto qui ("l'offerta e il codice devono restare la prima cosa").
-   Quella regola vale su una pagina che si legge; su una pagina che si
-   scorre col pollice arrivavano 140 parole in grassetto rosso e nemmeno
-   un'immagine, cioe' nessun motivo per fermarsi. Il video e' una persona
-   che dice che e' andata bene: anche da fermo e' una faccia, ed e' pure
-   l'ordine giusto -- prima uno che racconta, poi io che chiedo.
-   L'offerta non si perde: il codice e' ripetuto accanto al calendario e
-   nella barra fissa, che su telefono resta sempre a schermo. */
-@media (max-width:899px){
-  .pr-offer-vid{ order:-1; }
-  /* verticale e alto quanto un pollice, non una striscia: deve leggersi
-     come un video, non come un'immagine di riempimento */
-  .pr-offer-vid video{ max-height:340px; }
-}
-@media (min-width:900px){ .pr-offer{ grid-template-columns:1fr 232px; align-items:stretch; } }
-.pr-offer-vid{ margin:0; position:relative; border-radius:12px; overflow:hidden;
-  border:2px solid var(--line); background:#0F141A; }
-.pr-offer-vid video{ display:block; width:100%; height:auto; aspect-ratio:9/16;
-  max-height:290px; object-fit:cover; }
-@media (min-width:900px){
-  /* 🔴 IL VIDEO ESCE DAL FLUSSO, COSI' NON PUO' DECIDERE L'ALTEZZA.
-     Ci ho provato due volte con flexbox -- prima con un minimo di 220px
-     (sbagliato: un minimo impedisce di rimpicciolire), poi con
-     min-height:0 -- e il video restava comunque piu' alto del testo,
-     perche' un <video> porta con se' le proprie proporzioni naturali e
-     se lo lasci nel flusso quelle vincono sempre.
-     Messo in posizione assoluta dentro il riquadro, il video NON ha piu'
-     un'altezza propria: riempie lo spazio che la riga gli da', e la riga
-     la decide il testo. Che e' il verso giusto -- comanda quello che si
-     deve leggere. La didascalia va sopra il video, in basso, invece di
-     stargli sotto e allungare tutto. */
-  .pr-offer-vid{ display:block; position:relative; min-height:230px; }
-  .pr-offer-vid video{ position:absolute; inset:0; width:100%; height:100%;
-    max-height:none; aspect-ratio:auto; object-fit:cover; }
-  .pr-offer-vid figcaption{ position:absolute; left:0; right:0; bottom:0;
-    background:linear-gradient(transparent, rgba(15,20,26,.86) 42%);
-    color:#FFF; padding:22px 11px 9px; }
-  .pr-offer-vid figcaption span{ color:rgba(255,255,255,.78); }
-  .pr-offer-vid figcaption b{ color:#FFF; }
-}
-.pr-offer-vid figcaption{ padding:9px 11px; background:#FFF; font-size:.78rem;
-  line-height:1.4; }
-.pr-offer-vid figcaption span{ display:block; font-weight:700; color:var(--ink-soft);
-  font-size:.72rem; }
-.pr-offer-vid figcaption b{ color:var(--ink); }
-@media (max-width:899px){
-  .pr-offer-vid{ max-width:260px; margin:0 auto; }
-}
-/* WHATSAPP SEMPRE A VISTA, IN ALTO A DESTRA.
-   Su questa landing WhatsApp fa 55 contatti al mese contro i 2 del
-   modulo, ed e' il secondo modo di convertire dopo il carrello: non puo'
-   stare in fondo alla pagina, dove la profondita' media di scorrimento
-   (20%) dice che non arriva quasi nessuno.
-   In alto a DESTRA e non una barra intera: il logo sta a sinistra e
-   quello spazio e' vuoto in ogni schermata, mentre una barra a tutta
-   larghezza mangia altezza per sempre.
-   Solo sopra i 900px: sul telefono ci sono gia' la barra "prenota" in
-   fondo e la bolla della chat, e una terza cosa fissa coprirebbe la
-   pagina da tre lati proprio dove arriva il 79% del traffico. */
-.lp-contatti{ display:none; }
-.lp-wa{ display:none; }
-
-/* IL CONTATTO IN CIMA, IN LINEA. Viator sul telefono lo mette sopra le
-   foto: "Prenota online o chiama" piu' "Avvia la chat". Qui sta subito
-   sotto le stelle -- al 3% della pagina, quindi lo vedono tutti -- e
-   nel FLUSSO, non appiccicato: sul telefono c'e' gia' la barra in basso
-   e una terza cosa fissa coprirebbe la pagina da tre lati. */
-/* LE FACCE, ACCANTO AI PULSANTI. Chi prenota dall'altra parte del mondo
-   compra anche la certezza che qualcuno parlera' la sua lingua se
-   qualcosa va storto. Due volti e due nomi lo dicono in mezzo secondo;
-   una riga in fondo alla pagina non lo dice a nessuno.
-   Stanno INSIEME ai pulsanti: la faccia dice chi risponde, i pulsanti
-   dicono come si fa. Separate valgono meta'. */
-.hero-team{ display:flex; align-items:center; justify-content:center; gap:10px;
-  margin:14px auto 0; max-width:430px; text-align:left; }
-.hero-team img{ width:46px; height:46px; flex:none; border-radius:50%;
-  object-fit:cover; border:2px solid var(--orange); }
-.hero-team span{ font-size:.83rem; line-height:1.45; color:var(--ink-soft); }
-.hero-team b{ color:var(--ink); font-weight:800; }
-@media (max-width:420px){ .hero-team{ gap:9px; } .hero-team span{ font-size:.79rem; } }
-
-.hero-cont{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center;
-  gap:8px 10px; margin:12px auto 0; }
-.hero-cont a{ display:inline-flex; align-items:center; gap:7px;
-  padding:7px 13px; border-radius:999px; text-decoration:none;
-  font-size:.84rem; font-weight:800; line-height:1.15;
-  border:1px solid var(--line); background:#FFF; color:var(--ink); }
-.hero-cont a:hover{ border-color:var(--orange); color:var(--orange); }
-.hero-cont .wa{ background:#128C7E; border-color:#128C7E; color:#FFF; }
-.hero-cont .wa:hover{ background:#0F7A6C; border-color:#0F7A6C; color:#FFF; }
-.hero-cont svg{ width:17px; height:17px; flex:none; }
-@media (max-width:420px){ .hero-cont a{ font-size:.8rem; padding:7px 11px; } }
-@media (min-width:900px){
-  /* due pastiglie incolonnate: WhatsApp e il numero fisso. Il fisso
-     stava solo nell'hero, quindi spariva appena si scorreva. */
-  .lp-contatti{ position:fixed; top:14px; right:16px; z-index:100;
-    display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
-  .lp-wa{ position:static; top:auto; right:auto; z-index:auto;
-    display:inline-flex; align-items:center; gap:9px;
-    padding:9px 15px 9px 12px; border-radius:999px;
-    background:#128C7E; color:#FFF; text-decoration:none;
-    font-size:.86rem; font-weight:800; line-height:1.15;
-    box-shadow:0 6px 20px rgba(0,0,0,.22); transition:transform .18s ease, background .18s ease; }
-  .lp-wa:hover{ background:#0F7A6C; transform:translateY(-1px); }
-  .lp-contatti{ display:flex; }
-  /* 🔴 SI FA SPAZIO UNA VOLTA SOLA, invece di rincorrere il caso con i
-     margini: la pagina comincia 62px piu' in basso e quella striscia e'
-     delle pastiglie. Cosi' nessun titolo, per quanto lungo, potra' mai
-     finirci sotto -- e non si riapre il problema a ogni testo nuovo. */
-  body{ padding-top:62px; }
-  .lp-tel{ display:inline-flex; align-items:center; gap:8px;
-    padding:8px 14px 8px 11px; border-radius:999px; text-decoration:none;
-    background:#FFF; color:var(--ink); border:1px solid var(--line);
-    font-size:.82rem; font-weight:800; line-height:1.15;
-    box-shadow:0 4px 14px rgba(0,0,0,.12); }
-  .lp-tel:hover{ border-color:var(--orange); color:var(--orange); }
-  .lp-tel svg{ width:17px; height:17px; flex:none; }
-  .lp-wa svg{ width:20px; height:20px; flex:none; }
-  .lp-wa small{ display:block; font-size:.68rem; font-weight:600;
-    opacity:.85; letter-spacing:.01em; }
-}
-@media (prefers-reduced-motion:reduce){ .lp-wa{ transition:none; } }
-/* 🔴 SOPRA I 1400px LA PAGINA E' A DUE COLONNE e quella di destra -- 428px,
-   il calendario appiccicato -- comincia in cima: a `right:16px` la
-   pastiglia finiva esattamente sopra il titolo della prenotazione.
-   Si sposta a sinistra della colonna: resta a vista e non copre l'unica
-   cosa che deve essere premuta. */
-@media (min-width:1400px){ .lp-contatti{ right:calc(428px + 18px); } }
-
-/* LE DUE COSE CHE NESSUNO TI DA'. Erano due punti elenco fra quattro,
-   cioe' dichiarate uguali a "conferma immediata". Non lo sono: il
-   rimborso e le foto della giornata non li vende nessuna piattaforma.
-   Con 48 secondi attivi a sessione, quattro righe uguali si leggono come
-   una media -- e la media di quattro cose buone e' meno del meglio. */
-.pr-forti{ display:grid; gap:10px; margin:12px 0 10px; }
-@media (min-width:620px){ .pr-forti{ grid-template-columns:1fr 1fr; } }
-.pr-forte{ display:flex; gap:11px; align-items:flex-start;
-  padding:12px 13px; border-radius:12px; background:#FFF;
-  border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,.05); }
-.pr-forte i{ font-style:normal; font-size:1.25rem; line-height:1.1; flex:none; }
-.pr-forte b{ display:block; font-size:.96rem; font-weight:900; color:var(--ink);
-  line-height:1.3; margin-bottom:3px; }
-.pr-forte span{ display:block; font-size:.84rem; line-height:1.5; color:var(--ink-soft); }
-/* le due normali: restano scritte perche' tolgono un dubbio, ma non
-   devono rubare l'occhio alle due di sopra */
-.pr-normali{ margin:0; font-size:.82rem; line-height:1.55; color:var(--ink-soft); }
-.pr-normali b{ color:var(--ink); font-weight:800; }
-
-.pr-offer-top{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
-  margin-bottom:12px; }
-.pr-offer-was{ font-size:1.05rem; color:var(--ink-soft); text-decoration:line-through; }
-.pr-offer-now{ font-size:1.75rem; font-weight:900; color:var(--orange); line-height:1; }
-.pr-offer-lab{ font-size:.86rem; font-weight:800; color:var(--ink); }
-.pr-offer-code{ display:inline-flex; align-items:center; gap:8px; padding:5px 12px;
-  border-radius:999px; background:#FFF; border:2px dashed var(--orange);
-  font-size:.92rem; font-weight:900; letter-spacing:.06em; color:var(--orange);
-  user-select:all; }
-.pr-offer ul{ margin:0; padding:0; list-style:none; display:grid; gap:5px; }
-.pr-offer li{ display:flex; gap:8px; align-items:flex-start;
-  font-size:.88rem; line-height:1.45; }
-.pr-offer li b{ font-weight:800; }
-.pr-offer-when{ margin:12px 0 0; font-size:.78rem; color:var(--ink-soft); }
-
-/* LE RECENSIONI COME TESTO. Scorrono di lato sul telefono: sei carte
-   impilate sarebbero sei schermate, e su questa pagina lo spazio
-   verticale e' la risorsa piu' scarsa che c'e'. */
-.lp-rvs{ max-width:900px; margin:20px auto 0; }
-.lp-rvs-head{ margin:0 0 12px; text-align:left; }
-.lp-rvs-head b{ display:block; font-size:1.02rem; }
-.lp-rvs-head span{ display:block; font-size:.78rem; color:var(--ink-soft); margin-top:2px; }
-.lp-rvs-grid{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(268px,300px);
-  gap:12px; overflow-x:auto; padding-bottom:6px; scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch; }
-.lp-rvs-grid::-webkit-scrollbar{ height:6px; }
-.lp-rvs-grid::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.18); border-radius:99px; }
-.lp-rv{ scroll-snap-align:start; margin:0; padding:14px; background:#FFF;
-  border:1px solid var(--line); border-radius:14px; text-align:left;
-  /* la firma va in fondo: le schede sono alte uguali ma i testi no, e in
-     quella corta il nome restava a mezz'aria con un vuoto sotto */
-  display:flex; flex-direction:column; }
-.lp-rv blockquote{ flex:0 1 auto; }
-.lp-rv figcaption{ margin-top:auto; }
-/* mentre scorrono da sole l'aggancio va spento, altrimenti il movimento
-   e lo scatto dello snap si combattono e la fila trema */
-.lp-rvs-grid.va-da-sola{ scroll-snap-type:none; }
-.lp-rv-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.lp-rv-ini{ width:26px; height:26px; flex:none; border-radius:50%; background:var(--orange);
-  color:#FFF; font-weight:800; font-size:.82rem; display:flex; align-items:center;
-  justify-content:center; }
-.lp-rv-star{ color:#F5A623; font-size:.88rem; letter-spacing:.04em; }
-.lp-rv-src{ margin-left:auto; font-size:.64rem; font-weight:800; text-transform:uppercase;
-  letter-spacing:.05em; color:#1f5130; background:rgba(31,81,48,.1);
-  padding:3px 7px; border-radius:99px; }
-.lp-rv strong{ display:block; font-size:.9rem; margin-bottom:5px; }
-.lp-rv blockquote{ margin:0; font-size:.82rem; line-height:1.55; color:var(--ink-soft);
-  display:-webkit-box; -webkit-line-clamp:7; -webkit-box-orient:vertical; overflow:hidden; }
-.lp-rv figcaption{ margin-top:8px; font-size:.74rem; font-weight:700; color:var(--ink); }
-@media (max-width:560px){ .lp-rvs-grid{ grid-auto-columns:minmax(238px,260px); } }
-/* LA PROMOZIONE FINITA SPARISCE DA SOLA. Una sola classe sulla radice
-   spegne tutto quello che parla di sconto: il blocco, le righe del
-   codice, il prezzo barrato nella barra fissa. Cosi' non resta niente da
-   ricordarsi di togliere -- ed e' l'unico modo perche' una promozione
-   scaduta non resti in pagina per mesi. */
-.promo-finita .pr-promo{ display:none !important; }
-.pr-promo-off{ display:none; }
-.promo-finita .pr-promo-off{ display:inline; }
-
-/* IL CONTATORE, A CASELLE. Una pastiglia con "21d 7h" sembra un'etichetta
-   morta; tre caselle con i numeri grandi si leggono in un colpo e si
-   vedono cambiare. I minuti scorrono davvero -- il difetto dei contatori
-   finti non e' mai stato il movimento, e' il RIPARTIRE da capo a ogni
-   visita. Questo conta verso il 30 settembre e basta. */
-.pr-timer{ display:inline-flex; align-items:stretch; gap:6px; vertical-align:middle; }
-.pr-timer span.q{ display:flex; flex-direction:column; align-items:center;
-  min-width:46px; padding:5px 7px 4px; border-radius:9px;
-  background:#7A2016; color:#FFF; line-height:1; }
-.pr-timer span.q b{ font-size:1.18rem; font-weight:900; font-variant-numeric:tabular-nums; }
-.pr-timer span.q i{ font-style:normal; font-size:.56rem; font-weight:800;
-  text-transform:uppercase; letter-spacing:.09em; opacity:.8; margin-top:3px; }
-@media (max-width:560px){
-  .pr-timer span.q{ min-width:40px; padding:4px 6px 3px; }
-  .pr-timer span.q b{ font-size:1rem; }
-}
-
-/* 🔴 SU TELEFONO IL CONTATORE E LA FRASE NON STANNO AFFIANCATI.
-   Le quattro caselle sono larghe circa 210px e non si comprimono: alla
-   frase restavano centocinquanta pixel, cioe' undici righe da due parole
-   in grassetto rosso. Impilati, la frase torna a quattro righe intere.
-   Il contatore si prende la riga che ha: caselle in parti uguali invece
-   che piccole e schiacciate a sinistra -- deve sembrare una cosa decisa,
-   non una cosa avanzata. Vale solo per il blocco dell'offerta: quello
-   accanto al calendario e' gia' impilato e sta in un riquadro stretto. */
-@media (max-width:620px){
-  .pr-offer-urg{ flex-direction:column; align-items:stretch; gap:10px; }
-  .pr-offer-urg .pr-timer{ display:flex; width:100%; }
-  .pr-offer-urg .pr-timer span.q{ flex:1 1 0; min-width:0; }
-}
-.pr-promo-lab{ display:inline-block; padding:3px 10px; border-radius:999px;
-  background:var(--orange); color:#FFF; font-size:.7rem; font-weight:800;
-  text-transform:uppercase; letter-spacing:.08em; }
-
-/* L'URGENZA, e le due regole che la tengono onesta:
-   1. niente conto alla rovescia che riparte a ogni visita -- chi lo
-      riconosce smette di credere anche a quello che e' vero;
-   2. si dice solo quello che si puo' sostenere. "I gruppi piccoli si
-      riempiono" e' un fatto del prodotto, non una promessa inventata. */
-.pr-offer-urg{ display:flex; align-items:center; gap:9px; margin:12px 0 0;
-  padding:9px 13px; border-radius:10px; background:#FFF0EE; border:1px solid #F6C9C2;
-  font-size:.86rem; font-weight:700; color:#7A2016; line-height:1.45; }
-.pr-copy{ display:inline-flex; align-items:center; gap:9px; padding:7px 8px 7px 14px;
-  border-radius:999px; background:#FFF; border:2px dashed var(--orange);
-  font:inherit; cursor:pointer; }
-.pr-copy .cod{ font-size:1rem; font-weight:900; letter-spacing:.08em; color:var(--orange); }
-.pr-copy .lab{ font-size:.74rem; font-weight:800; text-transform:uppercase;
-  letter-spacing:.06em; padding:4px 10px; border-radius:999px;
-  background:var(--orange); color:#FFF; }
-.pr-copy.fatto .lab{ background:#1F7A3A; }
-.pr-copy:hover{ box-shadow:0 4px 14px -6px rgba(237,103,7,.6); }
-.pr-copy-how{ margin:8px 0 0; font-size:.86rem; line-height:1.5; color:var(--ink); }
-.pr-copy-how b{ font-weight:800; }
-.pr-offer-only{ margin:10px 0 0; font-size:.86rem; font-weight:800; color:var(--ink);
-  line-height:1.5; }
-.pr-offer-only b{ color:var(--orange); }
-@media (max-width:560px){
-  .pr-offer{ padding:15px 14px; margin-top:18px; }
-  .pr-offer-now{ font-size:1.5rem; }
-  .pr-offer li{ font-size:.87rem; }
-}
-/* VIA LE SCHEDE. Si nascondono e non si cancellano: il codice che le
-   gestisce e' agganciato anche alle tre carte piu' in alto, e togliendo
-   gli elementi troverebbe il vuoto -- le carte smetterebbero di
-
-.pr-code-here{ max-width:560px; margin:0 auto 12px; padding:9px 12px;
-  background:#FFF8F2; border:1px dashed var(--orange); border-radius:10px;
-  font-size:.8rem; font-weight:600; color:var(--ink-soft); text-align:center;
-  line-height:1.55; }
-.pr-code-here b{ color:var(--ink); font-weight:800; }
-
-/* LA CIFRA, IN CIMA AL RIQUADRO DEL CALENDARIO.
-   Prima la ragione, poi il tempo che resta: al contrario non funziona,
-   perche' il tempo che resta DI CHE COSA non si sa ancora. */
-.pr-here-off{ display:block; margin:0 0 9px; line-height:1; }
-.pr-here-off b{ font-size:2.3rem; font-weight:900; letter-spacing:-.02em;
-  color:var(--orange); }
-.pr-here-off i{ display:block; margin-top:6px; font-style:normal;
-  font-size:.76rem; font-weight:800; text-transform:uppercase;
-  letter-spacing:.06em; color:var(--ink-soft); }
-
-/* I TRE PASSI, ACCANTO AL CALENDARIO E SOLO LI'.
-   Numerati davvero (<ol>): sono azioni in ordine, e il numero dice
-   quante ne mancano. L'attesa dopo "Apply" e' scritta come parte del
-   passo, non come nota a pie' di pagina: una nota la legge chi ha gia'
-   un problema, e a quel punto ha gia' ripremuto tre volte. */
-.pr-passi{ max-width:560px; margin:0 auto 12px; padding:12px 14px;
-  background:#FFF8F2; border:1px dashed var(--orange); border-radius:10px;
-  text-align:left; }
-.pr-passi-t{ margin:0 0 8px; font-size:.78rem; font-weight:800;
-  text-transform:uppercase; letter-spacing:.05em; color:var(--orange); }
-.pr-passi ol{ margin:0; padding:0; list-style:none; counter-reset:p;
-  display:grid; gap:7px; }
-.pr-passi li{ counter-increment:p; display:flex; gap:9px; align-items:flex-start;
-  font-size:.82rem; line-height:1.5; color:var(--ink-soft); }
-.pr-passi li::before{ content:counter(p); flex:0 0 auto; width:17px; height:17px;
-  margin-top:2px; border-radius:50%; background:var(--orange); color:#FFF;
-  font-size:.64rem; font-weight:800; display:flex; align-items:center;
-  justify-content:center; }
-.pr-passi b{ color:var(--ink); font-weight:800; }
-.pr-passi i{ font-style:normal; background:#FFF; border:1px solid var(--line);
-  border-radius:5px; padding:1px 5px; font-size:.76rem; font-weight:700;
-  color:var(--ink); white-space:nowrap; }
-.pr-passi .att{ display:block; margin-top:2px; font-size:.76rem; opacity:.9; }
-.pr-passi .pr-copy{ padding:3px 4px 3px 9px; vertical-align:middle; }
-.pr-passi .pr-copy .cod{ font-size:.82rem; }
-.pr-passi .pr-copy .lab{ font-size:.6rem; padding:3px 7px; }
 </style>
 <script type="application/ld+json">
 {
@@ -2190,16 +1856,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      ============================================================ -->
 <!-- WhatsApp sempre a vista: vedi la nota nel foglio di stile.
      Stesso numero dei pulsanti in pagina e del footer. -->
-<div class="lp-contatti">
-  <a class="lp-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener"
+<a class="lp-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener"
    data-wa="alto" aria-label="Chat with us on WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
   <span>WhatsApp<small>Chat with us</small></span>
 </a>
-  <a class="lp-tel" href="tel:+39055286059" aria-label="Call us on +39 055 286059">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
-    +39 055 286059</a>
-</div>
 
 <div class="pg-cols">
 <div class="pg-main">
@@ -2245,74 +1906,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
          alt="Viator Experience Award Winner 2025 and 2023, rated 4.9 out of 5 based on 1,794 reviews on Viator and Tripadvisor">
     <img class="pr-aw-ta" src="img/award-tripadvisor.webp" width="300" height="300" loading="lazy" decoding="async"
          alt="Tripadvisor Travellers' Choice Awards 2025">
-  </div>
-
-<!-- Le facce prima dei pulsanti: chi risponde, poi come si fa. -->
-  <div class="hero-team">
-    <img src="img/team-prestige-rent.jpg" width="46" height="46" loading="eager" decoding="async"
-         alt="Violeta and Carrie, our English-speaking team in Florence">
-    <span><b>Violeta &amp; Carrie</b>, in our Florence office.
-    If you need anything before or during your trip, they answer in English.</span>
-  </div>
-  <div class="hero-cont">
-    <a class="wa" href="https://wa.me/393338424047" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
-      Ask on WhatsApp</a>
-    <a href="tel:+39055286059">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
-      +39 055 286059</a>
-  </div>
-
-  <div class="pr-offer pr-promo reveal">
-   <div class="pr-offer-txt">
-    <div class="pr-offer-top">
-      <span class="pr-promo-lab">September offer</span>
-      <span class="pr-offer-lab">Book direct, just here:</span>
-      <span class="pr-offer-now">&minus;10%</span>
-      <span class="pr-offer-lab">on your whole booking &mdash; any tour, any format</span>
-      <button type="button" class="pr-copy" data-code="DIRECT10"
-              aria-label="Copy the discount code DIRECT10">
-        <span class="cod">DIRECT10</span><span class="lab">Copy</span>
-      </button>
-    </div>
-    <p class="pr-copy-how">
-      Small group <b>&euro;149 &rarr; &euro;134</b> &middot; private tours, same 10%.
-    </p>
-    <div class="pr-forti">
-      <div class="pr-forte">
-        <i aria-hidden="true">🛡️</i>
-        <span><b>Not worth it? You get your money back.</b>
-        Tell your guide before you step off the bus &mdash; full refund,
-        no questions asked. No booking platform gives you this.</span>
-      </div>
-      <div class="pr-forte">
-        <i aria-hidden="true">📸</i>
-        <span><b>Your photo album of the day &mdash; free, only when you book direct.</b>
-        Photos taken during your day out, online the morning
-        after: yours to download and keep. Book through a platform and you
-        don&rsquo;t get it.</span>
-      </div>
-    </div>
-    <p class="pr-normali">
-      <b>Guaranteed departure</b> &mdash; we don&rsquo;t cancel on small groups
-      &middot; free cancellation up to 24h &middot; no booking fee &middot; instant confirmation
-    </p>
-    <p class="pr-offer-urg">
-      <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
-        <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
-        <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
-        <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
-        <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
-      </span>
-      <span><b>Only here &mdash; not on the booking platforms.</b> Ends
-      <b>30 September</b>, then back to &euro;149.</span>
-    </p>
-   </div>
-
-   <!-- LA PROVA ACCANTO ALLA PROMESSA. Stesso file del video piu' in
-        basso: il browser lo scarica una volta sola, e solo se qualcuno
-        preme play (`preload="none"`). La classe `slide-vid` serve al
-        pulsante grande, gestito dallo script che c'e' gia'. -->
   </div>
 
   <!-- galleria mosaico stile Viator: 1 grande + colonne 2x2 che sbordano e scorrono -->
@@ -2548,75 +2141,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      tour del sito: una riga di schede, un pannello per volta. Il
      contenuto e' quello di prima, spostato: nulla e' stato riscritto.
      ============================================================ -->
-<section class="lp-rvs reveal" aria-label="What our guests say">
-    <p class="lp-rvs-head">
-      <b>What our guests actually say</b>
-      <span>Every review below is public on the platform it came from.</span>
-    </p>
-    <div class="lp-rvs-grid">
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">F</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Great winery tour</strong>
-          <blockquote>Excellent tour both driver and guide Jason were excellent and very helpful would highly recommend this tour.</blockquote>
-          <figcaption>Fred P. &middot; August 2026</figcaption>
-        </figure>
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">C</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Prestige Rent save my day!</strong>
-          <blockquote>As we just found out that I have &quot;missed&quot; the Toscana trip I have booked [because they have left 6 minutes before the schedule] we needed HELP! And this is the moment we meet Jason! I am sure you know Jason! And his Argonauts! This time Jason offered us a bit of local wisdom/music [he has a great voice], the right words to the vintner, and a knack for finding the good wine without the danger. Two wineries, no sea monsters — just rolling hills, olive groves, and a reward far more drinkable than mythical wool. I would like very much to know the names of the wineries! The places are gorgeous and I&#x27;d love to return, to stay longer, to really feel Toscany in my blood!</blockquote>
-          <figcaption>Cristina P. &middot; July 2026</figcaption>
-        </figure>
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">J</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Super fun authentic experience</strong>
-          <blockquote>My wife, in-laws, and I had the absolute best experience with Prestige Rents. I had read some reviews about how they were hard to find or they left without their group. That couldn’t be further from the truth. Our guide Raf gave me a call 10 minutes before our departure time to check in on where we were at and give me a detailed description of how to find him. We were 1 minute late but it was no problem at all! Once on the bus Nino was an amazing driver. Raf gave some amazing insight on the area while also getting some laughs out of the whole bus. The small group description is accurate it felt intimate and well put together even though there were a few other families on board. My wife got a little car sick on the drive (which is normal for her on non-mountain roads). Raf and Nino were so kind to her making sure she had water and snacks while at the wine tasting so her stomach could settle. Both wineries were beautiful, organic, and authentic. I can’t speak highly enough about our experience and would recommend them to anyone looking to experience wine in Tuscany!</blockquote>
-          <figcaption>Joshua J. &middot; July 2026</figcaption>
-        </figure>
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">M</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Amazing Time in Beautiful Tuscan Wine Country</strong>
-          <blockquote>My wife and I had a wonderful time wine tasting with this tour. Both vineyards were beautiful, the food was great, and the wine was absolutely fantastic. Our tour guide, Jason, and driver, Mino were both awesome - they made the entire group feel welcome and kept the fun and energy level high the entire trip. This is a definite must do while in Florence!</blockquote>
-          <figcaption>Michael B. &middot; July 2026</figcaption>
-        </figure>
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">L</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Best wine tour and guide!</strong>
-          <blockquote>We did a half day wine tour of two local vineyards and it was fabulous! Our tour guide Jonathan was just incredible, full of knowledge, history, insights and fun! I would highly recommend him and the tour and we would definitely come back and do it again!</blockquote>
-          <figcaption>Lauren T. &middot; June 2026</figcaption>
-        </figure>
-        <figure class="lp-rv">
-          <div class="lp-rv-top">
-            <span class="lp-rv-ini" aria-hidden="true">C</span>
-            <span class="lp-rv-star" role="img" aria-label="5 out of 5">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span class="lp-rv-src">Verified booking</span>
-          </div>
-          <strong>Tuscany wine tour!</strong>
-          <blockquote>We were a group of 10 and thoroughly enjoyed our afternoon wine tour. The guides were all wonderful from the check in to the bus ride to the guide at each winery. The countryside is beautiful and each winery had its own charm. Definitely recommend.</blockquote>
-          <figcaption>Christy A. &middot; June 2026</figcaption>
-        </figure>
-    </div>
-  </section>
-
 <section id="info" class="pr-sec alt">
   <div class="pr-wrap wide">
     <div class="pr-head">
@@ -3251,16 +2775,6 @@ San Gimignano is a very small village where you can easily stroll around on your
            Due prodotti Regiondo distinti: 211541 = small group,
            210791 = Private tour to Siena and San Gimignano. -->
       <div id="bookform">
-        <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
-          <span class="pr-here-off"><b>&minus;10%</b><i>on your whole booking</i></span>
-          <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
-            <span class="q"><b data-q="g">&ndash;</b><i>days</i></span>
-            <span class="q"><b data-q="o">&ndash;</b><i>hours</i></span>
-            <span class="q"><b data-q="m">&ndash;</b><i>mins</i></span>
-            <span class="q"><b data-q="s">&ndash;</b><i>secs</i></span>
-          </span>
-          <span style="display:block;margin-top:7px"><b>September offer &mdash; available just here.</b> Ends 30 September.</span>
-        </p>
         <div class="bk-head reveal">
           <h3 class="bk-title">First, choose how you want to travel</h3>
           <p class="bk-sub">Then pick your date in the calendar.</p>
@@ -3298,19 +2812,6 @@ San Gimignano is a very small village where you can easily stroll around on your
           <span><i aria-hidden="true">⚡</i><b>Instant confirmation</b></span>
           <span><i aria-hidden="true">🏷️</i><b>Best price</b> when you book direct</span>
           <span><i aria-hidden="true">📞</i><b>Direct line</b> to our team, not a call centre</span>
-        </div>
-        <div class="pr-passi pr-promo reveal">
-          <p class="pr-passi-t">How to get your 10% off</p>
-          <ol>
-            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
-            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
-              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
-            <li><span>Paste
-              <button type="button" class="pr-copy" data-code="DIRECT10"
-                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-              and press <i>Apply</i>
-              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
-          </ol>
         </div>
       </div><!-- /#bookform -->
 
@@ -3572,7 +3073,7 @@ San Gimignano is a very small village where you can easily stroll around on your
     <!-- data-base = parte fissa del titolo; il nome della formula scelta
          viene aggiunto dallo script insieme al prezzo giusto. -->
     <div class="pr-sticky-title" data-base="Siena &amp; San Gimignano from Florence">Siena &amp; San Gimignano from Florence</div>
-    <div class="pr-sticky-price"><span class="pr-promo"><s>&euro;149</s> <b>&euro;134</b> <span class="per">per person &middot; DIRECT10</span></span><span class="pr-promo-off"><b>&euro;149</b> <span class="per">per person</span></span></div>
+    <div class="pr-sticky-price"><b>&euro;149</b> <span class="per">per person</span></div>
   </div>
   <a class="cta" href="#bookform">SECURE YOUR SPOT</a>
 </div>
@@ -4453,88 +3954,5 @@ San Gimignano is a very small village where you can easily stroll around on your
 <!-- I riquadri delle prenotazioni vere: stessa fonte del sito
      (/api/prenotazioni/, cioe' Regiondo). Vedi riprova.js. -->
 <script defer src="/lp/riprova.js" data-tour="siena-san-gimignano-the-tuscan-countryside-landing"></script>
-<script>
-/* IL CONTO ALLA ROVESCIA, VERO.
-   Conta verso un istante fisso -- il 30 settembre alle 23:59 ora di Roma,
-   cioe' le 21:59 UTC -- non verso "fra 24 ore": chiudi il portatile e
-   torni domani, e mancano ventiquattro ore in meno.
-
-   Giorni e ore, mai i secondi: i secondi che scorrono sono il segno di
-   riconoscimento dei contatori finti, e chi li riconosce smette di
-   credere anche al resto della pagina.
-
-   E quando finisce, SPEGNE TUTTO: una classe sulla radice fa sparire il
-   blocco, le righe del codice e il prezzo barrato. Un contatore in
-   negativo e' peggio di nessun contatore, ed e' quello che succede alle
-   promozioni che nessuno si ricorda di togliere. */
-(function(){
-  /* PIU' DI UN CONTATORE, UN SOLO OROLOGIO. Uno sta in cima
-     nell'offerta, uno accanto al calendario: se ognuno avesse il suo
-     ciclo, prima o poi mostrerebbero due secondi diversi nella stessa
-     schermata -- ed e' il genere di dettaglio che fa sospettare che il
-     tempo sia finto. Un ciclo solo li aggiorna tutti insieme. */
-  var tt = document.querySelectorAll('.pr-timer');
-  if (!tt.length) return;
-  var fine = Date.parse(tt[0].getAttribute('data-fine'));
-  if (!fine) return;
-  function due(n){ return n < 10 ? '0' + n : '' + n; }
-  function batti(){
-    var ms = fine - Date.now();
-    if (ms <= 0) { document.documentElement.classList.add('promo-finita'); return; }
-    var s = Math.floor(ms / 1000);
-    var g = Math.floor(s / 86400), o = Math.floor((s % 86400) / 3600),
-        m = Math.floor((s % 3600) / 60), sec = s % 60;
-    Array.prototype.forEach.call(tt, function(t){
-      var a = t.querySelector('[data-q="g"]'); if (a) a.textContent = g;
-      var b = t.querySelector('[data-q="o"]'); if (b) b.textContent = due(o);
-      var c = t.querySelector('[data-q="m"]'); if (c) c.textContent = due(m);
-      var d = t.querySelector('[data-q="s"]'); if (d) d.textContent = due(sec);
-    });
-  }
-  batti();
-  setInterval(batti, 1000);
-})();
-</script>
-<script>
-/* COPIA IL CODICE. Su un telefono selezionare un testo dentro una
-   pastiglia riesce a meta' della gente; un pulsante riesce sempre.
-   Il ripiego serve davvero: `navigator.clipboard` non esiste sui
-   browser vecchi, e senza di esso il pulsante non farebbe NIENTE --
-   che e' peggio di non averlo. Selezionando il testo, almeno il gesto
-   resta possibile. */
-(function(){
-  /* IN CATTURA, E FERMATO SUBITO. Dentro l'area del calendario c'e' un
-     altro gestore che intercetta i clic per riallineare il modulo: si
-     mangiava il nostro, e invece di copiare il codice la pagina saltava.
-     Ascoltando in fase di CATTURA questo arriva per primo, e
-     stopPropagation impedisce che l'altro veda mai il clic. */
-  document.addEventListener('click', function(e){
-    var b = e.target && e.target.closest ? e.target.closest('.pr-copy') : null;
-    if (!b) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    var cod = b.getAttribute('data-code') || '';
-    var lab = b.querySelector('.lab');
-    function fatto(){
-      b.classList.add('fatto');
-      if (lab) { lab.textContent = 'Copied'; }
-      setTimeout(function(){ b.classList.remove('fatto'); if (lab) lab.textContent = 'Copy'; }, 2200);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(cod).then(fatto, seleziona);
-    } else { seleziona(); }
-    function seleziona(){
-      try {
-        var n = b.querySelector('.cod'), r = document.createRange();
-        r.selectNodeContents(n);
-        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-        if (document.execCommand) { document.execCommand('copy'); fatto(); }
-      } catch (err) {}
-    }
-  }, true);
-})();
-</script>
-<script defer src="/lp/recensioni.js" data-tour="small-group-tour-to-siena-san-gimignano-and-the-tuscan-countryside-from-florence"></script>
 </body>
 </html>
