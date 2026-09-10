@@ -126,11 +126,54 @@ export function emailPerMeta(grezza: unknown): string | null {
  * perdono finisce nel rapporto invece che in un silenzio.
  */
 
+/* 🔴 UNA SOLA ECCEZIONE ALLA REGOLA QUI SOPRA: I NUMERI NORDAMERICANI.
+ *
+ * Misurato il 10/09/2026 su 49 prenotazioni dirette dal 15 luglio:
+ *
+ *     gia' internazionali (col +)   15
+ *     forma nordamericana           33     <-- buttati via
+ *     altra forma                    1
+ *
+ * Trentatre' su quarantanove finivano nel caricamento SENZA telefono,
+ * cioe' con la sola email come dato di abbinamento. E' la ragione
+ * principale per cui Google riconosce 7-9 acquisti al mese su ~109.
+ *
+ * ── PERCHE' QUESTI SI POSSONO RICONOSCERE, E GLI ALTRI NO ──────────
+ * Il piano di numerazione nordamericano ha una forma che si dichiara da
+ * sola: dieci cifre, la prima dell'indicativo da 2 a 9, la prima dello
+ * scambio da 2 a 9 -- oppure undici che cominciano per 1. Non e' un
+ * indovinare "sembra americano": e' una struttura verificabile.
+ *
+ * ── E IL RISCHIO E' MOLTO PIU' PICCOLO DI QUELLO CHE TEMEVO ────────
+ * Un cellulare italiano come 3338424047 ha la STESSA forma e verrebbe
+ * marcato +1 per sbaglio. Ma il danno finisce li', per due motivi che
+ * quando ho scritto la regola non avevo pesato:
+ *
+ *   1. L'EMAIL SI MANDA SEMPRE, e da sola funziona. Un telefono sbagliato
+ *      non toglie l'abbinamento per email: al massimo non ne aggiunge uno.
+ *   2. Perche' una vendita finisse davvero sul clic di un estraneo,
+ *      quel numero inventato dovrebbe (a) appartenere a qualcuno con un
+ *      account Google e (b) quella persona dovrebbe aver cliccato un
+ *      nostro annuncio negli ultimi 90 giorni. Su un numero americano a
+ *      caso e' una probabilita' che non si scrive.
+ *
+ * Quindi: un dato in meno costa una conversione non attribuita, e qui ne
+ * costava trentatre'. La regola non si abbandona -- si restringe a una
+ * forma che si riconosce.
+ */
+const NORDAMERICANO = /^[2-9]\d{2}[2-9]\d{6}$/;
+
 function cifre(grezzo: unknown): string | null {
   if (typeof grezzo !== 'string') return null;
   const t = grezzo.trim();
-  if (!t.startsWith('+')) return null;
   const n = t.replace(/\D/g, '');
+
+  if (!t.startsWith('+')) {
+    /* niente + : si accetta solo se la forma e' inequivocabilmente NANP */
+    const senzaUno = n.length === 11 && n.startsWith('1') ? n.slice(1) : n;
+    return senzaUno.length === 10 && NORDAMERICANO.test(senzaUno) ? '1' + senzaUno : null;
+  }
+
   /* E.164: da 8 a 15 cifre prefisso compreso. Sotto le otto e' un
      interno o un campo compilato per sbaglio. */
   return n.length >= 8 && n.length <= 15 ? n : null;
