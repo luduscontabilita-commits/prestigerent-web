@@ -2045,10 +2045,18 @@ html{ scroll-behavior:auto; }
    attivi a sessione, quello che non risalta non viene letto.
    L'etichetta si riconosce senza leggere; il rosso dice all'occhio dove
    fermarsi. */
-.gar-tag{ display:inline-block; margin-bottom:5px; padding:3px 9px;
-  border-radius:6px; background:#9B2C1E; color:#FFF;
-  font-size:.72rem; font-weight:900; letter-spacing:.07em;
-  text-transform:uppercase; }
+/* 🔴 ERA UNA PASTIGLIA PICCOLA: 0,72rem, maiuscolo, bianco su rosso
+   pieno. Maiuscolo + corpo piccolo + fondo pieno e' la combinazione che
+   si legge peggio -- il maiuscolo toglie il profilo alle parole, e a
+   quel corpo il profilo e' l'unica cosa che le rende riconoscibili.
+   Ed era un errore di gerarchia: la garanzia e' la cosa piu' forte del
+   riquadro e stava scritta piu' piccola di tutto il resto.
+   Adesso e' un titolo. Il contrasto sale invece di scendere: rosso scuro
+   su bianco sta molto sopra la soglia, bianco su rosso a quel corpo ci
+   stava appena. */
+.gar-tag{ display:block; margin:0 0 4px; font-size:1.15rem; font-weight:900;
+  color:#9B2C1E; letter-spacing:-.01em; line-height:1.2; }
+.gar-sott{ display:block; font-size:.9rem; margin-bottom:2px; }
 .gar-forte{ font-weight:800; color:#9B2C1E;
   text-decoration:underline; text-decoration-color:#9B2C1E;
   text-decoration-thickness:2px; text-underline-offset:3px; }
@@ -2340,8 +2348,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="pr-forti">
       <div class="pr-forte">
         <i aria-hidden="true">🛡️</i>
-        <span><span class="gar-tag">100% money-back guarantee</span>
-        <b>We are so sure of this day that we guarantee it.</b>
+        <span><span class="gar-tag">100% money back guarantee</span>
+        <b class="gar-sott">We are so sure of this day that we guarantee it.</b>
         If the experience isn&rsquo;t worth it, just tell your guide before you
         step off the bus: <span class="gar-forte">we refund you in full, on the
         spot</span>. No questions, no forms, no arguing.</span>
