@@ -55,8 +55,12 @@
      lasciare il video com'era che farlo partire a caso. */
   if (!('IntersectionObserver' in window)) return;
 
-  v.muted = true;                  /* obbligatorio: con l'audio nessun browser parte */
-  v.setAttribute('muted', '');
+  /* 🔴 SI PROVA CON L'AUDIO. Quasi sempre il browser rifiuta -- finche'
+     la persona non ha toccato la pagina e' una regola di Chrome, Safari e
+     Firefox insieme -- e allora si riparte muti chiedendo l'audio con un
+     pulsante. Provare e basta vorrebbe dire un video che non parte, cioe'
+     peggio di prima. */
+  v.muted = false;
   v.setAttribute('playsinline', '');
   v.playsInline = true;
   v.loop = true;
@@ -72,15 +76,60 @@
   });
   v.addEventListener('play', function () { fermatoAMano = false; });
 
+  /* IL PULSANTE DELL'AUDIO: acceso e spento, non a senso unico. Chi vuole
+     silenzio lo ha in un tocco -- era l'altra meta' della richiesta. */
+  var suono = document.createElement('button');
+  suono.type = 'button';
+  suono.className = 'vid-audio';
+  suono.hidden = true;
+  function scriviSuono() {
+    suono.textContent = v.muted ? '🔇  Sound on' : '🔊  Sound off';
+    suono.setAttribute('aria-label', v.muted ? 'Turn the sound on' : 'Turn the sound off');
+  }
+  suono.addEventListener('click', function (e) {
+    e.preventDefault(); e.stopPropagation();
+    v.muted = !v.muted;
+    if (!v.muted && v.paused) { var q = v.play(); if (q && q.catch) q.catch(function () {}); }
+    scriviSuono();
+  });
+  var cornice = v.parentNode;
+  if (cornice) {
+    cornice.appendChild(suono);
+    var st = document.createElement('style');
+    st.textContent = '.vid-audio{position:absolute;left:8px;bottom:8px;z-index:4;'
+      + 'display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:0;'
+      + 'border-radius:999px;background:rgba(15,20,26,.78);color:#FFF;cursor:pointer;'
+      + 'font:inherit;font-size:.78rem;font-weight:800;}'
+      + '.vid-audio:hover{background:rgba(15,20,26,.92);}';
+    document.head.appendChild(st);
+  }
+
+  /* 🔴 ECCO PERCHE' NON SI POTEVA NEMMENO ALZARE IL VOLUME.
+     Sopra il video c'e' `.vid-play`, il pulsante grande, che si nasconde
+     solo quando la cornice prende la classe `is-playing` -- classe messa
+     dallo script del carosello quando PREMI tu. Partendo da soli non
+     arrivava mai: quel pulsante restava sopra, si prendeva i clic, e i
+     comandi del video sotto erano irraggiungibili. Adesso la mettiamo. */
+  v.addEventListener('playing', function () {
+    if (cornice && cornice.classList) cornice.classList.add('is-playing');
+    suono.hidden = !v.muted;
+    scriviSuono();
+  });
+
   var uscendo = false;
   var occhio = new IntersectionObserver(function (voci) {
     voci.forEach(function (x) {
       if (x.isIntersecting && x.intersectionRatio >= 0.5) {
         if (fermatoAMano) return;
         var p = v.play();
-        /* se il browser rifiuta lo stesso, non si insiste e non si
-           scrive niente in console: resta il video com'era, coi comandi */
-        if (p && p.catch) p.catch(function () {});
+        if (p && p.catch) p.catch(function () {
+          /* rifiutato per via dell'audio: si riparte muti e lo si chiede */
+          v.muted = true;
+          suono.hidden = false;
+          scriviSuono();
+          var q = v.play();
+          if (q && q.catch) q.catch(function () {});
+        });
       } else if (!v.paused) {
         uscendo = true;
         v.pause();
