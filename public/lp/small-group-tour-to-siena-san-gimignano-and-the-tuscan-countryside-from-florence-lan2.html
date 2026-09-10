@@ -1797,8 +1797,14 @@ html{ scroll-behavior:auto; }
      cima valgono piu' di cento in fondo.
      E si leggono come UNA cosa -- "come ci contatti" -- invece che come
      due pulsanti impilati, dove il secondo sembra il ripiego del primo. */
-  .lp-contatti{ position:fixed; top:9px; right:16px; z-index:100;
-    display:flex; flex-direction:row; align-items:center; gap:8px; }
+  /* 🔴 NON PIU' FISSE ALLO SCHERMO: stanno dentro la colonna, sopra il
+     riquadro -10%. Sopra i 1400px quella colonna e' appiccicata e scorre
+     con la persona, quindi restano a vista lo stesso -- ma accanto al
+     punto in cui si decide, e senza rubare una striscia di pagina a
+     tutti. Sotto i 1400px la colonna torna nel flusso e i contatti la
+     seguono: nell'hero ci sono gia' le facce con gli stessi pulsanti. */
+  .lp-contatti{ display:flex; flex-direction:row; align-items:center;
+    justify-content:center; gap:8px; margin:0 0 12px; flex-wrap:wrap; }
   .lp-wa{ position:static; top:auto; right:auto; z-index:auto;
     display:inline-flex; align-items:center; gap:9px;
     padding:9px 15px 9px 12px; border-radius:999px;
@@ -1811,7 +1817,8 @@ html{ scroll-behavior:auto; }
      margini: la pagina comincia 62px piu' in basso e quella striscia e'
      delle pastiglie. Cosi' nessun titolo, per quanto lungo, potra' mai
      finirci sotto -- e non si riapre il problema a ogni testo nuovo. */
-  body{ padding-top:46px; }   /* una riga sola di pastiglie, non due */
+  /* la striscia riservata alle pastiglie non serve piu':
+     adesso stanno nel flusso, dentro la colonna. */
   .lp-tel{ display:inline-flex; align-items:center; gap:8px;
     padding:8px 14px 8px 11px; border-radius:999px; text-decoration:none;
     background:#FFF; color:var(--ink); border:1px solid var(--line);
@@ -1829,7 +1836,6 @@ html{ scroll-behavior:auto; }
    pastiglia finiva esattamente sopra il titolo della prenotazione.
    Si sposta a sinistra della colonna: resta a vista e non copre l'unica
    cosa che deve essere premuta. */
-@media (min-width:1400px){ .lp-contatti{ right:calc(428px + 18px); } }
 
 /* LE DUE COSE CHE NESSUNO TI DA'. Erano due punti elenco fra quattro,
    cioe' dichiarate uguali a "conferma immediata". Non lo sono: il
@@ -2209,18 +2215,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      la stessa struttura della scheda tour del sito. Sotto quella soglia
      .pg-cols torna un blocco unico e l'ordine e' quello di sempre.
      ============================================================ -->
-<!-- WhatsApp sempre a vista: vedi la nota nel foglio di stile.
-     Stesso numero dei pulsanti in pagina e del footer. -->
-<div class="lp-contatti">
-  <a class="lp-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener"
-   data-wa="alto" aria-label="Chat with us on WhatsApp">
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
-  <span>WhatsApp<small>Chat with us</small></span>
-</a>
-  <a class="lp-tel" href="tel:+39055286059" aria-label="Call us on +39 055 286059">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
-    +39 055 286059</a>
-</div>
 
 <div class="pg-cols">
 <div class="pg-main">
@@ -3273,6 +3267,22 @@ San Gimignano is a very small village where you can easily stroll around on your
            Due prodotti Regiondo distinti: 211541 = small group,
            210791 = Private tour to Siena and San Gimignano. -->
       <div id="bookform">
+
+        <!-- I contatti in cima alla colonna della prenotazione, non
+             appiccicati allo schermo. Il dubbio che fa scrivere -- "posso
+             cambiare data?", "ci sono anche i bambini?" -- nasce guardando il
+             calendario, non leggendo il titolo. Sopra i 1400px questa colonna
+             e' appiccicata, quindi restano a vista comunque. -->
+        <div class="lp-contatti">
+          <a class="lp-wa" href="https://wa.me/393338424047" target="_blank" rel="noopener"
+           data-wa="alto" aria-label="Chat with us on WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.67c2.2 0 4.27.86 5.82 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 0 1-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.25 8.26-8.25M8.53 7.33c-.16 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.71 2.75 4.22 3.74 2.09.83 2.51.67 2.97.62.46-.04 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.07-.1-.23-.16-.48-.28-.25-.14-1.47-.74-1.7-.82-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.15.17-.29.19-.53.07-.26-.13-1.06-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.12-.24-.01-.39.11-.5.11-.11.27-.29.37-.44.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.47-.01"/></svg>
+          <span>WhatsApp<small>Chat with us</small></span>
+        </a>
+          <a class="lp-tel" href="tel:+39055286059" aria-label="Call us on +39 055 286059">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2"/></svg>
+            +39 055 286059</a>
+        </div>
         <p class="pr-code-here pr-promo reveal" style="border-style:solid;background:#FFF3F1;border-color:#F6C9C2">
           <span class="pr-here-off"><b>&minus;10%</b><i>on your whole booking</i></span>
           <span class="pr-timer" data-fine="2026-09-30T21:59:59Z" aria-label="Time left before the offer ends">
