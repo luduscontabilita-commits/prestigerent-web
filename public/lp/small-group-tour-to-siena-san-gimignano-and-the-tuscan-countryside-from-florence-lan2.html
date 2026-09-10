@@ -2067,6 +2067,34 @@ html{ scroll-behavior:auto; }
 .ak-stacco{ max-width:640px; margin:0 auto 20px; padding-top:20px;
   border-top:1px solid var(--line); text-align:center;
   font-size:.92rem; line-height:1.6; color:var(--ink-soft); }
+
+
+/* 🔴 LA CORNICE DEL VIDEO NELL'OFFERTA, SCRITTA DOPO E CON DUE CLASSI.
+   `.pr-offer-vid` da sola pesa quanto `.slide-vid`, che pero' e' scritta
+   qui sopra: a parita' di peso vince l'ultima, e per tre volte ho
+   corretto regole che non entravano mai in vigore. Due classi insieme
+   pesano di piu', e stanno dopo: adesso comandano queste.
+   Quando una correzione al CSS "non fa niente", il sospetto va a chi
+   dice il contrario piu' in basso, non alla regola. */
+.pr-offer-vid.slide-vid{ width:auto; aspect-ratio:auto; background:#0F141A;
+  border-radius:12px; overflow:hidden; }
+
+@media (min-width:900px){
+  /* La cornice si allunga quanto il testo, e il video ci sta dentro in
+     posizione assoluta: il buco in basso non puo' esistere PER
+     COSTRUZIONE, qualunque lunghezza prenda il testo domani.
+     Il ritaglio parte dall'alto perche' in un video verticale la faccia
+     sta nel terzo superiore: tagliando dal centro si perde proprio lei. */
+  .pr-offer-vid.slide-vid{ position:relative; min-height:260px; height:100%; }
+  .pr-offer-vid.slide-vid video{ position:absolute; inset:0;
+    width:100%; height:100%; max-height:none; aspect-ratio:auto;
+    object-fit:cover; object-position:center 32%; }
+  .pr-offer-vid.slide-vid figcaption{ position:absolute; top:auto; bottom:0;
+    left:0; right:0; padding:26px 12px 10px; border-radius:0; background:
+    linear-gradient(transparent, rgba(15,20,26,.88) 45%); }
+  .pr-offer-vid.slide-vid figcaption span{ color:rgba(255,255,255,.8); }
+  .pr-offer-vid.slide-vid figcaption b{ color:#FFF; }
+}
 </style>
 <script type="application/ld+json">
 {
@@ -2387,6 +2415,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         basso: il browser lo scarica una volta sola, e solo se qualcuno
         preme play (`preload="none"`). La classe `slide-vid` serve al
         pulsante grande, gestito dallo script che c'e' gia'. -->
+   <figure class="pr-offer-vid slide-vid">
+     <video data-auto controls preload="none" playsinline poster="video/testimonial-t3.jpg"
+            aria-label="A guest talking to camera about their day with Prestige Rent">
+       <source src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/video/testimonial-t3.mp4" type="video/mp4">
+       Your browser cannot play this video.
+     </video>
+     <button class="vid-play" type="button" aria-label="Play this video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button>
+     <figcaption><span>A guest, in his words</span><b>&ldquo;Prestige was really great&rdquo;</b></figcaption>
+   </figure>
   </div>
 
   <!-- galleria mosaico stile Viator: 1 grande + colonne 2x2 che sbordano e scorrono -->
@@ -4614,5 +4651,8 @@ San Gimignano is a very small village where you can easily stroll around on your
 <!-- L'ultimo richiamo quando il mouse esce dalla pagina. Solo su
      computer: su telefono quel gesto non esiste. Vedi uscita.js. -->
 <script defer src="/lp/uscita.js" data-codice="DIRECT10" data-fine="30 September"></script>
+<!-- Il video dichiarato parte da solo quando arriva a schermo, muto e
+     solo su desktop. Vedi video-auto.js. -->
+<script defer src="/lp/video-auto.js"></script>
 </body>
 </html>
