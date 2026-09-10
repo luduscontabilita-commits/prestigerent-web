@@ -170,15 +170,36 @@
   });
   vai.addEventListener('click', via);
 
-  document.addEventListener('mouseout', function (e) {
+  function mostra() {
     if (aperto) return;
     if (!pronto || !haGuardato) return;
-    if (e.relatedTarget || e.toElement) return;     /* si sta muovendo dentro la pagina */
-    if (e.clientY > 6) return;                      /* esce dai lati o dal basso: non conta */
     if (staPrenotando()) return;                    /* regola 4 */
     aperto = true;
     if (!document.body.contains(velo)) document.body.appendChild(velo);
     requestAnimationFrame(function () { velo.classList.add('is-on'); });
     try { chiudi.focus(); } catch (e2) {}
+  }
+
+  /* 🔴 DUE EVENTI, NON UNO. La prima versione ascoltava solo `mouseout`
+     con la condizione `clientY <= 6`, e alla prova non partiva mai:
+     `mouseout` scatta anche muovendosi DENTRO la pagina (una volta per
+     ogni elemento attraversato), quindi va filtrato -- e quel filtro, con
+     sei pixel di margine, perdeva il gesto vero. Chi va verso la X del
+     browser si muove in diagonale e veloce: l'ultimo punto registrato
+     dentro la finestra e' spesso piu' in basso di sei pixel, o non viene
+     registrato affatto perche' il puntatore e' gia' fuori.
+
+     `mouseleave` su <html> scatta UNA volta sola, quando il puntatore
+     lascia davvero la pagina: e' il segnale giusto. `mouseout` resta come
+     riserva per i browser che non lo mandano, con la soglia portata a
+     venti pixel. */
+  document.documentElement.addEventListener('mouseleave', function (e) {
+    if (e.clientY > 20) return;   /* uscito dai lati o dal basso: non conta */
+    mostra();
+  });
+  document.addEventListener('mouseout', function (e) {
+    if (e.relatedTarget || e.toElement) return;     /* si muove dentro la pagina */
+    if (e.clientY > 20) return;
+    mostra();
   });
 })();
