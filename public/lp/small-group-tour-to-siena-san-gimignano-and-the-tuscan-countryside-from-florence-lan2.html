@@ -2060,6 +2060,13 @@ html{ scroll-behavior:auto; }
 .gar-forte{ font-weight:800; color:#9B2C1E;
   text-decoration:underline; text-decoration-color:#9B2C1E;
   text-decoration-thickness:2px; text-underline-offset:3px; }
+
+/* La riga che introduce il modulo. Non e' un titolo: sopra c'e' gia'
+   "Talk to a real person", e due intestazioni grandi attaccate si
+   annullano. Questa dice a CHI serve il modulo. */
+.ak-stacco{ max-width:640px; margin:0 auto 20px; padding-top:20px;
+  border-top:1px solid var(--line); text-align:center;
+  font-size:.92rem; line-height:1.6; color:var(--ink-soft); }
 </style>
 <script type="application/ld+json">
 {
@@ -3048,76 +3055,6 @@ The exact return time depends on traffic. In case you need to book other activit
   .ak-griglia{ grid-template-columns:1fr; }
 }
 </style>
-<section id="ask" class="pr-sec alt">
-  <div class="pr-wrap">
-    <div class="pr-head" style="margin-bottom:22px">
-      <p class="pr-kicker reveal">Something else in mind?</p>
-      <h2 class="pr-title reveal">Tell us and <em class="hl place">we build it</em></h2>
-      <p class="pr-lead reveal">Another date, a hotel pick-up, a private driver, a group of twelve, an itinerary of your own. Send the details and a real person answers &mdash; usually within a few hours.</p>
-    </div>
-
-    <form class="ak reveal" id="askform">
-      <div class="ak-griglia">
-
-        <label class="ak-campo">
-          <span>Name <b>*</b></span>
-          <input name="nome" type="text" required autocomplete="name" maxlength="80" placeholder="John Doe">
-        </label>
-
-        <label class="ak-campo">
-          <span>Email <b>*</b></span>
-          <input name="email" type="email" required autocomplete="email" inputmode="email" maxlength="160" placeholder="johndoe@example.com">
-        </label>
-
-        <label class="ak-campo">
-          <span>Phone (include country code, e.g. +1) <b>*</b></span>
-          <input name="telefono" type="tel" required autocomplete="tel" inputmode="tel" maxlength="40" placeholder="+1 555 019 2831">
-        </label>
-
-        <label class="ak-campo">
-          <span>Number of guests <b>*</b></span>
-          <input name="persone" type="number" required min="1" inputmode="numeric" placeholder="4">
-        </label>
-
-        <label class="ak-campo ak-largo">
-          <span>Date <b>*</b></span>
-          <input name="quando" type="date" required>
-        </label>
-
-        <label class="ak-campo ak-largo">
-          <span>Service you are interested in <b>*</b></span>
-          <textarea name="tour" required rows="4" maxlength="600" placeholder="Describe it with as many details as possible (pick-up and drop-off, pick-up time, preferred itinerary&hellip;). A clearer request lets us answer more precisely.">Siena, San Gimignano &amp; the Tuscan countryside &mdash; </textarea>
-        </label>
-
-        <label class="ak-campo ak-largo">
-          <span>Notes <i>(optional)</i></span>
-          <textarea name="messaggio" rows="3" maxlength="2000" placeholder="Special requests, preferences, or additional details&hellip;"></textarea>
-        </label>
-
-      </div>
-
-      <!-- L'esca. Si chiama "Company" perche' deve sembrare vera a un
-           bot, che compila tutto quello che trova; chi legge la pagina
-           non la vede e chi usa la tastiera non ci passa. -->
-      <div class="ak-esca" aria-hidden="true">
-        <label for="ak-azienda">Company</label>
-        <input id="ak-azienda" name="azienda" type="text" tabindex="-1" autocomplete="off">
-      </div>
-
-      <p class="ak-errore" id="ak-errore" role="alert" hidden></p>
-
-      <button type="submit" class="cta ak-invia" id="ak-invia">Send my request</button>
-      <p class="ak-nota">No payment is taken here &mdash; this is a request, not a booking.</p>
-    </form>
-
-    <div class="ak-fatto reveal" id="ak-fatto" hidden>
-      <b>Got it &mdash; thank you.</b>
-      <p>Your request is with our team in Florence. You will hear from a real person, usually within a few hours.</p>
-      <p class="ak-rif" id="ak-rif" hidden></p>
-      <a href="https://wa.me/393338424047" target="_blank" rel="noopener">In a hurry? Message us on WhatsApp</a>
-    </div>
-  </div>
-</section>
 
 <script>
 /* IL MODULO PARLA CON L'API DEL SITO, non con questo host.
@@ -3497,6 +3434,79 @@ San Gimignano is a very small village where you can easily stroll around on your
         <svg class="pr-gico mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
         <div><b>usa@prestigerent.com</b><span>Email us</span></div>
       </a>
+    </div>
+  </div>
+</section>
+
+<section id="ask" class="pr-sec alt">
+  <div class="pr-wrap">
+    <!-- Il titolo grande del modulo e' stato tolto: attaccato a "Talk to
+         a real person" erano due intestazioni che si annullavano. Resta
+         una riga che dice A CHI serve il modulo, invece di ripetere che
+         si puo' scrivere. -->
+    <p class="ak-stacco reveal">Prefer to write? Tell us the details &mdash; another date,
+    a hotel pick&#8209;up, a group of twelve, a winery you have already picked &mdash;
+    and a real person answers, usually within a few hours.</p>
+
+    <form class="ak reveal" id="askform">
+      <div class="ak-griglia">
+
+        <label class="ak-campo">
+          <span>Name <b>*</b></span>
+          <input name="nome" type="text" required autocomplete="name" maxlength="80" placeholder="John Doe">
+        </label>
+
+        <label class="ak-campo">
+          <span>Email <b>*</b></span>
+          <input name="email" type="email" required autocomplete="email" inputmode="email" maxlength="160" placeholder="johndoe@example.com">
+        </label>
+
+        <label class="ak-campo">
+          <span>Phone (include country code, e.g. +1) <b>*</b></span>
+          <input name="telefono" type="tel" required autocomplete="tel" inputmode="tel" maxlength="40" placeholder="+1 555 019 2831">
+        </label>
+
+        <label class="ak-campo">
+          <span>Number of guests <b>*</b></span>
+          <input name="persone" type="number" required min="1" inputmode="numeric" placeholder="4">
+        </label>
+
+        <label class="ak-campo ak-largo">
+          <span>Date <b>*</b></span>
+          <input name="quando" type="date" required>
+        </label>
+
+        <label class="ak-campo ak-largo">
+          <span>Service you are interested in <b>*</b></span>
+          <textarea name="tour" required rows="4" maxlength="600" placeholder="Describe it with as many details as possible (pick-up and drop-off, pick-up time, preferred itinerary&hellip;). A clearer request lets us answer more precisely.">Siena, San Gimignano &amp; the Tuscan countryside &mdash; </textarea>
+        </label>
+
+        <label class="ak-campo ak-largo">
+          <span>Notes <i>(optional)</i></span>
+          <textarea name="messaggio" rows="3" maxlength="2000" placeholder="Special requests, preferences, or additional details&hellip;"></textarea>
+        </label>
+
+      </div>
+
+      <!-- L'esca. Si chiama "Company" perche' deve sembrare vera a un
+           bot, che compila tutto quello che trova; chi legge la pagina
+           non la vede e chi usa la tastiera non ci passa. -->
+      <div class="ak-esca" aria-hidden="true">
+        <label for="ak-azienda">Company</label>
+        <input id="ak-azienda" name="azienda" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <p class="ak-errore" id="ak-errore" role="alert" hidden></p>
+
+      <button type="submit" class="cta ak-invia" id="ak-invia">Send my request</button>
+      <p class="ak-nota">No payment is taken here &mdash; this is a request, not a booking.</p>
+    </form>
+
+    <div class="ak-fatto reveal" id="ak-fatto" hidden>
+      <b>Got it &mdash; thank you.</b>
+      <p>Your request is with our team in Florence. You will hear from a real person, usually within a few hours.</p>
+      <p class="ak-rif" id="ak-rif" hidden></p>
+      <a href="https://wa.me/393338424047" target="_blank" rel="noopener">In a hurry? Message us on WhatsApp</a>
     </div>
   </div>
 </section>
