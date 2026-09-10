@@ -2503,28 +2503,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </span>
           <span style="display:block;margin-top:7px"><b>September offer &mdash; only on our website.</b> Ends 30 September, limited number of bookings.</span>
         </p>
-        <!-- I TRE PASSI STANNO SOTTO IL CALENDARIO, non sopra.
-             Sono istruzioni per DOPO aver scelto la data: messe prima si
-             leggevano quando non servivano ancora, e si prendevano la
-             parte alta della colonna fissa -- l'unica che si vede senza
-             scorrere. -->
-        <div class="pr-passi pr-promo reveal">
-          <p class="pr-passi-t">How to get your 10% off</p>
-          <ol>
-            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
-            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
-              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
-            <li><span>Paste
-              <button type="button" class="pr-copy" data-code="DIRECT10"
-                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
-              and press <i>Apply</i>
-              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
-          </ol>
-        </div>
-        <p class="bk-priv reveal">
-          Travelling as a couple or a family?
-          <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
-        </p>
 
         <div class="bk-tabs" role="tablist" aria-label="Choose how you want to book">
           <button type="button" class="bk-tab is-on" id="bk-tab-shared" role="tab" aria-selected="true" aria-controls="bk-shared">
@@ -2568,6 +2546,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
            gia' scelta e resta il dubbio 'e se poi non posso venire?'. -->
       <!-- Le garanzie subito prima del calendario, dove nasce l'esitazione:
            nella colonna ne restano visibili due, le altre le nasconde il CSS. -->
+
+        <!-- 🔴 I TRE PASSI STANNO QUI, SOTTO IL CALENDARIO.
+             Ieri avevo scritto di averli spostati e non era vero: l'ancora
+             che avevo usato era il link al privato, che nel documento sta
+             PRIMA delle schede e del widget. Risultato: la colonna di
+             prenotazione cominciava con due riquadri di promozione e il
+             calendario finiva fuori dalla prima schermata.
+             Sono istruzioni per DOPO aver scelto la data: sopra si
+             leggevano quando non servivano ancora, e rubavano il posto
+             all'unica cosa per cui questa colonna esiste. -->
+        <div class="pr-passi pr-promo reveal">
+          <p class="pr-passi-t">How to get your 10% off</p>
+          <ol>
+            <li><span>Pick your date and press <i>Proceed to checkout</i></span></li>
+            <li><span>On the payment page, click <i>Redeem value voucher or discount code</i>
+              <span class="att">It&rsquo;s a small link &mdash; the code box only appears after you click it.</span></span></li>
+            <li><span>Paste
+              <button type="button" class="pr-copy" data-code="DIRECT10"
+                 aria-label="Copy the discount code DIRECT10"><span class="cod">DIRECT10</span><span class="lab">Copy</span></button>
+              and press <i>Apply</i>
+              <span class="att">Give it <b>5&ndash;10 seconds</b> &mdash; the new total updates on its own. Don&rsquo;t press twice.</span></span></li>
+          </ol>
+        </div>
+
+        <!-- Il link al privato DOPO il calendario e i passi. Stava prima:
+             cioe' invitava ad andare altrove esattamente nel momento in cui
+             la persona stava per scegliere una data. Chi cerca il privato
+             lo trova comunque; chi non lo cerca non viene distratto. -->
+        <p class="bk-priv reveal">
+          Travelling as a couple or a family?
+          <a href="/lp/private-tasting-experience-in-tuscany-lan.html" target="_blank" rel="noopener">See the private tour &rarr;</a>
+        </p>
       <div class="pr-tguar reveal">
         <span><i aria-hidden="true">&#128737;&#65039;</i><b>Free cancellation &amp; date changes</b> up to 24h &mdash; 100% refund</span>
         <span><i aria-hidden="true">&#9889;</i><b>Instant confirmation</b></span>
