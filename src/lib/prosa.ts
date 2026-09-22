@@ -72,7 +72,15 @@ export function faqDa(html: string): Domanda[] {
   const pulito = pulisci(html);
   const out: Domanda[] = [];
 
-  const paragrafi = pulito.match(/<p>[\s\S]*?<\/p>/gi) ?? [];
+  /* 🔴 NON SOLO I PARAGRAFI: ANCHE GLI ELENCHI. Un <ul> non e' un <p>,
+     quindi non entrava qui dentro e spariva dalla pagina senza dire
+     niente -- 1.053 voci, su 86 schede su 87: i prezzi delle esperienze
+     in cantina, cosa portare, le misure per la sedia a rotelle. Tutte
+     cose scritte in elenco, perche' in elenco si scrivono.
+     E' lo stesso difetto dei 1.079 paragrafi raccontati qui sopra, un
+     piano piu' sotto: allora si leggeva un paragrafo solo, adesso si
+     leggevano tutti i paragrafi ma solo quelli. */
+  const paragrafi = pulito.match(/<p>[\s\S]*?<\/p>|<(?:ul|ol)[\s\S]*?<\/(?:ul|ol)>/gi) ?? [];
   for (let i = 0; i < paragrafi.length; i++) {
     const p = paragrafi[i];
     const m = p.match(/^<p>\s*<(?:strong|b)>([\s\S]*?)<\/(?:strong|b)>\s*([?？:\u2026]?|\.\.\.)\s*(?:<br\s*\/?>)?([\s\S]*)<\/p>$/i);
@@ -106,13 +114,23 @@ export function faqDa(html: string): Domanda[] {
     const pezzi = [m[3].trim()];
     for (let j = i + 1; j < paragrafi.length; j++) {
       if (/^<p>\s*<(?:strong|b)>/i.test(paragrafi[j])) break;
-      const corpo = paragrafi[j].replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
+      /* un elenco si tiene intero, coi suoi tag: e' quello che lo fa
+         vedere come elenco invece che come una riga di parole */
+      const lista = /^<(?:ul|ol)/i.test(paragrafi[j]);
+      const corpo = lista
+        ? paragrafi[j].trim()
+        : paragrafi[j].replace(/^<p>/i, '').replace(/<\/p>$/i, '').trim();
       /* Un paragrafo vuoto o fatto solo di spazi unificatori non aggiunge
          niente e produrrebbe righe vuote dentro l'accordion. */
       if (corpo.replace(/<[^>]+>|&nbsp;|\s/g, '')) pezzi.push(corpo);
       i = j;
     }
-    const a = pezzi.filter(Boolean).join('<br>');
+    /* 🔴 NIENTE <br> DAVANTI A UN ELENCO: farebbe un buco fra la frase
+       che lo introduce e i suoi pallini, e sembrerebbe un errore. */
+    const a = pezzi.filter(Boolean).reduce(
+      (fin, x, k) => (k === 0 ? x : fin + (/^<(?:ul|ol)/i.test(x) ? '' : '<br>') + x),
+      ''
+    );
 
     /* Senza risposta non e' una domanda: e' un titoletto in grassetto, e
        trasformarlo in accordion produrrebbe una riga che si apre sul vuoto. */
