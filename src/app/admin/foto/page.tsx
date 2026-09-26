@@ -1,7 +1,7 @@
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -23,7 +23,7 @@ type Riga = {
  * cioe' esattamente quella che finisce nell'elenco della home.
  */
 export default async function ElencoFoto() {
-  await soloGestione();
+  const io = await soloGestione();
 
   const sb = await supabaseServer();
   const { data } = await sb
@@ -49,19 +49,16 @@ export default async function ElencoFoto() {
   const pocheFoto = ordinate.filter((r) => r.quante > 0 && r.quante < 5).length;
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Foto dei tour</h1>
-          <p>
-            L&apos;ordine delle foto, tour per tour. La prima e&apos; la copertina: compare
-            nell&apos;elenco della home e nelle anteprime social. {ordinate.length} tour.
-          </p>
-        </div>
-        <a className="ad-back" href="/admin/">
-          &larr; Pannello
-        </a>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Foto dei tour"}
+      sottotitolo={<>
+          L’ordine delle foto, tour per tour. La prima è la copertina: compare nell’elenco
+          della home e nelle anteprime social. {ordinate.length} tour.
+        </>}
+    >
 
       <div className="ad-conta">
         <div>
@@ -120,6 +117,6 @@ export default async function ElencoFoto() {
           </tbody>
         </table>
       </div>
-    </main>
+    </Guscio>
   );
 }

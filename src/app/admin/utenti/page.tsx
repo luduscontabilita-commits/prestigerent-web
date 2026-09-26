@@ -1,10 +1,8 @@
-import Link from 'next/link';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
-import { Esci } from '@/components/admin/Esci';
 import { GestioneUtenti, type Utente } from '@/components/admin/GestioneUtenti';
 import { cambiaAttivo, creaGuida, rigeneraPassword } from './azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -55,20 +53,16 @@ export default async function Utenti() {
   }));
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Utenti</h1>
-          <p>
-            Chi può entrare nel pannello. Le <b>guide</b> vedono soltanto la gallery e
-            soltanto le foto che hanno caricato loro.
-          </p>
-        </div>
-        <div className="ad-head-dx">
-          <Esci io={io} />
-          <Link className="ad-back" href="/admin/">&larr; Pannello</Link>
-        </div>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Utenti"}
+      sottotitolo={<>
+          Chi può entrare nel pannello. Le <b>guide</b> vedono soltanto la gallery e
+          soltanto le foto che hanno caricato loro.
+        </>}
+    >
 
       {/* Detto qui perche' e' il posto dove verrebbe cercato, e perche'
           prometterlo e non poterlo mantenere sarebbe peggio che dirlo. */}
@@ -84,6 +78,6 @@ export default async function Utenti() {
         rigeneraPassword={rigeneraPassword}
         cambiaAttivo={cambiaAttivo}
       />
-    </main>
+    </Guscio>
   );
 }

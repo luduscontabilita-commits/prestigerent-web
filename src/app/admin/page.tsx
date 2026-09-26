@@ -1,8 +1,17 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Badge, Card, Group, SimpleGrid, Text, ThemeIcon } from '@mantine/core';
+import {
+  IconCamera,
+  IconChartBar,
+  IconChevronRight,
+  IconPhoto,
+  IconSearch,
+  IconUsers,
+} from '@tabler/icons-react';
 import { chiSono, haRuolo, RUOLI_GESTIONE } from '@/lib/auth';
 import { comeSiChiama } from '@/lib/accesso';
-import { Esci } from '@/components/admin/Esci';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,11 +21,6 @@ export const dynamic = 'force-dynamic';
  * non gestisce. Questa non puo' fare lo stesso: si rimanderebbe a se
  * stessa, e una guida girerebbe in tondo senza vedere niente. Quindi qui
  * si chiede solo di aver fatto l'accesso, e cambia COSA si vede.
- *
- * Una guida oggi non ha ancora niente da aprire: il caricamento delle
- * foto arriva in Fase 2a. Meglio dirglielo in una riga che mandarla su
- * una pagina che non esiste -- un 404 sembra un guasto, e chi lo vede
- * scrive per chiedere se e' rotto.
  */
 export default async function Pannello() {
   const io = await chiSono();
@@ -24,54 +28,98 @@ export default async function Pannello() {
 
   const gestisce = haRuolo(io, RUOLI_GESTIONE);
 
-  const voci = [
-    { href: '/admin/seo/', titolo: 'Title e description', testo: 'I testi che compaiono su Google, pagina per pagina. 123 pagine.' },
-    { href: '/admin/foto/', titolo: 'Foto dei tour', testo: 'L’ordine delle foto DEL PRODOTTO: la striscia in cima alle schede. La prima e’ la copertina, usata nell’elenco della home e nelle anteprime social.' },
-    /* Due voci che parlano di foto, e la differenza va detta in entrambe:
-       chi cerca "le foto" non sa quale delle due gli serve. Sopra le foto
-       del prodotto, qui le foto delle giornate caricate dalle guide. */
-    { href: '/admin/gallery/', titolo: 'Foto della gallery', testo: 'Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in fondo alle pagine, dopo approvazione.' },
-    { href: '/admin/utenti/', titolo: 'Utenti', testo: 'Chi puo’ entrare nel pannello. Da qui si creano le guide e si consegnano loro le credenziali.' },
-    { href: '/admin/numeri/', titolo: 'Numeri da Regiondo', testo: 'Recensioni, prenotazioni e disponibilita’. Si riaggiornano con un pulsante e dicono quanti anni hanno.' },
-  ];
+  const voci = gestisce
+    ? [
+        {
+          href: '/admin/gallery/',
+          titolo: 'Foto della gallery',
+          testo:
+            'Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in fondo alle pagine, dopo approvazione.',
+          icona: IconCamera,
+          colore: 'prestige',
+        },
+        {
+          href: '/admin/foto/',
+          titolo: 'Foto dei tour',
+          testo:
+            'L’ordine delle foto DEL PRODOTTO: la striscia in cima alle schede. La prima è la copertina, usata nell’elenco della home e nelle anteprime social.',
+          icona: IconPhoto,
+          colore: 'blue',
+        },
+        {
+          href: '/admin/seo/',
+          titolo: 'Title e description',
+          testo: 'I testi che compaiono su Google, pagina per pagina. 123 pagine.',
+          icona: IconSearch,
+          colore: 'grape',
+        },
+        {
+          href: '/admin/numeri/',
+          titolo: 'Numeri da Regiondo',
+          testo:
+            'Recensioni, prenotazioni e disponibilità. Si riaggiornano con un pulsante e dicono quanti anni hanno.',
+          icona: IconChartBar,
+          colore: 'teal',
+        },
+        {
+          href: '/admin/utenti/',
+          titolo: 'Utenti',
+          testo:
+            'Chi può entrare nel pannello. Da qui si creano le guide e si consegnano loro le credenziali.',
+          icona: IconUsers,
+          colore: 'indigo',
+        },
+      ]
+    : [
+        {
+          href: '/admin/gallery/',
+          titolo: 'Foto della gallery',
+          testo:
+            'Carica le foto delle giornate e dì a quali pagine appartengono. Le vede un amministratore prima che compaiano sul sito.',
+          icona: IconCamera,
+          colore: 'prestige',
+        },
+      ];
 
   return (
-    <main className="ad-main">
-      <header className="ad-head">
-        <div>
-          <h1>Pannello</h1>
-          {/* Mai l'email: per una guida sarebbe l'indirizzo interno finto
-              (`mario@guide.prestigerent.invalid`), e vederlo scritto
-              accanto al proprio nome fa pensare a un guasto. */}
-          <p>{comeSiChiama(io)}</p>
-        </div>
-        <Esci io={io} />
-      </header>
-
-      <div className="ad-griglia">
-        {gestisce ? (
-          <>
-            {voci.map((v) => (
-              <a className="ad-card" key={v.href} href={v.href}>
-                <strong>{v.titolo}</strong>
-                <span>{v.testo}</span>
-              </a>
-            ))}
-            <div className="ad-card ad-prossimo">
-              <strong>In arrivo</strong>
-              <span>Video dei tour</span>
-            </div>
-          </>
-        ) : (
-          <Link className="ad-card" href="/admin/gallery/">
-            <strong>Foto della gallery</strong>
-            <span>
-              Carica le foto delle giornate e dì a quali pagine appartengono. Le vede un
-              amministratore prima che compaiano sul sito.
-            </span>
-          </Link>
-        )}
-      </div>
-    </main>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={`Ciao ${comeSiChiama(io).split(' ')[0]}`}
+      sottotitolo={
+        gestisce
+          ? 'Da qui si governa tutto quello che il sito mostra e non mostra.'
+          : 'Da qui carichi le foto delle giornate e dici a quali pagine appartengono.'
+      }
+      azioni={
+        <Badge variant="light" color={gestisce ? 'indigo' : 'teal'} size="lg" radius="sm">
+          {gestisce ? 'amministratore' : 'guida'}
+        </Badge>
+      }
+    >
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        {voci.map((v) => (
+          <Card
+            key={v.href}
+            component={Link}
+            href={v.href}
+            withBorder
+            radius="md"
+            padding="lg"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <Group justify="space-between" align="flex-start" wrap="nowrap" mb="sm">
+              <ThemeIcon variant="light" color={v.colore} size={40} radius="md">
+                <v.icona size={21} stroke={1.6} />
+              </ThemeIcon>
+              <IconChevronRight size={17} style={{ opacity: 0.3, flexShrink: 0 }} />
+            </Group>
+            <Text fw={700} mb={4}>{v.titolo}</Text>
+            <Text size="sm" c="dimmed" lh={1.55}>{v.testo}</Text>
+          </Card>
+        ))}
+      </SimpleGrid>
+    </Guscio>
   );
 }

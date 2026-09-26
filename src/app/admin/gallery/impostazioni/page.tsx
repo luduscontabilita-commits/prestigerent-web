@@ -1,17 +1,16 @@
-import Link from 'next/link';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryImpostazioni } from '@/components/admin/GalleryImpostazioni';
 import { salvaImpostazioni } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function ImpostazioniGallery() {
-  await soloGestione();
+  const io = await soloGestione();
   const sb = await supabaseServer();
 
   const [{ data: imp }, { data: tag }, { data: conteggi }] = await Promise.all([
@@ -37,20 +36,19 @@ export default async function ImpostazioniGallery() {
   ).length;
 
   return (
-    <main className="ad-main">
-      <header className="ad-head">
-        <div>
-          <h1>Impostazioni della gallery</h1>
-          <p>Valgono per tutto il sito. Ogni pagina può scavalcarle da «Pagine».</p>
-        </div>
-        <Link className="ad-back" href="/admin/gallery/">&larr; Gallery</Link>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Impostazioni della gallery"}
+      sottotitolo={"Valgono per tutto il sito. Ogni pagina può scavalcarle da «Pagine»."}
+    >
 
       <GalleryImpostazioni
         iniziali={impostazioni}
         quantePronte={quantePronte}
         salva={salvaImpostazioni}
       />
-    </main>
+    </Guscio>
   );
 }

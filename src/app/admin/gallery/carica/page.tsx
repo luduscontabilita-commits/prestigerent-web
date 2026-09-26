@@ -1,10 +1,10 @@
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import Link from 'next/link';
 import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { GalleryCaricatore } from '@/components/admin/GalleryCaricatore';
 import { chiediFirme, pagineTaggabili, registraFoto } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -22,18 +22,13 @@ export default async function Carica() {
   const pagine = await pagineTaggabili();
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Carica e tagga</h1>
-          <p>
-            {haRuolo(io, RUOLI_GESTIONE)
-              ? 'Le tue foto vengono pubblicate subito: sei tu che approvi.'
-              : 'Le foto che carichi vengono viste da un amministratore prima di comparire sul sito.'}
-          </p>
-        </div>
-        <Link className="ad-back" href="/admin/gallery/">&larr; Gallery</Link>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Carica e tagga"}
+      sottotitolo={haRuolo(io, RUOLI_GESTIONE) ? 'Le tue foto vengono pubblicate subito: sei tu che approvi.' : 'Le foto che carichi vengono viste da un amministratore prima di comparire sul sito.'}
+    >
 
       {pagine.length === 0 ? (
         /* Senza registro non si puo' taggare, e senza tag non si puo'
@@ -51,6 +46,6 @@ export default async function Carica() {
           registraFoto={registraFoto}
         />
       )}
-    </main>
+    </Guscio>
   );
 }

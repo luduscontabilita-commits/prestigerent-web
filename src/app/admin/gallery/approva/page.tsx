@@ -1,11 +1,10 @@
-import Link from 'next/link';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { bassaRisoluzione, verraRitagliata } from '@/lib/gallery-tag';
 import { GalleryCoda, type InCoda } from '@/components/admin/GalleryCoda';
 import { aggiornaFoto, approva, pagineTaggabili, rifiuta } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +25,7 @@ type Riga = {
 };
 
 export default async function Approva() {
-  await soloGestione();
+  const io = await soloGestione();
 
   const sb = await supabaseServer();
   const [{ data }, pagine] = await Promise.all([
@@ -77,17 +76,16 @@ export default async function Approva() {
   });
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Da approvare {foto.length ? `(${foto.length})` : ''}</h1>
-          <p>
-            Si approva la foto <b>insieme</b> alla sua descrizione e alle sue pagine: un tag
-            messo da una guida arriva sul sito solo da qui.
-          </p>
-        </div>
-        <Link className="ad-back" href="/admin/gallery/">&larr; Gallery</Link>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={`Da approvare${foto.length ? ` (${foto.length})` : ''}`}
+      sottotitolo={<>
+          Si approva la foto <b>insieme</b> alla sua descrizione e alle sue pagine: un tag
+          messo da una guida arriva sul sito solo da qui.
+        </>}
+    >
 
       <GalleryCoda
         foto={foto}
@@ -96,6 +94,6 @@ export default async function Approva() {
         rifiuta={rifiuta}
         aggiornaFoto={aggiornaFoto}
       />
-    </main>
+    </Guscio>
   );
 }

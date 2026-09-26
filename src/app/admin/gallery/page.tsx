@@ -1,10 +1,29 @@
 import Link from 'next/link';
-import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE, supabaseServer } from '@/lib/auth';
-import { Esci } from '@/components/admin/Esci';
 import { redirect } from 'next/navigation';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
-import '@/styles/gallery-admin.css';
+import {
+  Alert,
+  Card,
+  Group,
+  Paper,
+  SimpleGrid,
+  Text,
+  ThemeIcon,
+  Title,
+} from '@mantine/core';
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconChevronRight,
+  IconClipboardCheck,
+  IconFileDescription,
+  IconLayoutGrid,
+  IconSettings,
+  IconUpload,
+  IconUser,
+} from '@tabler/icons-react';
+import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE, supabaseServer } from '@/lib/auth';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -30,54 +49,102 @@ export default async function GalleryIndice() {
 
   /* `head: true` e `count`: torna solo il numero, non le righe. La coda
      puo' avere centinaia di foto e qui serve un contatore. */
-  const { count: inAttesa } = await sb
-    .from('gallery_images')
-    .select('id', { count: 'exact', head: true })
-    .eq('status', 'in_attesa');
+  const [{ count: inAttesa }, { count: approvate }, { count: pagine }, { data: imp }] =
+    await Promise.all([
+      sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'in_attesa'),
+      sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'approvata'),
+      sb.from('gallery_tags').select('id', { count: 'exact', head: true }).eq('is_orphan', false),
+      sb.from('gallery_settings').select('galleries_enabled,min_images').eq('id', 1).maybeSingle(),
+    ]);
 
-  const { count: approvate } = await sb
-    .from('gallery_images')
-    .select('id', { count: 'exact', head: true })
-    .eq('status', 'approvata');
+  const impostazioni = imp as { galleries_enabled: boolean; min_images: number } | null;
+  const accesa = impostazioni?.galleries_enabled ?? false;
 
-  const { count: pagine } = await sb
-    .from('gallery_tags')
-    .select('id', { count: 'exact', head: true })
-    .eq('is_orphan', false);
+  const voci = [
+    {
+      href: '/admin/gallery/carica/',
+      titolo: 'Carica e tagga',
+      testo: 'Aggiungi foto e scegli su quali pagine devono comparire.',
+      icona: IconUpload,
+      colore: 'prestige',
+      soloAdmin: false,
+    },
+    {
+      href: '/admin/gallery/mie/',
+      titolo: 'Le mie foto',
+      testo: 'In attesa, approvate, rifiutate. Le rifiutate dicono perché.',
+      icona: IconUser,
+      colore: 'blue',
+      soloAdmin: false,
+    },
+    {
+      href: '/admin/gallery/tutte/',
+      titolo: `Tutte le foto${approvate ? ` (${approvate})` : ''}`,
+      testo: 'L’archivio completo: guarda, correggi, nascondi o elimina qualunque foto.',
+      icona: IconLayoutGrid,
+      colore: 'grape',
+      soloAdmin: true,
+    },
+    {
+      href: '/admin/gallery/approva/',
+      titolo: `Da approvare${inAttesa ? ` (${inAttesa})` : ''}`,
+      testo: 'Le foto inviate dalle guide. Approva, correggi o rimanda indietro.',
+      icona: IconClipboardCheck,
+      colore: inAttesa ? 'red' : 'teal',
+      soloAdmin: true,
+    },
+    {
+      href: '/admin/gallery/pagine/',
+      titolo: 'Pagine',
+      testo: 'Quali pagine hanno la gallery, con che titolo e in che ordine.',
+      icona: IconFileDescription,
+      colore: 'indigo',
+      soloAdmin: true,
+    },
+    {
+      href: '/admin/gallery/impostazioni/',
+      titolo: 'Impostazioni',
+      testo: 'L’interruttore generale, il numero minimo di foto, i titoli.',
+      icona: IconSettings,
+      colore: 'gray',
+      soloAdmin: true,
+    },
+  ].filter((v) => !v.soloAdmin || gestisce);
 
-  const { data: imp } = await sb
-    .from('gallery_settings')
-    .select('galleries_enabled,min_images')
-    .eq('id', 1)
-    .maybeSingle();
-  const acceso = (imp as { galleries_enabled: boolean } | null)?.galleries_enabled ?? false;
+  const numeri = [
+    { n: inAttesa ?? 0, testo: 'da approvare', allarme: !!inAttesa },
+    { n: approvate ?? 0, testo: 'sul sito', allarme: false },
+    { n: pagine ?? 0, testo: 'pagine nel registro', allarme: false },
+  ];
 
   return (
-    <main className="ad-main">
-      <header className="ad-head">
-        <div>
-          <h1>Foto della gallery</h1>
-          <p>
-            Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in
-            fondo alle pagine del sito.
-            <br />
-            <b>Non</b> sono le foto dei tour: quelle stanno in <Link href="/admin/foto/">Foto dei tour</Link> e
-            sono la striscia in cima alle schede, con la copertina.
-          </p>
-        </div>
-        <div className="ad-head-dx">
-          <Esci io={io} />
-          <Link className="ad-back" href="/admin/">&larr; Pannello</Link>
-        </div>
-      </header>
-
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo="Foto della gallery"
+      sottotitolo={
+        <>
+          Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in
+          fondo alle pagine del sito. <b>Non</b> sono le foto dei tour: quelle stanno in{' '}
+          <Link href="/admin/foto/">Foto dei tour</Link> e sono la striscia in cima alle
+          schede, con la copertina.
+        </>
+      }
+    >
       {/* Lo stato dell'interruttore in cima, sempre: e' la domanda che si
           fa chi non capisce perche' le foto non si vedono sul sito. */}
-      <div className={'g-stato ' + (acceso ? 'on' : 'off')}>
-        {acceso ? (
+      <Alert
+        variant="light"
+        color={accesa ? 'teal' : 'orange'}
+        icon={accesa ? <IconCheck size={20} /> : <IconAlertTriangle size={20} />}
+        mb="lg"
+        radius="md"
+      >
+        {accesa ? (
           <>
             <b>Le gallery sono accese.</b> Una pagina le mostra quando ha almeno{' '}
-            {(imp as { min_images: number } | null)?.min_images ?? 3} foto approvate.
+            {impostazioni?.min_images ?? 3} foto approvate.
           </>
         ) : (
           <>
@@ -85,51 +152,41 @@ export default async function GalleryIndice() {
             approvare: niente compare ai visitatori finché l’interruttore resta spento.
           </>
         )}
-      </div>
+      </Alert>
 
-      <div className="ad-conta">
-        <div className={inAttesa ? 'male' : 'bene'}>
-          <b>{inAttesa ?? 0}</b>
-          <span>da approvare</span>
-        </div>
-        <div>
-          <b>{approvate ?? 0}</b>
-          <span>approvate</span>
-        </div>
-        <div>
-          <b>{pagine ?? 0}</b>
-          <span>pagine nel registro</span>
-        </div>
-      </div>
+      <SimpleGrid cols={3} spacing="md" mb="lg">
+        {numeri.map((x) => (
+          <Paper key={x.testo} withBorder radius="md" p="md">
+            <Text fw={800} fz={{ base: 26, sm: 32 }} lh={1} c={x.allarme ? 'red' : undefined}>
+              {x.n}
+            </Text>
+            <Text size="xs" c="dimmed" mt={6} lh={1.3}>{x.testo}</Text>
+          </Paper>
+        ))}
+      </SimpleGrid>
 
-      <div className="ad-griglia">
-        <Link className="ad-card" href="/admin/gallery/carica/">
-          <strong>Carica e tagga</strong>
-          <span>Aggiungi foto e scegli su quali pagine devono comparire.</span>
-        </Link>
-
-        <Link className="ad-card" href="/admin/gallery/mie/">
-          <strong>Le mie foto</strong>
-          <span>In attesa, approvate, rifiutate. Le rifiutate dicono perché.</span>
-        </Link>
-
-        {gestisce && (
-          <>
-            <Link className="ad-card" href="/admin/gallery/approva/">
-              <strong>Da approvare {inAttesa ? `(${inAttesa})` : ''}</strong>
-              <span>Le foto inviate dalle guide. Approva, correggi o rimanda indietro.</span>
-            </Link>
-            <Link className="ad-card" href="/admin/gallery/pagine/">
-              <strong>Pagine</strong>
-              <span>Quali pagine hanno la gallery, con che titolo e in che ordine.</span>
-            </Link>
-            <Link className="ad-card" href="/admin/gallery/impostazioni/">
-              <strong>Impostazioni</strong>
-              <span>L’interruttore generale, il numero minimo di foto, i titoli.</span>
-            </Link>
-          </>
-        )}
-      </div>
-    </main>
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        {voci.map((v) => (
+          <Card
+            key={v.href}
+            component={Link}
+            href={v.href}
+            withBorder
+            radius="md"
+            padding="lg"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <Group justify="space-between" align="flex-start" wrap="nowrap" mb="sm">
+              <ThemeIcon variant="light" color={v.colore} size={40} radius="md">
+                <v.icona size={21} stroke={1.6} />
+              </ThemeIcon>
+              <IconChevronRight size={17} style={{ opacity: 0.3, flexShrink: 0 }} />
+            </Group>
+            <Title order={2} size="h5" mb={4}>{v.titolo}</Title>
+            <Text size="sm" c="dimmed" lh={1.55}>{v.testo}</Text>
+          </Card>
+        ))}
+      </SimpleGrid>
+    </Guscio>
   );
 }

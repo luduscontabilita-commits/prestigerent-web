@@ -1,10 +1,10 @@
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { notFound } from 'next/navigation';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import { RiordinaFoto } from '@/components/admin/RiordinaFoto';
 import { salvaFoto } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -23,7 +23,7 @@ export default async function RiordinaPagina({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  await soloGestione();
+  const io = await soloGestione();
 
   const { slug } = await params;
 
@@ -45,21 +45,18 @@ export default async function RiordinaPagina({
   const nome = contenuto?.blocks?.name ?? slug.replace(/-/g, ' ');
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>{nome}</h1>
-          <p>
-            <code>{slug}</code> · {foto.length} foto ·{' '}
-            <a href={`/tour/${slug}/`} target="_blank" rel="noopener">
-              vedi la pagina
-            </a>
-          </p>
-        </div>
-        <a className="ad-back" href="/admin/foto/">
-          &larr; Foto dei tour
-        </a>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={nome}
+      sottotitolo={
+        <>
+          <code>{slug}</code> · {foto.length} foto ·{' '}
+          <a href={`/tour/${slug}/`} target="_blank" rel="noopener">vedi la pagina sul sito</a>
+        </>
+      }
+    >
 
       <p className="ad-avviso">
         Trascina per riordinare. La <b>prima</b> foto e&apos; la copertina: e&apos; quella che si
@@ -75,6 +72,6 @@ export default async function RiordinaPagina({
       ) : (
         <RiordinaFoto slug={slug} iniziali={foto} salva={salvaFoto} />
       )}
-    </main>
+    </Guscio>
   );
 }

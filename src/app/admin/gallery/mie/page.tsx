@@ -1,12 +1,11 @@
-import Link from 'next/link';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { chiSono, haRuolo, RUOLI_CARICAMENTO, supabaseServer } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { GalleryMie, type MiaFoto } from '@/components/admin/GalleryMie';
 import { elimina, reinvia } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -73,16 +72,15 @@ export default async function Mie() {
   }));
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Le mie foto</h1>
-          <p>Quello che hai caricato, e a che punto è.</p>
-        </div>
-        <Link className="ad-back" href="/admin/gallery/">&larr; Gallery</Link>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Le mie foto"}
+      sottotitolo={"Quello che hai caricato, e a che punto è."}
+    >
 
       <GalleryMie foto={foto} reinvia={reinvia} elimina={elimina} />
-    </main>
+    </Guscio>
   );
 }

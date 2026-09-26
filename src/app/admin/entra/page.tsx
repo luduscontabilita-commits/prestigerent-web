@@ -1,9 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Alert,
+  Box,
+  Button,
+  Center,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { IconAlertCircle, IconLock, IconUser } from '@tabler/icons-react';
 import { entra } from './azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 
 /* LA SCHERMATA DI ACCESSO.
  *
@@ -16,12 +27,11 @@ import '@/styles/admin-telefono.css';
  * foto, spesso all'aperto e con una mano sola. Da qui tre scelte che
  * sembrano dettagli e non lo sono:
  *
- *  - `type="text"` e non `type="email"` sul primo campo. Sembra ovvio e
- *    non lo e': il campo prima era `type="email" required`, e un nome
- *    utente senza chiocciola NON PASSA la validazione del browser -- il
- *    modulo non si invierebbe proprio. In piu' su iOS `type="email"`
- *    apre una tastiera con la chiocciola al posto della barra
- *    spaziatrice, che per scrivere "mario" e' la tastiera sbagliata.
+ *  - il campo del nome utente NON e' `type="email"`. Sembra ovvio e non
+ *    lo e': prima lo era, e un nome utente senza chiocciola NON PASSA la
+ *    validazione del browser -- il modulo non si invierebbe proprio. In
+ *    piu' su iOS quel tipo apre una tastiera con la chiocciola al posto
+ *    della barra spaziatrice.
  *  - `autoCapitalize="off"` e `autoCorrect="off"`: il telefono
  *    maiuscolizza la prima lettera e "corregge" i nomi propri. `Mario`
  *    non entrerebbe, e la persona riproverebbe la stessa cosa tre volte
@@ -33,18 +43,18 @@ import '@/styles/admin-telefono.css';
 export default function Entra() {
   const [nome, setNome] = useState('');
   const [pw, setPw] = useState('');
-  const [stato, setStato] = useState<'fermo' | 'invio'>('fermo');
+  const [invio, setInvio] = useState(false);
   const [errore, setErrore] = useState('');
 
   const invia = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStato('invio');
+    setInvio(true);
     setErrore('');
 
     const r = await entra(nome, pw);
 
     if (!r.ok) {
-      setStato('fermo');
+      setInvio(false);
       setErrore(r.errore ?? 'Non è andata. Riprova.');
       return;
     }
@@ -57,57 +67,69 @@ export default function Entra() {
   };
 
   return (
-    <main className="ad-entra">
-      <div className="ad-box">
-        <h1>Pannello Prestige Rent</h1>
+    <Box mih="100dvh" bg="dark.8" p="md">
+      <Center mih="calc(100dvh - 2rem)">
+        <Paper shadow="xl" radius="lg" p={{ base: 'lg', sm: 40 }} w="100%" maw={420}>
+          <Stack gap="xs" mb="lg">
+            <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
+              PRESTIGE RENT
+            </Text>
+            <Title order={1} size="h3">Pannello</Title>
+          </Stack>
 
-        <form onSubmit={invia}>
-          <label htmlFor="nu">Nome utente</label>
-          <input
-            id="nu"
-            name="username"
-            type="text"
-            inputMode="text"
-            required
-            autoComplete="username"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="il tuo nome utente"
-          />
+          <form onSubmit={invia}>
+            <Stack gap="md">
+              <TextInput
+                label="Nome utente"
+                placeholder="il tuo nome utente"
+                required
+                size="md"
+                leftSection={<IconUser size={17} stroke={1.6} />}
+                value={nome}
+                onChange={(e) => setNome(e.currentTarget.value)}
+                autoComplete="username"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                data-autofocus
+              />
 
-          <label htmlFor="pw">Password</label>
-          <input
-            id="pw"
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            placeholder="la tua password"
-          />
+              <PasswordInput
+                label="Password"
+                placeholder="la tua password"
+                required
+                size="md"
+                leftSection={<IconLock size={17} stroke={1.6} />}
+                value={pw}
+                onChange={(e) => setPw(e.currentTarget.value)}
+                autoComplete="current-password"
+              />
 
-          <button type="submit" disabled={stato === 'invio'}>
-            {stato === 'invio' ? 'Accesso…' : 'Entra'}
-          </button>
+              <Button type="submit" size="md" fullWidth loading={invio} mt="xs">
+                Entra
+              </Button>
 
-          {/* `role="alert"`: chi usa un lettore di schermo sente
-              l'errore appena compare, senza doverlo andare a cercare. */}
-          {errore && (
-            <p className="ad-err" role="alert">
-              {errore}
-            </p>
-          )}
+              {/* `role="alert"`: chi usa un lettore di schermo sente
+                  l'errore appena compare, senza doverlo andare a cercare. */}
+              {errore && (
+                <Alert
+                  color="red"
+                  variant="light"
+                  icon={<IconAlertCircle size={18} />}
+                  role="alert"
+                >
+                  {errore}
+                </Alert>
+              )}
 
-          <p className="ad-nota">
-            Le credenziali te le dà l’amministratore. Se non riesci a entrare,
-            chiedi a lui: può assegnarti una password nuova in un momento.
-          </p>
-        </form>
-      </div>
-    </main>
+              <Text size="xs" c="dimmed" lh={1.6}>
+                Le credenziali te le dà l’amministratore. Se non riesci a entrare,
+                chiedi a lui: può assegnarti una password nuova in un momento.
+              </Text>
+            </Stack>
+          </form>
+        </Paper>
+      </Center>
+    </Box>
   );
 }

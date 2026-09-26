@@ -1,7 +1,7 @@
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { TabellaSeo, type Riga } from '@/components/admin/TabellaSeo';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -17,7 +17,7 @@ export const metadata = { robots: { index: false, follow: false } };
  * lavoro resta, non quanto ne e' stato fatto.
  */
 export default async function SeoPannello() {
-  await soloGestione();
+  const io = await soloGestione();
 
   const sb = await supabaseServer();
   const [{ data: nuovi }, { data: vecchi }] = await Promise.all([
@@ -47,21 +47,18 @@ export default async function SeoPannello() {
   });
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Title e description</h1>
-          <p>
-            Quello che compare su Google, pagina per pagina. A sinistra il sito attuale, a
-            destra la proposta. {righe.length} pagine.
-          </p>
-        </div>
-        <a className="ad-back" href="/admin/">
-          &larr; Pannello
-        </a>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Title e description"}
+      sottotitolo={<>
+          Quello che compare su Google, pagina per pagina. A sinistra il sito attuale, a
+          destra la proposta. {righe.length} pagine.
+        </>}
+    >
 
       <TabellaSeo righe={righe} />
-    </main>
+    </Guscio>
   );
 }

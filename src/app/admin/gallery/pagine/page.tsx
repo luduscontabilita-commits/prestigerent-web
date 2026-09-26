@@ -1,17 +1,16 @@
-import Link from 'next/link';
+import { comeSiChiama } from '@/lib/accesso';
+import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, spiega, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryPagine, type RigaPagina } from '@/components/admin/GalleryPagine';
 import { salvaPagina, sincronizzaPagine } from '../azioni';
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function Pagine() {
-  await soloGestione();
+  const io = await soloGestione();
   const sb = await supabaseServer();
 
   const [{ data: imp }, { data: tag }, { data: conteggi }] = await Promise.all([
@@ -57,19 +56,18 @@ export default async function Pagine() {
   const visibili = righe.filter((r) => r.visibile).length;
 
   return (
-    <main className="ad-main ad-largo">
-      <header className="ad-head">
-        <div>
-          <h1>Pagine</h1>
-          <p>
-            {righe.length} pagine nel registro, {visibili} mostrano la gallery adesso.
-            {!impostazioni.galleries_enabled && (
-              <> L’interruttore generale è <b>spento</b>: contano solo le pagine messe su «sempre accesa».</>
-            )}
-          </p>
-        </div>
-        <Link className="ad-back" href="/admin/gallery/">&larr; Gallery</Link>
-      </header>
+    <Guscio
+      chi={comeSiChiama(io)}
+      ruolo={io.ruolo}
+      voci={vociPerRuolo(io.ruolo)}
+      titolo={"Pagine"}
+      sottotitolo={<>
+          {righe.length} pagine nel registro, {visibili} mostrano la gallery adesso.
+          {!impostazioni.galleries_enabled && (
+            <> L’interruttore generale è <b>spento</b>: contano solo le pagine messe su «sempre accesa».</>
+          )}
+        </>}
+    >
 
       {righe.length === 0 && (
         <p className="ad-err">
@@ -79,6 +77,6 @@ export default async function Pagine() {
       )}
 
       <GalleryPagine righe={righe} sincronizza={sincronizzaPagine} salva={salvaPagina} />
-    </main>
+    </Guscio>
   );
 }

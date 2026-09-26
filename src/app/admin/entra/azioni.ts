@@ -1,5 +1,6 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/auth';
 import { DOMINIO_GUIDE, normalizza, pareEmail } from '@/lib/accesso';
 
@@ -117,4 +118,16 @@ export async function esci(): Promise<void> {
      persona. Una guida che esce dal telefono di un collega non deve
      buttare fuori se stessa dal proprio. */
   await sb.auth.signOut({ scope: 'local' });
+}
+
+/** Quella che usa il pulsante nel guscio: esce e porta alla schermata di
+ *  accesso.
+ *
+ *  🔴 `redirect()` STA FUORI DA QUALUNQUE try/catch, e non e' pignoleria:
+ *  funziona lanciando un'eccezione speciale, e un `catch` di troppo se la
+ *  mangerebbe lasciando il pulsante senza effetto -- si resterebbe sulla
+ *  pagina, disconnessi, senza nessun segnale. */
+export async function esciEVai(): Promise<void> {
+  await esci();
+  redirect('/admin/entra/');
 }
