@@ -3,7 +3,7 @@ import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { GestioneUtenti, type Utente } from '@/components/admin/GestioneUtenti';
-import { cambiaAttivo, creaGuida, rigeneraPassword } from './azioni';
+import { cambiaAttivo, creaGuida, eliminaGuida, rigeneraPassword, verificaPassword } from './azioni';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -29,12 +29,17 @@ export default async function Utenti() {
      perche' la regola resta una sola e sta nel database. */
   const [{ data: profili }, { data: abilitati }, { data: foto }] = await Promise.all([
     sb.from('profili').select('id,username,nome,email,ruolo,attivo,ultimo_accesso').order('ruolo').order('nome'),
-    sb.from('autorizzati').select('email,contatto'),
+    sb.from('autorizzati').select('email,contatto,password_chiara'),
     sb.from('gallery_images').select('uploaded_by'),
   ]);
 
-  const contatti = new Map(
-    ((abilitati ?? []) as { email: string; contatto: string | null }[]).map((a) => [a.email.toLowerCase(), a.contatto])
+  /* 🔴 La password in chiaro arriva SOLO qui, in una pagina che chiama
+     `soloGestione()`, e la tabella da cui viene e' invisibile a chi non e'
+     amministratore (policy `autorizzati_admin`). Non finisce in nessuna
+     query del sito pubblico. */
+  const rubrica = new Map(
+    ((abilitati ?? []) as { email: string; contatto: string | null; password_chiara: string | null }[])
+      .map((a) => [a.email.toLowerCase(), a])
   );
   const quanteFoto: Record<string, number> = {};
   for (const f of (foto ?? []) as { uploaded_by: string | null }[]) {
@@ -47,7 +52,8 @@ export default async function Utenti() {
     nome: p.nome,
     ruolo: p.ruolo,
     attivo: p.attivo,
-    contatto: contatti.get(p.email.toLowerCase()) ?? null,
+    contatto: rubrica.get(p.email.toLowerCase())?.contatto ?? null,
+    password: rubrica.get(p.email.toLowerCase())?.password_chiara ?? null,
     ultimoAccesso: p.ultimo_accesso,
     foto: quanteFoto[p.id] ?? 0,
     sonoIo: p.id === io.id,
@@ -78,6 +84,8 @@ export default async function Utenti() {
         creaGuida={creaGuida}
         rigeneraPassword={rigeneraPassword}
         cambiaAttivo={cambiaAttivo}
+        eliminaGuida={eliminaGuida}
+        verificaPassword={verificaPassword}
       />
     </Guscio>
   );

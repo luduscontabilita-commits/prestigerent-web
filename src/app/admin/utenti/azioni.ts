@@ -57,6 +57,27 @@ function generaPassword(): string {
   return Array.from(byte, (b) => ALFABETO_PASSWORD[b % n]).join('');
 }
 
+
+/** Il messaggio pronto da mandare alla persona. Sta in una funzione sola
+ *  perche' lo usano la creazione e il cambio password: due copie
+ *  divergerebbero alla prima correzione di una virgola. */
+function consegnaPer(nome: string | null, username: string | null, password: string): string {
+  return (
+    `Ciao ${nome ?? ''}, ecco come entrare per caricare le foto:
+
+` +
+    `Indirizzo: https://prestigerent.com/admin/entra/
+` +
+    `Nome utente: ${username ?? ''}
+` +
+    `Password: ${password}
+
+` +
+    `Salvali nel telefono: la password non puoi cambiarla tu, ` +
+    `se la perdi te ne assegno un'altra io.`
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    CREARE UNA GUIDA
    ═══════════════════════════════════════════════════════════════════ */
@@ -157,6 +178,14 @@ export async function creaGuida(dati: {
     nome,
     username,
     contatto: contatto || null,
+    /* 🔴 IN CHIARO, per decisione esplicita della proprieta' del
+       26/09/2026: l'admin deve poterla rileggere dal pannello.
+       La protegge la policy `autorizzati_admin` (e_admin()), che rende
+       l'INTERA tabella invisibile a chi non e' amministratore -- non e'
+       una colonna nascosta, e' una tabella che il pubblico non vede.
+       Le conseguenze per esteso stanno nella migrazione
+       20260926_password_guide_in_chiaro.sql. */
+    password_chiara: password,
   });
   if (e1) return { ok: false, errore: `Non ho potuto abilitare l’utente: ${e1.message}` };
 
@@ -246,6 +275,24 @@ export async function rigeneraPassword(idProfilo: string, scelta?: string): Prom
   const { error } = await sb.auth.admin.updateUserById(prof.id, { password });
   if (error) return { ok: false, errore: error.message };
 
+  /* La copia in chiaro si aggiorna DOPO che il cambio vero e' riuscito:
+     al contrario, un fallimento di GoTrue lascerebbe nel pannello una
+     password che non apre niente -- e l'admin la consegnerebbe. */
+  const { error: e3 } = await utente
+    .from('autorizzati')
+    .update({ password_chiara: password })
+    .eq('email', prof.email);
+  if (e3) {
+    return {
+      ok: true,
+      username: prof.username ?? undefined,
+      password,
+      generata: !voluta,
+      errore: 'Password cambiata, ma non sono riuscito a registrarla nel pannello: copiala adesso.',
+      consegna: consegnaPer(prof.nome, prof.username, password),
+    };
+  }
+
   return {
     ok: true,
     username: prof.username ?? undefined,
@@ -306,4 +353,120 @@ export async function cambiaAttivo(idProfilo: string, attivo: boolean): Promise<
 /* Il dominio interno serve alla pagina per non mostrarlo mai. */
 export async function dominioGuide(): Promise<string> {
   return DOMINIO_GUIDE;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LA PASSWORD REGISTRATA APRE ANCORA?
+   ═══════════════════════════════════════════════════════════════════
+
+   🔴 SERVE PERCHE' UNA COSA NON SI PUO' IMPEDIRE.
+   `supabase.auth.updateUser({password})` e' un endpoint del SERVIZIO, non
+   una funzione nostra: chi e' dentro ha la sessione e la chiave
+   pubblicabile nel browser e lo chiama dalla console. Togliere un modulo
+   dal pannello non spegne un endpoint di GoTrue, e non c'e' nessuna
+   impostazione che lo disattivi per un solo ruolo.
+
+   Quindi «le guide non devono poter cambiare niente» non si ottiene
+   vietando: si ottiene rendendo il cambio VISIBILE e REVERSIBILE. Questa
+   azione prova la password registrata come farebbe una persona dal
+   modulo. Se non apre piu', quella guida se l'e' cambiata: l'admin lo
+   vede e le riassegna quella che vuole lui, in un clic.
+
+   Non lascia niente dietro: si chiede un token e lo si butta. */
+export async function verificaPassword(idProfilo: string): Promise<Esito & { apre?: boolean }> {
+  const agente = await chiAgisce(RUOLI_GESTIONE);
+  if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
+
+  const utente = await supabaseServer();
+  const { data: p } = await utente
+    .from('profili')
+    .select('email,ruolo')
+    .eq('id', idProfilo)
+    .maybeSingle();
+  const prof = p as { email: string; ruolo: string } | null;
+  if (!prof) return { ok: false, errore: 'Questo utente non esiste.' };
+
+  const { data: a } = await utente
+    .from('autorizzati')
+    .select('password_chiara')
+    .eq('email', prof.email)
+    .maybeSingle();
+  const registrata = (a as { password_chiara: string | null } | null)?.password_chiara;
+  if (!registrata) {
+    return { ok: false, errore: 'Per questa persona non c’è nessuna password registrata: assegnagliene una.' };
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const pubblica = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !pubblica) return { ok: false, errore: 'Ambiente incompleto.' };
+
+  const r = await fetch(`${url}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: pubblica, 'content-type': 'application/json' },
+    body: JSON.stringify({ email: prof.email, password: registrata }),
+  });
+
+  return { ok: true, apre: r.ok };
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CANCELLARE UNA GUIDA
+   ═══════════════════════════════════════════════════════════════════
+
+   🔴 NON E' LA STESSA COSA DI «CHIUDI L'ACCESSO», e la differenza si
+   vede sulle FOTO.
+
+   `profili.id` ha `on delete cascade` verso `auth.users`, e
+   `gallery_images.uploaded_by` ha `on delete set null` verso `profili`.
+   Quindi cancellando la persona: l'utente sparisce, il profilo sparisce
+   con lui, e ogni foto che aveva caricato RESTA SUL SITO ma perde il
+   nome di chi l'ha fatta -- per sempre, perche' non c'e' piu' niente a
+   cui riattaccarla.
+
+   Per questo l'azione TORNA QUANTE FOTO PERDERANNO il nome, e il pannello
+   lo dice prima di chiedere conferma. Chiudere l'accesso invece non tocca
+   niente: la persona non entra piu' e le foto restano sue.
+
+   Si cancellano solo le GUIDE. Un admin si cancella dal database, da chi
+   ha le chiavi: qui dentro sarebbe un clic che toglie l'accesso al
+   pannello a se stessi o ai colleghi.
+*/
+export async function eliminaGuida(idProfilo: string): Promise<Esito & { foto?: number }> {
+  const agente = await chiAgisce(RUOLI_GESTIONE);
+  if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
+  if (idProfilo === agente.io.id) return { ok: false, errore: 'Non puoi cancellare te stesso.' };
+
+  const sb = segreto();
+  if (!sb) return { ok: false, errore: 'Manca SUPABASE_SECRET_KEY.' };
+
+  const utente = await supabaseServer();
+  const { data: p } = await utente
+    .from('profili')
+    .select('id,email,ruolo,nome')
+    .eq('id', idProfilo)
+    .maybeSingle();
+  const prof = p as { id: string; email: string; ruolo: string; nome: string | null } | null;
+  if (!prof) return { ok: false, errore: 'Questo utente non esiste.' };
+  if (prof.ruolo !== 'guida') {
+    return { ok: false, errore: 'Da qui si cancellano solo le guide. Un amministratore si toglie dal database.' };
+  }
+
+  const { count } = await utente
+    .from('gallery_images')
+    .select('id', { count: 'exact', head: true })
+    .eq('uploaded_by', idProfilo);
+
+  /* L'ordine: prima l'utente auth (che si porta via il profilo in
+     cascata), poi la riga in `autorizzati`. Al contrario, se la seconda
+     fallisse, resterebbe un profilo senza abilitazione -- una persona che
+     entra e non e' nell'elenco, cioe' uno stato che il trigger
+     `crea_profilo` non prevede. */
+  const { error } = await sb.auth.admin.deleteUser(idProfilo);
+  if (error) return { ok: false, errore: `Non ho potuto cancellare l’accesso: ${error.message}` };
+
+  /* Senza questa riga il nome utente resterebbe occupato e l'indirizzo
+     abilitato: ricreare la stessa guida darebbe «nome già in uso». */
+  await utente.from('autorizzati').delete().eq('email', prof.email);
+
+  return { ok: true, foto: count ?? 0 };
 }

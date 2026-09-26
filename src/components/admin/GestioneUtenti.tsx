@@ -25,7 +25,11 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconCopy,
+  IconEye,
+  IconEyeOff,
   IconKey,
+  IconShieldCheck,
+  IconTrash,
   IconLock,
   IconLockOpen,
   IconUserPlus,
@@ -33,23 +37,27 @@ import {
 
 /* GLI UTENTI DEL PANNELLO.
  *
- * ── 🔴 LE PASSWORD NON SI POSSONO MOSTRARE, E VA DETTO QUI ────────────
- * Supabase conserva l'IMPRONTA bcrypt della password, non la password:
- * e' un calcolo a senso unico, e dall'impronta non si torna indietro --
- * ne' noi, ne' Supabase, ne' chi avesse il database in mano. E' il motivo
- * per cui si usa bcrypt.
+ * ── 🔴 LE PASSWORD DELLE GUIDE SI VEDONO, ED E' UNA SCELTA ───────────
+ * Supabase conserva solo l'impronta bcrypt, che non si riporta indietro.
+ * Perche' l'admin possa rileggerle, dal 26/09/2026 la password viene
+ * salvata IN CHIARO in `autorizzati.password_chiara` -- decisione
+ * esplicita della proprieta', presa dopo che il rischio le e' stato
+ * esposto. La protegge la policy `autorizzati_admin` (e_admin()), che
+ * rende quella tabella invisibile a chi non e' amministratore.
  *
- * Quindi al posto di «vedere» c'e' il CONTROLLO, che per lavorare serve
- * allo stesso modo:
- *  - alla creazione l'admin puo' SCEGLIERE la password, e quindi la sa;
- *  - in qualunque momento puo' ASSEGNARNE UNA NUOVA, scelta o generata.
- * Una guida non puo' cambiarsela: l'unico che decide e' l'admin.
+ * A schermo la password resta COPERTA finche' non si chiede di vederla:
+ * il pannello si apre anche in mezzo a un ufficio, e una password
+ * stampata a video la legge chiunque passi.
  *
- * ── LA PASSWORD GENERATA SI VEDE UNA VOLTA SOLA ──────────────────────
- * Per lo stesso motivo: chiuso il riquadro, quella password non la sa
- * piu' nessuno. Se invece l'ha scritta l'admin, il riquadro non lo dice:
- * spaventare per una password che chi legge ha appena scelto sarebbe
- * rumore.
+ * ── «LA GUIDA NON PUO' CAMBIARE NIENTE»: quanto e' vero ──────────────
+ * Dal pannello, del tutto: non c'e' nessun modo di cambiare la propria
+ * password. Ma `supabase.auth.updateUser()` e' un endpoint del SERVIZIO,
+ * e chi e' dentro lo chiama dalla console del browser: non si spegne
+ * togliendo un modulo, e non c'e' un'impostazione che lo disattivi per un
+ * solo ruolo. Quindi il pulsante «Verifica» prova la password registrata
+ * come farebbe una persona: se non apre piu', quella guida se l'e'
+ * cambiata, e l'admin gliene riassegna un'altra in un clic. Non si vieta:
+ * si rende visibile e reversibile.
  */
 
 export type Utente = {
@@ -59,6 +67,10 @@ export type Utente = {
   ruolo: string;
   attivo: boolean;
   contatto: string | null;
+  /** 🔴 in chiaro, per decisione della proprieta'. Arriva da
+   *  `autorizzati.password_chiara`, tabella che la policy
+   *  `autorizzati_admin` rende invisibile a chi non e' amministratore. */
+  password: string | null;
   ultimoAccesso: string | null;
   foto: number;
   sonoIo: boolean;
@@ -72,6 +84,8 @@ export function GestioneUtenti({
   creaGuida,
   rigeneraPassword,
   cambiaAttivo,
+  eliminaGuida,
+  verificaPassword,
 }: {
   utenti: Utente[];
   creaGuida: (d: {
@@ -82,13 +96,23 @@ export function GestioneUtenti({
   }) => Promise<Esito>;
   rigeneraPassword: (id: string, scelta?: string) => Promise<Esito>;
   cambiaAttivo: (id: string, attivo: boolean) => Promise<{ ok: boolean; errore?: string }>;
+  eliminaGuida: (id: string) => Promise<{ ok: boolean; errore?: string; foto?: number }>;
+  verificaPassword: (id: string) => Promise<{ ok: boolean; errore?: string; apre?: boolean }>;
 }) {
   const [lista, setLista] = useState(utenti);
   const [form, setForm] = useState({ username: '', nome: '', contatto: '', password: '' });
   const [cred, setCred] = useState<Credenziali | null>(null);
   const [nuova, setNuova] = useState<{ id: string; nome: string; pw: string } | null>(null);
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
+  const [mostra, setMostra] = useState<Set<string>>(new Set());
   const [inCorso, avvia] = useTransition();
+
+  const svela = (id: string) =>
+    setMostra((m) => {
+      const n = new Set(m);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
 
   const guide = lista.filter((u) => u.ruolo === 'guida');
   const admin = lista.filter((u) => u.ruolo === 'admin');
@@ -209,6 +233,7 @@ export function GestioneUtenti({
                 <Table.Tr>
                   <Table.Th>Persona</Table.Th>
                   <Table.Th>Nome utente</Table.Th>
+                  <Table.Th>Password</Table.Th>
                   <Table.Th>Contatto</Table.Th>
                   <Table.Th>Ultimo accesso</Table.Th>
                   <Table.Th>Foto</Table.Th>
@@ -244,6 +269,37 @@ export function GestioneUtenti({
                       </Group>
                     </Table.Td>
                     <Table.Td>
+                      {u.password ? (
+                        <Group gap={4} wrap="nowrap">
+                          {/* Coperta finche' non si chiede di vederla: il
+                              pannello si apre anche in mezzo a un ufficio,
+                              e una password a schermo la legge chiunque
+                              passi. Un clic la mostra. */}
+                          <Text ff="monospace" size="sm">
+                            {mostra.has(u.id) ? u.password : '•'.repeat(Math.min(u.password.length, 12))}
+                          </Text>
+                          <Tooltip label={mostra.has(u.id) ? 'Nascondi' : 'Mostra'}>
+                            <ActionIcon variant="subtle" size="sm" onClick={() => svela(u.id)}
+                              aria-label={mostra.has(u.id) ? 'Nascondi la password' : 'Mostra la password'}>
+                              {mostra.has(u.id) ? <IconEyeOff size={13} /> : <IconEye size={13} />}
+                            </ActionIcon>
+                          </Tooltip>
+                          <CopyButton value={u.password} timeout={1500}>
+                            {({ copied, copy }) => (
+                              <Tooltip label={copied ? 'Copiata' : 'Copia'}>
+                                <ActionIcon variant="subtle" size="sm" onClick={copy}
+                                  aria-label="Copia la password">
+                                  {copied ? <IconCheck size={13} /> : <IconCopy size={13} />}
+                                </ActionIcon>
+                              </Tooltip>
+                            )}
+                          </CopyButton>
+                        </Group>
+                      ) : (
+                        <Text size="xs" c="dimmed">non registrata</Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
                       <Text size="sm" c={u.contatto ? undefined : 'dimmed'}>
                         {u.contatto ?? 'non indicato'}
                       </Text>
@@ -262,6 +318,36 @@ export function GestioneUtenti({
                           onClick={() => setNuova({ id: u.id, nome: u.nome ?? u.username ?? '', pw: '' })}>
                           Password
                         </Button>
+
+                        {/* La password registrata apre ancora? Se una
+                            guida se l'e' cambiata dalla console, qui si
+                            vede -- ed e' l'unico modo di accorgersene,
+                            perche' l'endpoint di GoTrue non si spegne. */}
+                        <Tooltip label="La password qui sopra apre ancora?">
+                          <ActionIcon
+                            variant="light"
+                            size="lg"
+                            disabled={!u.password}
+                            loading={inCorso}
+                            aria-label="Verifica la password"
+                            onClick={() =>
+                              avvia(async () => {
+                                const r = await verificaPassword(u.id);
+                                if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
+                                setMessaggio(
+                                  r.apre
+                                    ? { ok: true, testo: `La password di ${u.nome ?? u.username} funziona.` }
+                                    : {
+                                        ok: false,
+                                        testo: `La password registrata di ${u.nome ?? u.username} NON apre più: se l’è cambiata lei. Assegnagliene una nuova.`,
+                                      }
+                                );
+                              })
+                            }
+                          >
+                            <IconShieldCheck size={16} />
+                          </ActionIcon>
+                        </Tooltip>
                         <Tooltip label={u.attivo ? 'Chiudi l’accesso' : 'Riapri l’accesso'}>
                           <ActionIcon
                             variant="light"
@@ -284,6 +370,41 @@ export function GestioneUtenti({
                             }
                           >
                             {u.attivo ? <IconLock size={16} /> : <IconLockOpen size={16} />}
+                          </ActionIcon>
+                        </Tooltip>
+
+                        <Tooltip label="Cancella la guida">
+                          <ActionIcon
+                            variant="light"
+                            color="red"
+                            size="lg"
+                            loading={inCorso}
+                            aria-label="Cancella la guida"
+                            onClick={() => {
+                              /* 🔴 La conferma NOMINA la conseguenza, e non
+                                 e' la stessa di «chiudi l'accesso»: le foto
+                                 restano sul sito ma perdono per sempre il
+                                 nome di chi le ha caricate, perche' non c'e'
+                                 piu' niente a cui riattaccarle. */
+                              const avviso =
+                                u.foto > 0
+                                  ? `Cancellare ${u.nome ?? u.username}? Le ${u.foto} foto che ha caricato restano sul sito ma perdono il suo nome, per sempre. Se vuoi solo impedirle di entrare, usa il lucchetto.`
+                                  : `Cancellare ${u.nome ?? u.username}? Non si torna indietro.`;
+                              if (!window.confirm(avviso)) return;
+                              avvia(async () => {
+                                const r = await eliminaGuida(u.id);
+                                if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
+                                setLista((l) => l.filter((x) => x.id !== u.id));
+                                setMessaggio({
+                                  ok: true,
+                                  testo: r.foto
+                                    ? `Cancellata. Le sue ${r.foto} foto restano sul sito, senza più il suo nome.`
+                                    : 'Cancellata.',
+                                });
+                              });
+                            }}
+                          >
+                            <IconTrash size={16} />
                           </ActionIcon>
                         </Tooltip>
                       </Group>
