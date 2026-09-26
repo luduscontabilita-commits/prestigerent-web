@@ -5,6 +5,7 @@ import { bassaRisoluzione, verraRitagliata } from '@/lib/gallery-tag';
 import { GalleryCoda, type InCoda } from '@/components/admin/GalleryCoda';
 import { aggiornaFoto, approva, pagineTaggabili, rifiuta } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';

@@ -4,6 +4,7 @@ import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import { RiordinaFoto } from '@/components/admin/RiordinaFoto';
 import { salvaFoto } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

@@ -4,6 +4,7 @@ import { decidi, spiega, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryPagine, type RigaPagina } from '@/components/admin/GalleryPagine';
 import { salvaPagina, sincronizzaPagine } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';

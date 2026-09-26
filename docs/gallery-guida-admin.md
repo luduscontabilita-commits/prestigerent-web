@@ -7,23 +7,30 @@ Per chi carica le foto delle giornate. Si fa tutto dal telefono.
 ## Entrare
 
 1. apri **prestigerent.com/admin/entra/**
-2. scrivi la tua email, **lascia vuoto il campo password**
-3. premi **«Ricevi il link di accesso»**
-4. apri il link che ti arriva per email, **dallo stesso telefono**
+2. scrivi il **nome utente** e la **password** che ti ha dato
+   l’amministratore
+3. premi **Entra**
 
-Il link dura pochi minuti e vale una volta sola. **Non c'è nessuna
-password da ricordare**, e non ti serve nessun account da creare: la prima
-volta che entri il tuo profilo nasce da sé.
+Le credenziali te le manda lui: sono un nome utente (tipo `mario`) e una
+password. **Salvale nel telefono** appena le ricevi — quando il telefono
+ti propone di ricordarle, accetta: la prossima volta il modulo si riempie
+da solo.
 
-Se ti dice che **l'indirizzo non è abilitato**: o è scritto con un refuso
-(basta un punto di troppo), o il tuo indirizzo non è ancora stato
-aggiunto. Nel secondo caso non c'è niente che puoi fare dal telefono:
-scrivi a chi gestisce il sito e fatti aggiungere.
+Non c’è nessuna email da controllare e nessun link da aprire.
 
-Salvati l'indirizzo nei segnalibri: dal sito non c'è nessun link al
+**Se non riesci a entrare**, non c’è niente che puoi fare dal telefono: la
+password non si può cambiare da soli e non c’è un «password
+dimenticata». Scrivi all’amministratore, che te ne assegna una nuova in un
+momento.
+
+Salvati l’indirizzo nei segnalibri: dal sito non c’è nessun link al
 pannello, di proposito.
 
----
+## Uscire
+
+In alto a destra, in ogni pagina del pannello, c’è **Esci**. Usalo se
+presti il telefono a qualcuno o se lo cambi: finché non esci, chi ha il
+telefono in mano è dentro al tuo posto.
 
 ## Caricare le foto
 
@@ -81,7 +88,8 @@ amministratore, che può:
 - **approvarle** → compaiono sul sito;
 - **correggerle e approvarle** → se la descrizione o la pagina erano da
   sistemare, lo fa lui e non ti disturba;
-- **rimandartele indietro** → ti arriva una email con il motivo.
+- **rimandartele indietro** → il motivo lo trovi in «Le mie foto». Se hai
+  dato un indirizzo email all’amministratore, ti arriva anche lì.
 
 In **«Le mie foto»** vedi tutto quello che hai caricato, diviso in tre:
 *Rifiutate*, *In attesa*, *Approvate*. La scheda delle rifiutate si apre

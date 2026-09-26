@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE, supabaseServer } from '@/lib/auth';
+import { Esci } from '@/components/admin/Esci';
 import { redirect } from 'next/navigation';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +65,10 @@ export default async function GalleryIndice() {
             sono la striscia in cima alle schede, con la copertina.
           </p>
         </div>
-        <Link className="ad-back" href="/admin/">&larr; Pannello</Link>
+        <div className="ad-head-dx">
+          <Esci io={io} />
+          <Link className="ad-back" href="/admin/">&larr; Pannello</Link>
+        </div>
       </header>
 
       {/* Lo stato dell'interruttore in cima, sempre: e' la domanda che si

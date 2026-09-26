@@ -1,6 +1,7 @@
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { TabellaSeo, type Riga } from '@/components/admin/TabellaSeo';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

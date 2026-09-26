@@ -1,0 +1,127 @@
+/* IL PANNELLO SU UNO SCHERMO PICCOLO.
+ *
+ * 🔴 PERCHE' UN FILE A PARTE E SOLO AGGIUNTE.
+ * `admin.css` non ha NEMMENO UNA media query, ed e' importato da tutte le
+ * pagine del pannello. Dentro ci sono tre regole da cui dipende la
+ * tabella SEO -- 123 righe, lo strumento con cui si lavora ogni giorno:
+ * `.ad-perc{width:250px}`, `.ad-prima/.ad-dopo{width:calc((100% - 250px)/2)}`
+ * e l'intestazione appiccicata in alto. Toccarle per far stare le cose
+ * nel telefono romperebbe il lavoro di chi usa il pannello dal computer.
+ *
+ * Qui dentro quindi: solo regole DENTRO una media query, che sopra i
+ * 700px non esistono. Chi lavora dal computer non vede cambiare un pixel.
+ *
+ * ── A CHI SERVE ───────────────────────────────────────────────────────
+ * Alle guide, che caricano le foto dallo smartphone con cui le hanno
+ * appena scattate -- spesso all'aperto, con una mano sola, e senza aver
+ * mai visto un pannello di amministrazione.
+ */
+
+@media (max-width: 700px) {
+  /* ── respiro e leggibilita' ──────────────────────────────────── */
+  .ad-main { padding: 18px 14px 48px; }
+
+  /* L'intestazione in colonna: il titolo e il nome sopra, i comandi
+     sotto e a tutta larghezza. Affiancati a 360px si schiacciano fino a
+     diventare due pulsanti da toccare con la punta dell'unghia. */
+  .ad-head { flex-direction: column; align-items: stretch; gap: 14px; }
+  .ad-head h1 { font-size: 1.3rem; }
+  .ad-head-dx { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+  /* ── i bersagli da toccare ───────────────────────────────────────
+     44px e' la misura sotto la quale un dito sbaglia: e' la soglia che
+     Apple e Google indicano da anni, ed e' la differenza fra "tocco" e
+     "tocco tre volte". Vale per ogni comando, non solo per i principali. */
+  .ad-main button,
+  .ad-main .gc-mini,
+  .ad-main .ad-back,
+  .ad-esci,
+  .g-schede button { min-height: 44px; }
+
+  .gc-invia,
+  .gc-scegli { width: 100%; min-height: 52px; }
+
+  /* Le caselle da spuntare: quelle di sistema sono minuscole, e nel
+     menu delle pagine se ne toccano decine di fila. */
+  .gc-pagina input[type='checkbox'],
+  .g-pagine-scelta input[type='checkbox'],
+  .g-riga-sel input[type='checkbox'],
+  .gc-sel input[type='checkbox'] { width: 22px; height: 22px; }
+  .gc-pagina,
+  .g-pagine-scelta label { padding: 11px 2px; }
+
+  /* ── i campi ─────────────────────────────────────────────────────
+     16px NON e' una scelta estetica: sotto questa misura iOS INGRANDISCE
+     la pagina da solo quando si tocca un campo, e poi non la rimpicciolisce
+     piu'. Chi scrive l'alt di una foto si ritrova il pannello a meta'
+     schermo per il resto della sessione. */
+  .ad-main input,
+  .ad-main select,
+  .ad-main textarea,
+  .ad-box input { font-size: 16px; }
+
+  /* ── le tabelle ──────────────────────────────────────────────────
+     Non si riducono: si fanno scorrere di lato dentro il loro
+     contenitore, che e' gia' `overflow:auto`. Una tabella di 123 righe
+     spremuta in 360px non si legge comunque, e spezzarla in schede
+     rifarebbe /admin/seo/ e /admin/numeri/, che oggi funzionano.
+     `width:auto` neutralizza le larghezze fisse QUI, invece di
+     cancellarle sopra. */
+  .ad-tab-wrap { -webkit-overflow-scrolling: touch; }
+  .ad-tab { font-size: .8rem; }
+  .ad-perc { width: auto; min-width: 150px; }
+  .ad-prima, .ad-dopo { width: auto; min-width: 180px; }
+
+  /* La tabella delle pagine della gallery invece si puo' impilare: e'
+     fatta di poche colonne e di righe che si aprono. */
+  .g-tab { font-size: .82rem; }
+  .g-mod-griglia { grid-template-columns: 1fr; }
+
+  /* ── la gallery ──────────────────────────────────────────────── */
+  .gc-zona { padding: 22px 14px; }
+  .gc-card { grid-template-columns: 1fr; }
+  .gc-ant { max-width: 100%; aspect-ratio: 4 / 3; }
+  .g-riga { grid-template-columns: 1fr; }
+  .g-riga-foto { aspect-ratio: 3 / 4; }   /* le foto arrivano verticali */
+  .g-azioni { flex-direction: column; align-items: stretch; }
+  .g-azioni button { width: 100%; }
+
+  /* L'albero delle pagine sotto le foto, non di fianco: affiancati a
+     360px sarebbero due colonne da 170px, illeggibili tutte e due. */
+  .gc-corpo { grid-template-columns: 1fr; }
+
+  /* ── utenti ──────────────────────────────────────────────────── */
+  .ut-campi { grid-template-columns: 1fr; }
+  .ut-cred-azioni { flex-direction: column; }
+  .ut-cred-azioni button { width: 100%; }
+  .ut-azioni { flex-direction: column; align-items: stretch; }
+  .ut-azioni button { width: 100%; }
+
+  /* ── l'accesso ───────────────────────────────────────────────── */
+  .ad-box { padding: 26px 20px; border-radius: 14px; }
+}
+
+/* ── UN LIMITE NOTO E NON RISOLTO: /admin/foto/ COL DITO ───────────
+ *
+ * `admin.css:113` mette `touch-action:none` su `.ad-presa`, che e'
+ * l'intera foto del riordino (RiordinaFoto.tsx:233: attributes e
+ * listeners stanno sul contenitore, non su una maniglia). Senza quella
+ * riga @dnd-kit non fa partire il trascinamento; con quella riga, da
+ * telefono la PAGINA non scorre se il dito comincia sopra una foto -- e
+ * la griglia riempie lo schermo, quindi in pratica non scorre.
+ *
+ * NON l'ho risolto, e dico perche' invece di lasciar credere il
+ * contrario:
+ *
+ *  - scambiare PointerSensor con TouchSensor toglierebbe il
+ *    trascinamento col MOUSE a chi riordina dal computer, che e' il modo
+ *    in cui questa pagina viene usata oggi;
+ *  - fare una maniglia vera (`setActivatorNodeRef` su un elemento
+ *    piccolo) cambierebbe il gesto anche da computer: non si
+ *    trascinerebbe piu' la foto da un punto qualsiasi. E' una
+ *    regressione per gli utenti attuali, decisa per utenti che questa
+ *    pagina non la aprono.
+ *
+ * Perche' si puo' rimandare: `/admin/foto/` sono le foto DEL PRODOTTO,
+ * riservate agli admin e usate dal computer. Le guide vedono solo
+ * `/admin/gallery/`, che qui sopra e' sistemata per il telefono. */

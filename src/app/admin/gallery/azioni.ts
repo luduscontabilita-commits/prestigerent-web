@@ -526,6 +526,20 @@ export async function rifiuta(id: string, motivo: string): Promise<Esito> {
     .eq('id', id)
     .maybeSingle();
 
+  /* 🔴 ALLA GUIDA NON SI SCRIVE ALL'INDIRIZZO CON CUI ENTRA.
+     Dal 26/09/2026 le guide accedono con un indirizzo interno
+     `<nome>@guide.prestigerent.invalid`, che per costruzione non puo'
+     ricevere niente (RFC 2606). Mandare li' l'avviso di rifiuto vorrebbe
+     dire che quell'avviso non arriva MAI, e che nessuno se ne accorge --
+     `invia()` non lancia, torna solo false.
+     Il contatto vero, se la persona ne ha dato uno, sta in
+     `autorizzati.contatto`, ed e' quello il posto dove scrivere. */
+  const info = riga as unknown as { profili: { email: string } | null } | null;
+  const { data: rubrica } = info?.profili?.email
+    ? await sb.from('autorizzati').select('contatto').eq('email', info.profili.email).maybeSingle()
+    : { data: null };
+  const dove = (rubrica as { contatto: string | null } | null)?.contatto ?? null;
+
   const { error } = await sb
     .from('gallery_images')
     .update({
@@ -539,18 +553,30 @@ export async function rifiuta(id: string, motivo: string): Promise<Esito> {
   if (error) return { ok: false, errore: error.message };
 
   const chi = riga as unknown as { alt: string; profili: { email: string; nome: string | null } | null } | null;
-  if (chi?.profili?.email && postaConfigurata()) {
+  if (dove && postaConfigurata()) {
     await invia({
-      a: chi.profili.email,
+      a: dove,
       oggetto: 'Una tua foto è stata rimandata indietro',
       testo:
-        `Ciao${chi.profili.nome ? ' ' + chi.profili.nome : ''},\n\n` +
-        `la foto «${chi.alt}» non è stata pubblicata.\n\nMotivo: ${testo}\n\n` +
+        `Ciao${chi?.profili?.nome ? ' ' + chi.profili.nome : ''},\n\n` +
+        `la foto «${chi?.alt ?? ''}» non è stata pubblicata.\n\nMotivo: ${testo}\n\n` +
         `Puoi correggerla e rimandarla da qui:\n` +
         `https://prestigerent.com/admin/gallery/mie/\n`,
     });
+    return { ok: true };
   }
-  return { ok: true };
+
+  /* Senza contatto la foto e' respinta lo stesso -- il rifiuto e' gia'
+     scritto nel database e la guida lo legge in «Le mie foto» -- ma
+     l'admin deve sapere che nessuno ha ricevuto niente, o restera' ad
+     aspettare una correzione che non arriva perche' la persona non sa
+     che c'e' da farla. */
+  return {
+    ok: true,
+    errore: dove
+      ? undefined
+      : 'Rimandata indietro. Nessuna email inviata: questa persona non ha un contatto. Avvisala tu, oppure aggiungi la sua email in Utenti.',
+  };
 }
 
 /** Nascondere una foto GIA' sul sito, o rimetterla. Non e' un rifiuto: il

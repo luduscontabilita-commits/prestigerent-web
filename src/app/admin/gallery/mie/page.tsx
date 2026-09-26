@@ -6,6 +6,7 @@ import { urlFoto } from '@/lib/gallery-dati';
 import { GalleryMie, type MiaFoto } from '@/components/admin/GalleryMie';
 import { elimina, reinvia } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';

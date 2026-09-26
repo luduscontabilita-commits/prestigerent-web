@@ -2,6 +2,7 @@ import { soloGestione, supabaseServer } from '@/lib/auth';
 import { Numeri, type RigaNumeri } from '@/components/admin/Numeri';
 import { passoConteggi, passoDisponibilita, passoPrenotazioni, passoRecensioni } from './azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

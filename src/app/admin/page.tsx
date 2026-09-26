@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { chiSono, haRuolo, RUOLI_GESTIONE } from '@/lib/auth';
+import { comeSiChiama } from '@/lib/accesso';
+import { Esci } from '@/components/admin/Esci';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +31,7 @@ export default async function Pannello() {
        chi cerca "le foto" non sa quale delle due gli serve. Sopra le foto
        del prodotto, qui le foto delle giornate caricate dalle guide. */
     { href: '/admin/gallery/', titolo: 'Foto della gallery', testo: 'Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in fondo alle pagine, dopo approvazione.' },
+    { href: '/admin/utenti/', titolo: 'Utenti', testo: 'Chi puo’ entrare nel pannello. Da qui si creano le guide e si consegnano loro le credenziali.' },
     { href: '/admin/numeri/', titolo: 'Numeri da Regiondo', testo: 'Recensioni, prenotazioni e disponibilita’. Si riaggiornano con un pulsante e dicono quanti anni hanno.' },
   ];
 
@@ -37,8 +40,12 @@ export default async function Pannello() {
       <header className="ad-head">
         <div>
           <h1>Pannello</h1>
-          <p>{io.nome ?? io.email} · {io.ruolo}</p>
+          {/* Mai l'email: per una guida sarebbe l'indirizzo interno finto
+              (`mario@guide.prestigerent.invalid`), e vederlo scritto
+              accanto al proprio nome fa pensare a un guasto. */}
+          <p>{comeSiChiama(io)}</p>
         </div>
+        <Esci io={io} />
       </header>
 
       <div className="ad-griglia">

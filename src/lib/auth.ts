@@ -38,6 +38,10 @@ export type Profilo = {
   nome: string | null;
   ruolo: string;
   attivo: boolean;
+  /** Il nome con cui si entra. Lo copia da `autorizzati` il trigger
+   *  `crea_profilo()` al primo accesso. Puo' essere null solo per un
+   *  profilo nato prima del 26/09/2026 e mai aggiornato. */
+  username: string | null;
 };
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -85,7 +89,14 @@ export async function chiSono(): Promise<Profilo | null> {
   if (!user) return null;
   const { data } = await sb
     .from('profili')
-    .select('id,email,nome,ruolo,attivo')
+    /* 🔴 `username` c'e' dal 26/09/2026 (migrazione
+       `accesso_nome_utente`). Se questo codice arrivasse in produzione
+       PRIMA di quella migrazione, PostgREST risponderebbe 42703, `data`
+       sarebbe null e questa funzione tornerebbe null: il pannello
+       rimanderebbe alla schermata di accesso TUTTI, con il database
+       perfettamente sano e nessun errore da nessuna parte. Database
+       prima, push dopo -- non e' una preferenza. */
+    .select('id,email,nome,ruolo,attivo,username')
     .eq('id', user.id)
     .maybeSingle();
   const io = (data as Profilo) ?? null;
@@ -125,11 +136,23 @@ export async function soloGestione(): Promise<Profilo> {
   return io;
 }
 
-/** Per le PAGINE di caricamento della gallery (Fase 2a): admin e guide. */
+/** Per le PAGINE della gallery: ci entrano admin e guide.
+ *
+ *  🔴 ERA CODICE MORTO, e adesso si usa. Fino al 26/09/2026 questa
+ *  funzione era definita e non la importava nessuno: le quattro pagine
+ *  che dovevano usarla facevano il controllo a mano con `chiSono()` +
+ *  `haRuolo()`. Due conseguenze, tutte e due vere:
+ *   - la stessa condizione aveva due comportamenti diversi (questa
+ *     rimandava a `/admin/entra/`, le pagine a `/admin/`);
+ *   - era l'ennesima difesa che sembrava esserci e non c'era, come la
+ *     `guardia()` tolta dal layout lo stesso giorno.
+ *  Il rimando ora e' `/admin/` come nelle pagine: chi ha fatto l'accesso
+ *  ma non ha il ruolo giusto non va rispedito alla porta d'ingresso --
+ *  e' gia' dentro, va portato dove puo' stare. */
 export async function soloCaricatori(): Promise<Profilo> {
   const io = await chiSono();
   if (!io) redirect('/admin/entra/');
-  if (!haRuolo(io, RUOLI_CARICAMENTO)) redirect('/admin/entra/');
+  if (!haRuolo(io, RUOLI_CARICAMENTO)) redirect('/admin/');
   return io;
 }
 

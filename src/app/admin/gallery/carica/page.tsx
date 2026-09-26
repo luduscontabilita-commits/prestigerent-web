@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { GalleryCaricatore } from '@/components/admin/GalleryCaricatore';
 import { chiediFirme, pagineTaggabili, registraFoto } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';

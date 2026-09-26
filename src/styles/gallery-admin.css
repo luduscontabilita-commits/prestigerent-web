@@ -162,3 +162,44 @@
 .g-interruttore p { margin: 8px 0 0; font-size: .82rem; line-height: 1.55; color: #4A5A67; }
 .g-fieldset { border: 1px solid #E2E8EE; border-radius: 13px; padding: 14px 16px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
 .g-fieldset legend { padding: 0 6px; font-size: .82rem; font-weight: 800; }
+
+/* ── intestazione: chi sei e come esci ───────────────────────────── */
+.ad-head-dx { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.ad-io { display: flex; align-items: center; gap: 10px; }
+.ad-io-chi { display: flex; flex-direction: column; line-height: 1.25; font-size: .84rem; font-weight: 700; }
+.ad-io-chi em { font-style: normal; font-weight: 500; font-size: .72rem; color: #6B7885; }
+.ad-esci { padding: 9px 16px; border: 1px solid #D6DDE4; border-radius: 999px; background: #fff; font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; color: #16202A; }
+.ad-esci:hover { background: #F4F6F8; }
+
+/* ── utenti ──────────────────────────────────────────────────────── */
+.ut { display: flex; flex-direction: column; gap: 22px; }
+.ut h2 { font-size: 1rem; margin: 0 0 10px; }
+
+.ut-cred { border: 2px solid #9BD9B8; background: #EDFBF3; border-radius: 14px; padding: 16px; }
+.ut-avviso { margin: 0 0 12px; font-size: .84rem; line-height: 1.55; color: #155E3B; }
+.ut-cred textarea { width: 100%; padding: 12px 14px; border: 1px solid #9BD9B8; border-radius: 10px; font: inherit; font-size: .88rem; line-height: 1.6; background: #fff; resize: vertical; }
+.ut-cred-azioni { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.ut-cred-azioni button { padding: 11px 20px; border: 0; border-radius: 10px; background: #155E3B; color: #fff; font: inherit; font-size: .88rem; font-weight: 800; cursor: pointer; }
+.ut-cred-azioni button.ut-chiudi { background: #fff; color: #16202A; border: 1px solid #9BD9B8; }
+
+.ut-nuovo, .ut-elenco { background: #fff; border: 1px solid #E2E8EE; border-radius: 14px; padding: 16px; }
+.ut-campi { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 14px; }
+.ut-campi label { display: block; font-size: .8rem; font-weight: 700; }
+.ut-campi input { display: block; width: 100%; margin-top: 5px; padding: 11px 13px; border: 1px solid #D6DDE4; border-radius: 10px; font: inherit; font-size: .92rem; }
+.ut-campi input:focus { outline: 2px solid #ED6707; outline-offset: 1px; border-color: transparent; }
+.ut-nuovo > button { padding: 12px 24px; border: 0; border-radius: 10px; background: #ED6707; color: #fff; font: inherit; font-size: .9rem; font-weight: 800; cursor: pointer; }
+.ut-nuovo > button:disabled { opacity: .5; cursor: default; }
+
+.ut-riga { border-top: 1px solid #EEF2F5; padding: 14px 0; }
+.ut-riga.spento { opacity: .62; }
+.ut-chi { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.ut-chi strong { font-size: .95rem; }
+.ut-chi code { font-size: .78rem; color: #6B7885; }
+.ut-ruolo { padding: 2px 9px; border-radius: 999px; font-size: .7rem; font-weight: 800; background: #EEF2F5; color: #6B7885; }
+.ut-ruolo.admin { background: #FFF7ED; color: #7A4A12; }
+.ut-spento { padding: 2px 9px; border-radius: 999px; font-size: .7rem; font-weight: 800; background: #FDF2F1; color: #C0392B; }
+.ut-io { font-size: .72rem; color: #6B7885; font-style: italic; }
+.ut-dati { margin: 6px 0 10px; font-size: .78rem; color: #6B7885; }
+.ut-azioni { display: flex; gap: 9px; flex-wrap: wrap; }
+.ut-azioni button { padding: 9px 16px; border: 1px solid #D6DDE4; border-radius: 999px; background: #fff; font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; color: #16202A; }
+.ut-azioni button.ut-chiudi-acc { border-color: #E7B9B3; color: #C0392B; }

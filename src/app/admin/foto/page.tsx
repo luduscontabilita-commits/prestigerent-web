@@ -1,6 +1,7 @@
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

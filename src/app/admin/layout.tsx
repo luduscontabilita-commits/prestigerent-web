@@ -1,4 +1,5 @@
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 /* Il pannello NON deve mai finire su Google, nemmeno il giorno in cui il
    sito diventa visibile: e' l'unica parte che resta chiusa per sempre.

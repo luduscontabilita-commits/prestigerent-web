@@ -4,6 +4,7 @@ import { decidi, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryImpostazioni } from '@/components/admin/GalleryImpostazioni';
 import { salvaImpostazioni } from '../azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';

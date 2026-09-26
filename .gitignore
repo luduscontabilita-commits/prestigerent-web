@@ -79,3 +79,8 @@ INSTALLAZIONE_NUOVO_PC.md
 # basta un git add -A per pubblicarli, e restano nella cronologia anche
 # dopo averli tolti.
 /gallery/
+
+# 🔴 LE CREDENZIALI DEL PANNELLO, in chiaro. Come INSTALLAZIONE_NUOVO_PC.md:
+# questo repository e' PUBBLICO, e un file cosi' dentro un commit sarebbe
+# pubblicato al mondo -- e resterebbe nella cronologia anche dopo averlo tolto.
+CREDENZIALI_PANNELLO.md

@@ -1,69 +1,59 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { entra } from './azioni';
 import '@/styles/admin.css';
+import '@/styles/admin-telefono.css';
 
 /* LA SCHERMATA DI ACCESSO.
  *
- * Link via email, non password. Tre ragioni, in ordine:
+ * Nome utente e password. Il link via email non c'e' piu': gli utenti li
+ * crea l'amministratore e consegna le credenziali, quindi non serve un
+ * modo per farsi riconoscere da soli.
  *
- *  - Non c'e' nessuna password da rubare, da dimenticare o da riusare
- *    uguale a quella della posta.
- *  - Le guide, quando toccherA' a loro, lavorano dal telefono in mezzo a
- *    una vigna: scrivere una password lunga li' e' il modo migliore per
- *    non farsi usare lo strumento.
- *  - Chi entra deve gia' essere nell'elenco degli abilitati: e' il
- *    database a rifiutare gli estranei, non questa schermata. Anche
- *    scrivendo un indirizzo qualunque non succede niente.
+ * ── PENSATA PER UN TELEFONO ───────────────────────────────────────────
+ * Le guide entrano qui dallo smartphone con cui hanno appena scattato le
+ * foto, spesso all'aperto e con una mano sola. Da qui tre scelte che
+ * sembrano dettagli e non lo sono:
+ *
+ *  - `type="text"` e non `type="email"` sul primo campo. Sembra ovvio e
+ *    non lo e': il campo prima era `type="email" required`, e un nome
+ *    utente senza chiocciola NON PASSA la validazione del browser -- il
+ *    modulo non si invierebbe proprio. In piu' su iOS `type="email"`
+ *    apre una tastiera con la chiocciola al posto della barra
+ *    spaziatrice, che per scrivere "mario" e' la tastiera sbagliata.
+ *  - `autoCapitalize="off"` e `autoCorrect="off"`: il telefono
+ *    maiuscolizza la prima lettera e "corregge" i nomi propri. `Mario`
+ *    non entrerebbe, e la persona riproverebbe la stessa cosa tre volte
+ *    senza capire.
+ *  - `autoComplete="username"` e `"current-password"`: cosi' il gestore
+ *    di password del telefono si offre di salvarli e poi li riempie da
+ *    solo. E' la differenza fra usarlo e non usarlo.
  */
 export default function Entra() {
-  const [email, setEmail] = useState('');
+  const [nome, setNome] = useState('');
   const [pw, setPw] = useState('');
-  const [stato, setStato] = useState<'fermo' | 'invio' | 'fatto' | 'errore'>('fermo');
-  const [messaggio, setMessaggio] = useState('');
+  const [stato, setStato] = useState<'fermo' | 'invio'>('fermo');
+  const [errore, setErrore] = useState('');
 
   const invia = async (e: React.FormEvent) => {
     e.preventDefault();
     setStato('invio');
-    const sb = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-    );
-    /* DUE STRADE, E LA PASSWORD E' FACOLTATIVA.
-       Il link via email resta il modo consigliato -- non c'e' niente da
-       rubare e niente da ricordare -- ma chi entra spesso vuole poter
-       digitare e basta. Se il campo password e' vuoto si manda il link,
-       se e' pieno si prova la password: nessuno deve scegliere prima. */
-    const { error } = pw
-      ? await sb.auth.signInWithPassword({
-          email: email.trim().toLowerCase(),
-          password: pw,
-        })
-      : await sb.auth.signInWithOtp({
-          email: email.trim().toLowerCase(),
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin/` },
-        });
-    if (error) {
-      setStato('errore');
-      /* Supabase risponde "Database error saving new user" quando il
-         trigger rifiuta l'iscrizione, cioe' quando l'indirizzo non e'
-         nell'elenco degli abilitati. E' il controllo che funziona, ma
-         detto cosi' sembra un guasto -- e la causa piu' frequente e'
-         banale: un refuso nell'indirizzo. */
-      setMessaggio(
-        /database error|saving new user|unexpected/i.test(error.message)
-          ? "Questo indirizzo non è abilitato. Controlla di averlo scritto giusto: basta un punto di troppo."
-          : error.message
-      );
-    } else if (pw) {
-      /* La password entra subito: non c'e' nessun link da aprire, quindi
-         non si passa da /auth/callback e la redirezione la fa questa
-         pagina. */
-      window.location.href = '/admin/';
-    } else {
-      setStato('fatto');
+    setErrore('');
+
+    const r = await entra(nome, pw);
+
+    if (!r.ok) {
+      setStato('fermo');
+      setErrore(r.errore ?? 'Non è andata. Riprova.');
+      return;
     }
+
+    /* I cookie di sessione li ha gia' scritti l'azione sul server. Qui
+       serve solo andare al pannello, e si usa un cambio di indirizzo vero
+       e non il router del client: cosi' la pagina si ricostruisce da zero
+       e nessun pezzo dell'albero React resta con lo stato di prima. */
+    window.location.href = '/admin/';
   };
 
   return (
@@ -71,51 +61,52 @@ export default function Entra() {
       <div className="ad-box">
         <h1>Pannello Prestige Rent</h1>
 
-        {stato === 'fatto' ? (
-          <p className="ad-ok">
-            Ti ho mandato un link a <b>{email}</b>.<br />
-            Aprilo da questo stesso dispositivo: dura pochi minuti e vale una volta sola.
-          </p>
-        ) : (
-          <form onSubmit={invia}>
-            <label htmlFor="em">La tua email</label>
-            <input
-              id="em"
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="nome@esempio.com"
-            />
-            <label htmlFor="pw">
-              Password <span className="ad-opt">facoltativa</span>
-            </label>
-            <input
-              id="pw"
-              type="password"
-              autoComplete="current-password"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              placeholder="lascia vuoto per ricevere il link"
-            />
-            <button type="submit" disabled={stato === 'invio'}>
-              {stato === 'invio'
-                ? (pw ? 'Accesso…' : 'Invio in corso…')
-                : (pw ? 'Entra' : 'Ricevi il link di accesso')}
-            </button>
-            {stato === 'errore' && <p className="ad-err">{messaggio}</p>}
-            <p className="ad-nota">
-              Con la password entri subito. Lasciandola vuota ricevi un link via email:
-              {/* Accenti veri, non l&rsquo;apostrofo dopo la vocale: qui si
-                  leggeva &laquo;e&rsquo; il modo consigliato, perche&rsquo; non
-                  c&rsquo;e&rsquo; niente&raquo;. */}
-              è il modo consigliato, perché non c&rsquo;è niente da
-              ricordare e niente da rubare. In tutti e due i casi funziona solo con gli
-              indirizzi abilitati.
+        <form onSubmit={invia}>
+          <label htmlFor="nu">Nome utente</label>
+          <input
+            id="nu"
+            name="username"
+            type="text"
+            inputMode="text"
+            required
+            autoComplete="username"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="il tuo nome utente"
+          />
+
+          <label htmlFor="pw">Password</label>
+          <input
+            id="pw"
+            name="password"
+            type="password"
+            required
+            autoComplete="current-password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            placeholder="la tua password"
+          />
+
+          <button type="submit" disabled={stato === 'invio'}>
+            {stato === 'invio' ? 'Accesso…' : 'Entra'}
+          </button>
+
+          {/* `role="alert"`: chi usa un lettore di schermo sente
+              l'errore appena compare, senza doverlo andare a cercare. */}
+          {errore && (
+            <p className="ad-err" role="alert">
+              {errore}
             </p>
-          </form>
-        )}
+          )}
+
+          <p className="ad-nota">
+            Le credenziali te le dà l’amministratore. Se non riesci a entrare,
+            chiedi a lui: può assegnarti una password nuova in un momento.
+          </p>
+        </form>
       </div>
     </main>
   );
