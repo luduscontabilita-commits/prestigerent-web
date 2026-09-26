@@ -111,44 +111,88 @@
 
 /* ── IL LIGHTBOX ─────────────────────────────────────────────────── */
 
+/* 🔴 LA MISURA ARRIVA DAL POSIZIONAMENTO, NON DA `vw`/`dvh`.
+   Non e' una preferenza di stile: la versione precedente apriva la foto
+   alla sua misura naturale (2400px) e la tagliava. La catena era questa.
+
+   `.glight-foto img` si limita con `max-height: 100%`, e una percentuale
+   ha bisogno che l'altezza del genitore sia DEFINITA. L'altezza arrivava
+   da `height: 100dvh`. Basta che quella dichiarazione non venga applicata
+   -- un browser che non conosce `dvh`, o lo stile predefinito del
+   `<dialog>` che rientra in gioco -- e l'altezza torna `auto`: allora
+   `max-height: 100%` si risolve su un'altezza indefinita, che per le
+   regole delle percentuali vuol dire `none`. Nessun limite, immagine
+   intera a 2400px, e `overflow: hidden` la taglia. Una dichiarazione che
+   cade non lasciava una foto un po' piu' grande: la lasciava senza
+   nessun tetto.
+
+   E `width: 100vw` COMPRENDE la barra di scorrimento: sul desktop il
+   pannello era ~15px piu' largo dello schermo, quindi il bordo destro e
+   la × per chiudere finivano fuori dalla vista.
+
+   Qui un `<dialog>` modale e' `position: fixed`, e con `inset: 0`,
+   `margin: 0` e misure `auto` il suo riquadro coincide con la finestra
+   per costruzione. Nessuna unita' da supportare, niente barra di
+   scorrimento da contare, e l'altezza e' definita -- quindi la
+   percentuale sull'immagine si risolve sempre. `max-width`/`max-height`
+   a `none` servono a spegnere il `calc(100% - 6px - 2em)` che i browser
+   applicano da soli a `dialog:modal`. */
 .glight {
-  width: 100vw;
-  max-width: 100vw;
-  height: 100dvh;
-  max-height: 100dvh;
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   overflow: hidden;
+  /* lo scorrimento del dito resta dentro: senza questo, arrivati in fondo
+     si trascina la pagina che sta sotto */
+  overscroll-behavior: contain;
 }
 .glight::backdrop { background: rgba(8, 11, 15, .93); }
 
 .glight-box {
-  position: relative;
-  width: 100vw;
-  height: 100dvh;
+  /* `absolute` dentro un genitore `fixed` con `inset: 0`: altezza
+     definita senza scrivere un'unita'. */
+  position: absolute;
+  inset: 0;
   display: grid;
   /* la foto prende tutto lo spazio, la barra si prende quello che le
-     serve: cosi' la didascalia non copre mai l'immagine */
-  grid-template-rows: 1fr auto;
+     serve: cosi' la didascalia non copre mai l'immagine.
+     `minmax(0, 1fr)` e non `1fr`: un `1fr` nudo ha minimo `auto`, cioe'
+     non scende sotto il contenuto -- ed e' l'altro modo in cui una riga
+     si allarga oltre lo schermo per far stare un'immagine grande. */
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .glight-foto {
   display: grid;
   place-items: center;
   min-height: 0;   /* senza questo una griglia non lascia rimpicciolire il figlio */
+  min-width: 0;
   padding: 12px;
 }
 .glight-foto img {
+  /* LA FOTO SEMPRE INTERA: una verticale su desktop ha le bande ai lati,
+     una orizzontale su telefono sopra e sotto. Qui la foto e' il
+     contenuto, e ritagliarla sarebbe togliere proprio quello che si e'
+     andati a guardare.
+     `max-*` e non `width/height: 100%`: una foto piu' piccola dello
+     schermo resta alla sua misura invece di essere gonfiata e sfocata. */
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
-  /* LA FOTO SEMPRE INTERA: una verticale su desktop ha le bande ai lati,
-     una orizzontale su telefono sopra e sotto. Qui la foto e' il
-     contenuto, e ritagliarla sarebbe togliere proprio quello che si e'
-     andati a guardare. */
   object-fit: contain;
+  /* Il clic sulle bande nere chiude. Senza questo il bersaglio dell'evento
+     sarebbe l'immagine anche a lato, e il gesto piu' naturale per uscire
+     non funzionerebbe. Sull'immagine non si clicca niente: la × e le
+     frecce sono altrove. */
+  pointer-events: none;
 }
 
 .glight-barra {

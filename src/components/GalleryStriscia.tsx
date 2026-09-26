@@ -199,6 +199,11 @@ function Lightbox({
 }) {
   const box = useRef<HTMLDialogElement>(null);
   const partenzaX = useRef<number | null>(null);
+  /* Uno scorrimento col dito finisce SEMPRE con un `click`. Senza questa
+     memoria, il gesto per cambiare foto cambierebbe foto e poi chiuderebbe
+     il visore: due cose invece di una, e quella che si vede e' la
+     sbagliata. */
+  const trascinato = useRef(false);
 
   const scorri = useCallback(
     (verso: 1 | -1) => {
@@ -242,17 +247,26 @@ function Lightbox({
       /* ESC lo gestisce il browser: qui si rimette in pari lo stato, cosi'
          riaprendo la stessa foto il click funziona la prima volta. */
       onClose={chiudi}
-      /* Clic sullo sfondo: il bersaglio e' il dialog stesso solo fuori dal
-         contenuto, perche' il contenuto e' in un elemento figlio. */
-      onClick={(e) => { if (e.target === box.current) chiudi(); }}
-      onPointerDown={(e) => { partenzaX.current = e.clientX; }}
+      /* CLIC FUORI DALLA FOTO: chiude.
+         Il bersaglio non e' mai l'immagine -- ha `pointer-events: none`
+         apposta -- quindi le bande nere intorno arrivano qui come clic su
+         `.glight-foto`, e il vuoto sopra la barra come clic sul dialog.
+         Il caso che si esclude e' il gesto: uno scorrimento col dito
+         arriva fin qui come clic, e chiuderebbe subito dopo aver cambiato
+         foto. */
+      onClick={(e) => {
+        if (trascinato.current) { trascinato.current = false; return; }
+        const t = e.target as HTMLElement;
+        if (t === box.current || t.classList.contains('glight-foto')) chiudi();
+      }}
+      onPointerDown={(e) => { partenzaX.current = e.clientX; trascinato.current = false; }}
       onPointerUp={(e) => {
         const da = partenzaX.current;
         partenzaX.current = null;
         if (da === null) return;
         const salto = e.clientX - da;
         /* 45px: sopra il tremolio del dito, sotto un gesto voluto */
-        if (Math.abs(salto) > 45) scorri(salto < 0 ? 1 : -1);
+        if (Math.abs(salto) > 45) { trascinato.current = true; scorri(salto < 0 ? 1 : -1); }
       }}
       aria-label="Photo viewer"
     >
