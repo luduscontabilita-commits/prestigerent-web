@@ -381,6 +381,14 @@ describe('il registro delle pagine', () => {
     expect(registro([]).filter((v) => v.type === 'home')).toHaveLength(1);
   });
 
+  it('le entita’ HTML nei titoli non arrivano nel pannello', () => {
+    /* In tour_content.title c’e’ davvero `Siena &amp; San Gimignano`: sono
+       testi recuperati da WordPress. Il pannello li stampa come testo, non
+       come HTML, quindi senza decodifica si leggerebbe l’entita’. */
+    const v = registro([{ id: 'z', slug: 's', titolo: 'Siena &amp; San Gimignano' }]);
+    expect(v.find((x) => x.key === 'tour:s')?.label).toBe('Tour · Siena & San Gimignano');
+  });
+
   it('senza titolo inglese l’etichetta non resta vuota', () => {
     const v = registro([{ id: 'x', slug: 'un-tour-senza-titolo', titolo: null }]);
     expect(v.find((x) => x.key === 'tour:un-tour-senza-titolo')?.label).toBe('Tour · un tour senza titolo');

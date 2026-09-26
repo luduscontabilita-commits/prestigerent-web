@@ -131,6 +131,27 @@ function ultimoPezzo(path: string): string {
   return pezzi[pezzi.length - 1] ?? '';
 }
 
+/** 🔴 I TITOLI DEI TOUR CONTENGONO ENTITA' HTML.
+ *
+ *  In `tour_content.title` sta scritto `Siena &amp; San Gimignano`, non
+ *  `Siena & San Gimignano`: sono testi recuperati dalle pagine WordPress,
+ *  dove la e commerciale era codificata. Le pagine del sito li mettono
+ *  dentro HTML e il browser li rende giusti; il pannello no -- li stampa
+ *  come testo, e nel menu di chi carica si leggerebbe «Siena &amp; San
+ *  Gimignano».
+ *
+ *  Si decodificano le cinque entita' che compaiono davvero in questi
+ *  titoli, non tutte: un decodificatore completo qui sarebbe una libreria
+ *  per un problema che ha cinque casi. */
+function daEntita(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;|&rsquo;/g, '’');
+}
+
 /** Il nome leggibile nel pannello. In italiano il prefisso, in inglese il
  *  titolo della pagina: chi carica ritrova la pagina con le parole che
  *  legge navigando il sito, non con una chiave tecnica. */
@@ -141,7 +162,7 @@ function etichetta(tipo: TipoTag, titolo: string): string {
     port: 'Porto',
     tour: 'Tour',
   };
-  return tipo === 'home' ? 'Home' : `${prefisso[tipo]} · ${titolo}`;
+  return tipo === 'home' ? 'Home' : `${prefisso[tipo]} · ${daEntita(titolo)}`;
 }
 
 /** Un tour del catalogo, ridotto a quello che serve al registro. */
