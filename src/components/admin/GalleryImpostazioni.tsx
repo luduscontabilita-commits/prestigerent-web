@@ -1,6 +1,21 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import {
+  Alert,
+  Button,
+  Card,
+  Code,
+  Group,
+  NumberInput,
+  Select,
+  Stack,
+  Switch,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconDeviceFloppy } from '@tabler/icons-react';
 import { CRITERI, type Criterio, type Impostazioni } from '@/lib/gallery-tag';
 
 /* LE IMPOSTAZIONI GENERALI.
@@ -12,6 +27,12 @@ import { CRITERI, type Criterio, type Impostazioni } from '@/lib/gallery-tag';
  * l'unico che si fa confermare. Spegnerlo no: spegnere e' sempre la
  * direzione sicura, e chiedere conferma per mettere in salvo vuol dire
  * rallentare qualcuno che ha appena visto qualcosa che non gli piace.
+ *
+ * ── PERCHE' UN INTERRUTTORE E NON UNA CASELLA DI SPUNTA ────────────────
+ * Una casella dice «questa opzione e' scelta»; un interruttore dice
+ * «questa cosa e' accesa o spenta, adesso». Qui la seconda e' la domanda
+ * vera, ed e' quella che si vuole poter leggere da lontano entrando nella
+ * pagina. La scheda intorno cambia colore per lo stesso motivo.
  */
 
 const NOME_CRITERIO: Record<Criterio, string> = {
@@ -60,125 +81,122 @@ export function GalleryImpostazioni({
   };
 
   return (
-    <div className="g-imp">
-      {messaggio && <p className={messaggio.ok ? 'ad-ok' : 'ad-err'}>{messaggio.testo}</p>}
+    <Stack gap="md" maw={760}>
+      {messaggio && (
+        <Alert
+          color={messaggio.ok ? 'green' : 'red'}
+          icon={messaggio.ok ? <IconCheck size={18} /> : <IconAlertTriangle size={18} />}
+          withCloseButton
+          onClose={() => setMessaggio(null)}
+        >
+          {messaggio.testo}
+        </Alert>
+      )}
 
-      <div className={'g-interruttore ' + (d.galleries_enabled ? 'on' : 'off')}>
-        <label>
-          <input
-            type="checkbox"
-            checked={d.galleries_enabled}
-            onChange={(e) => setD({ ...d, galleries_enabled: e.target.checked })}
-          />
-          <b>Mostra le gallery sul sito</b>
-        </label>
-        <p>
-          {d.galleries_enabled
-            ? `Accesa: ${quantePronte} pagine hanno abbastanza foto e la mostrerebbero.`
-            : 'Spenta: nessun visitatore vede niente, su nessuna pagina. Si può caricare e approvare tranquillamente.'}
-        </p>
-      </div>
+      <Card
+        withBorder
+        radius="md"
+        padding="md"
+        style={{
+          borderColor: d.galleries_enabled ? 'var(--mantine-color-green-5)' : undefined,
+          background: d.galleries_enabled ? 'var(--mantine-color-green-0)' : undefined,
+        }}
+      >
+        <Switch
+          size="lg"
+          checked={d.galleries_enabled}
+          onChange={(e) => setD({ ...d, galleries_enabled: e.currentTarget.checked })}
+          label={<Text fw={700}>Mostra le gallery sul sito</Text>}
+          description={
+            d.galleries_enabled
+              ? `Accesa: ${quantePronte} pagine hanno abbastanza foto e la mostrerebbero.`
+              : 'Spenta: nessun visitatore vede niente, su nessuna pagina. Si può caricare e approvare tranquillamente.'
+          }
+        />
+      </Card>
 
-      <label>
-        Numero minimo di immagini per mostrare la gallery
-        <input
-          type="number"
+      <Card withBorder radius="md" padding="md">
+        <NumberInput
+          label="Numero minimo di immagini per mostrare la gallery"
           min={1}
           max={50}
           value={d.min_images}
-          onChange={(e) => setD({ ...d, min_images: Number(e.target.value) })}
+          onChange={(v) => setD({ ...d, min_images: Number(v) || 1 })}
+          description={
+            <>
+              Sotto questo numero la pagina non mostra niente: né titolo né spazio vuoto.
+              Contano solo le foto <b>approvate</b> con il tag di quella pagina.
+            </>
+          }
         />
-        <span className="gc-aiuto">
-          Sotto questo numero la pagina non mostra niente: né titolo né spazio vuoto.
-          Contano solo le foto <b>approvate</b> con il tag di quella pagina.
-        </span>
-      </label>
+      </Card>
 
-      <fieldset className="g-fieldset">
-        <legend>Titoli per le pagine normali (home, categorie, porti)</legend>
-        <label>
-          Titolo
-          <input
-            type="text"
+      <Card withBorder radius="md" padding="md">
+        <Stack gap="sm">
+          <Title order={2} size="h5">Titoli per le pagine normali (home, categorie, porti)</Title>
+          <TextInput
+            label="Titolo"
             value={d.default_title}
-            onChange={(e) => setD({ ...d, default_title: e.target.value })}
+            onChange={(e) => setD({ ...d, default_title: e.currentTarget.value })}
+            description={<>Fra asterischi la parola in corsivo, come nel resto del sito: <Code>Moments from the *road*</Code></>}
           />
-          <span className="gc-aiuto">
-            Fra asterischi la parola in corsivo, come nel resto del sito:
-            <code> Moments from the *road*</code>
-          </span>
-        </label>
-        <label>
-          Sottotitolo <span className="gc-opt">facoltativo</span>
-          <input
-            type="text"
+          <TextInput
+            label={<>Sottotitolo <Text span size="xs" c="dimmed">facoltativo</Text></>}
             value={d.default_subtitle ?? ''}
-            onChange={(e) => setD({ ...d, default_subtitle: e.target.value || null })}
+            onChange={(e) => setD({ ...d, default_subtitle: e.currentTarget.value || null })}
           />
-        </label>
-      </fieldset>
+        </Stack>
+      </Card>
 
-      <fieldset className="g-fieldset">
-        <legend>Titoli per le schede dei tour</legend>
-        <p className="gc-aiuto">
-          Sono separati di proposito: in cima a ogni scheda tour c’è già la striscia delle
-          foto del <b>prodotto</b>. Due strisce con lo stesso titolo nella stessa pagina
-          sembrano un errore, e queste sono le foto delle giornate vere.
-        </p>
-        <label>
-          Titolo
-          <input
-            type="text"
+      <Card withBorder radius="md" padding="md">
+        <Stack gap="sm">
+          <Title order={2} size="h5">Titoli per le schede dei tour</Title>
+          <Text size="xs" c="dimmed">
+            Sono separati di proposito: in cima a ogni scheda tour c’è già la striscia delle
+            foto del <b>prodotto</b>. Due strisce con lo stesso titolo nella stessa pagina
+            sembrano un errore, e queste sono le foto delle giornate vere.
+          </Text>
+          <TextInput
+            label="Titolo"
             value={d.default_title_tour}
-            onChange={(e) => setD({ ...d, default_title_tour: e.target.value })}
+            onChange={(e) => setD({ ...d, default_title_tour: e.currentTarget.value })}
           />
-        </label>
-        <label>
-          Sottotitolo <span className="gc-opt">facoltativo</span>
-          <input
-            type="text"
+          <TextInput
+            label={<>Sottotitolo <Text span size="xs" c="dimmed">facoltativo</Text></>}
             value={d.default_subtitle_tour ?? ''}
-            onChange={(e) => setD({ ...d, default_subtitle_tour: e.target.value || null })}
+            onChange={(e) => setD({ ...d, default_subtitle_tour: e.currentTarget.value || null })}
           />
-        </label>
-      </fieldset>
+        </Stack>
+      </Card>
 
-      <label>
-        Ordinamento predefinito delle gallery
-        <select
-          value={d.default_sort}
-          onChange={(e) => setD({ ...d, default_sort: e.target.value as Criterio })}
-        >
-          {CRITERI.map((c) => (
-            <option key={c} value={c}>{NOME_CRITERIO[c]}</option>
-          ))}
-        </select>
-        <span className="gc-aiuto">
-          «Casuale del giorno» mescola le foto ma tiene lo stesso ordine per tutta la
-          giornata, e cambia a mezzanotte: chi torna sul sito vede una gallery diversa,
-          e le pagine restano in cache.
-        </span>
-      </label>
+      <Card withBorder radius="md" padding="md">
+        <Stack gap="sm">
+          <Select
+            label="Ordinamento predefinito delle gallery"
+            data={CRITERI.map((c) => ({ value: c, label: NOME_CRITERIO[c] }))}
+            value={d.default_sort}
+            onChange={(v) => v && setD({ ...d, default_sort: v as Criterio })}
+            allowDeselect={false}
+            description="«Casuale del giorno» mescola le foto ma tiene lo stesso ordine per tutta la giornata, e cambia a mezzanotte: chi torna sul sito vede una gallery diversa, e le pagine restano in cache."
+          />
 
-      <label>
-        Velocità dello scorrimento automatico
-        <select
-          value={d.autoplay_speed}
-          onChange={(e) => setD({ ...d, autoplay_speed: e.target.value as Impostazioni['autoplay_speed'] })}
-        >
-          {(Object.keys(NOME_VELOCITA) as (keyof typeof NOME_VELOCITA)[]).map((k) => (
-            <option key={k} value={k}>{NOME_VELOCITA[k]}</option>
-          ))}
-        </select>
-        <span className="gc-aiuto">
-          Lo scorrimento si ferma da solo col mouse sopra, col dito, fuori dallo schermo e
-          per chi ha chiesto meno animazioni.
-        </span>
-      </label>
+          <Select
+            label="Velocità dello scorrimento automatico"
+            data={(Object.keys(NOME_VELOCITA) as (keyof typeof NOME_VELOCITA)[])
+              .map((k) => ({ value: k, label: NOME_VELOCITA[k] }))}
+            value={d.autoplay_speed}
+            onChange={(v) => v && setD({ ...d, autoplay_speed: v as Impostazioni['autoplay_speed'] })}
+            allowDeselect={false}
+            description="Lo scorrimento si ferma da solo col mouse sopra, col dito, fuori dallo schermo e per chi ha chiesto meno animazioni."
+          />
+        </Stack>
+      </Card>
 
-      <button type="button" onClick={invia} disabled={inCorso}>
-        {inCorso ? 'Salvo…' : 'Salva'}
-      </button>
-    </div>
+      <Group justify="flex-end">
+        <Button onClick={invia} loading={inCorso} leftSection={<IconDeviceFloppy size={18} />}>
+          Salva
+        </Button>
+      </Group>
+    </Stack>
   );
 }

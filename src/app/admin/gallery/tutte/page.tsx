@@ -6,7 +6,6 @@ import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { TutteLeFoto, type FotoAdmin } from '@/components/admin/TutteLeFoto';
 import { aggiornaFoto, cambiaVisibilita, elimina, pagineTaggabili } from '../azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

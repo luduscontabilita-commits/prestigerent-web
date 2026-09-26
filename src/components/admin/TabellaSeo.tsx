@@ -1,6 +1,19 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {
+  Anchor,
+  Badge,
+  Card,
+  Group,
+  SegmentedControl,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+} from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
 
 export type Riga = {
   percorso: string;
@@ -24,6 +37,13 @@ export type Riga = {
 const T_MAX = 60;
 const D_MAX = 155;
 const D_MIN = 80;
+
+/* 🔴 IL SITO E' QUESTO. I link puntavano ancora a
+   `prestigerent-web.vercel.app`, il dominio di anteprima di quando il
+   WordPress era ancora online: da questa tabella si apriva una copia, non
+   la pagina vera, e i controlli su title e description si facevano sul
+   posto sbagliato. */
+const SITO = 'https://prestigerent.com';
 
 type Difetto = 'lungo' | 'corto' | 'manca' | 'doppione';
 
@@ -49,6 +69,15 @@ const ETICHETTA: Record<Difetto, string> = {
   manca: 'manca',
   doppione: 'title duplicato',
 };
+
+function Numero({ n, che, male }: { n: number; che: string; male?: boolean }) {
+  return (
+    <Card withBorder radius="md" padding="sm">
+      <Text fz={28} fw={800} lh={1.1} c={male ? 'red' : undefined}>{n}</Text>
+      <Text size="xs" c="dimmed">{che}</Text>
+    </Card>
+  );
+}
 
 export function TabellaSeo({ righe }: { righe: Riga[] }) {
   const [cerca, setCerca] = useState('');
@@ -105,86 +134,84 @@ export function TabellaSeo({ righe }: { righe: Riga[] }) {
   }, [conDifetti, righe.length]);
 
   return (
-    <>
-      <div className="ad-conta">
-        <div>
-          <b>{conta.totale}</b>
-          <span>pagine</span>
-        </div>
-        <div className="male">
-          <b>{conta.prima}</b>
-          <span>con difetti oggi su WordPress</span>
-        </div>
-        <div className={conta.dopo ? 'male' : 'bene'}>
-          <b>{conta.dopo}</b>
-          <span>con difetti dopo la correzione</span>
-        </div>
-        <div className={conta.daFare ? 'male' : 'bene'}>
-          <b>{conta.daFare}</b>
-          <span>ancora da scrivere</span>
-        </div>
-        <div>
-          <b>{conta.aMano}</b>
-          <span>corrette a mano</span>
-        </div>
-      </div>
+    <Stack gap="md">
+      <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} spacing="sm">
+        <Numero n={conta.totale} che="pagine" />
+        <Numero n={conta.prima} che="con difetti oggi su WordPress" male={conta.prima > 0} />
+        <Numero n={conta.dopo} che="con difetti dopo la correzione" male={conta.dopo > 0} />
+        <Numero n={conta.daFare} che="ancora da scrivere" male={conta.daFare > 0} />
+        <Numero n={conta.aMano} che="corrette a mano" />
+      </SimpleGrid>
 
-      <div className="ad-barra">
-        <input
-          type="search"
-          placeholder="Cerca un percorso o un title…"
-          value={cerca}
-          onChange={(e) => setCerca(e.target.value)}
-        />
-        {(['tutte', 'rotte', 'da-fare'] as const).map((f) => (
-          <button
-            key={f}
-            type="button"
-            className={filtro === f ? 'on' : ''}
-            onClick={() => setFiltro(f)}
-          >
-            {f === 'tutte' ? 'Tutte' : f === 'rotte' ? 'Rotte oggi' : 'Da scrivere'}
-          </button>
-        ))}
-        <span className="ad-quante">{visibili.length} righe</span>
-      </div>
+      <Card withBorder radius="md" padding="sm">
+        <Group justify="space-between" wrap="wrap" gap="sm">
+          <TextInput
+            type="search"
+            placeholder="Cerca un percorso o un title…"
+            leftSection={<IconSearch size={15} />}
+            value={cerca}
+            onChange={(e) => setCerca(e.currentTarget.value)}
+            style={{ flex: '1 1 260px' }}
+          />
+          <SegmentedControl
+            value={filtro}
+            onChange={(v) => setFiltro(v as typeof filtro)}
+            data={[
+              { value: 'tutte', label: 'Tutte' },
+              { value: 'rotte', label: 'Rotte oggi' },
+              { value: 'da-fare', label: 'Da scrivere' },
+            ]}
+          />
+          <Text size="sm" c="dimmed">{visibili.length} righe</Text>
+        </Group>
+      </Card>
 
-      <div className="ad-tab-wrap">
-        <table className="ad-tab">
-          <thead>
-            <tr>
-              <th>Pagina</th>
-              <th>Oggi su WordPress</th>
-              <th>Proposta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visibili.map((r) => (
-              <tr key={r.percorso}>
-                <td className="ad-perc">
-                  <a href={'https://prestigerent-web.vercel.app' + r.percorso} target="_blank" rel="noopener">
-                    {r.percorso}
-                  </a>
-                  {!r.generato && <em className="ad-mano">corretta a mano</em>}
-                </td>
+      <Card withBorder radius="md" padding={0}>
+        <Table.ScrollContainer minWidth={820}>
+          <Table striped highlightOnHover verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th w={230}>Pagina</Table.Th>
+                <Table.Th>Oggi su WordPress</Table.Th>
+                <Table.Th>Proposta</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {visibili.map((r) => (
+                <Table.Tr key={r.percorso}>
+                  <Table.Td style={{ verticalAlign: 'top' }}>
+                    <Anchor
+                      href={SITO + r.percorso}
+                      target="_blank"
+                      rel="noopener"
+                      size="xs"
+                      style={{ wordBreak: 'break-all' }}
+                    >
+                      {r.percorso}
+                    </Anchor>
+                    {!r.generato && (
+                      <Badge size="xs" variant="light" color="gray" mt={4}>corretta a mano</Badge>
+                    )}
+                  </Table.Td>
 
-                <td className="ad-prima">
-                  <Cella title={r.vecchioTitle} descr={r.vecchiaDescr} difetti={r.primaDif} />
-                </td>
+                  <Table.Td style={{ verticalAlign: 'top' }}>
+                    <Cella title={r.vecchioTitle} descr={r.vecchiaDescr} difetti={r.primaDif} />
+                  </Table.Td>
 
-                <td className="ad-dopo">
-                  {r.nuovoTitle ? (
-                    <Cella title={r.nuovoTitle} descr={r.nuovaDescr} difetti={r.dopoDif} />
-                  ) : (
-                    <span className="ad-vuoto">da scrivere</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+                  <Table.Td style={{ verticalAlign: 'top' }}>
+                    {r.nuovoTitle ? (
+                      <Cella title={r.nuovoTitle} descr={r.nuovaDescr} difetti={r.dopoDif} />
+                    ) : (
+                      <Text size="sm" c="dimmed" fs="italic">da scrivere</Text>
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Card>
+    </Stack>
   );
 }
 
@@ -198,28 +225,40 @@ function Cella({
   difetti: Difetto[];
 }) {
   return (
-    <>
-      <div className="ad-t">
-        {title || <i>manca</i>}
+    <Stack gap={4}>
+      <Group gap={6} align="flex-start" wrap="nowrap">
+        <Text size="sm" fw={600} style={{ flex: 1, minWidth: 0 }}>
+          {title || <Text span c="dimmed" fs="italic">manca</Text>}
+        </Text>
         {title && (
-          <span className={'ad-n' + (title.length > T_MAX ? ' ko' : '')}>{title.length}</span>
+          <Badge size="xs" variant="light" color={title.length > T_MAX ? 'red' : 'gray'}>
+            {title.length}
+          </Badge>
         )}
-      </div>
-      <div className="ad-d">
-        {descr || <i>manca</i>}
+      </Group>
+
+      <Group gap={6} align="flex-start" wrap="nowrap">
+        <Text size="xs" c="dimmed" style={{ flex: 1, minWidth: 0 }}>
+          {descr || <Text span fs="italic">manca</Text>}
+        </Text>
         {descr && (
-          <span className={'ad-n' + (descr.length > D_MAX || descr.length < D_MIN ? ' ko' : '')}>
+          <Badge
+            size="xs"
+            variant="light"
+            color={descr.length > D_MAX || descr.length < D_MIN ? 'red' : 'gray'}
+          >
             {descr.length}
-          </span>
+          </Badge>
         )}
-      </div>
+      </Group>
+
       {difetti.length > 0 && (
-        <div className="ad-tag">
+        <Group gap={4}>
           {difetti.map((d) => (
-            <em key={d}>{ETICHETTA[d]}</em>
+            <Badge key={d} size="xs" color="red" variant="light">{ETICHETTA[d]}</Badge>
           ))}
-        </div>
+        </Group>
       )}
-    </>
+    </Stack>
   );
 }

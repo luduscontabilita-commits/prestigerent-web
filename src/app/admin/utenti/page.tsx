@@ -1,10 +1,11 @@
+import { Alert } from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { comeSiChiama } from '@/lib/accesso';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { GestioneUtenti, type Utente } from '@/components/admin/GestioneUtenti';
 import { cambiaAttivo, creaGuida, eliminaGuida, rigeneraPassword, verificaPassword } from './azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -73,11 +74,11 @@ export default async function Utenti() {
 
       {/* Detto qui perche' e' il posto dove verrebbe cercato, e perche'
           prometterlo e non poterlo mantenere sarebbe peggio che dirlo. */}
-      <div className="g-stato off">
+      <Alert color="gray" icon={<IconInfoCircle size={18} />} mb="md">
         <b>Le password degli amministratori si cambiano da Supabase</b>, non da qui, e
         vanno cambiate su tutti e tre gli account insieme: sono la stessa password per
         scelta. Da questa pagina si gestiscono le <b>guide</b>.
-      </div>
+      </Alert>
 
       <GestioneUtenti
         utenti={utenti}

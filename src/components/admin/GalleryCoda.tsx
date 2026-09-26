@@ -1,6 +1,25 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Collapse,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
+import {
+  IconAlertTriangle,
+  IconArrowBackUp,
+  IconCheck,
+  IconPencil,
+  IconX,
+} from '@tabler/icons-react';
 import type { Pagina } from './GalleryCaricatore';
 
 /* LA CODA DA APPROVARE.
@@ -24,6 +43,18 @@ import type { Pagina } from './GalleryCaricatore';
  * pagina resta aperta piu' a lungo le immagini smettono di comparire: si
  * ricarica e tornano. E' il prezzo del fatto che una foto non approvata non
  * sia raggiungibile da nessuno.
+ *
+ * ── PERCHE' MANTINE E NON PIU' LE CLASSI A MANO ────────────────────────
+ * Il CSS c'era e funzionava -- niente classi orfane, niente che sbordava,
+ * misurato in Chrome il 26/09/2026. Stonavano tre cose, e tutte e tre
+ * dicevano qualcosa di sbagliato all'occhio:
+ *  - le caselle di spunta erano quelle native del browser, in mezzo a
+ *    pagine dove sono di Mantine;
+ *  - «Rimanda indietro» era un `<details>` col triangolino del browser:
+ *    l'unico pezzo di pannello che sembrava una pagina di vent'anni fa;
+ *  - «Approva le selezionate» da DISATTIVATO era arancione slavato invece
+ *    che grigio, cioe' leggeva come un pulsante acceso e sbiadito proprio
+ *    nello stato in cui la pagina si apre.
  */
 
 export type InCoda = {
@@ -61,6 +92,8 @@ export function GalleryCoda({
   const [modifica, setModifica] = useState<string | null>(null);
   const [bozza, setBozza] = useState<{ alt: string; caption: string; tag: string[] }>({ alt: '', caption: '', tag: [] });
   const [motivo, setMotivo] = useState<Record<string, string>>({});
+  /** quale scheda ha il riquadro del rifiuto aperto */
+  const [rimanda, setRimanda] = useState<string | null>(null);
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, avvia] = useTransition();
 
@@ -86,199 +119,232 @@ export function GalleryCoda({
 
   if (!resto.length) {
     return (
-      <p className="ad-ok">
+      <Alert color="green" icon={<IconCheck size={18} />}>
         Niente da approvare. {messaggio?.ok && messaggio.testo}
-      </p>
+      </Alert>
     );
   }
 
   return (
-    <div className="g-coda">
-      {messaggio && <p className={messaggio.ok ? 'ad-ok' : 'ad-err'}>{messaggio.testo}</p>}
-
-      <div className="g-coda-barra">
-        <label>
-          <input
-            type="checkbox"
-            checked={scelte.size === resto.length}
-            onChange={(e) => setScelte(e.target.checked ? new Set(resto.map((f) => f.id)) : new Set())}
-          />{' '}
-          Seleziona tutte ({resto.length})
-        </label>
-        <button
-          type="button"
-          disabled={!scelte.size || inCorso}
-          onClick={() => fai(() => approva([...scelte]), [...scelte], `${scelte.size} foto approvate.`)}
+    <Stack gap="md">
+      {messaggio && (
+        <Alert
+          color={messaggio.ok ? 'green' : 'red'}
+          icon={messaggio.ok ? <IconCheck size={18} /> : <IconAlertTriangle size={18} />}
+          withCloseButton
+          onClose={() => setMessaggio(null)}
         >
-          Approva le {scelte.size || ''} selezionate
-        </button>
-      </div>
+          {messaggio.testo}
+        </Alert>
+      )}
+
+      <Card withBorder padding="sm" radius="md">
+        <Group justify="space-between" wrap="wrap" gap="sm">
+          <Checkbox
+            checked={scelte.size === resto.length}
+            indeterminate={scelte.size > 0 && scelte.size < resto.length}
+            onChange={(e) => setScelte(e.currentTarget.checked ? new Set(resto.map((f) => f.id)) : new Set())}
+            label={`Seleziona tutte (${resto.length})`}
+          />
+          <Button
+            disabled={!scelte.size || inCorso}
+            loading={inCorso && scelte.size > 0}
+            leftSection={<IconCheck size={16} />}
+            onClick={() => fai(() => approva([...scelte]), [...scelte], `${scelte.size} foto approvate.`)}
+          >
+            {scelte.size ? `Approva le ${scelte.size} selezionate` : 'Approva le selezionate'}
+          </Button>
+        </Group>
+      </Card>
 
       {resto.map((f) => {
         const inModifica = modifica === f.id;
+        const motivoScritto = (motivo[f.id] ?? '').trim();
         return (
-          <article className="g-riga" key={f.id}>
-            <label className="g-riga-sel">
-              <input
-                type="checkbox"
+          <Card withBorder padding="md" radius="md" key={f.id}>
+            <Stack gap="sm">
+              <Checkbox
                 checked={scelte.has(f.id)}
                 onChange={(e) => {
                   const n = new Set(scelte);
-                  if (e.target.checked) n.add(f.id); else n.delete(f.id);
+                  if (e.currentTarget.checked) n.add(f.id); else n.delete(f.id);
                   setScelte(n);
                 }}
+                label="Seleziona"
               />
-              <span className="gc-sel-txt">Seleziona</span>
-            </label>
 
-            <div className="g-riga-foto" style={{ background: f.colore ?? undefined }}>
-              {f.anteprima ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={f.anteprima} alt="" loading="lazy" decoding="async" />
-              ) : (
-                <span className="g-scaduta">
-                  Anteprima scaduta: ricarica la pagina
-                </span>
-              )}
-            </div>
-
-            <div className="g-riga-dati">
-              <p className="g-chi">
-                <b>{f.chi}</b> · caricata il {new Date(f.caricata).toLocaleDateString('it-IT')}
-                {' · '}
-                {f.width}×{f.height} ({f.height > f.width ? 'verticale' : 'orizzontale'})
-                {' · '}
-                {f.scattata
-                  ? `scattata il ${new Date(f.scattata).toLocaleDateString('it-IT')}`
-                  : 'senza data di scatto'}
-              </p>
-
-              {f.avvisi.map((a, i) => (
-                <p className="gc-avviso" key={i}>{a}</p>
-              ))}
-
-              {inModifica ? (
-                <>
-                  <label>
-                    Descrizione in inglese
-                    <input
-                      type="text"
-                      value={bozza.alt}
-                      onChange={(e) => setBozza({ ...bozza, alt: e.target.value })}
+              {/* Su telefono la foto sta sopra e i dati sotto; da 640px in
+                  su affiancate. `wrap` invece di due impaginazioni: una
+                  sola regola, e la soglia la decide il contenuto. */}
+              <Group align="flex-start" gap="md" wrap="wrap">
+                <div
+                  style={{
+                    width: 200, maxWidth: '100%', flex: '0 0 auto',
+                    background: f.colore ?? 'var(--mantine-color-gray-1)',
+                    borderRadius: 8, overflow: 'hidden',
+                  }}
+                >
+                  {f.anteprima ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={f.anteprima}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: '100%', display: 'block', aspectRatio: `${f.width} / ${f.height}`, objectFit: 'cover' }}
                     />
-                  </label>
-                  <label>
-                    Didascalia
-                    <input
-                      type="text"
-                      value={bozza.caption}
-                      onChange={(e) => setBozza({ ...bozza, caption: e.target.value })}
-                    />
-                  </label>
-                  <div className="g-pagine-scelta">
-                    {pagine.map((p) => (
-                      <label key={p.key}>
-                        <input
-                          type="checkbox"
-                          checked={bozza.tag.includes(p.key)}
-                          onChange={(e) =>
-                            setBozza({
-                              ...bozza,
-                              tag: e.target.checked
-                                ? [...bozza.tag, p.key]
-                                : bozza.tag.filter((k) => k !== p.key),
+                  ) : (
+                    <Text size="xs" c="dimmed" p="sm" ta="center">
+                      Anteprima scaduta: ricarica la pagina
+                    </Text>
+                  )}
+                </div>
+
+                <Stack gap="xs" style={{ flex: '1 1 260px', minWidth: 0 }}>
+                  <Text size="xs" c="dimmed">
+                    <b>{f.chi}</b> · caricata il {new Date(f.caricata).toLocaleDateString('it-IT')}
+                    {' · '}
+                    {f.width}×{f.height} ({f.height > f.width ? 'verticale' : 'orizzontale'})
+                    {' · '}
+                    {f.scattata
+                      ? `scattata il ${new Date(f.scattata).toLocaleDateString('it-IT')}`
+                      : 'senza data di scatto'}
+                  </Text>
+
+                  {f.avvisi.map((a, i) => (
+                    <Text key={i} size="xs" c="orange">{a}</Text>
+                  ))}
+
+                  {inModifica ? (
+                    <>
+                      <TextInput
+                        label="Descrizione in inglese"
+                        size="sm"
+                        value={bozza.alt}
+                        onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}
+                      />
+                      <TextInput
+                        label="Didascalia"
+                        size="sm"
+                        value={bozza.caption}
+                        onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
+                      />
+                      <Checkbox.Group
+                        label="Pagine"
+                        value={bozza.tag}
+                        onChange={(v) => setBozza({ ...bozza, tag: v })}
+                      >
+                        <Stack gap={4} mt={6} mah={220} style={{ overflowY: 'auto' }}>
+                          {pagine.map((p) => (
+                            <Checkbox key={p.key} value={p.key} label={p.label} size="sm" />
+                          ))}
+                        </Stack>
+                      </Checkbox.Group>
+
+                      <Group gap="xs" mt={4}>
+                        <Button
+                          size="sm"
+                          loading={inCorso}
+                          leftSection={<IconCheck size={16} />}
+                          onClick={() =>
+                            avvia(async () => {
+                              const r1 = await aggiornaFoto(f.id, {
+                                alt: bozza.alt,
+                                caption: bozza.caption || null,
+                                tag: bozza.tag,
+                              });
+                              if (!r1.ok) { setMessaggio({ ok: false, testo: r1.errore ?? 'Non salvata.' }); return; }
+                              const r2 = await approva([f.id]);
+                              if (!r2.ok) { setMessaggio({ ok: false, testo: r2.errore ?? 'Corretta ma non approvata.' }); return; }
+                              togli([f.id]);
+                              setModifica(null);
+                              setMessaggio({ ok: true, testo: 'Corretta e approvata.' });
                             })
                           }
-                        />
-                        <span>{p.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="g-azioni">
-                    <button
-                      type="button"
-                      disabled={inCorso}
-                      onClick={() =>
-                        avvia(async () => {
-                          const r1 = await aggiornaFoto(f.id, {
-                            alt: bozza.alt,
-                            caption: bozza.caption || null,
-                            tag: bozza.tag,
-                          });
-                          if (!r1.ok) { setMessaggio({ ok: false, testo: r1.errore ?? 'Non salvata.' }); return; }
-                          const r2 = await approva([f.id]);
-                          if (!r2.ok) { setMessaggio({ ok: false, testo: r2.errore ?? 'Corretta ma non approvata.' }); return; }
-                          togli([f.id]);
-                          setModifica(null);
-                          setMessaggio({ ok: true, testo: 'Corretta e approvata.' });
-                        })
-                      }
-                    >
-                      Salva e approva
-                    </button>
-                    <button type="button" className="g-annulla" onClick={() => setModifica(null)}>
-                      Annulla
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="g-alt">{f.alt}</p>
-                  {f.caption && <p className="g-did">{f.caption}</p>}
-                  <p className="g-tag">
-                    {f.tag.length ? f.tag.map((k) => <span key={k}>{nome(k)}</span>) : <i>nessuna pagina</i>}
-                  </p>
+                        >
+                          Salva e approva
+                        </Button>
+                        <Button size="sm" variant="default" leftSection={<IconX size={16} />} onClick={() => setModifica(null)}>
+                          Annulla
+                        </Button>
+                      </Group>
+                    </>
+                  ) : (
+                    <>
+                      <Text fw={600}>{f.alt}</Text>
+                      {f.caption && <Text size="sm" c="dimmed">{f.caption}</Text>}
 
-                  <div className="g-azioni">
-                    <button
-                      type="button"
-                      disabled={inCorso}
-                      onClick={() => fai(() => approva([f.id]), [f.id], 'Approvata.')}
-                    >
-                      Approva
-                    </button>
-                    <button
-                      type="button"
-                      className="g-corr"
-                      onClick={() => {
-                        setModifica(f.id);
-                        setBozza({ alt: f.alt, caption: f.caption ?? '', tag: [...f.tag] });
-                      }}
-                    >
-                      Correggi e approva
-                    </button>
-                  </div>
+                      <Group gap={6}>
+                        {f.tag.length ? (
+                          f.tag.map((k) => <Badge key={k} variant="light" color="gray">{nome(k)}</Badge>)
+                        ) : (
+                          <Text size="sm" c="dimmed" fs="italic">nessuna pagina</Text>
+                        )}
+                      </Group>
 
-                  <details className="g-rifiuto">
-                    <summary>Rimanda indietro</summary>
-                    <label>
-                      Motivo <b>obbligatorio</b>
-                      <input
-                        type="text"
-                        value={motivo[f.id] ?? ''}
-                        placeholder="Es.: la descrizione è in italiano, riscrivila in inglese"
-                        onChange={(e) => setMotivo({ ...motivo, [f.id]: e.target.value })}
-                      />
-                      <span className="gc-aiuto">
-                        Lo legge chi ha caricato la foto, e da lì capisce cosa cambiare.
-                        Senza motivo il database rifiuta il rifiuto.
-                      </span>
-                    </label>
-                    <button
-                      type="button"
-                      className="g-no"
-                      disabled={inCorso || !(motivo[f.id] ?? '').trim()}
-                      onClick={() => fai(() => rifiuta(f.id, motivo[f.id] ?? ''), [f.id], 'Rimandata indietro.')}
-                    >
-                      Rimanda indietro
-                    </button>
-                  </details>
-                </>
-              )}
-            </div>
-          </article>
+                      <Group gap="xs" mt={4}>
+                        <Button
+                          size="sm"
+                          disabled={inCorso}
+                          leftSection={<IconCheck size={16} />}
+                          onClick={() => fai(() => approva([f.id]), [f.id], 'Approvata.')}
+                        >
+                          Approva
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          leftSection={<IconPencil size={16} />}
+                          onClick={() => {
+                            setModifica(f.id);
+                            setBozza({ alt: f.alt, caption: f.caption ?? '', tag: [...f.tag] });
+                          }}
+                        >
+                          Correggi e approva
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="subtle"
+                          color="red"
+                          leftSection={<IconArrowBackUp size={16} />}
+                          onClick={() => setRimanda(rimanda === f.id ? null : f.id)}
+                          aria-expanded={rimanda === f.id}
+                        >
+                          Rimanda indietro
+                        </Button>
+                      </Group>
+
+                      <Collapse expanded={rimanda === f.id}>
+                        <Stack gap="xs" mt="xs">
+                          <TextInput
+                            label={<>Motivo <b>obbligatorio</b></>}
+                            size="sm"
+                            value={motivo[f.id] ?? ''}
+                            placeholder="Es.: la descrizione è in italiano, riscrivila in inglese"
+                            onChange={(e) => setMotivo({ ...motivo, [f.id]: e.currentTarget.value })}
+                            description="Lo legge chi ha caricato la foto, e da lì capisce cosa cambiare. Senza motivo il database rifiuta il rifiuto."
+                          />
+                          <Group>
+                            <Button
+                              size="sm"
+                              color="red"
+                              disabled={inCorso || !motivoScritto}
+                              leftSection={<IconArrowBackUp size={16} />}
+                              onClick={() => fai(() => rifiuta(f.id, motivo[f.id] ?? ''), [f.id], 'Rimandata indietro.')}
+                            >
+                              Rimanda indietro
+                            </Button>
+                          </Group>
+                        </Stack>
+                      </Collapse>
+                    </>
+                  )}
+                </Stack>
+              </Group>
+            </Stack>
+          </Card>
         );
       })}
-    </div>
+    </Stack>
   );
 }

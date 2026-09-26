@@ -7,7 +7,6 @@ import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { GalleryMie, type MiaFoto } from '@/components/admin/GalleryMie';
 import { elimina, reinvia } from '../azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

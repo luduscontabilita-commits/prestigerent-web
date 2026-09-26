@@ -1,3 +1,4 @@
+import { Anchor, Badge, Card, Code, Group, SimpleGrid, Table, Text } from '@mantine/core';
 import { comeSiChiama } from '@/lib/accesso';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
@@ -63,79 +64,90 @@ export default async function ElencoFoto() {
         </>}
     >
 
-      <div className="ad-conta">
-        <div>
-          <b>{ordinate.length}</b>
-          <span>tour</span>
-        </div>
-        <div className={senzaFoto ? 'male' : 'bene'}>
-          <b>{senzaFoto}</b>
-          <span>senza nemmeno una foto</span>
-        </div>
-        <div className={pocheFoto ? 'male' : 'bene'}>
-          <b>{pocheFoto}</b>
-          <span>con meno di 5 foto</span>
-        </div>
-      </div>
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm" mb="md">
+        <Card withBorder radius="md" padding="sm">
+          <Text fz={28} fw={800} lh={1.1}>{ordinate.length}</Text>
+          <Text size="xs" c="dimmed">tour</Text>
+        </Card>
+        <Card withBorder radius="md" padding="sm">
+          <Text fz={28} fw={800} lh={1.1} c={senzaFoto ? 'red' : 'green'}>{senzaFoto}</Text>
+          <Text size="xs" c="dimmed">senza nemmeno una foto</Text>
+        </Card>
+        <Card withBorder radius="md" padding="sm">
+          <Text fz={28} fw={800} lh={1.1} c={pocheFoto ? 'red' : 'green'}>{pocheFoto}</Text>
+          <Text size="xs" c="dimmed">con meno di 5 foto</Text>
+        </Card>
+      </SimpleGrid>
 
-      <div className="ad-tab-wrap">
-        <table className="ad-tab">
-          <thead>
-            <tr>
-              <th className="ad-col-ant">Copertina</th>
-              <th>Tour</th>
-              <th className="ad-col-n">Foto</th>
-              <th className="ad-col-n">Carica</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ordinate.map((r) => (
-              <tr key={r.slug}>
-                <td className="ad-col-ant">
-                  <a href={`/admin/foto/${r.slug}/`}>
-                    {r.copertina ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img className="ad-ant" src={r.copertina} alt="" loading="lazy" decoding="async" />
-                    ) : (
-                      <span className="ad-ant ad-ant-vuota" />
-                    )}
-                  </a>
-                </td>
+      <Card withBorder radius="md" padding={0}>
+        <Table.ScrollContainer minWidth={620}>
+          <Table striped highlightOnHover verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th w={92}>Copertina</Table.Th>
+                <Table.Th>Tour</Table.Th>
+                <Table.Th w={70}>Foto</Table.Th>
+                <Table.Th w={120}>Carica</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {ordinate.map((r) => (
+                <Table.Tr key={r.slug}>
+                  <Table.Td>
+                    <Anchor href={`/admin/foto/${r.slug}/`}>
+                      {r.copertina ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={r.copertina}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          style={{ width: 72, height: 54, objectFit: 'cover', borderRadius: 6, display: 'block' }}
+                        />
+                      ) : (
+                        <div style={{ width: 72, height: 54, borderRadius: 6,
+                                      background: 'var(--mantine-color-gray-2)' }} />
+                      )}
+                    </Anchor>
+                  </Table.Td>
 
-                <td>
-                  <a className="ad-riga-tour" href={`/admin/foto/${r.slug}/`}>
-                    <strong>{r.nome}</strong>
-                    <code>{r.slug}</code>
-                  </a>
-                  <div className="ad-tag ad-tag-neutro">
-                    {r.kind && <em>{r.kind}</em>}
-                    {r.status !== 'published' && <em className="ad-tag-ko">{r.status ?? 'senza stato'}</em>}
-                  </div>
-                </td>
+                  <Table.Td>
+                    <Anchor href={`/admin/foto/${r.slug}/`} underline="never">
+                      <Text fw={600} size="sm">{r.nome}</Text>
+                    </Anchor>
+                    <Code>{r.slug}</Code>
+                    <Group gap={6} mt={4}>
+                      {r.kind && <Badge size="xs" variant="light" color="gray">{r.kind}</Badge>}
+                      {r.status !== 'published' && (
+                        <Badge size="xs" variant="light" color="red">{r.status ?? 'senza stato'}</Badge>
+                      )}
+                    </Group>
+                  </Table.Td>
 
-                <td className="ad-col-n">
-                  <span className={'ad-n' + (r.quante < 5 ? ' ko' : '')}>{r.quante}</span>
-                </td>
+                  <Table.Td>
+                    <Badge variant="light" color={r.quante < 5 ? 'red' : 'gray'}>{r.quante}</Badge>
+                  </Table.Td>
 
-                {/* Il caricamento sta QUI, sulla riga, e non solo dentro la
-                    pagina del singolo tour: chi apre questo elenco lo apre
-                    ordinato per problema, e i tour senza foto sono i primi.
-                    Farlo passare dalla scheda vorrebbe dire due clic e un
-                    ritorno indietro per ognuno. */}
-                <td className="ad-col-n">
-                  <CaricaFotoTour
-                    slug={r.slug}
-                    nome={r.nome}
-                    firme={firmeTour}
-                    aggiungi={aggiungiFoto}
-                    compatto
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  {/* Il caricamento sta QUI, sulla riga, e non solo dentro la
+                      pagina del singolo tour: chi apre questo elenco lo apre
+                      ordinato per problema, e i tour senza foto sono i primi.
+                      Farlo passare dalla scheda vorrebbe dire due clic e un
+                      ritorno indietro per ognuno. */}
+                  <Table.Td>
+                    <CaricaFotoTour
+                      slug={r.slug}
+                      nome={r.nome}
+                      firme={firmeTour}
+                      aggiungi={aggiungiFoto}
+                      compatto
+                    />
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Card>
     </Guscio>
   );
 }

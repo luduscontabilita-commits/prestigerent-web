@@ -10,9 +10,6 @@ import '@mantine/core/styles.css';
  * Vengono DOPO quello di Mantine di proposito: a parita' di specificita'
  * vince chi e' dichiarato per ultimo, quindi le regole di queste classi
  * non vengono scavalcate dal foglio della libreria. */
-import '@/styles/admin.css';
-import '@/styles/admin-telefono.css';
-import '@/styles/gallery-admin.css';
 import { Tema } from '@/components/admin/Tema';
 
 /* Il pannello NON deve mai finire su Google, nemmeno il giorno in cui il

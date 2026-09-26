@@ -1,3 +1,5 @@
+import { Alert } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import { comeSiChiama } from '@/lib/accesso';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
@@ -6,7 +8,6 @@ import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE } from '@/lib/auth'
 import { redirect } from 'next/navigation';
 import { GalleryCaricatore } from '@/components/admin/GalleryCaricatore';
 import { chiediFirme, pagineTaggabili, registraFoto } from '../azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -35,10 +36,10 @@ export default async function Carica() {
         /* Senza registro non si puo' taggare, e senza tag non si puo'
            inviare: meglio dirlo qui che lasciare un elenco vuoto e un
            pulsante che non si accende mai. */
-        <p className="ad-err">
+        <Alert color="red" icon={<IconAlertTriangle size={18} />} mb="md">
           Il registro delle pagine è vuoto. Un amministratore deve premere
           «Sincronizza pagine» in <Link href="/admin/gallery/pagine/">Pagine</Link>.
-        </p>
+        </Alert>
       ) : (
         <GalleryCaricatore
           pagine={pagine}

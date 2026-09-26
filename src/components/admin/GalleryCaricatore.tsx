@@ -1,6 +1,29 @@
 'use client';
 
 import { useCallback, useMemo, useRef, useState, useTransition } from 'react';
+import {
+  Accordion,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Grid,
+  Group,
+  List,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconPhotoPlus,
+  IconSearch,
+  IconSend,
+} from '@tabler/icons-react';
 import { preparaFoto, type Preparata } from './preparaFoto';
 import type { TipoTag } from '@/lib/gallery-tag';
 import type { DaRegistrare, Firma } from '@/app/admin/gallery/azioni';
@@ -23,6 +46,13 @@ import type { DaRegistrare, Firma } from '@/app/admin/gallery/azioni';
  * Ma sopra al pulsante c'e' scritto cosa manca e a quale foto: un pulsante
  * grigio senza spiegazione e' il modo piu' sicuro di far chiudere la
  * pagina a chi sta caricando da un telefono in mezzo a una vigna.
+ *
+ * ── QUESTA E' LA PAGINA DELLE GUIDE, E SI VEDE NELLE SCELTE ────────────
+ * Le due colonne diventano una sotto i 768px, i bersagli del dito sono
+ * quelli di Mantine (piu' grandi delle caselle native che c'erano prima),
+ * e l'elenco delle pagine ha un'altezza massima con scorrimento proprio:
+ * senza, su un telefono, le 103 pagine spingerebbero il pulsante di invio
+ * a schermate di distanza dalle foto.
  */
 
 export type Pagina = { key: string; label: string; type: TipoTag; path: string };
@@ -64,6 +94,7 @@ export function GalleryCaricatore({
   const [selezione, setSelezione] = useState<Set<string>>(new Set());
   const [cerca, setCerca] = useState('');
   const [sopra, setSopra] = useState(false);
+  const [aperti, setAperti] = useState<string[]>(['home', 'cat', 'port']);
   const [esito, setEsito] = useState<{ ok: boolean; testo: string } | null>(null);
   const [invio, avvia] = useTransition();
   const input = useRef<HTMLInputElement>(null);
@@ -204,10 +235,23 @@ export function GalleryCaricatore({
 
   /* ── disegno ───────────────────────────────────────────────────────── */
 
+  /* Cercando si aprono tutti i gruppi: se una pagina corrisponde ma sta
+     dentro un gruppo chiuso, la ricerca sembra non aver trovato niente. */
+  const gruppiAperti = cerca.trim() ? GRUPPI.map((g) => g.tipo) : aperti;
+
   return (
-    <div className="gc">
-      <div
-        className={'gc-zona' + (sopra ? ' sopra' : '')}
+    <Stack gap="md">
+      <Paper
+        withBorder
+        radius="md"
+        p="lg"
+        style={{
+          borderStyle: 'dashed',
+          borderWidth: 2,
+          borderColor: sopra ? 'var(--mantine-color-prestige-6)' : undefined,
+          background: sopra ? 'var(--mantine-color-prestige-0)' : undefined,
+          textAlign: 'center',
+        }}
         onDragOver={(e) => { e.preventDefault(); setSopra(true); }}
         onDragLeave={() => setSopra(false)}
         onDrop={(e) => {
@@ -216,212 +260,277 @@ export function GalleryCaricatore({
           if (e.dataTransfer?.files?.length) aggiungi(e.dataTransfer.files);
         }}
       >
-        <strong>Trascina qui le foto</strong>
-        {/* Sul telefono il trascinamento non esiste: il pulsante e' la
-            strada principale, non l'alternativa. `accept="image/*"` fa
-            aprire a iOS la galleria o la fotocamera, e consegna JPEG anche
-            quando sul telefono la foto e' HEIC. */}
-        <button type="button" className="gc-scegli" onClick={() => input.current?.click()}>
-          Scegli foto
-        </button>
-        <input
-          ref={input}
-          type="file"
-          accept="image/*"
-          multiple
-          hidden
-          onChange={(e) => { if (e.target.files) aggiungi(e.target.files); e.target.value = ''; }}
-        />
-        <span className="gc-nota">
-          Fino a 40 per volta. Le foto vengono rimpicciolite e ripulite dei dati nascosti
-          (compresa la posizione GPS) qui sul tuo telefono, prima di partire.
-        </span>
-      </div>
+        <Stack gap="xs" align="center">
+          <Text fw={600}>Trascina qui le foto</Text>
+          {/* Sul telefono il trascinamento non esiste: il pulsante e' la
+              strada principale, non l'alternativa. `accept="image/*"` fa
+              aprire a iOS la galleria o la fotocamera, e consegna JPEG anche
+              quando sul telefono la foto e' HEIC. */}
+          <Button leftSection={<IconPhotoPlus size={18} />} onClick={() => input.current?.click()}>
+            Scegli foto
+          </Button>
+          <input
+            ref={input}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(e) => { if (e.target.files) aggiungi(e.target.files); e.target.value = ''; }}
+          />
+          <Text size="xs" c="dimmed" maw={520}>
+            Fino a 40 per volta. Le foto vengono rimpicciolite e ripulite dei dati nascosti
+            (compresa la posizione GPS) qui sul tuo telefono, prima di partire.
+          </Text>
+        </Stack>
+      </Paper>
 
       {schede.length > 0 && (
-        <div className="gc-corpo">
-          <div className="gc-foto">
-            <div className="gc-barra">
-              <span>
-                {valide.length} foto{selezione.size ? ` · ${selezione.size} selezionate` : ''}
-              </span>
-              {schede.length > 0 && (
-                <button
-                  type="button"
-                  className="gc-mini"
+        <Grid gap="md">
+          {/* ── le foto ── */}
+          <Grid.Col span={{ base: 12, md: 7 }}>
+            <Stack gap="sm">
+              <Group justify="space-between" wrap="wrap" gap="xs">
+                <Text size="sm" c="dimmed">
+                  {valide.length} foto{selezione.size ? ` · ${selezione.size} selezionate` : ''}
+                </Text>
+                <Button
+                  variant="subtle"
+                  size="compact-sm"
                   onClick={() => setSelezione(selezione.size ? new Set() : new Set(schede.map((s) => s.id)))}
                 >
                   {selezione.size ? 'Deseleziona tutte' : 'Seleziona tutte'}
-                </button>
-              )}
-            </div>
+                </Button>
+              </Group>
 
-            {schede.map((s) => (
-              <div className={'gc-card' + (s.errore ? ' ko' : '')} key={s.id}>
-                <label className="gc-sel">
-                  <input
-                    type="checkbox"
-                    checked={selezione.has(s.id)}
-                    onChange={(e) => {
-                      const n = new Set(selezione);
-                      if (e.target.checked) n.add(s.id); else n.delete(s.id);
-                      setSelezione(n);
-                    }}
-                  />
-                  <span className="gc-sel-txt">Seleziona</span>
-                </label>
+              {schede.map((s) => (
+                <Card
+                  withBorder
+                  radius="md"
+                  padding="sm"
+                  key={s.id}
+                  style={s.errore ? { borderColor: 'var(--mantine-color-red-4)' } : undefined}
+                >
+                  <Stack gap="sm">
+                    <Checkbox
+                      checked={selezione.has(s.id)}
+                      onChange={(e) => {
+                        const n = new Set(selezione);
+                        if (e.currentTarget.checked) n.add(s.id); else n.delete(s.id);
+                        setSelezione(n);
+                      }}
+                      label="Seleziona"
+                    />
 
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="gc-ant" src={s.anteprima} alt="" />
+                    <Group align="flex-start" gap="sm" wrap="wrap">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={s.anteprima}
+                        alt=""
+                        style={{ width: 120, maxWidth: '100%', borderRadius: 8, display: 'block',
+                                 background: 'var(--mantine-color-gray-1)', flex: '0 0 auto' }}
+                      />
 
-                <div className="gc-dati">
-                  <code className="gc-nome">{s.nome}</code>
+                      <Stack gap="xs" style={{ flex: '1 1 220px', minWidth: 0 }}>
+                        <Text size="xs" c="dimmed" style={{ wordBreak: 'break-all' }}>
+                          <code>{s.nome}</code>
+                        </Text>
 
-                  {s.lavorando && <p className="gc-lavoro">Preparo la foto…</p>}
+                        {s.lavorando && <Text size="sm" c="dimmed">Preparo la foto…</Text>}
+                        {s.errore && <Text size="sm" c="red">{s.errore}</Text>}
 
-                  {s.errore && <p className="gc-err">{s.errore}</p>}
+                        {s.pronta && (
+                          <>
+                            <Text size="xs" c="dimmed">
+                              {s.pronta.width}×{s.pronta.height}
+                              {' · '}
+                              {s.pronta.scattata
+                                ? `scattata il ${s.pronta.scattata.toLocaleDateString('it-IT')}`
+                                : 'senza data di scatto: si userà la data di caricamento'}
+                            </Text>
+                            {s.pronta.avvisi.map((a, i) => (
+                              <Text key={i} size="xs" c="orange">{a}</Text>
+                            ))}
 
-                  {s.pronta && (
-                    <>
-                      <p className="gc-misure">
-                        {s.pronta.width}×{s.pronta.height}
-                        {' · '}
-                        {s.pronta.scattata
-                          ? `scattata il ${s.pronta.scattata.toLocaleDateString('it-IT')}`
-                          : 'senza data di scatto: si userà la data di caricamento'}
-                      </p>
-                      {s.pronta.avvisi.map((a, i) => (
-                        <p className="gc-avviso" key={i}>{a}</p>
-                      ))}
+                            <TextInput
+                              label={<>Descrizione in inglese <b>obbligatoria</b></>}
+                              size="sm"
+                              value={s.alt}
+                              placeholder="Guests tasting wine at a Chianti winery"
+                              error={s.alt.trim().length > 0 && s.alt.trim().length < 3 ? 'Troppo corta' : undefined}
+                              description="Cosa si vede nella foto, in inglese. La leggono Google e chi non può vedere l’immagine. Non «foto 1» o «Toscana»."
+                              onChange={(e) => {
+                                const v = e.currentTarget.value;
+                                setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, alt: v } : y)));
+                              }}
+                            />
 
-                      <label>
-                        Descrizione in inglese <b>obbligatoria</b>
-                        <input
-                          type="text"
-                          value={s.alt}
-                          placeholder="Guests tasting wine at a Chianti winery"
-                          onChange={(e) =>
-                            setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, alt: e.target.value } : y)))
-                          }
-                        />
-                        <span className="gc-aiuto">
-                          Cosa si vede nella foto, in inglese. La leggono Google e chi non
-                          può vedere l’immagine. Non «foto 1» o «Toscana».
-                        </span>
-                      </label>
+                            <TextInput
+                              label={<>Didascalia <Text span size="xs" c="dimmed">facoltativa</Text></>}
+                              size="sm"
+                              value={s.caption}
+                              placeholder="Harvest week in Chianti"
+                              onChange={(e) => {
+                                const v = e.currentTarget.value;
+                                setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, caption: v } : y)));
+                              }}
+                            />
 
-                      <label>
-                        Didascalia <span className="gc-opt">facoltativa</span>
-                        <input
-                          type="text"
-                          value={s.caption}
-                          placeholder="Harvest week in Chianti"
-                          onChange={(e) =>
-                            setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, caption: e.target.value } : y)))
-                          }
-                        />
-                      </label>
+                            <Group gap={6}>
+                              {s.tag.length === 0 ? (
+                                <Text size="xs" c="red">Nessuna pagina scelta</Text>
+                              ) : (
+                                s.tag.map((k) => {
+                                  const p = pagine.find((x) => x.key === k);
+                                  return (
+                                    <Badge
+                                      key={k}
+                                      variant="light"
+                                      color="prestige"
+                                      rightSection={
+                                        <Text
+                                          component="span"
+                                          role="button"
+                                          aria-label={`Togli ${p?.label ?? k}`}
+                                          style={{ cursor: 'pointer', lineHeight: 1 }}
+                                          onClick={() => tocca([s.id], k, false)}
+                                        >
+                                          ×
+                                        </Text>
+                                      }
+                                    >
+                                      {p?.label ?? k}
+                                    </Badge>
+                                  );
+                                })
+                              )}
+                            </Group>
+                          </>
+                        )}
+                      </Stack>
+                    </Group>
+                  </Stack>
+                </Card>
+              ))}
+            </Stack>
+          </Grid.Col>
 
-                      <div className="gc-etichette">
-                        {s.tag.length === 0 && <span className="gc-manca">Nessuna pagina scelta</span>}
-                        {s.tag.map((k) => {
-                          const p = pagine.find((x) => x.key === k);
-                          return (
-                            <span className="gc-etichetta" key={k}>
-                              {p?.label ?? k}
-                              <button type="button" onClick={() => tocca([s.id], k, false)} aria-label={`Togli ${p?.label ?? k}`}>
-                                ×
-                              </button>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
+          {/* ── le pagine ── */}
+          <Grid.Col span={{ base: 12, md: 5 }}>
+            <Card withBorder radius="md" padding="sm">
+              <Stack gap="sm">
+                <Title order={2} size="h5">Pagine</Title>
+                <Text size="xs" c="dimmed">
+                  {selezione.size
+                    ? `Le spunte valgono per le ${selezione.size} foto selezionate.`
+                    : 'Nessuna foto selezionata: le spunte valgono per tutte.'}
+                </Text>
+
+                <TextInput
+                  size="sm"
+                  type="search"
+                  placeholder="cerca pagina…"
+                  leftSection={<IconSearch size={15} />}
+                  value={cerca}
+                  onChange={(e) => setCerca(e.currentTarget.value)}
+                />
+
+                {/* Altezza massima con scorrimento proprio: 103 pagine in
+                    un telefono spingerebbero il pulsante di invio a
+                    schermate di distanza. */}
+                <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+                  <Accordion multiple value={gruppiAperti} onChange={setAperti} variant="contained">
+                    {GRUPPI.map((g) => {
+                      const voci = filtrate.filter((p) => p.type === g.tipo);
+                      if (!voci.length) return null;
+                      return (
+                        <Accordion.Item value={g.tipo} key={g.tipo}>
+                          <Accordion.Control>
+                            <Group gap="xs">
+                              <Text size="sm" fw={600}>{g.titolo}</Text>
+                              <Badge size="sm" variant="light" color="gray">{voci.length}</Badge>
+                            </Group>
+                          </Accordion.Control>
+                          <Accordion.Panel>
+                            <Stack gap={8}>
+                              {voci.map((p) => {
+                                /* La spunta e' piena solo se TUTTE le foto
+                                   bersaglio hanno quel tag: con una selezione
+                                   mista si vede subito che non sono
+                                   d'accordo. */
+                                const quante = schede.filter((s) => bersagli.includes(s.id) && s.tag.includes(p.key)).length;
+                                const tutte = bersagli.length > 0 && quante === bersagli.length;
+                                return (
+                                  <Checkbox
+                                    key={p.key}
+                                    size="sm"
+                                    label={p.label}
+                                    checked={tutte}
+                                    indeterminate={quante > 0 && !tutte}
+                                    onChange={(e) => tocca(bersagli, p.key, e.currentTarget.checked)}
+                                  />
+                                );
+                              })}
+                            </Stack>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      );
+                    })}
+                  </Accordion>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="gc-pagine">
-            <h3>Pagine</h3>
-            <p className="gc-nota">
-              {selezione.size
-                ? `Le spunte valgono per le ${selezione.size} foto selezionate.`
-                : 'Nessuna foto selezionata: le spunte valgono per tutte.'}
-            </p>
-            <input
-              type="search"
-              placeholder="cerca pagina…"
-              value={cerca}
-              onChange={(e) => setCerca(e.target.value)}
-            />
-
-            {GRUPPI.map((g) => {
-              const voci = filtrate.filter((p) => p.type === g.tipo);
-              if (!voci.length) return null;
-              return (
-                <details className="gc-gruppo" key={g.tipo} open={g.tipo !== 'tour' || !!cerca.trim()}>
-                  <summary>
-                    {g.titolo} <span>{voci.length}</span>
-                  </summary>
-                  {voci.map((p) => {
-                    /* La spunta e' piena solo se TUTTE le foto bersaglio
-                       hanno quel tag: con una selezione mista si vede
-                       subito che non sono d'accordo. */
-                    const quante = schede.filter((s) => bersagli.includes(s.id) && s.tag.includes(p.key)).length;
-                    const tutte = bersagli.length > 0 && quante === bersagli.length;
-                    return (
-                      <label className="gc-pagina" key={p.key}>
-                        <input
-                          type="checkbox"
-                          checked={tutte}
-                          /* parzialmente spuntata: né vuota né piena */
-                          ref={(el) => { if (el) el.indeterminate = quante > 0 && !tutte; }}
-                          onChange={(e) => tocca(bersagli, p.key, e.target.checked)}
-                        />
-                        <span>{p.label}</span>
-                      </label>
-                    );
-                  })}
-                </details>
-              );
-            })}
-          </div>
-        </div>
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
       )}
 
       {schede.length > 0 && (
-        <div className="gc-invio">
-          {/* COSA MANCA, E A QUANTE FOTO. Un pulsante grigio senza
-              spiegazione fa chiudere la pagina. */}
-          {!puoInviare && !invio && (
-            <ul className="gc-manca-lista">
-              {!valide.length && <li>Nessuna foto pronta da inviare.</li>}
-              {senzaAlt > 0 && (
-                <li>
-                  {senzaAlt === 1 ? 'Una foto non ha' : `${senzaAlt} foto non hanno`} la descrizione in inglese.
-                </li>
-              )}
-              {senzaPagina > 0 && (
-                <li>
-                  {senzaPagina === 1 ? 'Una foto non ha' : `${senzaPagina} foto non hanno`} nessuna pagina.
-                </li>
-              )}
-            </ul>
-          )}
+        <Card withBorder radius="md" padding="md">
+          <Stack gap="sm">
+            {/* COSA MANCA, E A QUANTE FOTO. Un pulsante grigio senza
+                spiegazione fa chiudere la pagina. */}
+            {!puoInviare && !invio && (
+              <Alert color="yellow" icon={<IconAlertTriangle size={18} />} title="Manca ancora qualcosa">
+                <List size="sm" spacing={2}>
+                  {!valide.length && <List.Item>Nessuna foto pronta da inviare.</List.Item>}
+                  {senzaAlt > 0 && (
+                    <List.Item>
+                      {senzaAlt === 1 ? 'Una foto non ha' : `${senzaAlt} foto non hanno`} la descrizione in inglese.
+                    </List.Item>
+                  )}
+                  {senzaPagina > 0 && (
+                    <List.Item>
+                      {senzaPagina === 1 ? 'Una foto non ha' : `${senzaPagina} foto non hanno`} nessuna pagina.
+                    </List.Item>
+                  )}
+                </List>
+              </Alert>
+            )}
 
-          <button type="button" className="gc-invia" disabled={!puoInviare} onClick={invia}>
-            {invio
-              ? 'Sto caricando…'
-              : approvaSubito
-                ? `Pubblica ${valide.length || ''}`.trim()
-                : `Invia per approvazione ${valide.length || ''}`.trim()}
-          </button>
+            <Group justify="flex-end">
+              <Button
+                size="md"
+                disabled={!puoInviare}
+                loading={invio}
+                leftSection={<IconSend size={18} />}
+                onClick={invia}
+              >
+                {approvaSubito
+                  ? `Pubblica ${valide.length || ''}`.trim()
+                  : `Invia per approvazione ${valide.length || ''}`.trim()}
+              </Button>
+            </Group>
 
-          {esito && <p className={esito.ok ? 'gc-ok' : 'gc-err'}>{esito.testo}</p>}
-        </div>
+            {esito && (
+              <Alert
+                color={esito.ok ? 'green' : 'red'}
+                icon={esito.ok ? <IconCheck size={18} /> : <IconAlertTriangle size={18} />}
+              >
+                {esito.testo}
+              </Alert>
+            )}
+          </Stack>
+        </Card>
       )}
-    </div>
+    </Stack>
   );
 }

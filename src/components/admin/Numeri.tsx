@@ -2,6 +2,22 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Code,
+  Group,
+  List,
+  Progress,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+} from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconRefresh, IconSearch } from '@tabler/icons-react';
 import type { Esito, Parziale } from '@/app/admin/numeri/azioni';
 
 /* LA PAGINA DEI NUMERI.
@@ -209,147 +225,163 @@ export function Numeri({
      indovinare, e dura giusto il tempo di essere creduta. */
   const stato = adesso ? gravita(aggiornato, adesso) : 'attesa';
 
+  /* I colori della fascia dell'eta': verde/giallo/rosso arrivano da
+     `gravita()`, che e' la stessa funzione che colora la colonna
+     «Aggiornato» riga per riga. Un solo giudizio, in due posti. */
+  const COLORE = { bene: 'green', cosi: 'yellow', male: 'red', attesa: 'gray' } as const;
+
   return (
-    <>
-      <div className={`ad-fresco ad-fresco-${stato}`}>
-        <div>
-          <b>
-            {aggiornato && adesso ? `Aggiornato ${quantoFa(aggiornato, adesso)}` : aggiornato ? 'Aggiornato' : 'Mai aggiornato'}
-          </b>
-          <span>
-            {quandoAssoluto
-              ? `Ultima lettura da Regiondo: ${quandoAssoluto}. Finche' non si preme il pulsante, il sito dichiara questi numeri.`
-              : 'Nessuna lettura registrata: i numeri sul sito non vengono da qui.'}
-          </span>
-        </div>
-        <button className="ad-aggiorna" onClick={aggiorna} disabled={inCorso}>
-          {inCorso ? 'Sto aggiornando…' : 'Aggiorna adesso'}
-        </button>
-      </div>
+    <Stack gap="md">
+      <Card
+        withBorder
+        radius="md"
+        padding="md"
+        style={{
+          borderColor: `var(--mantine-color-${COLORE[stato]}-5)`,
+          background: `var(--mantine-color-${COLORE[stato]}-0)`,
+        }}
+      >
+        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Stack gap={2} style={{ flex: '1 1 320px' }}>
+            <Text fw={700} fz="lg">
+              {aggiornato && adesso
+                ? `Aggiornato ${quantoFa(aggiornato, adesso)}`
+                : aggiornato ? 'Aggiornato' : 'Mai aggiornato'}
+            </Text>
+            <Text size="sm" c="dimmed">
+              {quandoAssoluto
+                ? `Ultima lettura da Regiondo: ${quandoAssoluto}. Finché non si preme il pulsante, il sito dichiara questi numeri.`
+                : 'Nessuna lettura registrata: i numeri sul sito non vengono da qui.'}
+            </Text>
+          </Stack>
+          <Button
+            size="md"
+            onClick={aggiorna}
+            loading={inCorso}
+            leftSection={<IconRefresh size={18} />}
+          >
+            Aggiorna adesso
+          </Button>
+        </Group>
+      </Card>
 
       {(inCorso || percento === 100 || errore) && (
-        <div className="ad-avanza">
-          <div className="ad-avanza-barra">
-            <i style={{ width: `${percento}%` }} />
-          </div>
-          <p className="ad-avanza-passo">
-            <span>{errore ? 'Interrotto' : passo || 'Fatto'}</span>
-            <em>
-              {percento}% &middot; {secondi}s
-            </em>
-          </p>
-          {fatti.length > 0 && (
-            <ul className="ad-avanza-fatti">
-              {fatti.map((f, i) => (
-                <li key={i}>{f}</li>
-              ))}
-            </ul>
-          )}
-          {errore && <p className="ad-esito-ko">{errore}</p>}
-        </div>
+        <Card withBorder radius="md" padding="md">
+          <Stack gap="xs">
+            <Progress value={percento} color={errore ? 'red' : 'prestige'} size="lg" radius="sm" animated={inCorso} />
+            <Group justify="space-between">
+              <Text size="sm" fw={600}>{errore ? 'Interrotto' : passo || 'Fatto'}</Text>
+              <Text size="sm" c="dimmed">{percento}% · {secondi}s</Text>
+            </Group>
+            {fatti.length > 0 && (
+              <List size="sm" spacing={2} icon={<IconCheck size={14} color="var(--mantine-color-green-6)" />}>
+                {fatti.map((f, i) => <List.Item key={i}>{f}</List.Item>)}
+              </List>
+            )}
+            {errore && (
+              <Alert color="red" icon={<IconAlertTriangle size={18} />}>{errore}</Alert>
+            )}
+          </Stack>
+        </Card>
       )}
 
-      <div className="ad-conta">
-        <div>
-          <b>{totali.agganciati}</b>
-          <span>tour con un prodotto Regiondo</span>
-        </div>
-        <div>
-          <b>{totali.recensioni.toLocaleString('it-IT')}</b>
-          <span>recensioni Regiondo in totale</span>
-        </div>
-        <div className="bene">
-          <b>{totali.settimana.toLocaleString('it-IT')}</b>
-          <span>prenotazioni negli ultimi 7 giorni</span>
-        </div>
-        <div className={totali.esaurite ? 'male' : ''}>
-          <b>{totali.esaurite}</b>
-          <span>date esaurite nei prossimi 30 giorni</span>
-        </div>
-      </div>
+      <SimpleGrid cols={{ base: 2, md: 4 }} spacing="sm">
+        <Riquadro n={totali.agganciati} che="tour con un prodotto Regiondo" />
+        <Riquadro n={totali.recensioni.toLocaleString('it-IT')} che="recensioni Regiondo in totale" />
+        <Riquadro n={totali.settimana.toLocaleString('it-IT')} che="prenotazioni negli ultimi 7 giorni" colore="green" />
+        <Riquadro n={totali.esaurite} che="date esaurite nei prossimi 30 giorni" colore={totali.esaurite ? 'red' : undefined} />
+      </SimpleGrid>
 
-      <div className="ad-barra">
-        <input
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-          placeholder="Cerca uno slug o uno SKU"
-        />
-        <span className="ad-quante">
-          {elenco.length} di {righe.length}
-        </span>
-      </div>
+      <Card withBorder radius="md" padding="sm">
+        <Group justify="space-between" wrap="wrap" gap="sm">
+          <TextInput
+            value={filtro}
+            onChange={(e) => setFiltro(e.currentTarget.value)}
+            placeholder="Cerca uno slug o uno SKU"
+            leftSection={<IconSearch size={15} />}
+            style={{ flex: '1 1 260px' }}
+          />
+          <Text size="sm" c="dimmed">{elenco.length} di {righe.length}</Text>
+        </Group>
+      </Card>
 
-      <div className="ad-tab-wrap">
-        <table className="ad-tab">
-          <thead>
-            <tr>
-              <th>Tour</th>
-              <th className="ad-num">Recensioni</th>
-              <th className="ad-num">Prenotazioni 7gg</th>
-              <th>Prima data libera</th>
-              <th className="ad-num">Aggiornato</th>
-            </tr>
-          </thead>
-          <tbody>
-            {elenco.map((r) => (
-              <tr key={r.slug}>
-                <td>
-                  <span className="ad-riga-tour">
-                    <strong>{r.slug}</strong>
-                    <code>{r.sku ?? 'nessun prodotto Regiondo'}</code>
-                  </span>
-                </td>
-                <td className="ad-num">
-                  {r.quante ? (
-                    <>
-                      <b>{r.voto?.toFixed(1)}</b> <span className="ad-fioco">su {r.quante}</span>
-                    </>
-                  ) : (
-                    <span className="ad-vuoto">nessuna</span>
-                  )}
-                </td>
-                <td className="ad-num">
-                  {r.ultimi_7 ? (
-                    <>
-                      <b>{r.ultimi_7}</b>
-                      {r.oggi ? <span className="ad-fioco"> · {r.oggi} oggi</span> : null}
-                    </>
-                  ) : (
-                    <span className="ad-vuoto">0</span>
-                  )}
-                </td>
-                <td>
-                  {r.prima_libera ? (
-                    <>
-                      <b>{data(r.prima_libera)}</b>
-                      {r.posti_prima != null ? (
-                        <span className="ad-fioco"> · {r.posti_prima} posti</span>
-                      ) : null}
-                      {r.esaurite_30gg ? (
-                        <span className="ad-fioco">
-                          {' '}
-                          · {r.esaurite_30gg}/{r.date_totali_30gg} piene
-                        </span>
-                      ) : null}
-                    </>
-                  ) : (
-                    <span className="ad-vuoto">nessuna data</span>
-                  )}
-                </td>
-                <td className="ad-num">
-                  {r.aggiornato && adesso ? (
-                    <span className={`ad-eta ad-eta-${gravita(r.aggiornato, adesso)}`}>
-                      {quantoFa(r.aggiornato, adesso)}
-                    </span>
-                  ) : (
-                    <span className="ad-vuoto">mai</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+      <Card withBorder radius="md" padding={0}>
+        <Table.ScrollContainer minWidth={760}>
+          <Table striped highlightOnHover verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Tour</Table.Th>
+                <Table.Th w={120}>Recensioni</Table.Th>
+                <Table.Th w={140}>Prenotazioni 7gg</Table.Th>
+                <Table.Th w={210}>Prima data libera</Table.Th>
+                <Table.Th w={110}>Aggiornato</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {elenco.map((r) => (
+                <Table.Tr key={r.slug}>
+                  <Table.Td>
+                    <Text size="sm" fw={600}>{r.slug}</Text>
+                    <Code>{r.sku ?? 'nessun prodotto Regiondo'}</Code>
+                  </Table.Td>
+
+                  <Table.Td>
+                    {r.quante ? (
+                      <Text size="sm"><b>{r.voto?.toFixed(1)}</b> <Text span c="dimmed" size="xs">su {r.quante}</Text></Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">nessuna</Text>
+                    )}
+                  </Table.Td>
+
+                  <Table.Td>
+                    {r.ultimi_7 ? (
+                      <Text size="sm">
+                        <b>{r.ultimi_7}</b>
+                        {r.oggi ? <Text span c="dimmed" size="xs"> · {r.oggi} oggi</Text> : null}
+                      </Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">0</Text>
+                    )}
+                  </Table.Td>
+
+                  <Table.Td>
+                    {r.prima_libera ? (
+                      <Text size="sm">
+                        <b>{data(r.prima_libera)}</b>
+                        {r.posti_prima != null ? <Text span c="dimmed" size="xs"> · {r.posti_prima} posti</Text> : null}
+                        {r.esaurite_30gg ? (
+                          <Text span c="dimmed" size="xs"> · {r.esaurite_30gg}/{r.date_totali_30gg} piene</Text>
+                        ) : null}
+                      </Text>
+                    ) : (
+                      <Text size="sm" c="dimmed">nessuna data</Text>
+                    )}
+                  </Table.Td>
+
+                  <Table.Td>
+                    {r.aggiornato && adesso ? (
+                      <Badge size="sm" variant="light" color={COLORE[gravita(r.aggiornato, adesso)]}>
+                        {quantoFa(r.aggiornato, adesso)}
+                      </Badge>
+                    ) : (
+                      <Text size="sm" c="dimmed">mai</Text>
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Card>
+    </Stack>
+  );
+}
+
+function Riquadro({ n, che, colore }: { n: number | string; che: string; colore?: string }) {
+  return (
+    <Card withBorder radius="md" padding="sm">
+      <Text fz={28} fw={800} lh={1.1} c={colore}>{n}</Text>
+      <Text size="xs" c="dimmed">{che}</Text>
+    </Card>
   );
 }

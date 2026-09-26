@@ -1,3 +1,5 @@
+import { Alert } from '@mantine/core';
+import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 import { comeSiChiama } from '@/lib/accesso';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
@@ -63,20 +65,20 @@ export default async function RiordinaPagina({
       }
     >
 
-      <p className="ad-avviso">
+      <Alert color="blue" icon={<IconInfoCircle size={18} />} mb="md">
         Trascina per riordinare. La <b>prima</b> foto e&apos; la copertina: e&apos; quella che si
         vede nell&apos;elenco della home e quando qualcuno condivide il link. Le modifiche
         vanno in pagina solo dopo <b>Salva</b>.
-      </p>
+      </Alert>
 
       {foto.length === 0 ? (
         /* Fino al 26/09/2026 qui c'era scritto «vanno caricate prima
            altrove», e altrove non esisteva: un tour senza copertina
            restava senza copertina. Ora il pulsante e' in alto a destra. */
-        <p className="ad-vuoto">
+        <Alert color="yellow" icon={<IconAlertTriangle size={18} />}>
           Questo tour non ha nessuna foto. Usa <b>Aggiungi foto</b> qui sopra: la prima che
           carichi diventa la copertina, quella che si vede nell’elenco della home.
-        </p>
+        </Alert>
       ) : (
         <RiordinaFoto slug={slug} iniziali={foto} salva={salvaFoto} />
       )}

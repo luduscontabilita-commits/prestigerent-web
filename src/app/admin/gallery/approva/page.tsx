@@ -6,7 +6,6 @@ import { firmaAnteprime } from '@/lib/gallery-file';
 import { bassaRisoluzione, verraRitagliata } from '@/lib/gallery-tag';
 import { GalleryCoda, type InCoda } from '@/components/admin/GalleryCoda';
 import { aggiornaFoto, approva, pagineTaggabili, rifiuta } from '../azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };

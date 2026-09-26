@@ -5,7 +5,6 @@ import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryImpostazioni } from '@/components/admin/GalleryImpostazioni';
 import { salvaImpostazioni } from '../azioni';
-import '@/styles/gallery-admin.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
