@@ -120,8 +120,8 @@ for (const schermo of [{ nome: 'desktop', width: 1440, height: 900, mobile: fals
     return {
       indirizzo: location.pathname,
       titolo: (document.querySelector('h1')||{}).textContent || '',
-      righe: document.querySelectorAll('.ad-tab tbody tr').length,
-      pulsanti: document.querySelectorAll('.ad-tab tbody tr button').length,
+      righe: document.querySelectorAll('table tbody tr').length,
+      pulsanti: document.querySelectorAll('table tbody tr button').length,
       errore: /A server error occurred|couldn.t load|Application error/i.test(document.body.innerText),
     };
   `);
@@ -134,7 +134,7 @@ for (const schermo of [{ nome: 'desktop', width: 1440, height: 900, mobile: fals
 
   /* Il clic: e' qui che si vede se React si e' idratato davvero. */
   const dopo = await valuta(`
-    const b = document.querySelector('.ad-tab tbody tr button');
+    const b = document.querySelector('table tbody tr button');
     if (!b) return { errore: 'nessun pulsante' };
     b.click();
     await new Promise(r => setTimeout(r, 900));
