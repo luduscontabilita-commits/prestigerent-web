@@ -64,6 +64,9 @@ function generaPassword(): string {
 export type GuidaCreata = Esito & {
   username?: string;
   password?: string;
+  /** vero se l'ha generata il pannello. Serve a non dire «si vede una
+   *  volta sola» di una password che l'admin ha appena scritto lui. */
+  generata?: boolean;
   /** il testo gia' pronto da incollare in un messaggio */
   consegna?: string;
 };
@@ -87,6 +90,10 @@ export async function creaGuida(dati: {
   username: string;
   nome: string;
   contatto: string;
+  /** Facoltativa: vuota = la genera il pannello. Serve al caso concreto
+   *  di consegnare a voce una password che la persona ricorda, invece di
+   *  dodici caratteri casuali da dettare al telefono. */
+  password?: string;
 }): Promise<GuidaCreata> {
   const agente = await chiAgisce(RUOLI_GESTIONE);
   if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
@@ -113,7 +120,22 @@ export async function creaGuida(dati: {
   }
 
   const email = emailDiGuida(username);
-  const password = generaPassword();
+
+  /* 🔴 LA PASSWORD SCELTA SI CONTROLLA QUI, PRIMA di scrivere in
+     `autorizzati`. Se la si lasciasse passare, GoTrue la rifiuterebbe con
+     un 422 DOPO che la riga e' gia' stata scritta: il secondo tentativo
+     direbbe «nome gia' in uso», che e' l'errore piu' difficile da capire
+     fra tutti quelli possibili qui.
+     Otto caratteri e non sei (il minimo di Supabase): sei sono pochi per
+     una password che non scade e che nessuno cambiera' mai. */
+  const scelta = (dati.password ?? '').trim();
+  if (scelta && scelta.length < 8) {
+    return {
+      ok: false,
+      errore: 'La password deve avere almeno 8 caratteri. Lasciala vuota se preferisci che la generi io.',
+    };
+  }
+  const password = scelta || generaPassword();
 
   const utente = await supabaseServer();
 
@@ -158,6 +180,7 @@ export async function creaGuida(dati: {
     ok: true,
     username,
     password,
+    generata: !scelta,
     consegna:
       `Ciao ${nome}, ecco come entrare per caricare le foto:\n\n` +
       `Indirizzo: https://prestigerent.com/admin/entra/\n` +
@@ -185,7 +208,7 @@ export async function creaGuida(dati: {
  * si ottiene e' il CONTROLLO: da qui l'admin riprende in mano qualunque
  * account, in un momento, qualunque cosa sia successa alla password.
  */
-export async function rigeneraPassword(idProfilo: string): Promise<GuidaCreata> {
+export async function rigeneraPassword(idProfilo: string, scelta?: string): Promise<GuidaCreata> {
   const agente = await chiAgisce(RUOLI_GESTIONE);
   if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
 
@@ -212,7 +235,14 @@ export async function rigeneraPassword(idProfilo: string): Promise<GuidaCreata> 
     };
   }
 
-  const password = generaPassword();
+  const voluta = (scelta ?? '').trim();
+  if (voluta && voluta.length < 8) {
+    return {
+      ok: false,
+      errore: 'La password deve avere almeno 8 caratteri. Lasciala vuota se preferisci che la generi io.',
+    };
+  }
+  const password = voluta || generaPassword();
   const { error } = await sb.auth.admin.updateUserById(prof.id, { password });
   if (error) return { ok: false, errore: error.message };
 
@@ -220,6 +250,7 @@ export async function rigeneraPassword(idProfilo: string): Promise<GuidaCreata> 
     ok: true,
     username: prof.username ?? undefined,
     password,
+    generata: !voluta,
     consegna:
       `Ciao ${prof.nome ?? ''}, ecco la password nuova per entrare:\n\n` +
       `Indirizzo: https://prestigerent.com/admin/entra/\n` +

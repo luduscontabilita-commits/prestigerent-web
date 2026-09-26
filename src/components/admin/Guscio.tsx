@@ -88,6 +88,22 @@ export function Guscio({
                 laterale c'e' sempre e un pulsante per aprirla sarebbe un
                 comando che non fa niente. */}
             <Burger opened={aperta} onClick={toggle} hiddenFrom="sm" size="sm" aria-label="Menu" />
+            {/* Lo stesso logo trasparente della schermata di accesso e
+                dell'intestazione del sito: sta su Supabase Storage, non in
+                `public/`, quindi non c'e' una seconda copia da tenere
+                allineata il giorno che cambia.
+                `alt=""` e `aria-hidden`: accanto c'e' gia' scritto
+                PRESTIGE RENT, e un lettore di schermo che legge due volte
+                lo stesso nome e' rumore, non informazione. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png"
+              alt=""
+              aria-hidden="true"
+              width={28}
+              height={28}
+              style={{ display: 'block', flexShrink: 0 }}
+            />
             <Text fw={800} size="sm" style={{ letterSpacing: '.04em' }}>
               PRESTIGE RENT
             </Text>

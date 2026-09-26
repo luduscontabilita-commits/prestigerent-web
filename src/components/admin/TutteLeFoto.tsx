@@ -2,22 +2,54 @@
 
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
+import {
+  ActionIcon,
+  Alert,
+  Anchor,
+  AspectRatio,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Group,
+  Image,
+  Modal,
+  Paper,
+  ScrollArea,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+  Tooltip,
+} from '@mantine/core';
+import {
+  IconEdit,
+  IconEye,
+  IconEyeOff,
+  IconMaximize,
+  IconTrash,
+} from '@tabler/icons-react';
 import type { Pagina } from './GalleryCaricatore';
 
-/* L'ARCHIVIO DELLE FOTO, con i filtri e le azioni.
+/* L'ARCHIVIO DELLE FOTO.
  *
- * ── PERCHE' I FILTRI SONO LINK E NON PULSANTI ────────────────────────
- * Passano dall'indirizzo (`?stato=nascosta`). Tre conseguenze pratiche:
- * il filtro si puo' mandare a qualcuno, il tasto «indietro» del browser
- * funziona come uno si aspetta, e la pagina resta renderizzata dal
- * server -- niente elenco di centinaia di foto trascinato nel browser
- * per essere filtrato li'.
+ * 🔴 RISCRITTO CON MANTINE IL 26/09/2026. La prima versione usava classi
+ * `.tf-*` per cui non avevo mai scritto il CSS: le foto uscivano nude,
+ * alla loro dimensione naturale, senza griglia. Non era «brutto», era
+ * mancante -- e si vedeva solo aprendo la pagina da dentro.
  *
- * ── UNA GRIGLIA, NON UNA TABELLA ─────────────────────────────────────
- * Quello che si cerca qui e' UNA FOTO: la si riconosce guardandola, non
- * leggendo una riga. Le informazioni stanno sotto la miniatura, e le
- * azioni compaiono su ogni scheda -- non dietro a un menu, perche' su un
- * telefono un menu a comparsa e' un gesto in piu' per ogni foto.
+ * ── PERCHE' UNA GRIGLIA DI SCHEDE E NON UNA TABELLA ──────────────────
+ * Quello che si cerca qui e' UNA FOTO, e una foto la si riconosce
+ * guardandola, non leggendo una riga. Le informazioni stanno sotto la
+ * miniatura e i comandi su ogni scheda -- non dietro a un menu, perche'
+ * su un telefono un menu a comparsa e' un gesto in piu' per ogni foto.
+ *
+ * ── PERCHE' I FILTRI SONO LINK ───────────────────────────────────────
+ * Passano dall'indirizzo (`?stato=nascosta`): il filtro si puo' mandare a
+ * qualcuno, il tasto «indietro» funziona, e la pagina resta renderizzata
+ * dal server invece di trascinarsi centinaia di foto nel browser per
+ * filtrarle li'.
  */
 
 export type FotoAdmin = {
@@ -38,11 +70,11 @@ export type FotoAdmin = {
 
 type Esito = { ok: boolean; errore?: string };
 
-const NOME_STATO: Record<FotoAdmin['stato'], string> = {
-  approvata: 'sul sito',
-  nascosta: 'nascosta',
-  in_attesa: 'da approvare',
-  rifiutata: 'respinta',
+const STATO: Record<FotoAdmin['stato'], { testo: string; colore: string }> = {
+  approvata: { testo: 'sul sito', colore: 'teal' },
+  nascosta: { testo: 'nascosta', colore: 'gray' },
+  in_attesa: { testo: 'da approvare', colore: 'orange' },
+  rifiutata: { testo: 'respinta', colore: 'red' },
 };
 
 export function TutteLeFoto({
@@ -68,8 +100,8 @@ export function TutteLeFoto({
   ) => Promise<Esito>;
 }) {
   const [lista, setLista] = useState(foto);
-  const [apre, setApre] = useState<string | null>(null);
-  const [modifica, setModifica] = useState<string | null>(null);
+  const [grande, setGrande] = useState<FotoAdmin | null>(null);
+  const [modifica, setModifica] = useState<FotoAdmin | null>(null);
   const [bozza, setBozza] = useState({ alt: '', caption: '', tag: [] as string[] });
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, avvia] = useTransition();
@@ -82,7 +114,7 @@ export function TutteLeFoto({
     return '/admin/gallery/tutte/' + (t ? `?${t}` : '');
   };
 
-  const FILTRI: { chiave: string; testo: string }[] = [
+  const FILTRI = [
     { chiave: '', testo: 'Tutte' },
     { chiave: 'approvata', testo: `Sul sito (${conteggi.approvata ?? 0})` },
     { chiave: 'nascosta', testo: `Nascoste (${conteggi.nascosta ?? 0})` },
@@ -90,244 +122,292 @@ export function TutteLeFoto({
     { chiave: 'rifiutata', testo: `Respinte (${conteggi.rifiutata ?? 0})` },
   ];
 
+  const apriModifica = (f: FotoAdmin) => {
+    setModifica(f);
+    setBozza({ alt: f.alt, caption: f.caption ?? '', tag: f.tag.map((t) => t.key) });
+  };
+
   return (
-    <div className="tf">
-      {messaggio && <p className={messaggio.ok ? 'ad-ok' : 'ad-err'}>{messaggio.testo}</p>}
-
-      <div className="tf-filtri">
-        <div className="g-schede">
-          {FILTRI.map((f) => (
-            <Link
-              key={f.chiave || 'tutte'}
-              href={indirizzo(f.chiave, paginaAttiva)}
-              className={statoAttivo === f.chiave ? 'attiva' : ''}
-            >
-              {f.testo}
-            </Link>
-          ))}
-        </div>
-
-        <label className="tf-pagina">
-          Pagina
-          {/* Un <select> e non una lista di link: le pagine sono 103, e
-              centotré link non sono un filtro, sono un muro. */}
-          <select
-            value={paginaAttiva}
-            onChange={(e) => {
-              window.location.href = indirizzo(statoAttivo, e.target.value);
-            }}
-          >
-            <option value="">tutte le pagine</option>
-            {pagine.map((p) => (
-              <option key={p.key} value={p.key}>{p.label}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      {!lista.length && (
-        <p className="ad-ok">
-          Nessuna foto con questo filtro.{' '}
-          {(statoAttivo || paginaAttiva) && <Link href="/admin/gallery/tutte/">Togli i filtri</Link>}
-        </p>
+    <Stack gap="lg">
+      {messaggio && (
+        <Alert color={messaggio.ok ? 'teal' : 'red'} variant="light" radius="md" withCloseButton
+          onClose={() => setMessaggio(null)}>
+          {messaggio.testo}
+        </Alert>
       )}
 
-      <div className="tf-griglia">
-        {lista.map((f) => {
-          const inMod = modifica === f.id;
-          return (
-            <article className={'tf-card stato-' + f.stato} key={f.id}>
-              <button
-                type="button"
-                className="tf-foto"
-                style={{ background: f.colore ?? undefined }}
-                onClick={() => setApre(apre === f.id ? null : f.id)}
-                aria-label={apre === f.id ? 'Chiudi l’anteprima grande' : 'Apri l’anteprima grande'}
+      <Paper withBorder radius="md" p="sm">
+        <Group justify="space-between" gap="sm" wrap="wrap">
+          <Group gap={6} wrap="wrap">
+            {FILTRI.map((f) => (
+              <Button
+                key={f.chiave || 'tutte'}
+                component={Link}
+                href={indirizzo(f.chiave, paginaAttiva)}
+                size="xs"
+                radius="xl"
+                variant={statoAttivo === f.chiave ? 'filled' : 'default'}
               >
+                {f.testo}
+              </Button>
+            ))}
+          </Group>
+
+          {/* Un Select e non una fila di link: le pagine sono 103, e
+              centotre' link non sono un filtro, sono un muro. */}
+          <Select
+            size="xs"
+            w={{ base: '100%', sm: 300 }}
+            placeholder="tutte le pagine"
+            searchable
+            clearable
+            value={paginaAttiva || null}
+            data={pagine.map((p) => ({ value: p.key, label: p.label }))}
+            onChange={(v) => { window.location.href = indirizzo(statoAttivo, v ?? ''); }}
+          />
+        </Group>
+      </Paper>
+
+      {!lista.length && (
+        <Alert color="gray" variant="light" radius="md">
+          Nessuna foto con questo filtro.{' '}
+          {(statoAttivo || paginaAttiva) && (
+            <Anchor component={Link} href="/admin/gallery/tutte/">Togli i filtri</Anchor>
+          )}
+        </Alert>
+      )}
+
+      <SimpleGrid cols={{ base: 1, xs: 2, md: 3, xl: 4 }} spacing="md">
+        {lista.map((f) => (
+          <Card key={f.id} withBorder radius="md" padding={0} opacity={f.stato === 'nascosta' ? 0.65 : 1}>
+            <Card.Section pos="relative">
+              {/* `AspectRatio` tiene la griglia regolare anche con foto
+                  verticali e orizzontali mescolate: senza, ogni scheda
+                  sarebbe alta quanto la sua foto e la griglia ballerebbe. */}
+              <AspectRatio ratio={4 / 3} bg={f.colore ?? 'var(--mantine-color-gray-1)'}>
                 {f.anteprima ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={f.anteprima} alt="" loading="lazy" decoding="async" />
+                  <Image src={f.anteprima} alt={f.alt} fit="contain" loading="lazy" />
                 ) : (
-                  <span className="g-scaduta">Anteprima scaduta: ricarica</span>
+                  <Text size="xs" c="dimmed" ta="center" p="md">
+                    Anteprima scaduta: ricarica la pagina
+                  </Text>
                 )}
-                <span className={'tf-bollo ' + f.stato}>{NOME_STATO[f.stato]}</span>
-              </button>
+              </AspectRatio>
 
-              <div className="tf-dati">
-                {inMod ? (
-                  <>
-                    <label>
-                      Descrizione in inglese
-                      <input
-                        type="text"
-                        value={bozza.alt}
-                        onChange={(e) => setBozza({ ...bozza, alt: e.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Didascalia
-                      <input
-                        type="text"
-                        value={bozza.caption}
-                        onChange={(e) => setBozza({ ...bozza, caption: e.target.value })}
-                      />
-                    </label>
-                    <div className="g-pagine-scelta">
-                      {pagine.map((p) => (
-                        <label key={p.key}>
-                          <input
-                            type="checkbox"
-                            checked={bozza.tag.includes(p.key)}
-                            onChange={(e) =>
-                              setBozza({
-                                ...bozza,
-                                tag: e.target.checked
-                                  ? [...bozza.tag, p.key]
-                                  : bozza.tag.filter((k) => k !== p.key),
-                              })
-                            }
-                          />
-                          <span>{p.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <div className="tf-azioni">
-                      <button
-                        type="button"
-                        disabled={inCorso}
-                        onClick={() =>
-                          avvia(async () => {
-                            const r = await aggiornaFoto(f.id, {
-                              alt: bozza.alt,
-                              caption: bozza.caption || null,
-                              tag: bozza.tag,
-                            });
-                            if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non salvata.' }); return; }
-                            setLista((l) =>
-                              l.map((x) =>
-                                x.id === f.id
-                                  ? {
-                                      ...x,
-                                      alt: bozza.alt,
-                                      caption: bozza.caption || null,
-                                      tag: pagine.filter((p) => bozza.tag.includes(p.key)),
-                                    }
-                                  : x
-                              )
-                            );
-                            setModifica(null);
-                            setMessaggio({ ok: true, testo: 'Salvata.' });
-                          })
-                        }
-                      >
-                        Salva
-                      </button>
-                      <button type="button" className="g-annulla" onClick={() => setModifica(null)}>
-                        Annulla
-                      </button>
-                    </div>
-                  </>
+              <Badge
+                color={STATO[f.stato].colore}
+                variant="filled"
+                radius="sm"
+                pos="absolute"
+                top={8}
+                left={8}
+              >
+                {STATO[f.stato].testo}
+              </Badge>
+
+              <Tooltip label="Guarda grande">
+                <ActionIcon
+                  variant="default"
+                  radius="xl"
+                  pos="absolute"
+                  top={8}
+                  right={8}
+                  onClick={() => setGrande(f)}
+                  aria-label="Guarda la foto grande"
+                  disabled={!f.anteprima}
+                >
+                  <IconMaximize size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </Card.Section>
+
+            <Stack gap={6} p="sm">
+              <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>
+              {f.caption && <Text size="xs" c="dimmed" lineClamp={1}>{f.caption}</Text>}
+
+              <Text size="xs" c="dimmed">
+                {f.larghezza}×{f.altezza} ·{' '}
+                {f.chi ?? 'caricata prima che ci fossero gli utenti'} ·{' '}
+                {new Date(f.caricata).toLocaleDateString('it-IT')}
+              </Text>
+
+              <Group gap={4}>
+                {f.tag.length ? (
+                  f.tag.map((t) => (
+                    <Badge key={t.key} variant="light" color="gray" size="sm" radius="sm">
+                      {t.label}
+                    </Badge>
+                  ))
                 ) : (
-                  <>
-                    <p className="tf-alt">{f.alt}</p>
-                    {f.caption && <p className="g-did">{f.caption}</p>}
-                    <p className="tf-meta">
-                      {f.larghezza}×{f.altezza}
-                      {' · '}
-                      {f.chi ?? 'caricata prima che ci fossero gli utenti'}
-                      {' · '}
-                      {new Date(f.caricata).toLocaleDateString('it-IT')}
-                    </p>
-                    <p className="g-tag">
-                      {f.tag.length ? (
-                        f.tag.map((t) => <span key={t.key}>{t.label}</span>)
-                      ) : (
-                        <i>nessuna pagina: non si vede da nessuna parte</i>
-                      )}
-                    </p>
-                    {f.stato === 'rifiutata' && f.motivo && (
-                      <p className="ad-err g-motivo">Respinta: {f.motivo}</p>
-                    )}
-
-                    <div className="tf-azioni">
-                      <button
-                        type="button"
-                        className="g-corr"
-                        onClick={() => {
-                          setModifica(f.id);
-                          setBozza({
-                            alt: f.alt,
-                            caption: f.caption ?? '',
-                            tag: f.tag.map((t) => t.key),
-                          });
-                        }}
-                      >
-                        Correggi
-                      </button>
-
-                      {(f.stato === 'approvata' || f.stato === 'nascosta') && (
-                        <button
-                          type="button"
-                          disabled={inCorso}
-                          onClick={() =>
-                            avvia(async () => {
-                              const nascondi = f.stato === 'approvata';
-                              const r = await cambiaVisibilita(f.id, nascondi);
-                              if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
-                              setLista((l) =>
-                                l.map((x) =>
-                                  x.id === f.id ? { ...x, stato: nascondi ? 'nascosta' : 'approvata' } : x
-                                )
-                              );
-                              setMessaggio({
-                                ok: true,
-                                testo: nascondi
-                                  ? 'Nascosta dal sito. Il file resta: si può rimettere quando vuoi.'
-                                  : 'Di nuovo sul sito.',
-                              });
-                            })
-                          }
-                        >
-                          {f.stato === 'approvata' ? 'Nascondi dal sito' : 'Rimetti sul sito'}
-                        </button>
-                      )}
-
-                      <button
-                        type="button"
-                        className="g-no"
-                        disabled={inCorso}
-                        onClick={() => {
-                          /* La conferma c'e' perche' questa e' l'unica
-                             azione del pannello che non si annulla: va via
-                             la riga E il file dallo storage. */
-                          if (!window.confirm(`Eliminare «${f.alt}»? Il file viene cancellato e non si recupera.`)) return;
-                          avvia(async () => {
-                            const r = await elimina(f.id);
-                            if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
-                            setLista((l) => l.filter((x) => x.id !== f.id));
-                            setMessaggio({ ok: true, testo: 'Eliminata.' });
-                          });
-                        }}
-                      >
-                        Elimina
-                      </button>
-                    </div>
-                  </>
+                  <Badge variant="light" color="red" size="sm" radius="sm">
+                    nessuna pagina: non si vede da nessuna parte
+                  </Badge>
                 )}
-              </div>
+              </Group>
 
-              {/* L'anteprima grande, per giudicare una foto invece di
-                  indovinarla da una miniatura. */}
-              {apre === f.id && f.anteprima && (
-                <div className="tf-grande" onClick={() => setApre(null)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.anteprima} alt={f.alt} />
-                </div>
+              {f.stato === 'rifiutata' && f.motivo && (
+                <Text size="xs" c="red">Respinta: {f.motivo}</Text>
               )}
-            </article>
-          );
-        })}
-      </div>
-    </div>
+
+              <Group gap={6} mt={4}>
+                <Button size="compact-sm" variant="default" leftSection={<IconEdit size={14} />}
+                  onClick={() => apriModifica(f)}>
+                  Correggi
+                </Button>
+
+                {(f.stato === 'approvata' || f.stato === 'nascosta') && (
+                  <Button
+                    size="compact-sm"
+                    variant="default"
+                    loading={inCorso}
+                    leftSection={f.stato === 'approvata' ? <IconEyeOff size={14} /> : <IconEye size={14} />}
+                    onClick={() =>
+                      avvia(async () => {
+                        const nascondi = f.stato === 'approvata';
+                        const r = await cambiaVisibilita(f.id, nascondi);
+                        if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
+                        setLista((l) => l.map((x) => (x.id === f.id ? { ...x, stato: nascondi ? 'nascosta' : 'approvata' } : x)));
+                        setMessaggio({
+                          ok: true,
+                          testo: nascondi
+                            ? 'Nascosta dal sito. Il file resta: si può rimettere quando vuoi.'
+                            : 'Di nuovo sul sito.',
+                        });
+                      })
+                    }
+                  >
+                    {f.stato === 'approvata' ? 'Nascondi' : 'Rimetti'}
+                  </Button>
+                )}
+
+                <Tooltip label="Elimina per sempre">
+                  <ActionIcon
+                    color="red"
+                    variant="light"
+                    size="lg"
+                    aria-label="Elimina"
+                    onClick={() => {
+                      /* La conferma c'e' perche' questa e' l'unica azione
+                         del pannello che non si annulla: va via la riga E
+                         il file dallo storage. */
+                      if (!window.confirm(`Eliminare «${f.alt}»? Il file viene cancellato e non si recupera.`)) return;
+                      avvia(async () => {
+                        const r = await elimina(f.id);
+                        if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
+                        setLista((l) => l.filter((x) => x.id !== f.id));
+                        setMessaggio({ ok: true, testo: 'Eliminata.' });
+                      });
+                    }}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+            </Stack>
+          </Card>
+        ))}
+      </SimpleGrid>
+
+      {/* ── la foto grande ── */}
+      <Modal
+        opened={!!grande}
+        onClose={() => setGrande(null)}
+        size="xl"
+        centered
+        title={grande?.alt}
+      >
+        {grande?.anteprima && (
+          <Stack gap="sm">
+            <Image src={grande.anteprima} alt={grande.alt} fit="contain" mah="70vh" />
+            <Text size="sm" c="dimmed">
+              {grande.larghezza}×{grande.altezza}
+              {grande.scattata
+                ? ` · scattata il ${new Date(grande.scattata).toLocaleDateString('it-IT')}`
+                : ' · senza data di scatto'}
+            </Text>
+          </Stack>
+        )}
+      </Modal>
+
+      {/* ── correggi ── */}
+      <Modal
+        opened={!!modifica}
+        onClose={() => setModifica(null)}
+        title="Correggi la foto"
+        size="lg"
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Descrizione in inglese"
+            description="Cosa si vede nella foto. La leggono Google e chi non può vedere l’immagine."
+            value={bozza.alt}
+            onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Didascalia"
+            description="Facoltativa: compare sulla foto, sul sito."
+            value={bozza.caption}
+            onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
+          />
+
+          <div>
+            <Text size="sm" fw={500} mb={6}>Pagine</Text>
+            <ScrollArea.Autosize mah={260} type="auto">
+              <Stack gap={4} pr="sm">
+                {pagine.map((p) => (
+                  <Checkbox
+                    key={p.key}
+                    label={p.label}
+                    checked={bozza.tag.includes(p.key)}
+                    onChange={(e) =>
+                      setBozza({
+                        ...bozza,
+                        tag: e.currentTarget.checked
+                          ? [...bozza.tag, p.key]
+                          : bozza.tag.filter((k) => k !== p.key),
+                      })
+                    }
+                  />
+                ))}
+              </Stack>
+            </ScrollArea.Autosize>
+          </div>
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setModifica(null)}>Annulla</Button>
+            <Button
+              loading={inCorso}
+              onClick={() =>
+                avvia(async () => {
+                  if (!modifica) return;
+                  const r = await aggiornaFoto(modifica.id, {
+                    alt: bozza.alt,
+                    caption: bozza.caption || null,
+                    tag: bozza.tag,
+                  });
+                  if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non salvata.' }); return; }
+                  setLista((l) =>
+                    l.map((x) =>
+                      x.id === modifica.id
+                        ? {
+                            ...x,
+                            alt: bozza.alt,
+                            caption: bozza.caption || null,
+                            tag: pagine.filter((p) => bozza.tag.includes(p.key)),
+                          }
+                        : x
+                    )
+                  );
+                  setModifica(null);
+                  setMessaggio({ ok: true, testo: 'Salvata.' });
+                })
+              }
+            >
+              Salva
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </Stack>
   );
 }
