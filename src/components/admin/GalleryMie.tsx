@@ -102,14 +102,17 @@ export function GalleryMie({
   const salvaERimanda = (f: MiaFoto) =>
     avvia(async () => {
       setMessaggio(null);
+      /* Una chiamata sola, non due. `aggiornaFoto` rimette da se' in
+         coda una foto che era rifiutata -- deve farlo, altrimenti la
+         policy respinge tutta la modifica. Chiamare `reinvia` dopo
+         fallirebbe, perche' a quel punto la foto non e' piu' fra le
+         rifiutate. */
       const r1 = await aggiornaFoto(f.id, {
         alt: bozza.alt,
         caption: bozza.caption.trim() || null,
         tag: bozza.tag,
       });
       if (!r1.ok) { setMessaggio({ ok: false, testo: r1.errore ?? 'Non salvata.' }); return; }
-      const r2 = await reinvia(f.id);
-      if (!r2.ok) { setMessaggio({ ok: false, testo: r2.errore ?? 'Corretta ma non rimandata.' }); return; }
       const etichette = bozza.tag.map((k) => pagine.find((p) => p.key === k)?.label ?? k);
       setResto((x) => x.map((y) => (y.id === f.id
         ? { ...y, stato: 'in_attesa' as const, motivo: null, alt: bozza.alt,

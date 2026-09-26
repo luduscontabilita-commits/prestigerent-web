@@ -374,6 +374,33 @@ export async function aggiornaFoto(
     return { ok: false, errore: 'Una delle pagine indicate non è nel registro.' };
   }
 
+  /* 🔴 CORREGGERE UNA RIFIUTATA LA RIMETTE IN CODA, NELLO STESSO UPDATE.
+     Non e' una comodita': senza, la correzione non passa affatto.
+     La policy `modifica_gallery_images_mie` lascia a chi ha caricato
+     modificare una foto `in_attesa` o `rifiutata` (`using`), ma pretende
+     che DOPO la modifica la riga sia `in_attesa` (`with check`). Una
+     correzione che cambiasse solo descrizione e tag lascerebbe lo stato
+     su `rifiutata`, il `with check` la respingerebbe, e l'update
+     toccherebbe zero righe: il pannello direbbe «questa foto non e'
+     tua», che e' falso e incomprensibile per chi la sta correggendo.
+     Misurato dal vivo il 26/09/2026 con una guida vera.
+
+     Ed e' anche la cosa giusta di suo: una foto rifiutata e poi corretta
+     deve tornare in coda, non restare rifiutata con appeso il motivo di
+     una versione che non esiste piu'. Per questo si azzerano anche
+     `review_note`, `reviewed_by` e `reviewed_at`.
+
+     Solo `rifiutata`, pero'. `/admin/gallery/tutte/` chiama questa
+     stessa funzione su foto GIA' APPROVATE: forzare lo stato per tutti
+     vorrebbe dire che un admin che sistema una didascalia toglie la foto
+     dal sito senza averlo chiesto. */
+  const { data: prima } = await sb
+    .from('gallery_images')
+    .select('status')
+    .eq('id', id)
+    .maybeSingle();
+  const eraRifiutata = prima?.status === 'rifiutata';
+
   const { error, count } = await sb
     .from('gallery_images')
     .update(
@@ -381,6 +408,9 @@ export async function aggiornaFoto(
         alt: dati.alt.trim(),
         caption: dati.caption?.trim() || null,
         updated_at: new Date().toISOString(),
+        ...(eraRifiutata
+          ? { status: 'in_attesa', review_note: null, reviewed_by: null, reviewed_at: null }
+          : {}),
       },
       { count: 'exact' }
     )
