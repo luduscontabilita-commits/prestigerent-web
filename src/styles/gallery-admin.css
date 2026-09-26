@@ -1,0 +1,164 @@
+/* IL PANNELLO DELLA GALLERY.
+ *
+ * File a parte e non righe in fondo ad `admin.css`: quello e' il pannello
+ * che c'era, e tenerlo intatto vuol dire che se qualcosa si muove in
+ * /admin/seo/ o /admin/numeri/ non e' stata la gallery.
+ *
+ * Stessa tavolozza del resto del pannello, presa da admin.css: #ED6707 il
+ * comando, #E2E8EE i bordi, #6B7885 il testo secondario, #C0392B
+ * l'errore, #155E3B il verde. Non e' un pannello nuovo, e' una sezione in
+ * piu' dello stesso.
+ *
+ * 🔴 PENSATO PER UN TELEFONO TENUTO IN MANO: una colonna sola sotto i
+ * 900px, bersagli da toccare grandi, e NIENTE che dipenda dal passaggio
+ * del mouse -- su un telefono il mouse non esiste, e un comando che
+ * compare solo al passaggio semplicemente non c'e'.
+ */
+
+/* ── lo stato dell'interruttore, in cima ─────────────────────────── */
+.g-stato { margin: 0 0 18px; padding: 13px 16px; border-radius: 12px; font-size: .88rem; line-height: 1.55; border: 1px solid; }
+.g-stato.off { background: #FFF7ED; border-color: #F5C48A; color: #7A4A12; }
+.g-stato.on { background: #EDFBF3; border-color: #9BD9B8; color: #155E3B; }
+
+/* ── il caricatore ───────────────────────────────────────────────── */
+.gc-zona { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 30px 20px; border: 2px dashed #C9D4DE; border-radius: 16px; background: #fff; text-align: center; }
+.gc-zona.sopra { border-color: #ED6707; background: #FFF7F0; }
+.gc-zona strong { font-size: 1.05rem; }
+.gc-scegli { padding: 13px 26px; border: 0; border-radius: 999px; background: #ED6707; color: #fff; font: inherit; font-size: .95rem; font-weight: 800; cursor: pointer; }
+.gc-nota { font-size: .78rem; color: #6B7885; line-height: 1.5; max-width: 46ch; }
+
+.gc-corpo { display: grid; gap: 18px; margin-top: 20px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .gc-corpo { grid-template-columns: 1fr 320px; align-items: start; } }
+
+.gc-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: #6B7885; margin-bottom: 10px; }
+.gc-mini { display: inline-block; padding: 6px 12px; border: 1px solid #D6DDE4; border-radius: 999px; background: #fff; font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; color: #16202A; text-decoration: none; }
+
+.gc-card { display: grid; gap: 12px; grid-template-columns: 1fr; background: #fff; border: 1px solid #E2E8EE; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+@media (min-width: 560px) { .gc-card { grid-template-columns: 120px 1fr; } }
+.gc-card.ko { border-color: #E7B9B3; background: #FFF8F7; }
+
+.gc-sel { display: flex; align-items: center; gap: 7px; font-size: .78rem; color: #6B7885; }
+@media (min-width: 560px) { .gc-sel { grid-column: 1 / -1; } }
+
+.gc-ant { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: cover; border-radius: 10px; background: #EEF2F5; }
+.gc-dati { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.gc-nome { font-size: .74rem; color: #6B7885; word-break: break-all; }
+.gc-misure { margin: 0; font-size: .76rem; color: #6B7885; }
+.gc-lavoro { margin: 0; font-size: .8rem; color: #ED6707; font-weight: 700; }
+
+.gc-avviso { margin: 0; padding: 8px 10px; border-radius: 9px; background: #FFF7ED; border: 1px solid #F5C48A; color: #7A4A12; font-size: .78rem; line-height: 1.5; }
+.gc-err { margin: 0; padding: 8px 10px; border-radius: 9px; background: #FDF2F1; border: 1px solid #E7B9B3; color: #C0392B; font-size: .8rem; line-height: 1.5; }
+.gc-ok { margin: 0; padding: 8px 10px; border-radius: 9px; background: #EDFBF3; border: 1px solid #9BD9B8; color: #155E3B; font-size: .85rem; line-height: 1.55; }
+
+.gc-dati label,
+.g-riga-dati label,
+.g-imp label,
+.g-mod label { display: block; font-size: .8rem; font-weight: 700; color: #16202A; }
+
+.gc-dati input,
+.g-riga-dati input,
+.g-imp input,
+.g-imp select,
+.g-mod input,
+.g-mod select { display: block; width: 100%; margin-top: 5px; padding: 11px 13px; border: 1px solid #D6DDE4; border-radius: 10px; font: inherit; font-size: .92rem; }
+
+.gc-dati input:focus,
+.g-riga-dati input:focus,
+.g-imp input:focus,
+.g-imp select:focus,
+.g-mod input:focus,
+.g-mod select:focus { outline: 2px solid #ED6707; outline-offset: 1px; border-color: transparent; }
+
+.gc-aiuto { display: block; margin-top: 5px; font-size: .75rem; font-weight: 500; color: #6B7885; line-height: 1.5; }
+.gc-opt { font-weight: 500; color: #6B7885; }
+.gc-sel-txt { font-weight: 500; }
+
+.gc-etichette { display: flex; flex-wrap: wrap; gap: 6px; }
+.gc-etichetta { display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px 4px 10px; border-radius: 999px; background: #EEF2F5; font-size: .76rem; font-weight: 700; }
+.gc-etichetta button { border: 0; background: none; cursor: pointer; font-size: 1rem; line-height: 1; color: #6B7885; padding: 0 2px; }
+.gc-manca { font-size: .76rem; color: #C0392B; font-weight: 700; }
+
+.gc-pagine { background: #fff; border: 1px solid #E2E8EE; border-radius: 14px; padding: 14px; }
+.gc-pagine h3 { margin: 0 0 4px; font-size: .95rem; }
+.gc-pagine input[type=search] { width: 100%; margin: 10px 0; padding: 10px 13px; border: 1px solid #D6DDE4; border-radius: 10px; font: inherit; font-size: .9rem; }
+.gc-gruppo { border-top: 1px solid #EEF2F5; padding: 8px 0; }
+.gc-gruppo summary { cursor: pointer; font-size: .85rem; font-weight: 800; }
+.gc-gruppo summary span { color: #6B7885; font-weight: 600; }
+.gc-pagina { display: flex; align-items: flex-start; gap: 8px; padding: 7px 2px; font-size: .83rem; line-height: 1.4; }
+.gc-pagina input { margin-top: 2px; flex: 0 0 auto; }
+
+.gc-invio { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.gc-manca-lista { margin: 0; padding-left: 20px; font-size: .83rem; color: #C0392B; line-height: 1.6; }
+.gc-invia { padding: 15px 30px; border: 0; border-radius: 12px; background: #ED6707; color: #fff; font: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; }
+.gc-invia:disabled { opacity: .5; cursor: default; }
+
+/* ── la coda e «le mie foto» ─────────────────────────────────────── */
+.g-coda-barra { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px 14px; background: #fff; border: 1px solid #E2E8EE; border-radius: 12px; margin-bottom: 14px; font-size: .85rem; }
+
+.g-coda-barra button,
+.g-azioni button,
+.g-imp > button,
+.g-pagine-testa button,
+.g-mod button { padding: 11px 20px; border: 0; border-radius: 10px; background: #ED6707; color: #fff; font: inherit; font-size: .88rem; font-weight: 800; cursor: pointer; }
+
+.g-coda-barra button:disabled,
+.g-azioni button:disabled,
+.g-imp > button:disabled,
+.g-pagine-testa button:disabled { opacity: .5; cursor: default; }
+
+.g-azioni button.g-corr,
+.g-azioni button.g-annulla { background: #fff; color: #16202A; border: 1px solid #D6DDE4; }
+.g-azioni button.g-no,
+.g-rifiuto button.g-no { background: #C0392B; }
+
+.g-riga { display: grid; gap: 14px; grid-template-columns: 1fr; background: #fff; border: 1px solid #E2E8EE; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+@media (min-width: 640px) { .g-riga { grid-template-columns: 200px 1fr; } }
+.g-riga-sel { display: flex; align-items: center; gap: 7px; font-size: .78rem; color: #6B7885; }
+@media (min-width: 640px) { .g-riga-sel { grid-column: 1 / -1; } }
+
+/* `contain` e non `cover`: qui la foto si sta GIUDICANDO, e un ritaglio
+   farebbe approvare qualcosa di diverso da quello che andra' sul sito. */
+.g-riga-foto { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 11px; overflow: hidden; background: #EEF2F5; display: grid; place-items: center; }
+.g-riga-foto img { width: 100%; height: 100%; object-fit: contain; }
+.g-scaduta { padding: 10px; font-size: .75rem; color: #6B7885; text-align: center; line-height: 1.45; }
+
+.g-riga-dati { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.g-chi { margin: 0; font-size: .76rem; color: #6B7885; line-height: 1.5; }
+.g-alt { margin: 0; font-size: .95rem; font-weight: 700; line-height: 1.45; }
+.g-did { margin: 0; font-size: .85rem; color: #6B7885; }
+.g-tag { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.g-tag span { padding: 3px 9px; border-radius: 999px; background: #EEF2F5; font-size: .74rem; font-weight: 700; }
+.g-tag i { font-size: .78rem; color: #C0392B; }
+.g-motivo { line-height: 1.55; }
+.g-azioni { display: flex; gap: 9px; flex-wrap: wrap; }
+.g-rifiuto summary { cursor: pointer; font-size: .8rem; font-weight: 700; color: #C0392B; }
+.g-rifiuto label { margin: 9px 0; }
+.g-pagine-scelta { max-height: 220px; overflow: auto; border: 1px solid #E2E8EE; border-radius: 10px; padding: 8px; }
+.g-pagine-scelta label { display: flex; gap: 8px; align-items: flex-start; padding: 5px 2px; font-size: .82rem; font-weight: 500; }
+
+.g-schede { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.g-schede button { padding: 9px 16px; border: 1px solid #D6DDE4; border-radius: 999px; background: #fff; font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; color: #16202A; }
+.g-schede button.attiva { background: #16202A; color: #fff; border-color: #16202A; }
+.g-schede span { opacity: .65; }
+
+/* ── pagine e impostazioni ───────────────────────────────────────── */
+.g-pagine-testa { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.g-pagine-testa .gc-aiuto { flex: 1 1 240px; margin: 0; }
+.g-pagine-testa input[type=search] { flex: 1 1 200px; padding: 10px 13px; border: 1px solid #D6DDE4; border-radius: 10px; font: inherit; font-size: .9rem; }
+.g-tab code { font-size: .72rem; color: #6B7885; }
+.g-si { color: #155E3B; font-weight: 700; }
+.g-nascosta { color: #6B7885; }
+.g-orfana { background: #FFF8F7; }
+.g-mod { background: #F7F9FB; }
+.g-mod-griglia { display: grid; gap: 14px; grid-template-columns: 1fr; margin-bottom: 12px; }
+@media (min-width: 760px) { .g-mod-griglia { grid-template-columns: 1fr 1fr; } }
+
+.g-imp { display: flex; flex-direction: column; gap: 18px; max-width: 620px; }
+.g-interruttore { padding: 16px; border-radius: 13px; border: 1px solid; }
+.g-interruttore.off { background: #FFF7ED; border-color: #F5C48A; }
+.g-interruttore.on { background: #EDFBF3; border-color: #9BD9B8; }
+.g-interruttore label { display: flex; align-items: center; gap: 10px; font-size: 1rem; cursor: pointer; }
+.g-interruttore input { width: 20px; height: 20px; margin: 0; }
+.g-interruttore p { margin: 8px 0 0; font-size: .82rem; line-height: 1.55; color: #4A5A67; }
+.g-fieldset { border: 1px solid #E2E8EE; border-radius: 13px; padding: 14px 16px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
+.g-fieldset legend { padding: 0 6px; font-size: .82rem; font-weight: 800; }

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { chiSono, haRuolo, RUOLI_GESTIONE } from '@/lib/auth';
 
@@ -23,7 +24,11 @@ export default async function Pannello() {
 
   const voci = [
     { href: '/admin/seo/', titolo: 'Title e description', testo: 'I testi che compaiono su Google, pagina per pagina. 123 pagine.' },
-    { href: '/admin/foto/', titolo: 'Foto dei tour', testo: 'L’ordine delle foto. La prima e’ la copertina: elenco della home e anteprime social.' },
+    { href: '/admin/foto/', titolo: 'Foto dei tour', testo: 'L’ordine delle foto DEL PRODOTTO: la striscia in cima alle schede. La prima e’ la copertina, usata nell’elenco della home e nelle anteprime social.' },
+    /* Due voci che parlano di foto, e la differenza va detta in entrambe:
+       chi cerca "le foto" non sa quale delle due gli serve. Sopra le foto
+       del prodotto, qui le foto delle giornate caricate dalle guide. */
+    { href: '/admin/gallery/', titolo: 'Foto della gallery', testo: 'Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in fondo alle pagine, dopo approvazione.' },
     { href: '/admin/numeri/', titolo: 'Numeri da Regiondo', testo: 'Recensioni, prenotazioni e disponibilita’. Si riaggiornano con un pulsante e dicono quanti anni hanno.' },
   ];
 
@@ -47,17 +52,17 @@ export default async function Pannello() {
             ))}
             <div className="ad-card ad-prossimo">
               <strong>In arrivo</strong>
-              <span>Video dei tour · Foto della gallery</span>
+              <span>Video dei tour</span>
             </div>
           </>
         ) : (
-          <div className="ad-card ad-prossimo">
-            <strong>Caricamento delle foto</strong>
+          <Link className="ad-card" href="/admin/gallery/">
+            <strong>Foto della gallery</strong>
             <span>
-              Non e’ ancora attivo: te lo diciamo appena si puo’ usare. Da qui potrai
-              caricare le foto delle giornate e dire a quali pagine appartengono.
+              Carica le foto delle giornate e dì a quali pagine appartengono. Le vede un
+              amministratore prima che compaiano sul sito.
             </span>
-          </div>
+          </Link>
         )}
       </div>
     </main>

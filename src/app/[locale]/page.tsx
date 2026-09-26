@@ -16,6 +16,8 @@ import { prezzoDi } from '@/lib/prezzi';
 import { puntiScheda } from '@/lib/punti';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { PageGallery } from '@/components/PageGallery';
+import { chiaveHome } from '@/lib/gallery-dati';
 import { Premi } from '@/components/Premi';
 import { fonti, inEvidenza, votiPerTour } from '@/lib/recensioni';
 import { riprova, tuttiIConteggi } from '@/lib/riprova';
@@ -798,6 +800,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         totale={d.totale}
         titolo={`${aParoleMaiusc(d.anni ?? anniDiAttivita())} years, one reputation`}
       />
+
+      {/* Le foto delle giornate, caricate da chi accompagna gli ospiti.
+          Non rende NIENTE finche' l'interruttore generale e' spento o le
+          foto approvate sono sotto soglia: nessun titolo, nessun
+          contenitore, nessuno spazio. Vedi src/components/PageGallery.tsx */}
+      <PageGallery tag={chiaveHome} />
 
       <ContactSection locale={locale} />
 

@@ -101,6 +101,51 @@ export function postaConfigurata() {
   return conf() != null;
 }
 
+/* ── UN INVIO GENERICO, PER GLI AVVISI INTERNI ─────────────────────────
+ *
+ * `avvisaRichiesta()` e `confermaAlCliente()` restano come sono: hanno il
+ * loro HTML, i loro campi e la loro storia, e non vanno toccate.
+ *
+ * Questa serve agli avvisi della gallery -- «Marco ha inviato 12 foto da
+ * approvare», «la tua foto e' stata rifiutata perche'...» -- che sono
+ * email di servizio fra persone che lavorano al sito, non messaggi a un
+ * cliente.
+ *
+ * MITTENTE E DESTINATARIO RESTANO DENTRO MICROSOFT, come per le
+ * richieste: l'hosting Serverplan ha l'indirizzo predefinito
+ * ":fail: No Such User Here" e non riesce a mandare un'email a nessun
+ * indirizzo @prestigerent.com. Qui si parte da `SMTP_USER`, che e'
+ * usa@prestigerent.com, e si consegna dentro la stessa casa.
+ *
+ * NON LANCIA MAI. Un avviso che non parte non deve far fallire
+ * l'operazione che l'ha generato: se la posta e' giu', dodici foto
+ * caricate restano caricate e l'admin le trova nella coda comunque. Torna
+ * `false` e chi chiama decide se dirlo. */
+export async function invia(m: {
+  a: string | string[];
+  oggetto: string;
+  testo: string;
+  html?: string;
+}): Promise<boolean> {
+  const c = conf();
+  if (!c) return false;
+  const destinatari = (Array.isArray(m.a) ? m.a : [m.a]).filter(Boolean);
+  if (!destinatari.length) return false;
+  try {
+    const t = apri(c);
+    await t.sendMail({
+      from: `"Prestige Rent" <${c.user}>`,
+      to: destinatari.join(', '),
+      subject: m.oggetto,
+      text: m.testo,
+      ...(m.html ? { html: m.html } : {}),
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /* ── LA CONFERMA A CHI HA SCRITTO ──────────────────────────────────────
  *
  * Non e' cortesia: evita la richiesta doppia. Chi scrive dagli Stati

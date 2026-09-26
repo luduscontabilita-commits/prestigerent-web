@@ -42,9 +42,26 @@ type Opzioni = {
   /** quante diapositive sono ORIGINALI (le altre sono i cloni del ciclo).
    *  Serve a sapere dopo quanti pixel si torna al punto di partenza. */
   originali?: number;
+  /** 🔴 LE FRECCE CON DIAPOSITIVE DI LARGHEZZA DIVERSA.
+   *
+   * Spenta, e va lasciata spenta dove le diapositive sono tutte larghe
+   * uguale: `PhotoStrip` e `Videos` si comportano come prima, al pixel.
+   *
+   * Serve alla gallery con tag, dove ogni foto e' larga secondo le sue
+   * proporzioni. Il passo normale e' la larghezza della PRIMA
+   * diapositiva: se la prima e' una verticale stretta, ogni clic avanza
+   * di poco e si finisce sempre a meta' di una foto -- e sembra che la
+   * freccia funzioni male. Accesa, la freccia porta all'inizio della
+   * diapositiva successiva, qualunque larghezza abbia. */
+  passoPerDiapositiva?: boolean;
 };
 
-export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzioni = {}) {
+export function useFilm({
+  auto = false,
+  velocita = 0.55,
+  originali = 0,
+  passoPerDiapositiva = false,
+}: Opzioni = {}) {
   const box = useRef<HTMLDivElement>(null);
 
   const [motoRidotto, setMotoRidotto] = useState(true);
@@ -178,12 +195,37 @@ export function useFilm({ auto = false, velocita = 0.55, originali = 0 }: Opzion
     const el = box.current;
     if (!el) return;
     setFermo(true);
+
+    /* Con diapositive di larghezza diversa il passo si MISURA sul posto.
+       Lo scostamento fra il bordo sinistro di una diapositiva e quello del
+       contenitore E' esattamente di quanto bisogna scorrere per portarla a
+       filo: e siccome si legge dalla posizione reale sullo schermo, vale
+       anche se il contenitore ha un margine interno, cosa che con
+       `offsetLeft` andrebbe scontata a mano. */
+    if (passoPerDiapositiva) {
+      const track = el.querySelector<HTMLElement>('.film-track');
+      const bordo = el.getBoundingClientRect().left;
+      const scostamenti = Array.from(track?.children ?? [])
+        .map((s) => (s as HTMLElement).getBoundingClientRect().left - bordo);
+      /* la tolleranza di un pixel: a filo, gli arrotondamenti del browser
+         danno 0,4px e senza di essa la freccia non si muoverebbe */
+      const passo = verso === 1
+        ? scostamenti.filter((d) => d > 1).sort((a, b) => a - b)[0]
+        : scostamenti.filter((d) => d < -1).sort((a, b) => b - a)[0];
+      if (passo !== undefined) {
+        el.scrollBy({ left: passo, behavior: motoRidotto ? 'auto' : 'smooth' });
+        return;
+      }
+      /* nessuna diapositiva da quel lato: si scende al passo di sotto,
+         cosi' la freccia fa comunque qualcosa invece di sembrare morta */
+    }
+
     const prima = el.querySelector<HTMLElement>('.film-track > *');
     /* un passo = una diapositiva, non "l'80% della finestra": con
        diapositive larghe 880px l'80% ne mostrava una a meta' */
     const passo = prima ? prima.getBoundingClientRect().width + 14 : el.clientWidth * 0.8;
     el.scrollBy({ left: verso * passo, behavior: motoRidotto ? 'auto' : 'smooth' });
-  }, [motoRidotto]);
+  }, [motoRidotto, passoPerDiapositiva]);
 
   const alterna = useCallback(() => setFermo((f) => !f), []);
 

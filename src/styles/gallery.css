@@ -1,0 +1,201 @@
+/* LA GALLERY CON TAG: SOLO QUELLO CHE `landing.css` NON HA GIA'.
+ *
+ * 🔴 `landing.css` NON SI RISCRIVE -- e' la grafica importata dalla
+ * landing Siena, collaudata su traffico a pagamento. Qui si riusano le sue
+ * classi (`.film-section`, `.film-head`, `.film-title`, `.film-sub`,
+ * `.film-wrap`, `.film`, `.film-track`, `.film-btn`, `.film-auto`) e si
+ * aggiunge soltanto la diapositiva, che deve comportarsi al contrario
+ * della sua.
+ *
+ * LA DIFFERENZA, che e' tutta qui: `.slide` ha larghezza fissa e
+ * `object-fit:cover`, cioe' RITAGLIA. Con foto verticali e orizzontali
+ * mescolate quel ritaglio perde meta' di ogni verticale. `.gslide` invece
+ * ha altezza fissa e larghezza dalle proporzioni: la foto si vede intera.
+ *
+ * I colori sono i token che il sito ha gia' (`--card`, `--line`, `--ph`,
+ * `--ink-soft`): nessun colore nuovo scritto a mano, cosi' il tema chiaro
+ * e quello scuro continuano a funzionare da soli.
+ */
+
+/* ── LA STRISCIA ─────────────────────────────────────────────────── */
+
+/* Quando le foto ci stanno tutte non si scorre: si centrano. Senza questo
+   una gallery da tre foto resterebbe appiccicata a sinistra con un vuoto
+   a destra, e sembrerebbe che manchi qualcosa. */
+.gfilm-ferma { overflow-x: hidden; cursor: default; }
+.gfilm-ferma .gtrack { justify-content: center; width: 100%; }
+
+.gtrack { align-items: center; }
+
+.gslide {
+  position: relative;
+  flex: 0 0 auto;
+  /* L'ALTEZZA E' LA COSTANTE, la larghezza la decide `aspect-ratio`
+     scritto nello stile inline dalle misure salvate all'upload. I tre
+     scaglioni sono gli stessi che `ALTEZZE` dichiara in gallery-tag.ts,
+     dove servono a calcolare `sizes`: se qui si cambia un numero, va
+     cambiato anche la', o il browser scarica la variante sbagliata. */
+  height: 300px;
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  /* mentre la foto arriva si vede il suo colore dominante (stile inline);
+     `--ph` e' la rete di sicurezza per le righe vecchie senza colore */
+  background: var(--ph);
+}
+
+@media (min-width: 481px) { .gslide { height: 340px; } }
+@media (min-width: 1025px) { .gslide { height: 420px; } }
+
+/* Il bersaglio del clic e' un <button>: si arriva col Tab, si apre con
+   Invio o barra spaziatrice, e chi usa uno screen reader sente che la foto
+   si puo' aprire. Un <div onClick> non fa nessuna di queste tre cose. */
+.gslide-apri {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.gslide img {
+  width: 100%;
+  height: 100%;
+  /* La casella ha GIA' le proporzioni della foto, quindi `cover` non
+     ritaglia niente: serve solo a non lasciare mezzo pixel di sfondo per
+     gli arrotondamenti del browser. */
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform: scale(1.01);
+  transition: transform 1.1s cubic-bezier(.22, 1, .36, 1);
+}
+.gslide:hover img { transform: scale(1.05); }
+
+/* Chi arriva col Tab deve vedere dov'e'. `:focus-visible` e non `:focus`:
+   col mouse il contorno non compare. */
+.gslide-apri:focus-visible {
+  /* `var(--ink)` e `outline:3px` come ogni altro contorno del sito
+     (`.cta`, `.pr-video`, `.pr-acc summary`): il fuoco da tastiera si deve
+     riconoscere subito, e si riconosce perche' e' sempre lo stesso. */
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+  border-radius: 18px;
+}
+
+.gslide figcaption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 56px 16px 12px;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(15, 20, 26, 0) 0%, rgba(15, 20, 26, .62) 100%);
+  pointer-events: none;
+}
+.gslide figcaption b {
+  font-size: .92rem;
+  font-weight: 600;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+}
+
+/* Chi ha chiesto meno movimento non deve nemmeno vedere lo zoom al
+   passaggio del mouse: `useFilm` gia' non fa scorrere niente, ma
+   l'ingrandimento e' movimento anche lui. */
+@media (prefers-reduced-motion: reduce) {
+  .gslide img { transition: none; transform: none; }
+  .gslide:hover img { transform: none; }
+}
+
+/* ── IL LIGHTBOX ─────────────────────────────────────────────────── */
+
+.glight {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.glight::backdrop { background: rgba(8, 11, 15, .93); }
+
+.glight-box {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  display: grid;
+  /* la foto prende tutto lo spazio, la barra si prende quello che le
+     serve: cosi' la didascalia non copre mai l'immagine */
+  grid-template-rows: 1fr auto;
+}
+
+.glight-foto {
+  display: grid;
+  place-items: center;
+  min-height: 0;   /* senza questo una griglia non lascia rimpicciolire il figlio */
+  padding: 12px;
+}
+.glight-foto img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  /* LA FOTO SEMPRE INTERA: una verticale su desktop ha le bande ai lati,
+     una orizzontale su telefono sopra e sotto. Qui la foto e' il
+     contenuto, e ritagliarla sarebbe togliere proprio quello che si e'
+     andati a guardare. */
+  object-fit: contain;
+}
+
+.glight-barra {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+  color: #fff;
+}
+.glight-conta {
+  font-variant-numeric: tabular-nums;  /* il contatore non balla fra 9 e 10 */
+  font-weight: 700;
+  font-size: .95rem;
+  opacity: .8;
+  flex: 0 0 auto;
+}
+.glight-did { font-size: .95rem; opacity: .95; }
+
+.glight-x,
+.glight-freccia {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  cursor: pointer;
+}
+.glight-x:hover,
+.glight-freccia:hover { background: rgba(255, 255, 255, .26); }
+.glight-x:focus-visible,
+.glight-freccia:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+.glight-x { top: calc(10px + env(safe-area-inset-top)); right: 12px; }
+.glight-x svg, .glight-freccia svg { width: 22px; height: 22px; }
+
+.glight-freccia { top: 50%; transform: translateY(-50%); }
+.glight-freccia.prev { left: 10px; }
+.glight-freccia.next { right: 10px; }
+
+/* Sul telefono le frecce laterali rubano spazio alla foto e il gesto
+   naturale e' lo scorrimento col dito, che c'e'. Restano il contatore e
+   la ×, che e' il modo per uscire. */
+@media (max-width: 560px) {
+  .glight-freccia { display: none; }
+}

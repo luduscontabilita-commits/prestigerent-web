@@ -17,6 +17,8 @@ import { breadcrumb, grafo, hreflangDi, organization } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
 import { Premi } from '@/components/Premi';
 import { ContactSection } from '@/components/ContactSection';
+import { PageGallery } from '@/components/PageGallery';
+import { chiavePercorso } from '@/lib/gallery-dati';
 import '@/styles/home.css';
 
 export const revalidate = 3600;
@@ -352,6 +354,15 @@ export default async function Categoria_({
       )}
 
       <Premi />
+
+      {/* Queste pagine non hanno le recensioni (solo `Premi`), quindi la
+          gallery va prima del blocco contatti finale, che e' l'ultima
+          sezione. Le pagine sotto /destinations/ e /transfers/ NON sono nel
+          registro per decisione della proprieta': qui la chiamata c'e'
+          comunque e torna `null` da sola, perche' il tag non esiste --
+          niente `if` da tenere in pari con il registro. */}
+      <PageGallery tag={chiavePercorso(cat.path)} />
+
       {/* Il titolo della categoria entra nel modulo come se fosse il nome
           di un tour: cosi' l'oggetto dell'email dice "Cinque Terre" o
           "Wine & food" invece di un generico "Richiesta dal sito", e chi

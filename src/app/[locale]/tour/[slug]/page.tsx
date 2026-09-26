@@ -13,6 +13,8 @@ import { StickyBook } from '@/components/StickyBook';
 import { testiModulo } from '@/lib/testi';
 import { ContactSection } from '@/components/ContactSection';
 import { Recensioni } from '@/components/Recensioni';
+import { PageGallery } from '@/components/PageGallery';
+import { chiaveTour } from '@/lib/gallery-dati';
 import { fattiDi } from '@/lib/fatti';
 import { BarraFatti } from '@/components/BarraFatti';
 import { FasciaFiducia } from '@/components/Riprova';
@@ -851,6 +853,14 @@ export default async function TourPage({
       </section>
 
       <Recensioni fonti={iPunteggi} recensioni={leRecensioni} />
+
+      {/* Le foto delle giornate su QUESTO tour. E' una seconda striscia
+          dopo `PhotoStrip` in cima, e il titolo lo dice: quelle sopra sono
+          le foto del prodotto, queste sono le giornate vere. Il titolo
+          predefinito e' `default_title_tour`, diverso da quello delle
+          altre pagine proprio per non sembrare lo stesso blocco due volte.
+          Con l'interruttore spento non rende niente. */}
+      <PageGallery tag={chiaveTour(slug)} />
 
       </div>{/* /.pg-main */}
 

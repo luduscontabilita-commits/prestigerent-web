@@ -157,6 +157,49 @@ descrizione del tour.
 
 ---
 
+## La gallery con tag — le foto delle guide
+
+Una **seconda** striscia, in fondo alle pagine, con le foto delle giornate
+caricate da chi accompagna gli ospiti. Non c'entra niente con la sezione
+qui sopra: quelle sono le foto del prodotto in cima alle schede
+(`PhotoStrip`, `/admin/foto`), queste sono le giornate vere
+(`PageGallery`, `/admin/gallery`). Entrambi i pannelli lo dicono in
+interfaccia, perché chi cerca «le foto» non sa quale delle due gli serve.
+
+🔴 **È spenta.** `gallery_settings.galleries_enabled = false`: il codice è
+in produzione e non produce un byte di HTML per nessun visitatore finché
+la proprietà non accende l'interruttore da `/admin/gallery/impostazioni/`.
+Accendendolo il pannello chiede conferma e dice su quante pagine
+comparirà.
+
+**Come sta insieme: `GALLERY_AGENT.md`** nella radice — file, regole,
+scelte che si discostano dal piano e perché, cosa fare la prima volta,
+cosa guardare quando qualcosa non va. La guida per chi carica dal telefono
+è `docs/gallery-guida-admin.md`, in italiano e senza tecnicismi.
+
+Le tre cose da sapere senza aprire niente:
+
+- **103 pagine nel registro**, non 124: per decisione della proprietà del
+  26/09/2026 sono escluse tutte le pagine il cui indirizzo contiene
+  `/destinations/` o `/transfers/`. Le **schede** dei singoli transfer
+  restano dentro, perché stanno sotto `/tour/`.
+- **Chi carica non approva.** Si usano i ruoli che c'erano già: `admin` fa
+  tutto, `guida` carica e tagga. Una foto non approvata sta in un bucket
+  **privato**, e che non possa finire in quello pubblico è un vincolo del
+  database, non una convenzione del codice.
+- **Il ruolo si controlla adesso, in tutto `/admin`.** Fino al 26/09/2026
+  il codice non guardava mai `profili.ruolo`: chiunque avesse un profilo
+  entrava in SEO, foto dei tour e numeri di Regiondo. Ora ogni pagina
+  chiama `soloGestione()` e **ogni server action** chiama `chiAgisce()` —
+  perché una action non passa da nessuna pagina e da nessun layout.
+
+`npm test` prova la logica pura (65 test, nessuna rete, nessun `.next`):
+la regola di visibilità, l'ordinamento, le proporzioni, il registro e la
+lettura dell'EXIF. Tutto il resto si verifica con `curl` sull'indirizzo
+pubblicato, come dice la regola 1.
+
+---
+
 ## La posta
 
 **Gli MX puntano a Microsoft 365.** Ma l'hosting Serverplan e' configurato

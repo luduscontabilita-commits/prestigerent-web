@@ -136,12 +136,26 @@ export async function soloCaricatori(): Promise<Profilo> {
 /** Per le SERVER ACTION. Non redirige -- in un'azione una redirezione
  *  arriverebbe al browser come un errore e non come una spiegazione --
  *  ma torna il profilo oppure il messaggio da mostrare a chi ha premuto
- *  il pulsante. */
+ *  il pulsante.
+ *
+ *  🔴 I DUE CAMPI SONO SEMPRE PRESENTI, uno dei due `null`, e non e' una
+ *  sciatteria: un tipo unione `{io} | {errore}` sembra piu' preciso ma
+ *  NON SI RESTRINGE. TypeScript segue un discriminante solo se ha un tipo
+ *  unitario, e `errore?: undefined` contro `errore: string` non lo e':
+ *  dopo `if (errore) return`, `io` resterebbe `possibly undefined` e ogni
+ *  chiamante finirebbe per metterci un `!`, cioe' per spegnere proprio il
+ *  controllo che serviva. Con due campi annullabili il restringimento
+ *  funziona sul modo giusto di scrivere il controllo:
+ *
+ *      const chi = await chiAgisce();
+ *      if (!chi.io) return { ok: false, errore: chi.errore };
+ *      // qui chi.io e' un Profilo, senza asserzioni
+ */
 export async function chiAgisce(
   ammessi: readonly string[] = RUOLI_GESTIONE
-): Promise<{ io: Profilo; errore?: undefined } | { io?: undefined; errore: string }> {
+): Promise<{ io: Profilo | null; errore: string | null }> {
   const io = await chiSono();
-  if (!io) return { errore: 'Sessione scaduta: rientra dal pannello.' };
-  if (!haRuolo(io, ammessi)) return { errore: 'Non hai i permessi per questa operazione.' };
-  return { io };
+  if (!io) return { io: null, errore: 'Sessione scaduta: rientra dal pannello.' };
+  if (!haRuolo(io, ammessi)) return { io: null, errore: 'Non hai i permessi per questa operazione.' };
+  return { io, errore: null };
 }
