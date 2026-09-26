@@ -193,6 +193,28 @@ Le tre cose da sapere senza aprire niente:
   chiama `soloGestione()` e **ogni server action** chiama `chiAgisce()` —
   perché una action non passa da nessuna pagina e da nessun layout.
 
+🔴 **IL CONFINE SERVER/CLIENT HA GIA' ROTTO IL PANNELLO TRE VOLTE.**
+Quando un Server Component importa da un modulo client -- e tutto
+`@mantine/core` lo e' -- non riceve i componenti veri: riceve dei
+**riferimenti**, che Next sostituisce nel browser. Un riferimento non
+porta con se' niente di quello che stava attaccato all'originale. Le tre
+forme viste finora, tutte con lo stesso esito (500 su ogni pagina, o su
+una sola):
+  1. una funzione normale esportata da un file `'use client'` e chiamata
+     da un Server Component (`vociPerRuolo()`) -- risolto spostandola in
+     `src/lib/menu-admin.ts`;
+  2. un componente passato come proprieta' (`component={Link}` su una
+     `Card`) -- risolto mettendo il `Link` fuori e la `Card` dentro;
+  3. la **notazione col punto**: `Table.Thead`, `Table.ScrollContainer`
+     diventano `undefined`, e React rende `undefined` come componente
+     (errore #130). Risolto spostando la tabella in
+     `ElencoFotoTour.tsx`, che e' client.
+
+**La regola:** in un Server Component solo componenti Mantine SEMPLICI
+(`Alert`, `Card`, `Text`, `Badge`). Appena serve il punto, quel pezzo
+va in un componente client, che riceve solo dati serializzabili.
+`tsc` non vede niente di tutto questo: i tipi sono giusti.
+
 🔴 **`npm run prova:pannello` entra e prova il pannello DA DENTRO.**
 Il 26/09/2026 tutte e quindici le pagine hanno risposto 500 a chi era
 entrato, e la verifica non se n'era accorta: si controllavano le pagine
