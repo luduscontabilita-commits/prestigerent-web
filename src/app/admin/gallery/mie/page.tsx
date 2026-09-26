@@ -1,5 +1,6 @@
 import { comeSiChiama } from '@/lib/accesso';
-import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
+import { Guscio } from '@/components/admin/Guscio';
+import { vociPerRuolo } from '@/lib/menu-admin';
 import { chiSono, haRuolo, RUOLI_CARICAMENTO, supabaseServer } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { firmaAnteprime } from '@/lib/gallery-file';

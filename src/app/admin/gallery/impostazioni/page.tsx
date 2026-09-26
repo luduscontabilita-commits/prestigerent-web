@@ -1,5 +1,6 @@
 import { comeSiChiama } from '@/lib/accesso';
-import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
+import { Guscio } from '@/components/admin/Guscio';
+import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryImpostazioni } from '@/components/admin/GalleryImpostazioni';

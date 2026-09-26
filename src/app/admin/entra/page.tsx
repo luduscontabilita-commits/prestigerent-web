@@ -70,11 +70,29 @@ export default function Entra() {
     <Box mih="100dvh" bg="dark.8" p="md">
       <Center mih="calc(100dvh - 2rem)">
         <Paper shadow="xl" radius="lg" p={{ base: 'lg', sm: 40 }} w="100%" maw={420}>
-          <Stack gap="xs" mb="lg">
-            <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
-              PRESTIGE RENT
-            </Text>
-            <Title order={1} size="h3">Pannello</Title>
+          <Stack gap="sm" mb="lg" align="center">
+            {/* Il logo trasparente del sito (blocco tRNS verificato), lo
+                stesso file che usa l'intestazione delle pagine pubbliche:
+                sta su Supabase Storage, non in `public/`, quindi non c'e'
+                una seconda copia da tenere allineata.
+                `<img>` e non `next/image`: e' la scelta di tutto questo
+                progetto -- vedi la nota in cima a src/lib/foto.ts -- e qui
+                sarebbe anche inutile, perche' il file pesa 5 KB.
+                eslint-disable-next-line @next/next/no-img-element */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png"
+              alt="Prestige Rent"
+              width={72}
+              height={72}
+              style={{ display: 'block' }}
+            />
+            <Stack gap={2} align="center">
+              <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
+                PRESTIGE RENT
+              </Text>
+              <Title order={1} size="h3">Pannello</Title>
+            </Stack>
           </Stack>
 
           <form onSubmit={invia}>

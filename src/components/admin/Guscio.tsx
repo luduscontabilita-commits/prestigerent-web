@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   AppShell,
-  Badge,
   Burger,
   Button,
   Group,
@@ -24,6 +23,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { esciEVai } from '@/app/admin/entra/azioni';
+import type { VoceMenu } from '@/lib/menu-admin';
 
 /* IL GUSCIO DEL PANNELLO: barra laterale, intestazione, uscita.
  *
@@ -45,12 +45,6 @@ import { esciEVai } from '@/app/admin/entra/azioni';
  * che cancella i cookie verrebbe chiamata da sola e ci si ritroverebbe
  * disconnessi aprendo il pannello. Un'azione in POST non si prefetcha.
  */
-
-export type VoceMenu = {
-  href: string;
-  testo: string;
-  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti';
-};
 
 const ICONE = {
   gallery: IconCamera,
@@ -164,30 +158,5 @@ export function Guscio({
         {children}
       </AppShell.Main>
     </AppShell>
-  );
-}
-
-/** Le voci che tocca a ciascun ruolo. Sta qui e non nelle pagine: se ogni
- *  pagina si costruisse il suo menu, prima o poi due pagine mostrerebbero
- *  due menu diversi e nessuno saprebbe quale e' quello giusto. */
-export function vociPerRuolo(ruolo: string): VoceMenu[] {
-  const gallery: VoceMenu = { href: '/admin/gallery/', testo: 'Foto della gallery', icona: 'gallery' };
-  if (ruolo !== 'admin') return [gallery];
-  return [
-    gallery,
-    { href: '/admin/foto/', testo: 'Foto dei tour', icona: 'foto' },
-    { href: '/admin/seo/', testo: 'Title e description', icona: 'seo' },
-    { href: '/admin/numeri/', testo: 'Numeri da Regiondo', icona: 'numeri' },
-    { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },
-  ];
-}
-
-/** Il bollino di stato, usato in piu' pagine: verde se la gallery e'
- *  accesa, arancio se e' spenta. */
-export function StatoGallery({ accesa, testo }: { accesa: boolean; testo: string }) {
-  return (
-    <Badge color={accesa ? 'teal' : 'orange'} variant="light" size="lg" radius="sm">
-      {testo}
-    </Badge>
   );
 }

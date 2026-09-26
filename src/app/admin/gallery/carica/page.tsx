@@ -1,5 +1,6 @@
 import { comeSiChiama } from '@/lib/accesso';
-import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
+import { Guscio } from '@/components/admin/Guscio';
+import { vociPerRuolo } from '@/lib/menu-admin';
 import Link from 'next/link';
 import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE } from '@/lib/auth';
 import { redirect } from 'next/navigation';

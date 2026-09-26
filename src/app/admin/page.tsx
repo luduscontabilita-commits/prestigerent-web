@@ -11,7 +11,8 @@ import {
 } from '@tabler/icons-react';
 import { chiSono, haRuolo, RUOLI_GESTIONE } from '@/lib/auth';
 import { comeSiChiama } from '@/lib/accesso';
-import { Guscio, vociPerRuolo } from '@/components/admin/Guscio';
+import { Guscio } from '@/components/admin/Guscio';
+import { vociPerRuolo } from '@/lib/menu-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,15 +101,18 @@ export default async function Pannello() {
     >
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
         {voci.map((v) => (
-          <Card
+          /* 🔴 IL LINK STA FUORI, LA CARD DENTRO.
+             `component={Link}` passerebbe una FUNZIONE da un Server
+             Component a un componente client, e quello non si puo'
+             serializzare: il risultato era un errore 500 subito dopo
+             l'accesso. In `Guscio` la stessa cosa e' lecita, perche'
+             quello e' gia' un componente client. */
+          <Link
             key={v.href}
-            component={Link}
             href={v.href}
-            withBorder
-            radius="md"
-            padding="lg"
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
           >
+          <Card withBorder radius="md" padding="lg" h="100%">
             <Group justify="space-between" align="flex-start" wrap="nowrap" mb="sm">
               <ThemeIcon variant="light" color={v.colore} size={40} radius="md">
                 <v.icona size={21} stroke={1.6} />
@@ -118,6 +122,7 @@ export default async function Pannello() {
             <Text fw={700} mb={4}>{v.titolo}</Text>
             <Text size="sm" c="dimmed" lh={1.55}>{v.testo}</Text>
           </Card>
+          </Link>
         ))}
       </SimpleGrid>
     </Guscio>
