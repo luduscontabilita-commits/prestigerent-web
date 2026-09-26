@@ -107,7 +107,13 @@ export function ElencoFotoTour({
                   </Table.Td>
 
                   <Table.Td>
-                    <Anchor href={`/admin/foto/${r.slug}/`} underline="never">
+                    {/* `c="inherit"`: il nome del tour e' il CONTENUTO della
+                        riga, non un comando. Con il colore predefinito di
+                        Anchor diventava arancione, e in una tabella di 87
+                        righe ottantasette titoli accesi sono rumore: non
+                        indicano piu' niente, perche' sono tutti uguali.
+                        Resta cliccabile, e si sottolinea al passaggio. */}
+                    <Anchor href={`/admin/foto/${r.slug}/`} c="inherit" underline="hover">
                       <Text fw={600} size="sm">{r.nome}</Text>
                     </Anchor>
                     <Code>{r.slug}</Code>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   AppShell,
+  Box,
   Burger,
   Button,
   Group,
@@ -135,38 +136,53 @@ export function Guscio({
             const attiva = v.href === '/admin/'
               ? percorso === '/admin' || percorso === '/admin/'
               : percorso.startsWith(v.href.replace(/\/$/, ''));
-            /* Il sottomenu si apre con la sezione, e resta aperto finche'
-               si e' dentro: chiuderlo mentre ci si muove fra le sue
-               pagine vorrebbe dire far sparire da sotto le mani i
-               collegamenti che si stanno usando. */
+            /* 🔴 LE SOTTOVOCI NON VANNO DENTRO `<NavLink>` COME FIGLI.
+               Il 26/09/2026 le ci ho messe, e il clic su «Foto della
+               gallery» ha smesso del tutto di funzionare. Il motivo sta
+               nel codice di Mantine: una NavLink CON FIGLI chiama
+               `event.preventDefault()` e si limita ad aprire o chiudere
+               il gruppo -- la navigazione viene annullata di proposito,
+               perche' quel componente li' e' pensato come interruttore.
+               E avendole dato anche `opened` controllato senza
+               `onChange`, non apriva nemmeno: il clic non faceva niente.
+
+               Qui invece il titolo resta una voce NORMALE, che naviga, e
+               le sue pagine sono altre voci normali disegnate sotto,
+               rientrate. Il gruppo si mostra quando si e' dentro la
+               sezione: e' la stessa cosa a vedersi, senza l'interruttore
+               che mangia il clic. */
+            const aperto = attiva && !!v.sotto?.length;
             return (
-              <NavLink
-                key={v.href}
-                component={Link}
-                href={v.href}
-                label={v.testo}
-                leftSection={<Icona size={18} stroke={1.6} />}
-                active={attiva && !v.sotto}
-                opened={v.sotto ? attiva : undefined}
-                onClick={close}
-                childrenOffset={30}
-                style={{ borderRadius: 8 }}
-                mb={2}
-              >
-                {v.sotto?.map((s) => (
-                  <NavLink
-                    key={s.href}
-                    component={Link}
-                    href={s.href}
-                    label={s.testo}
-                    /* uguaglianza e non prefisso: `/admin/gallery/` e'
-                       prefisso di tutte, e le accenderebbe tutte insieme */
-                    active={percorso.replace(/\/$/, '') === s.href.replace(/\/$/, '')}
-                    onClick={close}
-                    style={{ borderRadius: 8 }}
-                  />
-                ))}
-              </NavLink>
+              <div key={v.href}>
+                <NavLink
+                  component={Link}
+                  href={v.href}
+                  label={v.testo}
+                  leftSection={<Icona size={18} stroke={1.6} />}
+                  active={attiva}
+                  onClick={close}
+                  style={{ borderRadius: 8 }}
+                  mb={2}
+                />
+                {aperto && (
+                  <Box ml={30} mb={4}>
+                    {v.sotto!.map((s) => (
+                      <NavLink
+                        key={s.href}
+                        component={Link}
+                        href={s.href}
+                        label={s.testo}
+                        /* uguaglianza e non prefisso: `/admin/gallery/` e'
+                           prefisso di tutte, e le accenderebbe insieme */
+                        active={percorso.replace(/\/$/, '') === s.href.replace(/\/$/, '')}
+                        onClick={close}
+                        style={{ borderRadius: 8 }}
+                        py={6}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </div>
             );
           })}
         </AppShell.Section>
