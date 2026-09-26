@@ -1,5 +1,7 @@
 'use client';
 
+import { SceltaPagine } from './SceltaPagine';
+
 import { useState, useTransition } from 'react';
 import {
   Alert,
@@ -229,17 +231,12 @@ export function GalleryCoda({
                         value={bozza.caption}
                         onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
                       />
-                      <Checkbox.Group
-                        label="Pagine"
-                        value={bozza.tag}
-                        onChange={(v) => setBozza({ ...bozza, tag: v })}
-                      >
-                        <Stack gap={4} mt={6} mah={220} style={{ overflowY: 'auto' }}>
-                          {pagine.map((p) => (
-                            <Checkbox key={p.key} value={p.key} label={p.label} size="sm" />
-                          ))}
-                        </Stack>
-                      </Checkbox.Group>
+                      <SceltaPagine
+                        pagine={pagine}
+                        valore={bozza.tag}
+                        cambia={(v) => setBozza({ ...bozza, tag: v })}
+                        altezza={220}
+                      />
 
                       <Group gap="xs" mt={4}>
                         <Button

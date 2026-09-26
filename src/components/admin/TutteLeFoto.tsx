@@ -1,5 +1,7 @@
 'use client';
 
+import { SceltaPagine } from './SceltaPagine';
+
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import {
@@ -10,12 +12,10 @@ import {
   Badge,
   Button,
   Card,
-  Checkbox,
   Group,
   Image,
   Modal,
   Paper,
-  ScrollArea,
   Select,
   SimpleGrid,
   Stack,
@@ -350,28 +350,12 @@ export function TutteLeFoto({
             onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
           />
 
-          <div>
-            <Text size="sm" fw={500} mb={6}>Pagine</Text>
-            <ScrollArea.Autosize mah={260} type="auto">
-              <Stack gap={4} pr="sm">
-                {pagine.map((p) => (
-                  <Checkbox
-                    key={p.key}
-                    label={p.label}
-                    checked={bozza.tag.includes(p.key)}
-                    onChange={(e) =>
-                      setBozza({
-                        ...bozza,
-                        tag: e.currentTarget.checked
-                          ? [...bozza.tag, p.key]
-                          : bozza.tag.filter((k) => k !== p.key),
-                      })
-                    }
-                  />
-                ))}
-              </Stack>
-            </ScrollArea.Autosize>
-          </div>
+          <SceltaPagine
+            pagine={pagine}
+            valore={bozza.tag}
+            cambia={(v) => setBozza({ ...bozza, tag: v })}
+            altezza={260}
+          />
 
           <Group justify="flex-end">
             <Button variant="default" onClick={() => setModifica(null)}>Annulla</Button>

@@ -1,5 +1,7 @@
 'use client';
 
+import { SceltaPagine } from './SceltaPagine';
+
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import {
@@ -16,7 +18,6 @@ import {
   Text,
 } from '@mantine/core';
 import {
-  Checkbox,
   Collapse,
   TextInput,
 } from '@mantine/core';
@@ -287,20 +288,12 @@ export function GalleryMie({
                         value={bozza.caption}
                         onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
                       />
-                      <Checkbox.Group
-                        label="Pagine"
-                        value={bozza.tag}
-                        onChange={(v) => setBozza({ ...bozza, tag: v })}
-                      >
-                        {/* Altezza limitata con scorrimento proprio: le
-                            pagine sono molte e questa scheda sta dentro
-                            una griglia, su un telefono. */}
-                        <Stack gap={6} mt={6} mah={200} style={{ overflowY: 'auto' }}>
-                          {pagine.map((p) => (
-                            <Checkbox key={p.key} value={p.key} label={p.label} size="xs" />
-                          ))}
-                        </Stack>
-                      </Checkbox.Group>
+                      <SceltaPagine
+                        pagine={pagine}
+                        valore={bozza.tag}
+                        cambia={(v) => setBozza({ ...bozza, tag: v })}
+                        altezza={180}
+                      />
 
                       <Group gap={6}>
                         <Button
