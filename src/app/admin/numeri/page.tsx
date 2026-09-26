@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { soloGestione, supabaseServer } from '@/lib/auth';
 import { Numeri, type RigaNumeri } from '@/components/admin/Numeri';
 import { passoConteggi, passoDisponibilita, passoPrenotazioni, passoRecensioni } from './azioni';
 import '@/styles/admin.css';
@@ -46,8 +45,7 @@ function aRoma(iso: string): string {
 }
 
 export default async function NumeriPannello() {
-  const io = await chiSono();
-  if (!io) redirect('/admin/entra/');
+  await soloGestione();
 
   const sb = await supabaseServer();
   const [{ data: tours }, { data: valutazioni }, { data: conteggi }, { data: disponibilita }] =

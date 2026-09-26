@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { chiAgisce, supabaseServer } from '@/lib/auth';
 import {
   calendario,
   prenotazioniPagina,
@@ -64,9 +64,24 @@ export type Parziale = {
   p7: number;
 };
 
+/* 🔴 LA GUARDIA CONTROLLA IL RUOLO, non solo la sessione.
+ *
+ * Prima bastava avere un profilo qualunque. Finche' i profili erano tre e
+ * tutti e tre admin non cambiava niente; dal momento che esiste un
+ * account `guida` -- una persona che carica foto dal telefono e nient'altro
+ * -- diventa la differenza fra "vede i numeri di Regiondo" e "no".
+ *
+ * E sta QUI e non nella pagina perche' una server action NON PASSA dalla
+ * pagina: si chiama con una POST al suo identificativo. Proteggere
+ * /admin/numeri/ e lasciare aperta `passoPrenotazioni` vorrebbe dire
+ * proteggere la porta e lasciare la finestra.
+ *
+ * Sotto c'e' comunque la RLS (`e_admin()` sulle quattro tabelle), che
+ * rifiuterebbe la scrittura: questo controllo serve a rispondere "non hai
+ * i permessi" invece di "fatto" con zero righe toccate. */
 async function guardia() {
-  const io = await chiSono();
-  return io ? null : 'Sessione scaduta: rientra dal pannello.';
+  const { errore } = await chiAgisce();
+  return errore ?? null;
 }
 
 /* ─────────────────────────────────────────────────────────────────────

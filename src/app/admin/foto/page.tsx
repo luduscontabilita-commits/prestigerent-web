@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import '@/styles/admin.css';
 
@@ -23,8 +22,7 @@ type Riga = {
  * cioe' esattamente quella che finisce nell'elenco della home.
  */
 export default async function ElencoFoto() {
-  const io = await chiSono();
-  if (!io) redirect('/admin/entra/');
+  await soloGestione();
 
   const sb = await supabaseServer();
   const { data } = await sb

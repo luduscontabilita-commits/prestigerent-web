@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { soloGestione, supabaseServer } from '@/lib/auth';
 import { TabellaSeo, type Riga } from '@/components/admin/TabellaSeo';
 import '@/styles/admin.css';
 
@@ -17,8 +16,7 @@ export const metadata = { robots: { index: false, follow: false } };
  * lavoro resta, non quanto ne e' stato fatto.
  */
 export default async function SeoPannello() {
-  const io = await chiSono();
-  if (!io) redirect('/admin/entra/');
+  await soloGestione();
 
   const sb = await supabaseServer();
   const [{ data: nuovi }, { data: vecchi }] = await Promise.all([

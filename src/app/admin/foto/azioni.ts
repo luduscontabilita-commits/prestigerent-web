@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { chiAgisce, supabaseServer } from '@/lib/auth';
 import { LOCALE_CODES } from '@/lib/locales';
 import type { FotoAdmin } from '@/components/admin/RiordinaFoto';
 
@@ -19,8 +19,18 @@ const LOCALE = 'en';
 type Esito = { ok: boolean; errore?: string };
 
 export async function salvaFoto(slug: string, foto: FotoAdmin[]): Promise<Esito> {
-  const io = await chiSono();
-  if (!io) return { ok: false, errore: 'Sessione scaduta: rientra dal pannello.' };
+  /* 🔴 IL CONTROLLO DEL RUOLO STA QUI, non nella pagina che apre il
+     riordino. Una server action non passa da nessuna pagina: si chiama
+     con una POST al suo identificativo, e chiunque abbia fatto l'accesso
+     al pannello puo' farlo a mano. Proteggere /admin/foto/ e lasciare
+     aperta questa funzione vorrebbe dire permettere a una guida di
+     riscrivere la copertina di un tour -- cioe' la foto che finisce
+     nell'elenco della home e nelle anteprime social.
+     La RLS rifiuterebbe comunque la scrittura (`e_admin()` su
+     `tour_content`): questo serve a dire "non hai i permessi" invece di
+     un "riuscito" con zero righe toccate. */
+  const { errore } = await chiAgisce();
+  if (errore) return { ok: false, errore };
 
   /* Salvare zero foto vuol dire una scheda senza copertina in home e
      senza anteprima social: se e' davvero quello che si vuole, si toglie

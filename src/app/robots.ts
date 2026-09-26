@@ -42,10 +42,29 @@ const TRAINING = [
   'meta-externalagent',
 ];
 
+/* IL PANNELLO NON SI SCANSIONA.
+ *
+ * Non era escluso da nessuna regola: ogni bot consentito aveva `Allow: /`
+ * e nient'altro, quindi `/admin/` era esplicitamente permesso. Non e' mai
+ * finito su Google perche' il layout del pannello dichiara `noindex` e
+ * perche' senza accesso le pagine rimandano alla schermata di ingresso --
+ * ma erano due difese che dipendono da altro, non una riga che dice di
+ * non passare.
+ *
+ * Con la barra finale: gli indirizzi del pannello sono `/admin/`,
+ * `/admin/seo/`, `/admin/foto/...`, e `/admin` senza barra risponde 308
+ * verso `/admin/` (`trailingSlash: true`), che qui e' vietato.
+ *
+ * Resta una richiesta cortese (RFC 9309): quello che TIENE il pannello
+ * fuori dall'indice e' il `noindex` in src/app/admin/layout.tsx, e quello
+ * che lo tiene chiuso e' il controllo d'accesso in ogni pagina. */
+const PANNELLO = '/admin/';
+
 export default function robots(): MetadataRoute.Robots {
   const consentiti = [...RICERCA_CLASSICA, ...RICERCA_AI, ...TRAINING].map((userAgent) => ({
     userAgent,
     allow: '/',
+    disallow: PANNELLO,
   }));
 
   return {
@@ -57,7 +76,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // parametri di tracciamento: pagine identiche a URL diversi
-        disallow: ['/*?utm_', '/*?fbclid', '/*?gclid'],
+        disallow: [PANNELLO, '/*?utm_', '/*?fbclid', '/*?gclid'],
       },
     ],
     sitemap: `${SITE}/sitemap.xml`,

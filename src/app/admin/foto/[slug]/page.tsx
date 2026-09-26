@@ -1,5 +1,5 @@
-import { notFound, redirect } from 'next/navigation';
-import { chiSono, supabaseServer } from '@/lib/auth';
+import { notFound } from 'next/navigation';
+import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import { RiordinaFoto } from '@/components/admin/RiordinaFoto';
 import { salvaFoto } from '../azioni';
@@ -22,8 +22,7 @@ export default async function RiordinaPagina({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const io = await chiSono();
-  if (!io) redirect('/admin/entra/');
+  await soloGestione();
 
   const { slug } = await params;
 
