@@ -3,6 +3,8 @@ import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
+import { CaricaFotoTour } from '@/components/admin/CaricaFotoTour';
+import { aggiungiFoto, firmeTour } from './azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -83,6 +85,7 @@ export default async function ElencoFoto() {
               <th className="ad-col-ant">Copertina</th>
               <th>Tour</th>
               <th className="ad-col-n">Foto</th>
+              <th className="ad-col-n">Carica</th>
             </tr>
           </thead>
           <tbody>
@@ -112,6 +115,21 @@ export default async function ElencoFoto() {
 
                 <td className="ad-col-n">
                   <span className={'ad-n' + (r.quante < 5 ? ' ko' : '')}>{r.quante}</span>
+                </td>
+
+                {/* Il caricamento sta QUI, sulla riga, e non solo dentro la
+                    pagina del singolo tour: chi apre questo elenco lo apre
+                    ordinato per problema, e i tour senza foto sono i primi.
+                    Farlo passare dalla scheda vorrebbe dire due clic e un
+                    ritorno indietro per ognuno. */}
+                <td className="ad-col-n">
+                  <CaricaFotoTour
+                    slug={r.slug}
+                    nome={r.nome}
+                    firme={firmeTour}
+                    aggiungi={aggiungiFoto}
+                    compatto
+                  />
                 </td>
               </tr>
             ))}

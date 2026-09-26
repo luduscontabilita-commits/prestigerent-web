@@ -5,7 +5,8 @@ import { notFound } from 'next/navigation';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { fotoDi, type Blocchi } from '@/components/admin/blocchi';
 import { RiordinaFoto } from '@/components/admin/RiordinaFoto';
-import { salvaFoto } from '../azioni';
+import { CaricaFotoTour } from '@/components/admin/CaricaFotoTour';
+import { aggiungiFoto, firmeTour, salvaFoto } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -57,6 +58,9 @@ export default async function RiordinaPagina({
           <a href={`/tour/${slug}/`} target="_blank" rel="noopener">vedi la pagina sul sito</a>
         </>
       }
+      azioni={
+        <CaricaFotoTour slug={slug} nome={nome} firme={firmeTour} aggiungi={aggiungiFoto} />
+      }
     >
 
       <p className="ad-avviso">
@@ -66,9 +70,12 @@ export default async function RiordinaPagina({
       </p>
 
       {foto.length === 0 ? (
+        /* Fino al 26/09/2026 qui c'era scritto «vanno caricate prima
+           altrove», e altrove non esisteva: un tour senza copertina
+           restava senza copertina. Ora il pulsante e' in alto a destra. */
         <p className="ad-vuoto">
-          Questo tour non ha nessuna foto in <code>blocks.images</code>. Vanno caricate prima
-          altrove: qui si riordina, non si aggiunge.
+          Questo tour non ha nessuna foto. Usa <b>Aggiungi foto</b> qui sopra: la prima che
+          carichi diventa la copertina, quella che si vede nell’elenco della home.
         </p>
       ) : (
         <RiordinaFoto slug={slug} iniziali={foto} salva={salvaFoto} />
