@@ -15,7 +15,13 @@ import {
   Tabs,
   Text,
 } from '@mantine/core';
-import { IconAlertTriangle, IconPhotoUp, IconRefresh, IconTrash } from '@tabler/icons-react';
+import {
+  Checkbox,
+  Collapse,
+  TextInput,
+} from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconPencil, IconPhotoUp, IconRefresh, IconTrash, IconX } from '@tabler/icons-react';
+import type { Pagina } from './GalleryCaricatore';
 
 /* «LE MIE FOTO», in tre schede.
  *
@@ -38,6 +44,9 @@ export type MiaFoto = {
   anteprima: string | null;
   caricata: string;
   pagine: string[];
+  /** le CHIAVI dei tag, non le etichette: il modulo di correzione deve
+   *  rimettere le spunte su quello che c'era */
+  chiavi: string[];
 };
 
 type Esito = { ok: boolean; errore?: string };
@@ -50,12 +59,17 @@ const SCHEDE = [
 
 export function GalleryMie({
   foto,
+  pagine,
   reinvia,
   elimina,
+  aggiornaFoto,
 }: {
   foto: MiaFoto[];
+  /** tutte le pagine taggabili, per il modulo di correzione */
+  pagine: Pagina[];
   reinvia: (id: string) => Promise<Esito>;
   elimina: (id: string) => Promise<Esito>;
+  aggiornaFoto: (id: string, d: { alt: string; caption: string | null; tag: string[] }) => Promise<Esito>;
 }) {
   const conta = (s: string) =>
     s === 'approvata'
@@ -68,6 +82,42 @@ export function GalleryMie({
   const [resto, setResto] = useState(foto);
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, avvia] = useTransition();
+
+  /* Quale foto si sta correggendo, e la bozza. Una per volta: due moduli
+     aperti insieme su un telefono sono due colonne di campi in cui non si
+     capisce piu' a quale foto appartengono. */
+  const [corregge, setCorregge] = useState<string | null>(null);
+  const [bozza, setBozza] = useState<{ alt: string; caption: string; tag: string[] }>({ alt: '', caption: '', tag: [] });
+
+  const apriCorrezione = (f: MiaFoto) => {
+    setCorregge(f.id);
+    setBozza({ alt: f.alt, caption: f.caption ?? '', tag: [...f.chiavi] });
+    setMessaggio(null);
+  };
+
+  /** Salva le correzioni E rimanda in coda, in un gesto solo.
+   *
+   *  Separare «salva» da «rimanda» lascerebbe la foto corretta ma ferma
+   *  fra le rifiutate, e chi l'ha corretta penserebbe di aver finito. */
+  const salvaERimanda = (f: MiaFoto) =>
+    avvia(async () => {
+      setMessaggio(null);
+      const r1 = await aggiornaFoto(f.id, {
+        alt: bozza.alt,
+        caption: bozza.caption.trim() || null,
+        tag: bozza.tag,
+      });
+      if (!r1.ok) { setMessaggio({ ok: false, testo: r1.errore ?? 'Non salvata.' }); return; }
+      const r2 = await reinvia(f.id);
+      if (!r2.ok) { setMessaggio({ ok: false, testo: r2.errore ?? 'Corretta ma non rimandata.' }); return; }
+      const etichette = bozza.tag.map((k) => pagine.find((p) => p.key === k)?.label ?? k);
+      setResto((x) => x.map((y) => (y.id === f.id
+        ? { ...y, stato: 'in_attesa' as const, motivo: null, alt: bozza.alt,
+            caption: bozza.caption.trim() || null, chiavi: [...bozza.tag], pagine: etichette }
+        : y)));
+      setCorregge(null);
+      setMessaggio({ ok: true, testo: 'Corretta e rimandata: aspetta di nuovo l’approvazione.' });
+    });
 
   if (!foto.length) {
     return (
@@ -166,6 +216,24 @@ export function GalleryMie({
                   </Alert>
 
                   <Group gap={6}>
+                    {/* 🔴 CORREGGERE, e non solo rimandare.
+                        Fino al 26/09/2026 qui c'erano due soli comandi:
+                        «Rimanda cosi' com'e'» ed «Elimina». Ma il motivo
+                        piu' comune del rifiuto e' proprio un tag
+                        sbagliato o una descrizione in italiano: chiedere
+                        una correzione e non dare il modo di farla
+                        lasciava una sola strada vera, cancellare la foto
+                        e ricaricarla da capo. Il server lo permetteva
+                        gia' -- `aggiornaFoto` ammette chi carica sulle
+                        proprie foto non approvate -- mancava il modulo. */}
+                    <Button
+                      size="compact-sm"
+                      variant="filled"
+                      leftSection={<IconPencil size={14} />}
+                      onClick={() => (corregge === f.id ? setCorregge(null) : apriCorrezione(f))}
+                    >
+                      {corregge === f.id ? 'Chiudi' : 'Correggi'}
+                    </Button>
                     <Button
                       size="compact-sm"
                       variant="default"
@@ -200,6 +268,65 @@ export function GalleryMie({
                       Elimina
                     </Button>
                   </Group>
+
+                  <Collapse expanded={corregge === f.id}>
+                    <Stack gap="xs" mt="xs">
+                      <TextInput
+                        size="xs"
+                        label="Descrizione in inglese"
+                        value={bozza.alt}
+                        onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}
+                        description="Cosa si vede nella foto, in inglese."
+                      />
+                      <TextInput
+                        size="xs"
+                        label="Didascalia"
+                        value={bozza.caption}
+                        onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
+                      />
+                      <Checkbox.Group
+                        label="Pagine"
+                        value={bozza.tag}
+                        onChange={(v) => setBozza({ ...bozza, tag: v })}
+                      >
+                        {/* Altezza limitata con scorrimento proprio: le
+                            pagine sono molte e questa scheda sta dentro
+                            una griglia, su un telefono. */}
+                        <Stack gap={6} mt={6} mah={200} style={{ overflowY: 'auto' }}>
+                          {pagine.map((p) => (
+                            <Checkbox key={p.key} value={p.key} label={p.label} size="xs" />
+                          ))}
+                        </Stack>
+                      </Checkbox.Group>
+
+                      <Group gap={6}>
+                        <Button
+                          size="compact-sm"
+                          leftSection={<IconCheck size={14} />}
+                          loading={inCorso}
+                          disabled={bozza.alt.trim().length < 3 || bozza.tag.length === 0}
+                          onClick={() => salvaERimanda(f)}
+                        >
+                          Salva e rimanda
+                        </Button>
+                        <Button
+                          size="compact-sm"
+                          variant="subtle"
+                          leftSection={<IconX size={14} />}
+                          onClick={() => setCorregge(null)}
+                        >
+                          Annulla
+                        </Button>
+                      </Group>
+                      {(bozza.alt.trim().length < 3 || bozza.tag.length === 0) && (
+                        <Text size="xs" c="orange">
+                          {bozza.alt.trim().length < 3
+                            ? 'Serve la descrizione in inglese.'
+                            : 'Serve almeno una pagina.'}
+                        </Text>
+                      )}
+                    </Stack>
+                  </Collapse>
                 </>
               )}
 

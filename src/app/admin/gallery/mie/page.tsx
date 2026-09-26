@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { GalleryMie, type MiaFoto } from '@/components/admin/GalleryMie';
-import { elimina, reinvia } from '../azioni';
+import { aggiornaFoto, elimina, pagineTaggabili, reinvia } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -21,7 +21,7 @@ type Riga = {
   storage_path: string;
   created_at: string;
   blur_data_url: string | null;
-  gallery_image_tags: { gallery_tags: { label: string } | null }[];
+  gallery_image_tags: { gallery_tags: { key: string; label: string } | null }[];
 };
 
 /* «LE MIE FOTO»: dove una guida vede cosa e' successo a quello che ha
@@ -43,12 +43,17 @@ export default async function Mie() {
     .from('gallery_images')
     .select(
       'id,alt,caption,status,review_note,bucket,storage_path,created_at,blur_data_url,' +
-        'gallery_image_tags(gallery_tags(label))'
+        'gallery_image_tags(gallery_tags(key,label))'
     )
     .eq('uploaded_by', io.id)
     .order('created_at', { ascending: false });
 
   const righe = (data ?? []) as unknown as Riga[];
+
+  /* L'elenco delle pagine serve al modulo di correzione: una guida che
+     si vede tornare indietro una foto perche' «i tag sono sbagliati»
+     deve poterli cambiare da qui, non solo rimandarla com'era. */
+  const pagine = await pagineTaggabili();
 
   /* Le foto ancora nell'inbox non hanno indirizzo pubblico: servono le
      firme. Quelle approvate o nascoste stanno nel bucket pubblico e
@@ -69,6 +74,9 @@ export default async function Mie() {
         : (firme[r.storage_path] ?? null),
     caricata: r.created_at,
     pagine: r.gallery_image_tags.map((t) => t.gallery_tags?.label).filter((l): l is string => !!l),
+    /* Le CHIAVI oltre alle etichette: servono al modulo di correzione,
+       che deve poter rimettere le spunte su quello che c'era. */
+    chiavi: r.gallery_image_tags.map((t) => t.gallery_tags?.key).filter((k): k is string => !!k),
   }));
 
   return (
@@ -80,7 +88,13 @@ export default async function Mie() {
       sottotitolo={"Quello che hai caricato, e a che punto è."}
     >
 
-      <GalleryMie foto={foto} reinvia={reinvia} elimina={elimina} />
+      <GalleryMie
+        foto={foto}
+        pagine={pagine}
+        reinvia={reinvia}
+        elimina={elimina}
+        aggiornaFoto={aggiornaFoto}
+      />
     </Guscio>
   );
 }
