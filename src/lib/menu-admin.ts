@@ -28,6 +28,11 @@ export type VoceMenu = {
    *  confine fra server e client. La traduzione in componente avviene
    *  dentro il guscio, che e' gia' nel browser. */
   icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti';
+  /** Le pagine dentro questa sezione, mostrate quando la sezione e'
+   *  aperta. SOLO I TITOLI: la spiegazione di ognuna sta gia' sulla
+   *  pagina della sezione, e ripeterla in una barra laterale larga 260px
+   *  la riempirebbe di testo che nessuno legge due volte. */
+  sotto?: { href: string; testo: string }[];
 };
 
 /** Le voci che tocca a ciascun ruolo.
@@ -36,10 +41,25 @@ export type VoceMenu = {
  *  `soloGestione()` e le loro azioni chiamano `chiAgisce()`. Qui si toglie
  *  il rumore a chi non ne ha bisogno -- la porta e' chiusa altrove. */
 export function vociPerRuolo(ruolo: string): VoceMenu[] {
+  /* Le due che valgono per tutti: una guida carica e guarda le sue. Le
+     altre quattro sono di gestione, e stanno dietro `soloGestione()`
+     sulle pagine -- qui si toglie il rumore, non si chiude la porta. */
+  const sempre = [
+    { href: '/admin/gallery/carica/', testo: 'Carica e tagga' },
+    { href: '/admin/gallery/mie/', testo: 'Le mie foto' },
+  ];
+  const diGestione = [
+    { href: '/admin/gallery/tutte/', testo: 'Tutte le foto' },
+    { href: '/admin/gallery/approva/', testo: 'Da approvare' },
+    { href: '/admin/gallery/pagine/', testo: 'Pagine' },
+    { href: '/admin/gallery/impostazioni/', testo: 'Impostazioni' },
+  ];
+
   const gallery: VoceMenu = {
     href: '/admin/gallery/',
     testo: 'Foto della gallery',
     icona: 'gallery',
+    sotto: ruolo === 'admin' ? [...sempre, ...diGestione] : sempre,
   };
   if (ruolo !== 'admin') return [gallery];
   return [

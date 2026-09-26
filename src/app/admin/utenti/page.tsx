@@ -50,6 +50,7 @@ export default async function Utenti() {
   const utenti: Utente[] = ((profili ?? []) as Riga[]).map((p) => ({
     id: p.id,
     username: p.username,
+    email: p.email,
     nome: p.nome,
     ruolo: p.ruolo,
     attivo: p.attivo,

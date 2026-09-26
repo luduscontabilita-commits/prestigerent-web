@@ -135,6 +135,10 @@ export function Guscio({
             const attiva = v.href === '/admin/'
               ? percorso === '/admin' || percorso === '/admin/'
               : percorso.startsWith(v.href.replace(/\/$/, ''));
+            /* Il sottomenu si apre con la sezione, e resta aperto finche'
+               si e' dentro: chiuderlo mentre ci si muove fra le sue
+               pagine vorrebbe dire far sparire da sotto le mani i
+               collegamenti che si stanno usando. */
             return (
               <NavLink
                 key={v.href}
@@ -142,11 +146,27 @@ export function Guscio({
                 href={v.href}
                 label={v.testo}
                 leftSection={<Icona size={18} stroke={1.6} />}
-                active={attiva}
+                active={attiva && !v.sotto}
+                opened={v.sotto ? attiva : undefined}
                 onClick={close}
+                childrenOffset={30}
                 style={{ borderRadius: 8 }}
                 mb={2}
-              />
+              >
+                {v.sotto?.map((s) => (
+                  <NavLink
+                    key={s.href}
+                    component={Link}
+                    href={s.href}
+                    label={s.testo}
+                    /* uguaglianza e non prefisso: `/admin/gallery/` e'
+                       prefisso di tutte, e le accenderebbe tutte insieme */
+                    active={percorso.replace(/\/$/, '') === s.href.replace(/\/$/, '')}
+                    onClick={close}
+                    style={{ borderRadius: 8 }}
+                  />
+                ))}
+              </NavLink>
             );
           })}
         </AppShell.Section>

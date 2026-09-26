@@ -63,6 +63,9 @@ import {
 export type Utente = {
   id: string;
   username: string | null;
+  /** l'indirizzo con cui Supabase conosce la persona. Al login vale
+   *  quanto il nome utente: si puo' scrivere l'uno o l'altra. */
+  email: string;
   nome: string | null;
   ruolo: string;
   attivo: boolean;
@@ -430,6 +433,25 @@ export function GestioneUtenti({
             <Paper key={u.id} withBorder radius="md" p="sm">
               <Text fw={600} size="sm">{u.nome ?? u.username}</Text>
               <Text ff="monospace" size="xs" c="dimmed">{u.username ?? '—'}</Text>
+              {/* L'EMAIL, non solo il nome utente. Al login si puo'
+                  scrivere l'uno o l'altra, e l'email e' anche l'indirizzo
+                  con cui Supabase conosce la persona: senza, per sapere a
+                  chi appartiene un account bisognava aprire Supabase. */}
+              <Group gap={4} wrap="nowrap" mt={2}>
+                <Text ff="monospace" size="xs" c="dimmed" style={{ wordBreak: 'break-all' }}>
+                  {u.email}
+                </Text>
+                <CopyButton value={u.email} timeout={1500}>
+                  {({ copied, copy }) => (
+                    <Tooltip label={copied ? 'Copiata' : 'Copia'}>
+                      <ActionIcon size="xs" variant="subtle" color={copied ? 'teal' : 'gray'}
+                        onClick={copy} aria-label="Copia l’email">
+                        {copied ? <IconCheck size={12} /> : <IconCopy size={12} />}
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </CopyButton>
+              </Group>
               <Text size="xs" c="dimmed" mt={4}>
                 {u.ultimoAccesso
                   ? `ultimo accesso ${new Date(u.ultimoAccesso).toLocaleDateString('it-IT')}`
