@@ -5,9 +5,21 @@
 .ad-box{ width:100%; max-width:420px; background:#fff; border-radius:18px; padding:34px 30px; box-shadow:0 24px 60px rgba(0,0,0,.3); }
 .ad-box h1{ font-size:1.25rem; margin:0 0 22px; }
 .ad-box label{ display:block; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#6B7885; margin-bottom:7px; }
+/* 🔴 L'ETICHETTA CHE SEGUE UN CAMPO HA BISOGNO DI ARIA SOPRA.
+   `label` aveva solo il margine SOTTO, e `input` nessuno: fra il campo
+   email e "PASSWORD FACOLTATIVA" non c'era un pixel, e le due coppie
+   etichetta/campo si leggevano come un blocco solo. Si mette lo spazio
+   sull'etichetta e non sotto al campo perche' cosi' l'ULTIMO campo non si
+   porta dietro un margine che poi va scontato contro il pulsante. */
+.ad-box input + label{ margin-top:20px; }
 .ad-box input{ width:100%; padding:13px 15px; border:1px solid #D6DDE4; border-radius:11px; font:inherit; font-size:1rem; }
 .ad-box input:focus{ outline:2px solid #ED6707; outline-offset:1px; border-color:transparent; }
-.ad-box button{ width:100%; margin-top:14px; padding:14px; border:0; border-radius:11px; background:#ED6707; color:#fff; font:inherit; font-size:.98rem; font-weight:800; cursor:pointer; }
+/* "facoltativa" e' un'informazione, non un'intestazione: dentro
+   l'etichetta deve pesare meno, o le due parole gridano uguale. */
+.ad-box .ad-opt{ font-weight:600; letter-spacing:.04em; color:#94A3B0; text-transform:none; }
+/* Lo stesso respiro che c'e' fra i campi: 14px lasciavano il pulsante
+   piu' attaccato al campo di quanto i campi non lo fossero fra loro. */
+.ad-box button{ width:100%; margin-top:20px; padding:14px; border:0; border-radius:11px; background:#ED6707; color:#fff; font:inherit; font-size:.98rem; font-weight:800; cursor:pointer; }
 .ad-box button:disabled{ opacity:.6; cursor:default; }
 .ad-nota{ margin:16px 0 0; font-size:.8rem; color:#6B7885; line-height:1.55; }
 .ad-ok{ font-size:.95rem; line-height:1.6; }

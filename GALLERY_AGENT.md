@@ -121,6 +121,55 @@ Si usano i ruoli che c'erano già in `profili`, **senza aggiungerne**:
 | Pagine, Impostazioni | sì | non le vede |
 | resto di `/admin` | sì | no |
 
+### Come si crea l'accesso di una guida
+
+**Una riga in `autorizzati`. Non serve nessun invito da Supabase, e non
+serve nessun profilo admin.**
+
+```sql
+insert into public.autorizzati (email, ruolo, nome)
+values ('nome.cognome@esempio.com', 'guida', 'Nome Cognome');
+```
+
+Poi la persona va da sé su `https://prestigerent.com/admin/entra/`, scrive
+il suo indirizzo, **lascia vuoto il campo password** e apre il link che
+riceve per email. Al primo accesso il profilo nasce da solo.
+
+🔴 **Il ruolo lo decide `autorizzati`, non il default della colonna.** È il
+trigger `al_primo_accesso` su `auth.users`, che esegue `crea_profilo()`:
+
+```sql
+select ruolo, nome into r, n from autorizzati where lower(email) = lower(new.email);
+if r is null then raise exception 'Questo indirizzo non e'' abilitato ad accedere.';
+insert into profili (id, email, nome, ruolo) values (new.id, new.email, n, r);
+```
+
+Due conseguenze pratiche:
+
+- **se l'indirizzo non è in `autorizzati`, l'accesso non si crea affatto.**
+  Supabase risponde «Database error saving new user», che sembra un guasto
+  del sito e non lo è: la schermata di accesso lo traduce già in «Questo
+  indirizzo non è abilitato. Controlla di averlo scritto giusto».
+  Invitare la persona da Supabase → Authentication → Users **senza** la
+  riga in `autorizzati` non funziona: il trigger rifiuta l'inserimento;
+- `ruolo` in `autorizzati` ammette solo `admin` e `guida`
+  (`autorizzati_ruolo_check`): scriverne un altro fa fallire l'insert, che
+  è quello che si vuole.
+
+**Per cambiare ruolo a chi è già entrato** bisogna toccare tutte e due le
+tabelle: `autorizzati` decide cosa succede al *primo* accesso, `profili` è
+quello che il sito legge ogni volta.
+
+```sql
+update public.autorizzati set ruolo = 'guida' where email = '...';
+update public.profili     set ruolo = 'guida' where email = '...';
+```
+
+**Per chiudere l'accesso** senza perdere la paternità delle foto
+caricate: `update public.profili set attivo = false where email = '...'`.
+`chiSono()` legge `attivo`, quindi la persona non entra più, e le sue foto
+restano dove sono con il suo nome.
+
 **Tre punti di controllo, non uno:**
 1. le pagine chiamano `soloGestione()` (o controllano il ruolo a mano dove
    servono entrambi);
@@ -219,9 +268,8 @@ sull'indirizzo pubblicato **dopo il push**.
 1. **push** e attendere `deploy.yml` nelle Actions;
 2. `/admin/gallery/pagine/` → **«Sincronizza pagine»**. Deve dire 103
    nuove;
-3. creare l'account di chi caricherà: invito da **Supabase → Authentication
-   → Users**, con l'indirizzo in `autorizzati`. Il profilo nasce
-   `ruolo = 'guida'` da solo, perché è il default della colonna;
+3. **creare l'account di chi caricherà** — una riga in `autorizzati`, e
+   basta (vedi sotto: non serve nessun invito da Supabase);
 4. caricare qualche foto come guida, approvarle come admin;
 5. `/admin/gallery/pagine/` → su **una** pagina di prova mettere
    visibilità «sempre accesa», e guardarla sul sito con l'interruttore

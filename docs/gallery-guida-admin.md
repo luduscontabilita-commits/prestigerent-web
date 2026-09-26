@@ -6,13 +6,22 @@ Per chi carica le foto delle giornate. Si fa tutto dal telefono.
 
 ## Entrare
 
-1. apri **prestigerent.com/admin/**
-2. scrivi la tua email e premi **«Ricevi il link di accesso»**
-3. apri il link che ti arriva per email, **dallo stesso telefono**
+1. apri **prestigerent.com/admin/entra/**
+2. scrivi la tua email, **lascia vuoto il campo password**
+3. premi **«Ricevi il link di accesso»**
+4. apri il link che ti arriva per email, **dallo stesso telefono**
 
-Il link dura pochi minuti e vale una volta sola. Non c'è nessuna password
-da ricordare. Se ti dice che l'indirizzo non è abilitato, controlla di
-averlo scritto bene: basta un punto di troppo.
+Il link dura pochi minuti e vale una volta sola. **Non c'è nessuna
+password da ricordare**, e non ti serve nessun account da creare: la prima
+volta che entri il tuo profilo nasce da sé.
+
+Se ti dice che **l'indirizzo non è abilitato**: o è scritto con un refuso
+(basta un punto di troppo), o il tuo indirizzo non è ancora stato
+aggiunto. Nel secondo caso non c'è niente che puoi fare dal telefono:
+scrivi a chi gestisce il sito e fatti aggiungere.
+
+Salvati l'indirizzo nei segnalibri: dal sito non c'è nessun link al
+pannello, di proposito.
 
 ---
 

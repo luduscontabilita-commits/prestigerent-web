@@ -107,7 +107,10 @@ export default function Entra() {
             {stato === 'errore' && <p className="ad-err">{messaggio}</p>}
             <p className="ad-nota">
               Con la password entri subito. Lasciandola vuota ricevi un link via email:
-              e&rsquo; il modo consigliato, perche&rsquo; non c&rsquo;e&rsquo; niente da
+              {/* Accenti veri, non l&rsquo;apostrofo dopo la vocale: qui si
+                  leggeva &laquo;e&rsquo; il modo consigliato, perche&rsquo; non
+                  c&rsquo;e&rsquo; niente&raquo;. */}
+              è il modo consigliato, perché non c&rsquo;è niente da
               ricordare e niente da rubare. In tutti e due i casi funziona solo con gli
               indirizzi abilitati.
             </p>
