@@ -193,7 +193,20 @@ Le tre cose da sapere senza aprire niente:
   chiama `soloGestione()` e **ogni server action** chiama `chiAgisce()` —
   perché una action non passa da nessuna pagina e da nessun layout.
 
-`npm test` prova la logica pura (65 test, nessuna rete, nessun `.next`):
+🔴 **`npm run prova:pannello` entra e prova il pannello DA DENTRO.**
+Il 26/09/2026 tutte e quindici le pagine hanno risposto 500 a chi era
+entrato, e la verifica non se n'era accorta: si controllavano le pagine
+con `curl` **senza sessione**, si vedeva il `307 -> /admin/entra/` e si
+scriveva «chiuso, giusto». Ma cosi' il codice che sta **dopo** l'accesso
+non lo esegue mai nessuno — ed era li' tutto il guasto, trovato dalla
+proprieta' usando il pannello.
+Lo script fa l'accesso come un browser (token da Supabase, cookie nel
+formato di `@supabase/ssr`) e chiede ogni pagina. Non esegue JavaScript:
+prova il rendering sul **server**, cioe' proprio gli errori di confine
+fra Server e Client Component che `tsc` non vede. **Va lanciato dopo ogni
+push che tocca `/admin`.**
+
+`npm test` prova la logica pura (86 test, nessuna rete, nessun `.next`):
 la regola di visibilità, l'ordinamento, le proporzioni, il registro e la
 lettura dell'EXIF. Tutto il resto si verifica con `curl` sull'indirizzo
 pubblicato, come dice la regola 1.
