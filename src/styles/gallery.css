@@ -111,32 +111,20 @@
 
 /* ── IL LIGHTBOX ─────────────────────────────────────────────────── */
 
-/* 🔴 LA MISURA ARRIVA DAL POSIZIONAMENTO, NON DA `vw`/`dvh`.
-   Non e' una preferenza di stile: la versione precedente apriva la foto
-   alla sua misura naturale (2400px) e la tagliava. La catena era questa.
-
-   `.glight-foto img` si limita con `max-height: 100%`, e una percentuale
-   ha bisogno che l'altezza del genitore sia DEFINITA. L'altezza arrivava
-   da `height: 100dvh`. Basta che quella dichiarazione non venga applicata
-   -- un browser che non conosce `dvh`, o lo stile predefinito del
-   `<dialog>` che rientra in gioco -- e l'altezza torna `auto`: allora
-   `max-height: 100%` si risolve su un'altezza indefinita, che per le
-   regole delle percentuali vuol dire `none`. Nessun limite, immagine
-   intera a 2400px, e `overflow: hidden` la taglia. Una dichiarazione che
-   cade non lasciava una foto un po' piu' grande: la lasciava senza
-   nessun tetto.
-
-   E `width: 100vw` COMPRENDE la barra di scorrimento: sul desktop il
-   pannello era ~15px piu' largo dello schermo, quindi il bordo destro e
-   la × per chiudere finivano fuori dalla vista.
-
-   Qui un `<dialog>` modale e' `position: fixed`, e con `inset: 0`,
+/* LA MISURA ARRIVA DAL POSIZIONAMENTO, NON DA `vw`/`dvh`.
+   Un `<dialog>` modale e' gia' `position: fixed`: con `inset: 0`,
    `margin: 0` e misure `auto` il suo riquadro coincide con la finestra
-   per costruzione. Nessuna unita' da supportare, niente barra di
-   scorrimento da contare, e l'altezza e' definita -- quindi la
-   percentuale sull'immagine si risolve sempre. `max-width`/`max-height`
-   a `none` servono a spegnere il `calc(100% - 6px - 2em)` che i browser
-   applicano da soli a `dialog:modal`. */
+   per costruzione. Nessuna unita' da supportare, e soprattutto niente
+   `width: 100vw`, che COMPRENDE la barra di scorrimento e rendeva il
+   riquadro ~15px piu' largo dello schermo sul desktop, spingendo fuori
+   dalla vista il bordo destro e la × per chiudere.
+   `max-width`/`max-height: none` spengono il `calc(100% - 6px - 2em)`
+   che i browser applicano da soli a `dialog:modal`.
+
+   🔴 Questo NON e' il motivo per cui la foto si apriva tagliata -- il
+   primo tentativo, il 26/09/2026, diede la colpa a `100dvh` e non
+   risolse niente. La causa vera sta sulla cornice `.glight-foto` qui
+   sotto, ed e' scritta li'. */
 .glight {
   position: fixed;
   inset: 0;
@@ -169,10 +157,30 @@
   grid-template-rows: minmax(0, 1fr) auto;
 }
 
+/* 🔴 QUI `flex`, E NON `grid`. NON E' UNA PREFERENZA: E' LA CORREZIONE.
+   Con `display: grid` su questa cornice, Chrome NON risolve il
+   `max-height: 100%` dell'immagine qui sotto. La dichiarazione c'e' e
+   risulta anche in `getComputedStyle` -- semplicemente non limita
+   niente, e la foto resta alla sua misura naturale: misurato dentro
+   Chrome il 26/09/2026 su prestigerent.com, finestra 1920x1080, cornice
+   alta 1035px, immagine 1536x2048 che sbordava fino a y=2060.
+
+   Non e' l'altezza del contenitore a mancare, come si potrebbe pensare:
+   provato a imporre `height: 100%` sulla cornice lasciando `grid`, e
+   l'immagine e' rimasta 1536x2048. Cambiata la sola riga `grid` ->
+   `flex`, la stessa identica percentuale ha funzionato: 758x1011,
+   proporzioni 0,7497 contro 0,75 del file, dentro lo schermo.
+
+   Quindi: se un domani qualcuno rimette `grid` qui perche' sembra piu'
+   ordinato accanto al resto, la foto torna a uscire dallo schermo, e il
+   CSS sembrera' giusto a chi lo legge. Si riprova con
+   `scratchpad/prova-varianti.mjs`, che apre la pagina pubblicata in
+   Chrome e misura il rettangolo vero. */
 .glight-foto {
-  display: grid;
-  place-items: center;
-  min-height: 0;   /* senza questo una griglia non lascia rimpicciolire il figlio */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;   /* senza questo il figlio non si lascia rimpicciolire */
   min-width: 0;
   padding: 12px;
 }

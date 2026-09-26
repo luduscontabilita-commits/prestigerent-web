@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:guarda": "vitest",
-    "prova:pannello": "node scripts/prova-pannello.mjs"
+    "prova:pannello": "node scripts/prova-pannello.mjs",
+    "prova:lightbox": "node scripts/misura-lightbox.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
