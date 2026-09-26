@@ -55,6 +55,27 @@ export default async function Pagine() {
     };
   });
 
+  /* L'ORDINE: prima quelle che la gallery ce l'hanno davvero.
+   *
+   * Il registro ha 103 pagine e cento di queste non hanno nemmeno una
+   * foto: in ordine alfabetico, le tre che contano finiscono sparse in
+   * mezzo, e chi apre la pagina per vedere «dove si vede la gallery»
+   * deve cercarle. Quindi: prima le visibili, dentro ognuno dei due
+   * gruppi le piu' fotografate in cima, e a parita' l'ordine alfabetico
+   * perche' due righe identiche non si scambino di posto a ogni
+   * ricarica.
+   *
+   * 🔴 L'ordine si decide QUI, sul server, e non nel componente: la'
+   * cambia lo stato di una riga appena si tocca il suo interruttore, e
+   * una riga che salta di posizione sotto le dita e' il modo piu' sicuro
+   * di far cliccare quella sbagliata. Si riordina alla prossima
+   * apertura. */
+  righe.sort((a, b) =>
+    Number(b.visibile) - Number(a.visibile) ||
+    b.quante - a.quante ||
+    a.label.localeCompare(b.label, 'it')
+  );
+
   const visibili = righe.filter((r) => r.visibile).length;
 
   return (
