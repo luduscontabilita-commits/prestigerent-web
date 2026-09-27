@@ -210,8 +210,15 @@ pagina (`GalleryFotoPagina.tsx`). Deciso con la proprietà il 27/09/2026:
   che la colonna conta e la soglia misura. Una foto in attesa taggata su
   una pagina non ha un posto nella striscia finché non è approvata;
 - 🔴 **una foto nuova su una pagina va IN FONDO**: l'ultima posizione di
-  quella pagina + 10 (`ultimePosizioni()`), sia al caricamento sia quando
-  la si aggiunge a una pagina da «Tutte le foto». Non più un 1000 fisso;
+  quella pagina + 10 (`inFondo()` in `gallery-tag.ts`, provata dai test),
+  al caricamento, quando la si aggiunge a una pagina da «Tutte le foto»,
+  e **di nuovo all'approvazione**. Non più un 1000 fisso;
+- 🔴 **all'approvazione la foto di una guida si sposta in fondo, adesso**
+  (dal 27/09/2026). La posizione presa al caricamento può essere diventata
+  «in mezzo»: mentre la foto aspettava, la gallery può essere stata
+  riordinata (le posizioni ripartono da 10) o allungata da un admin. Più
+  foto approvate insieme arrivano in fila nell'ordine della coda. Una foto
+  nascosta e poi rimessa, invece, torna **dov'era**: lì non si sposta;
 - 🔴 **correggere una foto non disfa l'ordine**: `aggiornaFoto()` tocca
   solo le pagine aggiunte o tolte. Fino al 27/09/2026 riscriveva tutti i
   legami con posizione 1000 e senza stella: correggere una didascalia
@@ -281,7 +288,7 @@ caricate e l'admin le trova in coda comunque.
 
 ## Cosa è provato, e come
 
-`npm test` — 88 test in tre file (questo, l'EXIF, l'accesso), nessuna rete, nessun database, nessun `.next`.
+`npm test` — 92 test in tre file (questo, l'EXIF, l'accesso), nessuna rete, nessun database, nessun `.next`.
 
 - **la regola di visibilità**: interruttore, override `on`/`off`, soglia
   globale e per pagina, foto sotto soglia, zero foto;

@@ -12,7 +12,7 @@ import {
   firmaCaricamento,
   nomeFile,
 } from '@/lib/gallery-file';
-import { chiaviDoppie, registro, type Criterio, type TipoTag, type VoceRegistro } from '@/lib/gallery-tag';
+import { chiaviDoppie, inFondo, registro, type Criterio, type Legame, type TipoTag, type VoceRegistro } from '@/lib/gallery-tag';
 
 /* LE AZIONI DEL PANNELLO GALLERY.
  *
@@ -68,21 +68,20 @@ async function percorsiDi(sb: Awaited<ReturnType<typeof supabaseServer>>, idFoto
   return [...new Set(righe.map((r) => r.gallery_tags?.path).filter((p): p is string => !!p))];
 }
 
-/** L'ultima posizione di ogni pagina, per mettere una foto nuova IN FONDO.
+/** I legami delle pagine indicate, per calcolare `inFondo()` su ognuna.
  *  Non un numero fisso («1000»): dopo un riordino le posizioni sono 10,
  *  20, 30..., e su una pagina con piu' di cento foto un 1000 fisso
- *  finirebbe in mezzo. Si prende la piu' alta e si va avanti di dieci. */
-async function ultimePosizioni(
+ *  finirebbe in mezzo. La regola sta in gallery-tag.ts, provata dai test. */
+async function legamiDi(
   sb: Awaited<ReturnType<typeof supabaseServer>>,
   tagIds: string[]
-): Promise<Map<string, number>> {
-  const ultima = new Map<string, number>(tagIds.map((id) => [id, 0]));
-  if (!tagIds.length) return ultima;
-  const { data } = await sb.from('gallery_image_tags').select('tag_id,position').in('tag_id', tagIds);
-  for (const r of (data ?? []) as { tag_id: string; position: number }[]) {
-    if (r.position > (ultima.get(r.tag_id) ?? 0)) ultima.set(r.tag_id, r.position);
-  }
-  return ultima;
+): Promise<Legame[]> {
+  if (!tagIds.length) return [];
+  const { data } = await sb
+    .from('gallery_image_tags')
+    .select('image_id,tag_id,position')
+    .in('tag_id', tagIds);
+  return (data ?? []) as Legame[];
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -312,17 +311,15 @@ export async function registraFoto(foto: DaRegistrare[]): Promise<Esito & { quan
   /* Di dieci in dieci, e in fondo: una foto nuova non scavalca l'ordine
      che qualcuno ha sistemato a mano. Piu' foto nello stesso invio
      arrivano in fila nell'ordine in cui sono state scelte. */
-  const ultima = await ultimePosizioni(sb, [...perChiave.values()].map((t) => t.id));
-  const legami: { image_id: string; tag_id: string; position: number }[] = [];
+  const esistenti = await legamiDi(sb, [...perChiave.values()].map((t) => t.id));
+  const legami: Legame[] = [];
   for (const f of foto) {
     const id = perPercorso.get(f.storage_path);
     if (!id) continue;
     for (const k of f.tag) {
       const t = perChiave.get(k);
       if (!t) continue;
-      const pos = (ultima.get(t.id) ?? 0) + 10;
-      ultima.set(t.id, pos);
-      legami.push({ image_id: id, tag_id: t.id, position: pos });
+      legami.push({ image_id: id, tag_id: t.id, position: inFondo([...esistenti, ...legami], t.id) });
     }
   }
   if (legami.length) {
@@ -468,10 +465,10 @@ export async function aggiornaFoto(
     if (e1) return { ok: false, errore: e1.message };
   }
   if (nuove.length) {
-    const ultima = await ultimePosizioni(sb, nuove.map((t) => t.id));
+    const esistenti = await legamiDi(sb, nuove.map((t) => t.id));
     const { error: e2 } = await sb
       .from('gallery_image_tags')
-      .insert(nuove.map((t) => ({ image_id: id, tag_id: t.id, position: (ultima.get(t.id) ?? 0) + 10 })));
+      .insert(nuove.map((t) => ({ image_id: id, tag_id: t.id, position: inFondo(esistenti, t.id) })));
     if (e2) return { ok: false, errore: e2.message };
   }
 
@@ -542,7 +539,10 @@ export async function approva(ids: string[]): Promise<Esito & { quante?: number 
     .select('id,bucket,storage_path,status')
     .in('id', ids);
   const daFare = ((righe ?? []) as { id: string; bucket: string; storage_path: string; status: string }[])
-    .filter((r) => r.status === 'in_attesa');
+    .filter((r) => r.status === 'in_attesa')
+    /* nell'ordine in cui arrivano dalla coda, non in quello del database:
+       e' l'ordine in cui finiranno in fondo alla gallery */
+    .sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
   if (!daFare.length) return { ok: false, errore: 'Nessuna di queste foto è in attesa.' };
 
   const percorsi = await percorsiDi(sb, daFare.map((r) => r.id));
@@ -578,6 +578,26 @@ export async function approva(ids: string[]): Promise<Esito & { quante?: number 
 
     await cancella(BUCKET_INBOX, [r.storage_path]);
     fatte++;
+
+    /* 🔴 IN FONDO ADESSO, NON DOVE ERA AL CARICAMENTO. La posizione presa
+       quando la guida ha caricato puo' essere diventata «in mezzo»: nel
+       frattempo la gallery puo' essere stata riordinata (le posizioni
+       ripartono da 10) o allungata da un admin. La foto compare sul sito
+       adesso, quindi va in fondo adesso, su ognuna delle sue pagine. Le
+       foto approvate insieme arrivano in fila nell'ordine della coda.
+       Se questo passo fallisce la foto e' comunque approvata: resta dove
+       l'aveva messa il caricamento, e lo si dice. */
+    const { data: suoi } = await sb.from('gallery_image_tags').select('tag_id').eq('image_id', r.id);
+    const tagDellaFoto = ((suoi ?? []) as { tag_id: string }[]).map((x) => x.tag_id);
+    const esistenti = await legamiDi(sb, tagDellaFoto);
+    for (const t of tagDellaFoto) {
+      const { error: ep } = await sb
+        .from('gallery_image_tags')
+        .update({ position: inFondo(esistenti, t, r.id) })
+        .eq('image_id', r.id)
+        .eq('tag_id', t);
+      if (ep) problemi.push(`approvata, ma non spostata in fondo: ${ep.message}`);
+    }
   }
 
   if (fatte) rinfresca(percorsi);

@@ -9,6 +9,7 @@ import {
   entranoTutte,
   esclusa,
   giornoRoma,
+  inFondo,
   larghezzaDesktop,
   ordina,
   pezziTitolo,
@@ -282,6 +283,29 @@ describe('ordina', () => {
 });
 
 /* ═══ misure, proporzioni, sizes ═════════════════════════════════════ */
+
+describe('inFondo: dove arriva una foto nuova su una pagina', () => {
+  const L = (image_id: string, tag_id: string, position: number) => ({ image_id, tag_id, position });
+
+  it('pagina vuota: 10', () => {
+    expect(inFondo([], 't')).toBe(10);
+  });
+
+  it('dopo l’ultima della STESSA pagina, di dieci in dieci', () => {
+    expect(inFondo([L('a', 't', 10), L('b', 't', 30), L('c', 'altra', 900)], 't')).toBe(40);
+  });
+
+  it('all’approvazione non conta la posizione che la foto aveva gia’', () => {
+    /* la foto della guida aveva preso 40 al caricamento; poi la gallery e'
+       stata riordinata e allungata fino a 80: approvata, va a 90, non a 40 */
+    const legami = [L('g', 't', 40), ...[10, 20, 30, 50, 60, 70, 80].map((p, i) => L(`x${i}`, 't', p))];
+    expect(inFondo(legami, 't', 'g')).toBe(90);
+  });
+
+  it('se e’ gia’ l’ultima resta in fondo, senza saltare avanti a vuoto', () => {
+    expect(inFondo([L('a', 't', 10), L('g', 't', 20)], 't', 'g')).toBe(20);
+  });
+});
 
 describe('proporzioni e misure', () => {
   it('le foto normali da telefono non vengono mai toccate', () => {

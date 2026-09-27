@@ -484,6 +484,31 @@ export function ordina(
   return [...fissate, ...ordinato];
 }
 
+/** Un legame foto-pagina, come sta in `gallery_image_tags`. */
+export type Legame = { image_id: string; tag_id: string; position: number };
+
+/**
+ * DOVE VA UNA FOTO CHE ARRIVA SU UNA PAGINA: IN FONDO.
+ *
+ * L'ultima posizione della pagina + 10, senza contare la foto stessa (che
+ * all'approvazione ha gia' un suo legame, fatto al caricamento). Di dieci
+ * in dieci come nel resto del pannello, cosi' infilarne una in mezzo non
+ * obbliga a rinumerare. Pagina vuota: 10.
+ *
+ * Si usa al caricamento, quando si aggiunge una pagina da «Correggi», e
+ * 🔴 ALL'APPROVAZIONE: e' li' che la foto compare sul sito, e «in fondo»
+ * deve voler dire in fondo IN QUEL MOMENTO. Prima restava la posizione
+ * presa al caricamento, e se nel frattempo la gallery era stata riordinata
+ * (10, 20... 80) o allungata, la foto della guida compariva in mezzo.
+ */
+export function inFondo(legami: readonly Legame[], tagId: string, escludi?: string): number {
+  let ultima = 0;
+  for (const l of legami) {
+    if (l.tag_id === tagId && l.image_id !== escludi && l.position > ultima) ultima = l.position;
+  }
+  return ultima + 10;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    6. LE MISURE: PROPORZIONI E `sizes`
    ═══════════════════════════════════════════════════════════════════ */
