@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Alert } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { comeSiChiama } from '@/lib/accesso';
@@ -6,7 +7,7 @@ import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, spiega, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryPagine, type RigaPagina } from '@/components/admin/GalleryPagine';
-import { fotoDellaPagina, salvaFotoPagina, salvaPagina, sincronizzaPagine } from '../azioni';
+import { fotoDellaPagina, salvaFotoPagina, salvaPagina } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -94,7 +95,8 @@ export default async function Pagine() {
 
       {righe.length === 0 && (
         <Alert color="red" icon={<IconAlertTriangle size={18} />} mb="md">
-          Il registro è vuoto: premi «Sincronizza pagine» qui sotto per riempirlo dal
+          Il registro è vuoto: premi «Sincronizza pagine» in{' '}
+          <Link href="/admin/gallery/impostazioni/">Impostazioni</Link> per riempirlo dal
           codice e dal catalogo.
         </Alert>
       )}
@@ -107,7 +109,6 @@ export default async function Pagine() {
       <GalleryPagine
         righe={righe}
         impostazioni={impostazioni}
-        sincronizza={sincronizzaPagine}
         salva={salvaPagina}
         caricaFoto={fotoDellaPagina}
         salvaFoto={salvaFotoPagina}

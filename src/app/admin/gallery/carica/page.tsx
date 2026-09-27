@@ -38,7 +38,7 @@ export default async function Carica() {
            pulsante che non si accende mai. */
         <Alert color="red" icon={<IconAlertTriangle size={18} />} mb="md">
           Il registro delle pagine è vuoto. Un amministratore deve premere
-          «Sincronizza pagine» in <Link href="/admin/gallery/pagine/">Pagine</Link>.
+          «Sincronizza pagine» in <Link href="/admin/gallery/impostazioni/">Impostazioni</Link>.
         </Alert>
       ) : (
         <GalleryCaricatore

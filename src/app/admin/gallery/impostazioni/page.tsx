@@ -4,7 +4,8 @@ import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryImpostazioni } from '@/components/admin/GalleryImpostazioni';
-import { salvaImpostazioni } from '../azioni';
+import { SincronizzaPagine } from '@/components/admin/SincronizzaPagine';
+import { salvaImpostazioni, sincronizzaPagine } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -49,6 +50,10 @@ export default async function ImpostazioniGallery() {
         quantePronte={quantePronte}
         salva={salvaImpostazioni}
       />
+
+      <div style={{ marginTop: 'var(--mantine-spacing-xl)' }}>
+        <SincronizzaPagine pagine={(tag ?? []).length} sincronizza={sincronizzaPagine} />
+      </div>
     </Guscio>
   );
 }

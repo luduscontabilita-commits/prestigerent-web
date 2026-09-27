@@ -177,7 +177,7 @@ export function GalleryImpostazioni({
             value={d.default_sort}
             onChange={(v) => v && setD({ ...d, default_sort: v as Criterio })}
             allowDeselect={false}
-            description="«Casuale del giorno» mescola le foto ma tiene lo stesso ordine per tutta la giornata, e cambia a mezzanotte: chi torna sul sito vede una gallery diversa, e le pagine restano in cache."
+            description="Vale per le pagine rimaste su «Usa l’ordinamento predefinito». Una pagina di cui hai trascinato le foto da «Pagine → Foto» è passata a «Manuale» e resta così anche se cambi questo. «Casuale del giorno» mescola le foto ma tiene lo stesso ordine per tutta la giornata, e cambia a mezzanotte."
           />
 
           <Select

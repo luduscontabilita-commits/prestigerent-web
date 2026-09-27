@@ -23,7 +23,6 @@ import {
   IconCheck,
   IconExternalLink,
   IconPhoto,
-  IconRefresh,
   IconSearch,
 } from '@tabler/icons-react';
 import { CRITERI, decidi, spiega, type Criterio, type Impostazioni, type Tag } from '@/lib/gallery-tag';
@@ -117,7 +116,6 @@ const VISIBILITA = [
 export function GalleryPagine({
   righe,
   impostazioni,
-  sincronizza,
   salva,
   caricaFoto,
   salvaFoto,
@@ -126,7 +124,6 @@ export function GalleryPagine({
   /** servono a ricalcolare lo stato di una riga appena cambia, con la
    *  stessa funzione che usa il sito */
   impostazioni: Impostazioni;
-  sincronizza: () => Promise<{ ok: boolean; errore?: string; aggiunte?: number; aggiornate?: number; orfane?: number; perTipo?: Record<string, number> }>;
   salva: (
     id: string,
     d: {
@@ -225,41 +222,18 @@ export function GalleryPagine({
         </Alert>
       )}
 
+      {/* «Sincronizza pagine» sta in Impostazioni dal 27/09/2026: si usa
+          una volta sola, e qui occupava la cima della pagina di tutti i
+          giorni. */}
       <Card withBorder radius="md" padding="sm">
-        <Group justify="space-between" align="flex-end" wrap="wrap" gap="sm">
-          <Stack gap={4} style={{ flex: '1 1 320px' }}>
-            <Button
-              loading={inCorso}
-              leftSection={<IconRefresh size={16} />}
-              style={{ alignSelf: 'flex-start' }}
-              onClick={() =>
-                avvia(async () => {
-                  setMessaggio(null);
-                  const r = await sincronizza();
-                  if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
-                  const perTipo = Object.entries(r.perTipo ?? {}).map(([t, n]) => `${n} ${t}`).join(', ');
-                  setMessaggio({
-                    ok: true,
-                    testo: `Registro aggiornato: ${r.aggiunte} nuove, ${r.aggiornate} già c’erano, ${r.orfane} orfane. (${perTipo}). Ricarica per vedere l’elenco aggiornato.`,
-                  });
-                })
-              }
-            >
-              Sincronizza pagine
-            </Button>
-            <Text size="xs" c="dimmed">
-              Rilegge le pagine dal codice e dal catalogo. Non cancella mai una riga: una
-              pagina che non esiste più diventa «orfana» e resta, con le sue foto.
-            </Text>
-          </Stack>
-
+        <Group justify="flex-start" wrap="wrap" gap="sm">
           <TextInput
             type="search"
             placeholder="cerca pagina…"
             leftSection={<IconSearch size={15} />}
             value={cerca}
             onChange={(e) => setCerca(e.currentTarget.value)}
-            style={{ flex: '0 1 260px' }}
+            style={{ flex: '0 1 320px' }}
           />
         </Group>
       </Card>

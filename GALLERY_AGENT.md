@@ -101,7 +101,9 @@ Escluse anche, come prima: `about-us`, `contact-us`, `faqs`,
 landing, il pannello.
 
 **Il registro si riempie col pulsante «Sincronizza pagine»** in
-`/admin/gallery/pagine/`. Non uno script `npm`: la regola 1 del CLAUDE.md
+`/admin/gallery/impostazioni/` (`SincronizzaPagine.tsx`; fino al
+27/09/2026 stava in cima a «Pagine», spostato perché si usa di rado: la
+prima volta e quando nasce un tour o una categoria). Non uno script `npm`: la regola 1 del CLAUDE.md
 dice niente in locale, e uno script avrebbe voluto la chiave di servizio
 sul PC. Non cancella mai una riga: una pagina che esce dal codice diventa
 `is_orphan` e resta, con le sue foto.
@@ -308,7 +310,7 @@ sull'indirizzo pubblicato **dopo il push**.
 ## Da fare la prima volta, in ordine
 
 1. **push** e attendere `deploy.yml` nelle Actions;
-2. `/admin/gallery/pagine/` → **«Sincronizza pagine»**. Deve dire 103
+2. `/admin/gallery/impostazioni/` → **«Sincronizza pagine»**. Deve dire 103
    nuove;
 3. **creare l'account di chi caricherà** — una riga in `autorizzati`, e
    basta (vedi sotto: non serve nessun invito da Supabase);
@@ -330,7 +332,7 @@ uso (`numeri-freschi.ts`, `conversioni-memoria.ts`); `SMTP_*` e
 | Sintomo | Dove guardare |
 |---|---|
 | le foto non compaiono sul sito | `/admin/gallery/pagine/`: la colonna Stato dice il motivo esatto, con la stessa funzione che usa la pagina |
-| «Il registro delle pagine è vuoto» | «Sincronizza pagine» |
+| «Il registro delle pagine è vuoto» | «Sincronizza pagine», in Impostazioni |
 | l'anteprima nella coda è un rettangolo vuoto | le firme durano 10 minuti: ricarica. È il prezzo del fatto che una foto in attesa non sia raggiungibile |
 | «Lo spazio file non è configurato» | manca `SUPABASE_SECRET_KEY` nell'ambiente di Vercel |
 | una foto HEIC viene rifiutata | è voluto, e il messaggio dice cosa fare (iPhone → Impostazioni → Fotocamera → Formati → «Più compatibile») |
