@@ -98,6 +98,31 @@ indietro. Da lì puoi rimandarla o eliminarla.
 
 ---
 
+## Per chi amministra: l'ordine delle foto di una pagina
+
+In **Pagine**, sulla riga della pagina, premi **«Foto»**. Compaiono le
+foto di quella pagina, nello stesso ordine in cui le vede chi visita il
+sito.
+
+- **Per spostare una foto** prendila dalla maniglia in alto a sinistra e
+  trascinala. Quando salvi, quella pagina passa da sola all'ordinamento
+  **«Manuale»**: da lì in poi le foto stanno esattamente dove le hai messe.
+- **Per togliere una foto da quella pagina** premi la ✕ rossa; per
+  toglierle tutte, «Togli tutte». La foto non viene cancellata: resta
+  nell'archivio e sulle altre pagine. Finché non salvi, «Rimetti» la
+  riporta dentro.
+- **Se restano meno foto del minimo**, la gallery su quella pagina non si
+  vede più. Il pannello te lo dice prima che tu salvi.
+- **La stella** compare solo se la pagina **non** è in ordine manuale (per
+  esempio «Casuale del giorno»): tiene una foto sempre per prima mentre le
+  altre si mescolano. In manuale non serve: basta trascinare la foto al
+  primo posto.
+
+Niente è salvato finché non premi **«Salva ordine»**; «Annulla» torna
+all'ultimo salvataggio.
+
+---
+
 ## Domande che vengono sempre
 
 **Ho caricato le foto ma sul sito non si vedono.**

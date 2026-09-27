@@ -6,7 +6,7 @@ import { vociPerRuolo } from '@/lib/menu-admin';
 import { soloGestione, supabaseServer } from '@/lib/auth';
 import { decidi, spiega, type Impostazioni, type Tag } from '@/lib/gallery-tag';
 import { GalleryPagine, type RigaPagina } from '@/components/admin/GalleryPagine';
-import { salvaPagina, sincronizzaPagine } from '../azioni';
+import { fotoDellaPagina, salvaFotoPagina, salvaPagina, sincronizzaPagine } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -109,6 +109,8 @@ export default async function Pagine() {
         impostazioni={impostazioni}
         sincronizza={sincronizzaPagine}
         salva={salvaPagina}
+        caricaFoto={fotoDellaPagina}
+        salvaFoto={salvaFotoPagina}
       />
     </Guscio>
   );

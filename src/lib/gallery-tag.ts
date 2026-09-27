@@ -421,7 +421,8 @@ function alterna(foto: readonly Foto[]): Foto[] {
  *
  * Le foto FISSATE vengono sempre prima, nel loro ordine manuale, e il
  * criterio si applica solo al resto: cosi' la foto migliore resta la prima
- * anche con "casuale del giorno".
+ * anche con "casuale del giorno". Tranne che col criterio MANUALE, dove
+ * vale solo la posizione trascinata e la stella non conta.
  *
  * Perche' il casuale e' del GIORNO e non della visita: l'ordine si calcola
  * sul server da un seme fisso (chiave della pagina + data), quindi la
@@ -436,8 +437,23 @@ export function ordina(
   chiave: string,
   oggi: string = giornoRoma()
 ): Foto[] {
+  /* L'ultimo spareggio e' l'id: due foto caricate insieme hanno la stessa
+     posizione (1000, «in fondo») e la stessa data, e senza un criterio
+     finale il loro ordine dipenderebbe da come le restituisce il
+     database -- cioe' il pannello potrebbe mostrarle in un ordine e il
+     sito in un altro. */
   const manuale = (a: Foto, b: Foto) =>
-    a.position - b.position || a.created_at.localeCompare(b.created_at);
+    a.position - b.position ||
+    a.created_at.localeCompare(b.created_at) ||
+    a.image_id.localeCompare(b.image_id);
+
+  /* 🔴 CON L'ORDINE MANUALE LA STELLA NON CONTA (decisione della
+     proprieta' del 27/09/2026). L'ordine a mano e' gia' quello voluto,
+     foto per foto: una fissata che scavalcasse la posizione trascinata
+     sarebbe un ordine diverso da quello che il pannello mostra. `pinned`
+     resta nel database e torna a valere se si passa a un altro criterio;
+     il pannello, in manuale, la stella non la fa nemmeno vedere. */
+  if (criterio === 'manual') return [...foto].sort(manuale);
 
   const fissate = foto.filter((f) => f.pinned).sort(manuale);
   const resto = foto.filter((f) => !f.pinned);
@@ -459,8 +475,9 @@ export function ordina(
     case 'alternate':
       ordinato = alterna([...resto].sort(manuale));
       break;
-    case 'manual':
     default:
+      /* 'manual' e' gia' uscito sopra; qui arriva solo un valore che il
+         database non dovrebbe avere, e l'ordine a mano e' il ripiego. */
       ordinato = [...resto].sort(manuale);
   }
 

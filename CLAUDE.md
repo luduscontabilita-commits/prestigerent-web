@@ -228,7 +228,7 @@ prova il rendering sul **server**, cioe' proprio gli errori di confine
 fra Server e Client Component che `tsc` non vede. **Va lanciato dopo ogni
 push che tocca `/admin`.**
 
-`npm test` prova la logica pura (86 test, nessuna rete, nessun `.next`):
+`npm test` prova la logica pura (88 test, nessuna rete, nessun `.next`):
 la regola di visibilità, l'ordinamento, le proporzioni, il registro e la
 lettura dell'EXIF. Tutto il resto si verifica con `curl` sull'indirizzo
 pubblicato, come dice la regola 1.

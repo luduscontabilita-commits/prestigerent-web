@@ -22,10 +22,13 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconExternalLink,
+  IconPhoto,
   IconRefresh,
   IconSearch,
 } from '@tabler/icons-react';
 import { CRITERI, decidi, spiega, type Criterio, type Impostazioni, type Tag } from '@/lib/gallery-tag';
+import type { FotoPagina } from '@/app/admin/gallery/azioni';
+import { GalleryFotoPagina } from './GalleryFotoPagina';
 
 /* IL REGISTRO DELLE PAGINE.
  *
@@ -42,12 +45,18 @@ import { CRITERI, decidi, spiega, type Criterio, type Impostazioni, type Tag } f
  * in fondo e si vede subito.
  *
  * ── 🔴 LA CHIAVE STA SUL FRAMMENTO ─────────────────────────────────────
- * Ogni pagina rende DUE righe: la sua, e quella aperta della modifica.
+ * Ogni pagina rende piu' righe: la sua, e quella del pannello aperto.
  * Prima erano dentro un `<>` senza chiave, con le chiavi sulle due righe
  * figlie: React avvisa, e la riconciliazione diventa fragile proprio
  * mentre si filtra con la ricerca -- cioe' quando l'elenco cambia
  * lunghezza sotto le mani. `<Fragment key>` e' la forma che accetta una
  * chiave.
+ *
+ * ── DUE PANNELLI SOTTO LA RIGA, UNO ALLA VOLTA ─────────────────────────
+ * «Modifica» per titolo, soglia, visibilita' e criterio; «Foto» per
+ * l'ordine trascinato, le stelle e le foto da togliere. Uno solo aperto
+ * in tutta la tabella: due pannelli della stessa pagina aperti insieme
+ * potrebbero dire due criteri diversi, e salvare quello sbagliato.
  */
 
 export type RigaPagina = {
@@ -110,6 +119,8 @@ export function GalleryPagine({
   impostazioni,
   sincronizza,
   salva,
+  caricaFoto,
+  salvaFoto,
 }: {
   righe: RigaPagina[];
   /** servono a ricalcolare lo stato di una riga appena cambia, con la
@@ -126,9 +137,16 @@ export function GalleryPagine({
       sort_override: Criterio | null;
     }
   ) => Promise<Esito>;
+  caricaFoto: (tagId: string) => Promise<Esito & { foto?: FotoPagina[] }>;
+  salvaFoto: (
+    tagId: string,
+    d: { ordine: { image_id: string; pinned: boolean }[]; tolte: string[]; manuale: boolean }
+  ) => Promise<Esito & { quante?: number }>;
 }) {
   const [dati, setDati] = useState(righe);
-  const [aperta, setAperta] = useState<string | null>(null);
+  const [aperto, setAperto] = useState<{ id: string; cosa: 'modifica' | 'foto' } | null>(null);
+  const apri = (id: string, cosa: 'modifica' | 'foto') =>
+    setAperto(aperto?.id === id && aperto.cosa === cosa ? null : { id, cosa });
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, avvia] = useTransition();
   const [cerca, setCerca] = useState('');
@@ -255,7 +273,7 @@ export function GalleryPagine({
                 <Table.Th w={70}>Foto</Table.Th>
                 <Table.Th w={210}>Gallery su questa pagina</Table.Th>
                 <Table.Th>Stato</Table.Th>
-                <Table.Th w={150} />
+                <Table.Th w={230} />
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -301,12 +319,23 @@ export function GalleryPagine({
                     </Table.Td>
                     <Table.Td>
                       <Group gap={6} wrap="nowrap">
+                        {/* L'ordine delle foto, e le foto da togliere. Spento
+                            a zero foto: non c'e' niente da mettere in fila. */}
                         <Button
                           size="compact-xs"
-                          variant={aperta === r.id ? 'filled' : 'default'}
-                          onClick={() => setAperta(aperta === r.id ? null : r.id)}
+                          variant={aperto?.id === r.id && aperto.cosa === 'foto' ? 'filled' : 'default'}
+                          leftSection={<IconPhoto size={13} />}
+                          disabled={r.quante === 0}
+                          onClick={() => apri(r.id, 'foto')}
                         >
-                          {aperta === r.id ? 'Chiudi' : 'Modifica'}
+                          {aperto?.id === r.id && aperto.cosa === 'foto' ? 'Chiudi' : `Foto (${r.quante})`}
+                        </Button>
+                        <Button
+                          size="compact-xs"
+                          variant={aperto?.id === r.id && aperto.cosa === 'modifica' ? 'filled' : 'default'}
+                          onClick={() => apri(r.id, 'modifica')}
+                        >
+                          {aperto?.id === r.id && aperto.cosa === 'modifica' ? 'Chiudi' : 'Modifica'}
                         </Button>
                         <Anchor href={r.path} target="_blank" rel="noreferrer" size="xs">
                           <Group gap={3} wrap="nowrap"><IconExternalLink size={13} /> Apri</Group>
@@ -315,7 +344,21 @@ export function GalleryPagine({
                     </Table.Td>
                   </Table.Tr>
 
-                  {aperta === r.id && (
+                  {aperto?.id === r.id && aperto.cosa === 'foto' && (
+                    <Table.Tr>
+                      <Table.Td colSpan={5} style={{ background: 'var(--mantine-color-gray-0)' }}>
+                        <GalleryFotoPagina
+                          riga={r}
+                          impostazioni={impostazioni}
+                          carica={caricaFoto}
+                          salva={salvaFoto}
+                          onSalvato={(patch) => cambia(r.id, patch)}
+                        />
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+
+                  {aperto?.id === r.id && aperto.cosa === 'modifica' && (
                     <Table.Tr>
                       <Table.Td colSpan={5} style={{ background: 'var(--mantine-color-gray-0)' }}>
                         <Stack gap="sm" py="xs">
@@ -364,12 +407,13 @@ export function GalleryPagine({
                               label="Ordinamento di questa pagina"
                               size="sm"
                               data={[
-                                { value: '', label: 'Usa l’ordinamento predefinito' },
+                                { value: '', label: `Usa l’ordinamento predefinito (${NOME_CRITERIO[impostazioni.default_sort]})` },
                                 ...CRITERI.map((c) => ({ value: c, label: NOME_CRITERIO[c] })),
                               ]}
                               value={r.sort_override ?? ''}
                               onChange={(v) => cambia(r.id, { sort_override: v ? (v as Criterio) : null })}
                               allowDeselect={false}
+                              description="L’ordine a mano si fa da «Foto», trascinando: salvandolo, qui diventa «Manuale» da solo."
                             />
                           </SimpleGrid>
 
@@ -392,7 +436,7 @@ export function GalleryPagine({
                                       ? { ok: true, testo: `«${r.label}» salvata. La pagina si aggiorna in pochi secondi.` }
                                       : { ok: false, testo: e.errore ?? 'Non salvata.' }
                                   );
-                                  if (e.ok) setAperta(null);
+                                  if (e.ok) setAperto(null);
                                 })
                               }
                             >

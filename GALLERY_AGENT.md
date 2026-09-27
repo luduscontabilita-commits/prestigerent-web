@@ -68,6 +68,7 @@ CLAUDE.md.
 | `src/components/admin/preparaFoto.ts` | canvas: rotazione, ridimensionamento, WebP, colore dominante |
 | `src/app/admin/gallery/azioni.ts` | tutte le server action |
 | `src/app/admin/gallery/**` | il pannello: indice, carica, approva, mie, pagine, impostazioni |
+| `src/components/admin/GalleryFotoPagina.tsx` | in «Pagine», il pulsante **Foto (n)**: ordine trascinato, stelle, foto da togliere |
 | `src/styles/gallery.css` | la striscia sul sito |
 | `src/styles/gallery-admin.css` | il pannello |
 
@@ -181,6 +182,39 @@ restano dove sono con il suo nome.
 
 ---
 
+## L'ordine delle foto di una pagina
+
+Da `/admin/gallery/pagine/`, pulsante **«Foto (n)»** sulla riga della
+pagina (`GalleryFotoPagina.tsx`). Deciso con la proprietà il 27/09/2026:
+
+- **le miniature arrivano nell'ordine del sito**, messe in fila da
+  `ordina()` col criterio della pagina. «Prima qui» vuol dire «prima sul
+  sito», qualunque sia il criterio;
+- **trascinare vuol dire «Manuale»**: al salvataggio le posizioni diventano
+  quelle dell'elenco (10, 20, 30…) e `sort_override` passa a `manual` da
+  solo. Senza trascinamento le posizioni non si toccano e il criterio
+  resta quello che era;
+- 🔴 **in manuale la stella non conta.** `ordina()` con `manual` guarda
+  solo la posizione, e il pannello la stella non la mostra. `pinned` resta
+  nel database e torna a valere se la pagina passa a un criterio per data,
+  casuale o alternato — solo lì serve a tenere una foto in testa;
+- **togliere non è cancellare**: si cancella la riga di
+  `gallery_image_tags` per QUELLA pagina. La foto resta in archivio
+  («Tutte le foto») e sulle altre pagine, e si ritagga da lì;
+- **sotto soglia la gallery sparisce da sola**, per `decidi()`. Il
+  pannello lo annuncia prima del salvataggio, e dopo aggiorna la colonna
+  «Foto» e lo «Stato» con il numero riletto dal database;
+- si lavora sulle foto **approvate** (vista `gallery_public`): sono quelle
+  che la colonna conta e la soglia misura. Una foto in attesa taggata su
+  una pagina non ha un posto nella striscia finché non è approvata, e
+  arriva in fondo (posizione 1000).
+
+Azioni: `fotoDellaPagina()` e `salvaFotoPagina()` in `azioni.ts`, tutte e
+due dietro `chiAgisce(RUOLI_GESTIONE)`. Hanno sostituito `riordinaPagina()`,
+che esisteva ma non la chiamava nessuno.
+
+---
+
 ## Il ciclo di vita di una foto
 
 ```
@@ -238,13 +272,14 @@ caricate e l'admin le trova in coda comunque.
 
 ## Cosa è provato, e come
 
-`npm test` — 65 test, nessuna rete, nessun database, nessun `.next`.
+`npm test` — 88 test in tre file (questo, l'EXIF, l'accesso), nessuna rete, nessun database, nessun `.next`.
 
 - **la regola di visibilità**: interruttore, override `on`/`off`, soglia
   globale e per pagina, foto sotto soglia, zero foto;
 - **il titolo**: `*parola*`, asterischi spaiati, i due predefiniti, il
   titolo della pagina che vince;
-- **l'ordinamento**: i 5 criteri, le foto fissate in testa, la data di
+- **l'ordinamento**: i 5 criteri, le foto fissate in testa (ma **non** in
+  manuale), lo spareggio stabile a parità di posizione, la data di
   caricamento quando manca quella di scatto, «casuale del giorno» uguale
   tutto il giorno e diverso domani, «alternata» con un solo formato,
   nessun criterio che perde foto;

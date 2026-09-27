@@ -730,29 +730,126 @@ export async function salvaPagina(
   return { ok: true };
 }
 
-/** L'ordine a mano di UNA pagina, e le foto fissate in testa. `position` e
- *  `pinned` stanno sul LEGAME e non sulla foto: la stessa foto puo' essere
- *  la prima su una scheda e l'ultima su una categoria. */
-export async function riordinaPagina(
-  tagId: string,
-  ordine: { image_id: string; position: number; pinned: boolean }[]
-): Promise<Esito> {
+/* ═══════════════════════════════════════════════════════════════════
+   LE FOTO DI UNA PAGINA: ORDINE, STELLE, RIMOZIONI
+   ═══════════════════════════════════════════════════════════════════
+
+   Dal pulsante «Foto» della tabella Pagine. `position` e `pinned` stanno
+   sul LEGAME e non sulla foto: la stessa foto puo' essere la prima su una
+   scheda e l'ultima su una categoria.
+
+   Si lavora sulle foto APPROVATE, lette dalla vista pubblica: sono quelle
+   che la colonna «Foto» conta e che la soglia misura. Una foto in attesa
+   o nascosta taggata sulla pagina non si vede sul sito, e riordinarla qui
+   darebbe un ordine che nessun visitatore vede. */
+
+export type FotoPagina = {
+  image_id: string;
+  url: string;
+  width: number;
+  height: number;
+  alt: string;
+  caption: string | null;
+  taken_at: string | null;
+  created_at: string;
+  position: number;
+  pinned: boolean;
+};
+
+export async function fotoDellaPagina(
+  tagId: string
+): Promise<Esito & { foto?: FotoPagina[] }> {
   const { errore } = await chiAgisce(RUOLI_GESTIONE);
   if (errore) return { ok: false, errore };
   const sb = await supabaseServer();
 
-  for (const r of ordine) {
+  const { data: tag } = await sb.from('gallery_tags').select('key').eq('id', tagId).maybeSingle();
+  if (!tag) return { ok: false, errore: 'Questa pagina non è più nel registro: ricarica.' };
+
+  const { data, error } = await sb
+    .from('gallery_public')
+    .select('image_id,bucket,storage_path,width,height,alt,caption,taken_at,created_at,position,pinned')
+    .eq('tag_key', (tag as { key: string }).key);
+  if (error) return { ok: false, errore: error.message };
+
+  type Riga = Omit<FotoPagina, 'url'> & { bucket: string; storage_path: string };
+  return {
+    ok: true,
+    foto: ((data ?? []) as Riga[]).map(({ bucket, storage_path, ...f }) => ({
+      ...f,
+      url: sb.storage.from(bucket).getPublicUrl(storage_path).data.publicUrl,
+    })),
+  };
+}
+
+/**
+ * Salva in un colpo solo quello che si e' fatto nel pannello di una pagina.
+ *
+ * - `ordine`: le foto che RESTANO, nell'ordine in cui si vedono.
+ * - `tolte`: le foto da togliere da QUESTA pagina. Si cancella il legame,
+ *   non la foto: resta in archivio e sulle altre pagine dove compare.
+ * - `manuale`: si e' trascinato. Allora le posizioni diventano quelle
+ *   dell'elenco e la pagina passa al criterio «Manuale» (decisione della
+ *   proprieta' del 27/09/2026): un ordine fatto a mano che il sito poi
+ *   rimescolasse per data sarebbe lavoro buttato senza nessun avviso.
+ *   Senza trascinamento le posizioni non si toccano e il criterio resta.
+ *
+ * Le posizioni vanno DI DIECI IN DIECI, come dice la migrazione: infilare
+ * una foto in mezzo non obbliga a rinumerare le altre.
+ */
+export async function salvaFotoPagina(
+  tagId: string,
+  d: { ordine: { image_id: string; pinned: boolean }[]; tolte: string[]; manuale: boolean }
+): Promise<Esito & { quante?: number }> {
+  const { errore } = await chiAgisce(RUOLI_GESTIONE);
+  if (errore) return { ok: false, errore };
+
+  const restano = d.ordine.map((r) => r.image_id);
+  if (new Set(restano).size !== restano.length || restano.some((id) => d.tolte.includes(id))) {
+    return { ok: false, errore: 'Elenco delle foto incoerente: ricarica la pagina e riprova.' };
+  }
+
+  const sb = await supabaseServer();
+  const { data } = await sb.from('gallery_tags').select('key,path').eq('id', tagId).maybeSingle();
+  const tag = data as { key: string; path: string } | null;
+  if (!tag) return { ok: false, errore: 'Questa pagina non è più nel registro: ricarica.' };
+
+  if (d.tolte.length) {
     const { error } = await sb
       .from('gallery_image_tags')
-      .update({ position: r.position, pinned: r.pinned })
+      .delete()
+      .eq('tag_id', tagId)
+      .in('image_id', d.tolte);
+    if (error) return { ok: false, errore: error.message };
+  }
+
+  for (const [i, r] of d.ordine.entries()) {
+    const campi = d.manuale ? { position: (i + 1) * 10, pinned: r.pinned } : { pinned: r.pinned };
+    const { error } = await sb
+      .from('gallery_image_tags')
+      .update(campi)
       .eq('tag_id', tagId)
       .eq('image_id', r.image_id);
     if (error) return { ok: false, errore: error.message };
   }
 
-  const { data } = await sb.from('gallery_tags').select('path').eq('id', tagId).maybeSingle();
-  if (data) rinfresca([(data as { path: string }).path]);
-  return { ok: true };
+  if (d.manuale) {
+    const { error } = await sb
+      .from('gallery_tags')
+      .update({ sort_override: 'manual', updated_at: new Date().toISOString() })
+      .eq('id', tagId);
+    if (error) return { ok: false, errore: error.message };
+  }
+
+  rinfresca([tag.path]);
+
+  /* Il numero vero, riletto: e' quello che decide la soglia, e il pannello
+     lo mostra al posto del conto fatto nel browser. */
+  const { count } = await sb
+    .from('gallery_public')
+    .select('image_id', { count: 'exact', head: true })
+    .eq('tag_key', tag.key);
+  return { ok: true, quante: count ?? d.ordine.length };
 }
 
 /** Le pagine del registro, per il menu di chi carica. Le orfane restano

@@ -215,6 +215,18 @@ describe('ordina', () => {
     expect(ordina([recente, fissata], 'daily_random', 'k')[0]).toBe(fissata);
   });
 
+  it('manuale: a parità di posizione e data l’ordine non dipende da come arrivano', () => {
+    const x = foto({ image_id: 'b', position: 1000, created_at: '2026-09-26T11:00:00Z' });
+    const y = foto({ image_id: 'a', position: 1000, created_at: '2026-09-26T11:00:00Z' });
+    expect(ordina([x, y], 'manual', 'k')).toEqual(ordina([y, x], 'manual', 'k'));
+  });
+
+  it('manuale: la stella NON scavalca la posizione trascinata', () => {
+    const prima = foto({ pinned: false, position: 10 });
+    const fissata = foto({ pinned: true, position: 20 });
+    expect(ordina([fissata, prima], 'manual', 'k')).toEqual([prima, fissata]);
+  });
+
   it('piu’ fissate restano fra loro nell’ordine manuale', () => {
     const p2 = foto({ pinned: true, position: 20 });
     const p1 = foto({ pinned: true, position: 10 });
