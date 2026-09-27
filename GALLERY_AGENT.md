@@ -206,8 +206,15 @@ pagina (`GalleryFotoPagina.tsx`). Deciso con la proprietà il 27/09/2026:
   «Foto» e lo «Stato» con il numero riletto dal database;
 - si lavora sulle foto **approvate** (vista `gallery_public`): sono quelle
   che la colonna conta e la soglia misura. Una foto in attesa taggata su
-  una pagina non ha un posto nella striscia finché non è approvata, e
-  arriva in fondo (posizione 1000).
+  una pagina non ha un posto nella striscia finché non è approvata;
+- 🔴 **una foto nuova su una pagina va IN FONDO**: l'ultima posizione di
+  quella pagina + 10 (`ultimePosizioni()`), sia al caricamento sia quando
+  la si aggiunge a una pagina da «Tutte le foto». Non più un 1000 fisso;
+- 🔴 **correggere una foto non disfa l'ordine**: `aggiornaFoto()` tocca
+  solo le pagine aggiunte o tolte. Fino al 27/09/2026 riscriveva tutti i
+  legami con posizione 1000 e senza stella: correggere una didascalia
+  mandava la foto in fondo su ogni pagina. Rinfresca anche le pagine da
+  cui la foto esce, che prima restavano in cache con la foto dentro.
 
 Azioni: `fotoDellaPagina()` e `salvaFotoPagina()` in `azioni.ts`, tutte e
 due dietro `chiAgisce(RUOLI_GESTIONE)`. Hanno sostituito `riordinaPagina()`,

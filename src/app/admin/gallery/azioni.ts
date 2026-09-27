@@ -68,6 +68,23 @@ async function percorsiDi(sb: Awaited<ReturnType<typeof supabaseServer>>, idFoto
   return [...new Set(righe.map((r) => r.gallery_tags?.path).filter((p): p is string => !!p))];
 }
 
+/** L'ultima posizione di ogni pagina, per mettere una foto nuova IN FONDO.
+ *  Non un numero fisso («1000»): dopo un riordino le posizioni sono 10,
+ *  20, 30..., e su una pagina con piu' di cento foto un 1000 fisso
+ *  finirebbe in mezzo. Si prende la piu' alta e si va avanti di dieci. */
+async function ultimePosizioni(
+  sb: Awaited<ReturnType<typeof supabaseServer>>,
+  tagIds: string[]
+): Promise<Map<string, number>> {
+  const ultima = new Map<string, number>(tagIds.map((id) => [id, 0]));
+  if (!tagIds.length) return ultima;
+  const { data } = await sb.from('gallery_image_tags').select('tag_id,position').in('tag_id', tagIds);
+  for (const r of (data ?? []) as { tag_id: string; position: number }[]) {
+    if (r.position > (ultima.get(r.tag_id) ?? 0)) ultima.set(r.tag_id, r.position);
+  }
+  return ultima;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    1. SINCRONIZZA LE PAGINE
    ═══════════════════════════════════════════════════════════════════ */
@@ -292,15 +309,20 @@ export async function registraFoto(foto: DaRegistrare[]): Promise<Esito & { quan
 
   const perPercorso = new Map(((inserite ?? []) as { id: string; storage_path: string }[]).map((r) => [r.storage_path, r.id]));
 
+  /* Di dieci in dieci, e in fondo: una foto nuova non scavalca l'ordine
+     che qualcuno ha sistemato a mano. Piu' foto nello stesso invio
+     arrivano in fila nell'ordine in cui sono state scelte. */
+  const ultima = await ultimePosizioni(sb, [...perChiave.values()].map((t) => t.id));
   const legami: { image_id: string; tag_id: string; position: number }[] = [];
   for (const f of foto) {
     const id = perPercorso.get(f.storage_path);
     if (!id) continue;
     for (const k of f.tag) {
       const t = perChiave.get(k);
-      /* Di dieci in dieci, e in fondo: una foto nuova non scavalca l'ordine
-         che qualcuno ha sistemato a mano. */
-      if (t) legami.push({ image_id: id, tag_id: t.id, position: 1000 });
+      if (!t) continue;
+      const pos = (ultima.get(t.id) ?? 0) + 10;
+      ultima.set(t.id, pos);
+      legami.push({ image_id: id, tag_id: t.id, position: pos });
     }
   }
   if (legami.length) {
@@ -420,16 +442,45 @@ export async function aggiornaFoto(
     return { ok: false, errore: 'Questa foto non è tua, oppure è già approvata: la può modificare solo un admin.' };
   }
 
-  /* I tag si riscrivono per intero: togliere e rimettere e' piu' semplice
-     di calcolare la differenza, e su una foto i tag sono pochissimi. */
-  const { error: e1 } = await sb.from('gallery_image_tags').delete().eq('image_id', id);
-  if (e1) return { ok: false, errore: e1.message };
-  const { error: e2 } = await sb
+  /* 🔴 SI TOCCANO SOLO LE PAGINE CHE CAMBIANO. Fino al 27/09/2026 i
+     legami si cancellavano e si riscrivevano tutti con posizione 1000:
+     correggere una didascalia mandava la foto in fondo su OGNI pagina e
+     le toglieva la stella, cioe' disfaceva senza avviso l'ordine fatto a
+     mano da «Pagine → Foto». Ora le pagine che restano tengono posizione
+     e stella; quelle nuove mettono la foto in fondo; quelle tolte perdono
+     il legame. */
+  const { data: attuali } = await sb
     .from('gallery_image_tags')
-    .insert(trovati.map((t) => ({ image_id: id, tag_id: t.id, position: 1000 })));
-  if (e2) return { ok: false, errore: e2.message };
+    .select('tag_id,gallery_tags(path)')
+    .eq('image_id', id);
+  const legamiAttuali = (attuali ?? []) as unknown as { tag_id: string; gallery_tags: { path: string } | null }[];
+  const vuole = new Set(trovati.map((t) => t.id));
+  const ha = new Set(legamiAttuali.map((r) => r.tag_id));
+  const via = legamiAttuali.filter((r) => !vuole.has(r.tag_id));
+  const nuove = trovati.filter((t) => !ha.has(t.id));
 
-  rinfresca(trovati.map((t) => t.path));
+  if (via.length) {
+    const { error: e1 } = await sb
+      .from('gallery_image_tags')
+      .delete()
+      .eq('image_id', id)
+      .in('tag_id', via.map((r) => r.tag_id));
+    if (e1) return { ok: false, errore: e1.message };
+  }
+  if (nuove.length) {
+    const ultima = await ultimePosizioni(sb, nuove.map((t) => t.id));
+    const { error: e2 } = await sb
+      .from('gallery_image_tags')
+      .insert(nuove.map((t) => ({ image_id: id, tag_id: t.id, position: (ultima.get(t.id) ?? 0) + 10 })));
+    if (e2) return { ok: false, errore: e2.message };
+  }
+
+  /* Anche le pagine da cui la foto e' uscita: se no la si vede ancora la'
+     fino alla scadenza della cache. */
+  rinfresca([
+    ...trovati.map((t) => t.path),
+    ...via.map((r) => r.gallery_tags?.path).filter((p): p is string => !!p),
+  ]);
   return { ok: true };
 }
 
