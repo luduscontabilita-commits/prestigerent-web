@@ -171,7 +171,8 @@ export type TourPerRegistro = { id: string; slug: string; titolo: string | null 
 /**
  * IL REGISTRO INTERO, costruito dal codice e dal catalogo.
  *
- * Tornano 103 voci: 1 home + 5 categorie + 10 porti + 87 tour. E' la
+ * Tornano 102 voci: 1 home + 5 categorie + 10 porti + 86 tour (solo i
+ * PUBBLICATI: il chiamante filtra `status`, vedi `sincronizzaPagine`). E' la
  * funzione che alimenta il pulsante "Sincronizza pagine" del pannello, e
  * la stessa che il menu di chi carica usa per sapere quali pagine
  * esistono.

@@ -179,10 +179,12 @@ cosa guardare quando qualcosa non va. La guida per chi carica dal telefono
 
 Le tre cose da sapere senza aprire niente:
 
-- **103 pagine nel registro**, non 124: per decisione della proprietà del
+- **102 pagine nel registro**, non 124: per decisione della proprietà del
   26/09/2026 sono escluse tutte le pagine il cui indirizzo contiene
   `/destinations/` o `/transfers/`. Le **schede** dei singoli transfer
-  restano dentro, perché stanno sotto `/tour/`.
+  restano dentro, perché stanno sotto `/tour/`. Solo i tour
+  **pubblicati**: la bozza `...-landing` (il doppione del vecchio
+  WordPress, che rimanda alla scheda vera) è fuori dal 27/09/2026.
 - **Chi carica non approva.** Si usano i ruoli che c'erano già: `admin` fa
   tutto, `guida` carica e tagga. Una foto non approvata sta in un bucket
   **privato**, e che non possa finire in quello pubblico è un vincolo del

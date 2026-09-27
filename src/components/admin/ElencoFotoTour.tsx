@@ -119,8 +119,15 @@ export function ElencoFotoTour({
                     <Code>{r.slug}</Code>
                     <Group gap={6} mt={4}>
                       {r.kind && <Badge size="xs" variant="light" color="gray">{r.kind}</Badge>}
+                      {/* Detto a parole: «draft» non spiega che la scheda
+                          non e' sul sito, che e' l'unica cosa che conta
+                          sapere guardando questa riga. */}
                       {r.status !== 'published' && (
-                        <Badge size="xs" variant="light" color="red">{r.status ?? 'senza stato'}</Badge>
+                        <Badge size="xs" variant="light" color="red">
+                          {r.status === 'draft' ? 'bozza: non è sul sito'
+                            : r.status === 'review' ? 'in revisione: non è sul sito'
+                            : 'senza stato: non è sul sito'}
+                        </Badge>
                       )}
                     </Group>
                   </Table.Td>

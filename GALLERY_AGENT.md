@@ -81,9 +81,17 @@ tiene le vigne toscane fuori dalle pagine dei transfer per Venezia.
 
 ---
 
-## Il registro: 103 pagine
+## Il registro: 102 pagine
 
-1 home + 5 categorie + 10 porti + 87 tour.
+1 home + 5 categorie + 10 porti + 86 tour.
+
+🔴 **Solo i tour PUBBLICATI** (dal 27/09/2026). In `tours` ci sono 87
+righe: 86 pubblicate e una bozza, `siena-san-gimignano-the-tuscan-countryside-landing`,
+il doppione del vecchio WordPress che sul sito rimanda con un 308 alla
+scheda vera. Prima entrava nel registro con un nome quasi uguale a quello
+della scheda vera, e una foto taggata lì non sarebbe comparsa da nessuna
+parte. La sua riga in `gallery_tags` (0 foto) è stata cancellata lo
+stesso giorno.
 
 **Escluse per decisione della proprietà (26/09/2026):** tutte le pagine il
 cui indirizzo contiene `/destinations/` (9) o `/transfers/` (12). I tipi
@@ -278,7 +286,7 @@ caricate e l'admin le trova in coda comunque.
 | cache | `unstable_cache` + `revalidateTag` | `revalidatePath` | il progetto **non ha nessuna cache di query**: mette in cache le pagine (ISR) e le rinfresca con `revalidatePath`, come fa già `admin/foto/azioni.ts`. Una seconda cache dentro una pagina già in cache non fa risparmiare niente e aggiunge un modo perché i due strati dicano cose diverse |
 | ruolo | nuovo ruolo `user` | `guida` che c'era già | è il default di `profili.ruolo`, sta nel vincolo di `profili` **e** di `autorizzati`, e il pannello annunciava già «Caricamenti delle guide». Zero DDL sui ruoli |
 | policy sui file | in migrazione | chiave segreta lato server | `storage.objects` appartiene a `supabase_storage_admin` e il ruolo delle migrazioni **non ne è membro** (`pg_has_role(...,'MEMBER') = false`, misurato). Una `create policy` lì dentro farebbe fallire la migrazione intera |
-| menu dei tag | albero da `SEZIONI` | gruppi + ricerca | dopo le esclusioni il registro è 103 voci di cui **87 tour**: un albero di navigazione aggiunge profondità senza aiutare a trovare un tour, la ricerca sì. I quattro gruppi (Home/Categorie/Porti/Tour) coincidono con quello che resterebbe dell'albero |
+| menu dei tag | albero da `SEZIONI` | gruppi + ricerca | dopo le esclusioni il registro è 102 voci di cui **86 tour**: un albero di navigazione aggiunge profondità senza aiutare a trovare un tour, la ricerca sì. I quattro gruppi (Home/Categorie/Porti/Tour) coincidono con quello che resterebbe dell'albero |
 | orientamento EXIF | `imageOrientation: 'from-image'` | letto e applicato a mano | dove quell'opzione non è supportata viene **ignorata in silenzio**: nessun errore, solo tutte le verticali coricate. Leggendo il tag e girando noi il risultato è uguale su ogni browser |
 | data di scatto | `exifr` | ~60 righe nostre | serve **un** campo. `exifr` porta decine di tag nel bundle del pannello, cioè nel telefono di chi carica |
 | titolo | uno predefinito | **due** | sulle schede tour in cima c'è già `PhotoStrip`: due strisce con lo stesso titolo sembrano un errore. L'alternativa era scrivere un titolo a mano su 87 schede |
@@ -317,8 +325,8 @@ sull'indirizzo pubblicato **dopo il push**.
 ## Da fare la prima volta, in ordine
 
 1. **push** e attendere `deploy.yml` nelle Actions;
-2. `/admin/gallery/impostazioni/` → **«Sincronizza pagine»**. Deve dire 103
-   nuove;
+2. `/admin/gallery/impostazioni/` → **«Sincronizza pagine»**. Deve dire 102
+   pagine;
 3. **creare l'account di chi caricherà** — una riga in `autorizzati`, e
    basta (vedi sotto: non serve nessun invito da Supabase);
 4. caricare qualche foto come guida, approvarle come admin;

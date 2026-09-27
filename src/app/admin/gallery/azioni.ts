@@ -116,7 +116,14 @@ export async function sincronizzaPagine(): Promise<EsitoSync> {
   const sb = await supabaseServer();
 
   const [{ data: tours }, { data: contenuti }, { data: categorie }] = await Promise.all([
-    sb.from('tours').select('id,slug'),
+    /* 🔴 SOLO I TOUR PUBBLICATI. In `tours` c'e' anche una bozza: il
+       doppione `siena-san-gimignano-the-tuscan-countryside-landing` del
+       vecchio WordPress, che sul sito rimanda con un 308 alla scheda vera.
+       Fino al 27/09/2026 entrava nel registro come pagina a se', con un
+       nome quasi uguale a quello della scheda vera: una foto taggata li'
+       non sarebbe comparsa da nessuna parte. Una pagina che il sito non
+       mostra non puo' avere una gallery. */
+    sb.from('tours').select('id,slug').eq('status', 'published'),
     sb.from('tour_content').select('tour_id,title').eq('locale', 'en'),
     sb.from('tour_categorie').select('categorie'),
   ]);
