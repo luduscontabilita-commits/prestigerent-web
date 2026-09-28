@@ -51,6 +51,17 @@ Tocca **«Foto della gallery»**, poi **«Carica e tagga»**.
    comparire. Puoi spuntarne più di una.
 5. **«Invia per approvazione»**.
 
+### L'album del sito
+
+In cima all'elenco delle pagine c'è **«Album del sito»**. Una foto con
+questa spunta finisce nella pagina **Guest album** del sito
+(`prestigerent.com/album/`), che raccoglie le foto più belle delle
+giornate. Ci compare **appena viene approvata**, sempre, senza le regole
+delle altre gallery.
+
+Nell'album ci sono persone: metti la spunta solo sulle foto in cui chi è
+ritratto ti ha detto di sì a essere fotografato e pubblicato.
+
 ### Per fare più in fretta
 
 Se dieci foto vanno sulla stessa pagina: spunta **«Seleziona tutte»** in

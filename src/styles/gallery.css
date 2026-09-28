@@ -251,3 +251,56 @@
 @media (max-width: 560px) {
   .glight-freccia { display: none; }
 }
+
+/* ── L'ALBUM: /album/ ────────────────────────────────────────────── */
+
+/* RIGHE GIUSTIFICATE IN SOLO CSS (vedi la nota in AlbumGriglia.tsx).
+   Ogni foto porta il suo rapporto in `--r`: `flex-basis` e `flex-grow`
+   proporzionali a `--r` fanno crescere le larghezze nella stessa
+   proporzione, e `aspect-ratio` tiene le altezze uguali dentro la riga.
+   La foto resta INTERA: nessun ritaglio, se non per i formati estremi che
+   `rapporto()` ha gia' riportato fra 9:16 e 2:1. */
+.album-griglia {
+  list-style: none; margin: 28px 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+/* L'ultima riga non si stira: questo elemento vuoto prende tutto lo spazio
+   che avanza. Senza, due foto rimaste sole in fondo diventerebbero enormi. */
+.album-griglia::after { content: ''; flex-grow: 999999; }
+
+.album-foto {
+  --h: 170px;
+  flex-grow: var(--r);
+  flex-basis: calc(var(--r) * var(--h));
+  aspect-ratio: var(--r);
+  position: relative; overflow: hidden;
+  border-radius: 10px;
+  background: var(--ph);
+}
+@media (min-width: 561px)  { .album-foto { --h: 230px; } }
+@media (min-width: 1025px) { .album-foto { --h: 280px; } }
+
+.album-apri {
+  all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in;
+}
+.album-apri:focus-visible { outline: 3px solid var(--orange); outline-offset: -3px; }
+.album-foto img {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  transition: transform .5s ease;
+}
+.album-foto:hover img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  .album-foto img { transition: none; }
+  .album-foto:hover img { transform: none; }
+}
+
+.album-vuoto {
+  text-align: center; color: var(--ink-soft); margin: 40px 0; font-size: 1.02rem;
+}
+
+/* Il consenso delle persone ritratte: in fondo, leggibile ma discreto. */
+.album-nota {
+  max-width: 680px; margin: 34px auto 0; padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft); font-size: .88rem; line-height: 1.6; text-align: center;
+}

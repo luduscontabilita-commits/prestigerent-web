@@ -89,6 +89,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: alternative('/faqs/'),
     },
 
+    /* L'album degli ospiti (dal 28/09/2026): foto vere delle giornate,
+       aggiornate a ogni approvazione dal pannello -- da qui `weekly`. */
+    {
+      url: percorso(DEFAULT_LOCALE, '/album/'),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+      alternates: alternative('/album/'),
+    },
+
     /* Le pagine legali: sono raggiungibili dal piede di ogni pagina, non
        hanno noindex e Google le indicizza comunque. Dichiararle costa una
        riga e toglie l'incoerenza fra cio' che il sito espone e cio' che

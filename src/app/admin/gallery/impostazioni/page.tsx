@@ -33,7 +33,8 @@ export default async function ImpostazioniGallery() {
      vuole sapere prima, non dopo. */
   const comeSeAcceso: Impostazioni = { ...impostazioni, galleries_enabled: true };
   const quantePronte = ((tag ?? []) as Tag[]).filter(
-    (t) => !t.is_orphan && decidi(comeSeAcceso, t, perChiave[t.key] ?? 0).visibile
+    /* L'album si esclude: non dipende dall'interruttore, compare sempre. */
+    (t) => !t.is_orphan && t.type !== 'album' && decidi(comeSeAcceso, t, perChiave[t.key] ?? 0).visibile
   ).length;
 
   return (

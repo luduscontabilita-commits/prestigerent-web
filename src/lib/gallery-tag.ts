@@ -27,8 +27,17 @@ import { CATEGORIE } from './categorie';
    ═══════════════════════════════════════════════════════════════════ */
 
 /** I tipi di pagina ammessi. Erano sei: `dest` e `transfer` sono usciti il
- *  26/09/2026 insieme alle loro pagine (vedi ESCLUSI qui sotto). */
-export type TipoTag = 'home' | 'cat' | 'tour' | 'port';
+ *  26/09/2026 insieme alle loro pagine (vedi ESCLUSI qui sotto).
+ *
+ *  `album` e' entrato il 28/09/2026 ed e' un tipo a se': non e' una pagina
+ *  che OSPITA una gallery, e' la pagina /album/ che E' tutta gallery. Non
+ *  passa da `decidi()` -- niente interruttore, soglia, override, titolo o
+ *  ordine delle impostazioni: mostra sempre tutte le foto APPROVATE con
+ *  questo tag. Vedi `src/app/[locale]/album/page.tsx`. */
+export type TipoTag = 'home' | 'cat' | 'tour' | 'port' | 'album';
+
+/** La chiave dell'unico tag di tipo album. */
+export const CHIAVE_ALBUM = 'album';
 
 export type Criterio = 'manual' | 'newest' | 'oldest' | 'daily_random' | 'alternate';
 
@@ -161,6 +170,7 @@ function etichetta(tipo: TipoTag, titolo: string): string {
     cat: 'Categoria',
     port: 'Porto',
     tour: 'Tour',
+    album: 'Album',
   };
   return tipo === 'home' ? 'Home' : `${prefisso[tipo]} · ${daEntita(titolo)}`;
 }
@@ -171,8 +181,9 @@ export type TourPerRegistro = { id: string; slug: string; titolo: string | null 
 /**
  * IL REGISTRO INTERO, costruito dal codice e dal catalogo.
  *
- * Tornano 102 voci: 1 home + 5 categorie + 10 porti + 86 tour (solo i
- * PUBBLICATI: il chiamante filtra `status`, vedi `sincronizzaPagine`). E' la
+ * Tornano 103 voci: 1 home + 1 album + 5 categorie + 10 porti + 86 tour
+ * (solo i PUBBLICATI: il chiamante filtra `status`, vedi
+ * `sincronizzaPagine`). E' la
  * funzione che alimenta il pulsante "Sincronizza pagine" del pannello, e
  * la stessa che il menu di chi carica usa per sapere quali pagine
  * esistono.
@@ -188,6 +199,18 @@ export function registro(
 ): VoceRegistro[] {
   const voci: VoceRegistro[] = [
     { key: 'home', type: 'home', label: 'Home', path: '/', ref_id: null, senza_tour: false },
+    /* 🔴 SE MANCASSE QUI, "Sincronizza pagine" la marcherebbe orfana: la
+       sincronizzazione tiene solo le chiavi che questa funzione produce.
+       Stessa etichetta e stesso indirizzo della migration
+       20260928_gallery_album.sql, cosi' le due non si contraddicono. */
+    {
+      key: CHIAVE_ALBUM,
+      type: 'album',
+      label: 'Album · Our guests’ album',
+      path: '/album/',
+      ref_id: null,
+      senza_tour: false,
+    },
   ];
 
   for (const c of CATEGORIE) {

@@ -109,6 +109,14 @@ export const IconaInfo = () => (
   </svg>
 );
 
+/* La macchina fotografica, per l'album degli ospiti (28/09/2026). */
+export const IconaFoto = () => (
+  <svg {...P}>
+    <path d="M4 8h3l2-2.5h6L17 8h3v11H4z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </svg>
+);
+
 export const IconaMezzo = () => (
   <svg {...P}>
     <path d="M3 16V8a1 1 0 0 1 1-1h9v9" />

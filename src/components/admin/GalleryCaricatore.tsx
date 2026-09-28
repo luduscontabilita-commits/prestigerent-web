@@ -70,7 +70,11 @@ type Scheda = {
   lavorando: boolean;
 };
 
+/* L'album per primo: e' il tag che una guida usa piu' spesso, e non e' una
+   pagina di prodotto da cercare nell'albero -- e' "metti questa foto
+   nell'album del sito". */
 const GRUPPI: { tipo: TipoTag; titolo: string }[] = [
+  { tipo: 'album', titolo: 'Album del sito' },
   { tipo: 'home', titolo: 'Home' },
   { tipo: 'cat', titolo: 'Categorie' },
   { tipo: 'port', titolo: 'Porti' },
@@ -94,7 +98,7 @@ export function GalleryCaricatore({
   const [selezione, setSelezione] = useState<Set<string>>(new Set());
   const [cerca, setCerca] = useState('');
   const [sopra, setSopra] = useState(false);
-  const [aperti, setAperti] = useState<string[]>(['home', 'cat', 'port']);
+  const [aperti, setAperti] = useState<string[]>(['album', 'home', 'cat', 'port']);
   const [esito, setEsito] = useState<{ ok: boolean; testo: string } | null>(null);
   const [invio, avvia] = useTransition();
   const input = useRef<HTMLInputElement>(null);

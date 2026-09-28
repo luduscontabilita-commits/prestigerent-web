@@ -401,6 +401,15 @@ describe('il registro delle pagine', () => {
     expect([...tipi]).not.toContain('transfer');
   });
 
+  it('l’album c’e’ sempre, una volta sola, con chiave e indirizzo della migration', () => {
+    /* Se mancasse, "Sincronizza pagine" marcherebbe orfano il tag album. */
+    const album = registro([]).filter((v) => v.type === 'album');
+    expect(album).toHaveLength(1);
+    expect(album[0].key).toBe('album');
+    expect(album[0].path).toBe('/album/');
+    expect(esclusa(album[0].path)).toBe(false);
+  });
+
   it('i porti diventano `port:`, le altre categorie `cat:`', () => {
     const voci = registro([]);
     expect(voci.find((v) => v.path === '/cruise-port-tours/livorno-port/')?.key).toBe('port:livorno-port');

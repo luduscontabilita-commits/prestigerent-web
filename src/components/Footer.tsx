@@ -4,7 +4,7 @@ import { testoBreve } from '@/lib/cifre';
 import { riprova } from '@/lib/riprova';
 import { RiapriPreferenze } from '@/components/Consenso';
 import {
-  IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta,
+  IconaFaq, IconaAereo, IconaMappa, IconaInfo, IconaMezzo, IconaCarta, IconaFoto,
   IconaTripadvisor, IconaInstagram, IconaFacebook, IconaTikTok, IconaWhatsApp,
   CartaStripe, CartaMastercard, CartaVisa, CartaPayPal, CartaAmex,
 } from '@/components/IconeFooter';
@@ -119,6 +119,10 @@ const AZIENDA: Voce[] = [
   /* Puntava a `/#fleet`, un pezzo di home, perche' la pagina non
      c'era. Dal 03/09/2026 c'e': quattro Mercedes con le capienze. */
   ['Our vehicles', '/our-vehicles/', IconaMezzo],
+  /* Le foto delle giornate, scattate dalle guide (28/09/2026). Nel piede
+     e non nel menu: il menu e' gia' pieno, e chi cerca le foto di chi e'
+     stato con noi le cerca qui, accanto a "About us". */
+  ['Guest album', '/album/', IconaFoto],
 ];
 
 /* 🔴 TRE VOCI DEL FOOTER VECCHIO CHE NON TORNANO.

@@ -185,6 +185,9 @@ Le tre cose da sapere senza aprire niente:
   restano dentro, perché stanno sotto `/tour/`. Solo i tour
   **pubblicati**: la bozza `...-landing` (il doppione del vecchio
   WordPress, che rimanda alla scheda vera) è fuori dal 27/09/2026.
+- **`/album/` è l'eccezione** (28/09/2026): mostra sempre tutte le foto
+  approvate col tag `album`, senza interruttore, soglia né impostazioni
+  delle gallery. Per questo non sta in «Pagine» del pannello.
 - **Chi carica non approva.** Si usano i ruoli che c'erano già: `admin` fa
   tutto, `guida` carica e tagga. Una foto non approvata sta in un bucket
   **privato**, e che non possa finire in quello pubblico è un vincolo del

@@ -186,7 +186,10 @@ export function GalleryStriscia({
    Una verticale su desktop ha le bande ai lati, una orizzontale su
    telefono le ha sopra e sotto. Mai ritagliata: qui la foto e' il
    contenuto, non la decorazione. */
-function Lightbox({
+/* Esportato dal 28/09/2026: lo usa anche la griglia di /album/
+   (`AlbumGriglia.tsx`). Un solo lightbox per tutto il sito, cosi' la foto
+   grande si apre, si chiude e si scorre allo stesso modo ovunque. */
+export function Lightbox({
   foto,
   aperta,
   chiudi,

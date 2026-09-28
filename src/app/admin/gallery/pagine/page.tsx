@@ -31,7 +31,12 @@ export default async function Pagine() {
     perChiave[r.tag_key] = (perChiave[r.tag_key] ?? 0) + 1;
   }
 
-  const righe: RigaPagina[] = ((tag ?? []) as Tag[]).map((t) => {
+  /* 🔴 L'ALBUM NON STA IN QUESTO ELENCO. Qui si decidono soglia, titolo,
+     ordine e accensione di una gallery dentro una pagina; la pagina
+     /album/ non ne segue nessuno (deciso il 28/09/2026): mostra sempre
+     tutte le foto approvate col tag album. Mostrarla qui con quei comandi
+     vorrebbe dire offrire manopole che non girano niente. */
+  const righe: RigaPagina[] = ((tag ?? []) as Tag[]).filter((t) => t.type !== 'album').map((t) => {
     const quante = perChiave[t.key] ?? 0;
     /* 🔴 LA STESSA FUNZIONE DEL SITO. Se qui ci fosse un `if` scritto a
        mano, il pannello potrebbe dire «Visibile» su una pagina che non
@@ -90,6 +95,9 @@ export default async function Pagine() {
           {!impostazioni.galleries_enabled && (
             <> L’interruttore generale è <b>spento</b>: contano solo le pagine messe su «sempre accesa».</>
           )}
+          {' '}La pagina <a href="/album/" target="_blank" rel="noopener">Album</a> non è in
+          questo elenco: non ha impostazioni, mostra sempre tutte le foto approvate col tag
+          «Album».
         </>}
     >
 

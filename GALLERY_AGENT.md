@@ -81,9 +81,34 @@ tiene le vigne toscane fuori dalle pagine dei transfer per Venezia.
 
 ---
 
-## Il registro: 102 pagine
+## Il registro: 103 voci
 
-1 home + 5 categorie + 10 porti + 86 tour.
+1 home + **1 album** + 5 categorie + 10 porti + 86 tour.
+
+### L'album: `/album/` (dal 28/09/2026)
+
+Un tag in più, `album` (tipo `album`), e una pagina pubblica che mostra
+**tutte** le foto con quel tag, in una griglia. Deciso dalla proprietà:
+
+- **Sempre visibile, senza le regole delle gallery**: niente interruttore
+  generale, soglia, override, titolo o ordine delle impostazioni. La
+  pagina non passa da `galleryDi()`/`decidi()`, e per questo **non compare
+  in «Pagine»** (dove quelle manopole non girerebbero niente) né nel
+  conteggio «su quante pagine comparirà» delle Impostazioni.
+- **Ma solo foto approvate**: legge da `gallery_public`. L'approvazione è la
+  tutela sul consenso delle persone ritratte, non un'impostazione.
+- **Dalla più recente** (data di scatto, o di caricamento), con la stessa
+  `ordina(…, 'newest')` delle gallery.
+- Titolo «Our guests' *album*», link **«Guest album»** nel footer, nella
+  sitemap, indicizzata. In fondo la frase sul consenso, nella forma breve.
+- Griglia a **righe giustificate** in solo CSS (`AlbumGriglia.tsx`,
+  `gallery.css`): foto intere e proporzionate, ordine da sinistra a destra.
+  Il lightbox è quello delle gallery, esportato da `GalleryStriscia.tsx`.
+- Il tag nasce dalla migration `20260928_gallery_album.sql` **e** da
+  `registro()`: se mancasse lì, «Sincronizza pagine» lo marcherebbe orfano.
+  Nel menu dei tag del caricamento è il primo gruppo, «Album del sito».
+- Si aggiorna da solo: `rinfresca()` rigenera il percorso dei tag toccati,
+  e quello del tag album è `/album/`.
 
 🔴 **Solo i tour PUBBLICATI** (dal 27/09/2026). In `tours` ci sono 87
 righe: 86 pubblicate e una bozza, `siena-san-gimignano-the-tuscan-countryside-landing`,
