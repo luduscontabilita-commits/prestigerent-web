@@ -46,17 +46,27 @@ export default async function GalleryIndice() {
   if (!haRuolo(io, RUOLI_CARICAMENTO)) redirect('/admin/');
 
   const gestisce = haRuolo(io, RUOLI_GESTIONE);
-  const sb = await supabaseServer();
+
+  /* 🔴 LA GUIDA VEDE SOLO LE DUE PORTE CHE PUO' APRIRE.
+     Deciso dalla proprieta' il 28/09/2026, entrando con una guida di
+     prova: la descrizione, l'avviso dell'interruttore e i tre contatori
+     sono affari di chi gestisce. Una guida non accende le gallery, non
+     approva, non tiene il registro -- e la descrizione la mandava in
+     "Foto dei tour", una pagina che per lei e' chiusa.
+     Per lo stesso motivo, per una guida i conteggi non si chiedono
+     nemmeno al database: servivano solo a quelle tre cose. */
+  const sb = gestisce ? await supabaseServer() : null;
 
   /* `head: true` e `count`: torna solo il numero, non le righe. La coda
      puo' avere centinaia di foto e qui serve un contatore. */
-  const [{ count: inAttesa }, { count: approvate }, { count: pagine }, { data: imp }] =
-    await Promise.all([
-      sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'in_attesa'),
-      sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'approvata'),
-      sb.from('gallery_tags').select('id', { count: 'exact', head: true }).eq('is_orphan', false),
-      sb.from('gallery_settings').select('galleries_enabled,min_images').eq('id', 1).maybeSingle(),
-    ]);
+  const [{ count: inAttesa }, { count: approvate }, { count: pagine }, { data: imp }] = sb
+    ? await Promise.all([
+        sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'in_attesa'),
+        sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'approvata'),
+        sb.from('gallery_tags').select('id', { count: 'exact', head: true }).eq('is_orphan', false),
+        sb.from('gallery_settings').select('galleries_enabled,min_images').eq('id', 1).maybeSingle(),
+      ])
+    : [{ count: 0 }, { count: 0 }, { count: 0 }, { data: null }];
 
   const impostazioni = imp as { galleries_enabled: boolean; min_images: number } | null;
   const accesa = impostazioni?.galleries_enabled ?? false;
@@ -125,46 +135,52 @@ export default async function GalleryIndice() {
       voci={vociPerRuolo(io.ruolo)}
       titolo="Foto della gallery"
       sottotitolo={
-        <>
-          Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in
-          fondo alle pagine del sito. <b>Non</b> sono le foto dei tour: quelle stanno in{' '}
-          <Link href="/admin/foto/">Foto dei tour</Link> e sono la striscia in cima alle
-          schede, con la copertina.
-        </>
+        gestisce ? (
+          <>
+            Le foto delle giornate, caricate da chi accompagna gli ospiti. Compaiono in
+            fondo alle pagine del sito. <b>Non</b> sono le foto dei tour: quelle stanno in{' '}
+            <Link href="/admin/foto/">Foto dei tour</Link> e sono la striscia in cima alle
+            schede, con la copertina.
+          </>
+        ) : undefined
       }
     >
-      {/* Lo stato dell'interruttore in cima, sempre: e' la domanda che si
-          fa chi non capisce perche' le foto non si vedono sul sito. */}
-      <Alert
-        variant="light"
-        color={accesa ? 'teal' : 'orange'}
-        icon={accesa ? <IconCheck size={20} /> : <IconAlertTriangle size={20} />}
-        mb="lg"
-        radius="md"
-      >
-        {accesa ? (
-          <>
-            <b>Le gallery sono accese.</b> Una pagina le mostra quando ha almeno{' '}
-            {impostazioni?.min_images ?? 3} foto approvate.
-          </>
-        ) : (
-          <>
-            <b>Le gallery sono spente su tutto il sito.</b> Si può caricare, taggare e
-            approvare: niente compare ai visitatori finché l’interruttore resta spento.
-          </>
-        )}
-      </Alert>
+      {gestisce && (
+        <>
+          {/* Lo stato dell'interruttore in cima, sempre: e' la domanda che si
+              fa chi non capisce perche' le foto non si vedono sul sito. */}
+          <Alert
+            variant="light"
+            color={accesa ? 'teal' : 'orange'}
+            icon={accesa ? <IconCheck size={20} /> : <IconAlertTriangle size={20} />}
+            mb="lg"
+            radius="md"
+          >
+            {accesa ? (
+              <>
+                <b>Le gallery sono accese.</b> Una pagina le mostra quando ha almeno{' '}
+                {impostazioni?.min_images ?? 3} foto approvate.
+              </>
+            ) : (
+              <>
+                <b>Le gallery sono spente su tutto il sito.</b> Si può caricare, taggare e
+                approvare: niente compare ai visitatori finché l’interruttore resta spento.
+              </>
+            )}
+          </Alert>
 
-      <SimpleGrid cols={3} spacing="md" mb="lg">
-        {numeri.map((x) => (
-          <Paper key={x.testo} withBorder radius="md" p="md">
-            <Text fw={800} fz={{ base: 26, sm: 32 }} lh={1} c={x.allarme ? 'red' : undefined}>
-              {x.n}
-            </Text>
-            <Text size="xs" c="dimmed" mt={6} lh={1.3}>{x.testo}</Text>
-          </Paper>
-        ))}
-      </SimpleGrid>
+          <SimpleGrid cols={3} spacing="md" mb="lg">
+            {numeri.map((x) => (
+              <Paper key={x.testo} withBorder radius="md" p="md">
+                <Text fw={800} fz={{ base: 26, sm: 32 }} lh={1} c={x.allarme ? 'red' : undefined}>
+                  {x.n}
+                </Text>
+                <Text size="xs" c="dimmed" mt={6} lh={1.3}>{x.testo}</Text>
+              </Paper>
+            ))}
+          </SimpleGrid>
+        </>
+      )}
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
         {voci.map((v) => (
