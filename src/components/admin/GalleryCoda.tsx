@@ -220,7 +220,7 @@ export function GalleryCoda({
                   {inModifica ? (
                     <>
                       <TextInput
-                        label="Descrizione in inglese"
+                        label="Descrizione in inglese (facoltativa)"
                         size="sm"
                         value={bozza.alt}
                         onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}
@@ -268,7 +268,7 @@ export function GalleryCoda({
                     </>
                   ) : (
                     <>
-                      <Text fw={600}>{f.alt}</Text>
+                      <Text fw={600} c={f.alt ? undefined : 'dimmed'}>{f.alt || 'Senza descrizione'}</Text>
                       {f.caption && <Text size="sm" c="dimmed">{f.caption}</Text>}
 
                       <Group gap={6}>

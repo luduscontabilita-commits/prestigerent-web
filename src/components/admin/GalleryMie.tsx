@@ -20,10 +20,7 @@ import {
   Tabs,
   Text,
 } from '@mantine/core';
-import {
-  Collapse,
-  TextInput,
-} from '@mantine/core';
+import { Collapse } from '@mantine/core';
 import { IconAlertTriangle, IconCheck, IconPencil, IconPhotoUp, IconRefresh, IconTrash, IconX } from '@tabler/icons-react';
 import type { Pagina } from './GalleryCaricatore';
 
@@ -253,7 +250,7 @@ export function GalleryMie({
                   }}
                 />
               )}
-              <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>
+              {f.alt && <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>}
               {f.caption && <Text size="xs" c="dimmed" lineClamp={1}>{f.caption}</Text>}
 
               <Group gap={4}>
@@ -347,19 +344,10 @@ export function GalleryMie({
 
                   <Collapse expanded={corregge === f.id}>
                     <Stack gap="xs" mt="xs">
-                      <TextInput
-                        size="xs"
-                        label="Descrizione in inglese"
-                        value={bozza.alt}
-                        onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}
-                        description="Cosa si vede nella foto, in inglese."
-                      />
-                      <TextInput
-                        size="xs"
-                        label="Didascalia"
-                        value={bozza.caption}
-                        onChange={(e) => setBozza({ ...bozza, caption: e.currentTarget.value })}
-                      />
+                      {/* Solo le pagine (28/09/2026): descrizione e
+                          didascalia non si chiedono piu' alla guida, ne'
+                          al caricamento ne' qui. Restano quelle che
+                          c'erano, e partono invariate. */}
                       <SceltaPagine
                         pagine={pagine}
                         valore={bozza.tag}
@@ -372,7 +360,7 @@ export function GalleryMie({
                           size="compact-sm"
                           leftSection={<IconCheck size={14} />}
                           loading={inCorso}
-                          disabled={bozza.alt.trim().length < 3 || bozza.tag.length === 0}
+                          disabled={bozza.tag.length === 0}
                           onClick={() => salvaERimanda(f)}
                         >
                           Salva e rimanda
@@ -386,12 +374,8 @@ export function GalleryMie({
                           Annulla
                         </Button>
                       </Group>
-                      {(bozza.alt.trim().length < 3 || bozza.tag.length === 0) && (
-                        <Text size="xs" c="orange">
-                          {bozza.alt.trim().length < 3
-                            ? 'Serve la descrizione in inglese.'
-                            : 'Serve almeno una pagina.'}
-                        </Text>
+                      {bozza.tag.length === 0 && (
+                        <Text size="xs" c="orange">Serve almeno una pagina.</Text>
                       )}
                     </Stack>
                   </Collapse>

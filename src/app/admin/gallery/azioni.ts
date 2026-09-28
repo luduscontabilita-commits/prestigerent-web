@@ -269,10 +269,14 @@ export async function registraFoto(foto: DaRegistrare[]): Promise<Esito & { quan
   const admin = RUOLI_GESTIONE.includes(io.ruolo);
   const sb = await supabaseServer();
 
+  /* 🔴 LA DESCRIZIONE NON E' PIU' OBBLIGATORIA (28/09/2026, decisione
+     della proprieta'): «la guida non la inserirebbe mai». Il caricamento
+     non ha piu' campi di testo, per nessun ruolo; la foto si salva con
+     `alt` vuoto (la colonna e' `not null`, quindi stringa vuota) e sul
+     sito esce come immagine senza descrizione. Chi vuole puo' scriverla
+     dopo, da «Tutte le foto» o dalla coda. Resta obbligatoria la PAGINA:
+     una foto senza pagina non compare da nessuna parte. */
   for (const f of foto) {
-    if (!f.alt?.trim() || f.alt.trim().length < 3) {
-      return { ok: false, errore: 'Ogni foto ha bisogno di una descrizione in inglese (alt).' };
-    }
     if (!f.tag?.length) {
       return { ok: false, errore: 'Ogni foto ha bisogno di almeno una pagina.' };
     }
@@ -298,7 +302,7 @@ export async function registraFoto(foto: DaRegistrare[]): Promise<Esito & { quan
         width: f.width,
         height: f.height,
         blur_data_url: f.colore,
-        alt: f.alt.trim(),
+        alt: (f.alt ?? '').trim(),
         caption: f.caption?.trim() || null,
         status: admin ? 'approvata' : 'in_attesa',
         uploaded_by: io.id,
@@ -387,9 +391,9 @@ export async function aggiornaFoto(
 ): Promise<Esito> {
   const { errore } = await chiAgisce(RUOLI_CARICAMENTO);
   if (errore) return { ok: false, errore };
-  if (!dati.alt?.trim() || dati.alt.trim().length < 3) {
-    return { ok: false, errore: 'La descrizione in inglese (alt) è obbligatoria.' };
-  }
+  /* La descrizione e' facoltativa dal 28/09/2026 (vedi `registraFoto`):
+     obbligarla qui bloccherebbe la guida che corregge le PAGINE di una
+     foto rifiutata, caricata senza descrizione. */
   if (!dati.tag?.length) return { ok: false, errore: 'Serve almeno una pagina.' };
 
   const sb = await supabaseServer();
@@ -431,7 +435,7 @@ export async function aggiornaFoto(
     .from('gallery_images')
     .update(
       {
-        alt: dati.alt.trim(),
+        alt: (dati.alt ?? '').trim(),
         caption: dati.caption?.trim() || null,
         updated_at: new Date().toISOString(),
         ...(eraRifiutata
@@ -693,7 +697,12 @@ export async function rifiuta(id: string, motivo: string): Promise<Esito> {
       oggetto: 'Una tua foto è stata rimandata indietro',
       testo:
         `Ciao${chi?.profili?.nome ? ' ' + chi.profili.nome : ''},\n\n` +
-        `la foto «${chi?.alt ?? ''}» non è stata pubblicata.\n\nMotivo: ${testo}\n\n` +
+        /* senza descrizione (possibile dal 28/09/2026) si dice «una tua
+           foto», non «la foto «»» */
+        (chi?.alt?.trim()
+          ? `la foto «${chi.alt.trim()}» non è stata pubblicata.`
+          : 'una tua foto non è stata pubblicata.') +
+        `\n\nMotivo: ${testo}\n\n` +
         `Puoi correggerla e rimandarla da qui:\n` +
         `https://prestigerent.com/admin/gallery/mie/\n`,
     });

@@ -40,16 +40,11 @@ Tocca **«Foto della gallery»**, poi **«Carica e tagga»**.
    selezionarne quante vuoi, fino a 40 per volta.
 2. Ogni foto compare come una scheda. Aspetta un attimo: il telefono la
    sta rimpicciolendo.
-3. Su ogni scheda scrivi due cose:
-   - **la descrizione in inglese** (obbligatoria): *cosa si vede* nella
-     foto. Per esempio `Guests tasting wine at a Chianti winery`. Non «foto
-     1», non «Toscana»: la leggono Google e le persone che non possono
-     vedere l'immagine.
-   - **la didascalia** (se vuoi): una frase breve che compare sulla foto
-     sul sito.
-4. A destra (o sotto, sul telefono) scegli **le pagine** dove la foto deve
-   comparire. Puoi spuntarne più di una.
-5. **«Invia per approvazione»**.
+3. Scegli **le pagine** dove la foto deve comparire: a destra (o sotto,
+   sul telefono), oppure dalla barra in fondo allo schermo. Puoi
+   sceglierne più di una. **Non c'è niente da scrivere**: nessuna
+   descrizione, nessuna didascalia.
+4. **«Invia per approvazione»**.
 
 ### L'album del sito
 
@@ -92,8 +87,8 @@ tutta la scheda»), scegli la pagina nella barra in basso e premi
 ## Le cose che il pannello ti dice
 
 **«Il pulsante non si accende»** — sopra al pulsante c'è scritto cosa
-manca: quante foto sono senza descrizione e quante senza pagina. Non è
-bloccato, manca qualcosa.
+manca: quante foto sono ancora senza pagina. Non è bloccato, manca
+qualcosa.
 
 **«Risoluzione bassa»** — la foto si vede sul sito, ma aperta a schermo
 pieno risulterà sfocata. Succede con le foto ricevute su WhatsApp, che le
@@ -116,8 +111,8 @@ Le foto che invii **non vanno subito sul sito**. Le guarda un
 amministratore, che può:
 
 - **approvarle** → compaiono sul sito;
-- **correggerle e approvarle** → se la descrizione o la pagina erano da
-  sistemare, lo fa lui e non ti disturba;
+- **correggerle e approvarle** → se la pagina era da sistemare, lo fa lui
+  e non ti disturba;
 - **rimandartele indietro** → il motivo lo trovi in «Le mie foto». Se hai
   dato un indirizzo email all’amministratore, ti arriva anche lì.
 
@@ -168,9 +163,11 @@ Tre motivi possibili, in ordine di probabilità:
 Una volta approvata, la tocca solo un amministratore. Chiedi a lui:
 «nascondere» una foto è immediato e non la cancella.
 
-**Ho sbagliato la descrizione.**
+**Ho sbagliato la pagina.**
 Se la foto è ancora in attesa, correggila da «Le mie foto». Se è già
-approvata, chiedi a un amministratore.
+approvata, aggiungi la pagina giusta con la barra in fondo: resta in
+attesa finché un amministratore non la approva. Per toglierne una, chiedi
+a lui.
 
 **Le foto pesano, consumo i dati del telefono?**
 Poco: il telefono le rimpicciolisce **prima** di mandarle. Una foto da 5 MB

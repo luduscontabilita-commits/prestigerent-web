@@ -364,6 +364,7 @@ caricate e l'admin le trova in coda comunque.
 | data di scatto | `exifr` | ~60 righe nostre | serve **un** campo. `exifr` porta decine di tag nel bundle del pannello, cioè nel telefono di chi carica |
 | titolo | uno predefinito | **due** | sulle schede tour in cima c'è già `PhotoStrip`: due strisce con lo stesso titolo sembrano un errore. L'alternativa era scrivere un titolo a mano su 87 schede |
 | drag & drop dei tag | con `@dnd-kit` | caselle da spuntare + selezione multipla | il drag & drop c'è per i **file** (l'area di caricamento). Per i tag, su un telefono trascinare una foto su un albero di 103 voci è peggio di spuntare: la selezione multipla fa lo stesso lavoro in meno gesti |
+| descrizione (`alt`) | obbligatoria, in inglese, al caricamento | **niente campi di testo nel caricamento, per nessun ruolo**; `alt` salvato vuoto | decisione della proprietà del 28/09/2026: «la guida non la inserirebbe mai». Scartate due alternative proposte (descrizione automatica dalla pagina; scritta dall'admin all'approvazione). La colonna è `not null`, quindi si salva `''`: sul sito l'immagine esce senza descrizione, e i punti che la citavano (card del pannello, email di rifiuto, `aria-label` dell'album) hanno un'alternativa. Resta **facoltativa** e modificabile dall'admin in «Tutte le foto» e nella coda; la guida non la vede più nemmeno in «Correggi». **La pagina resta obbligatoria** |
 
 ---
 

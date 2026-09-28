@@ -48,7 +48,8 @@ export function AlbumGriglia({ foto }: { foto: FotoStriscia[] }) {
                 type="button"
                 className="album-apri"
                 onClick={() => setAperta(i)}
-                aria-label={`Open photo ${i + 1} of ${foto.length}: ${f.alt}`}
+                /* la descrizione puo' mancare (28/09/2026): allora solo il numero */
+                aria-label={`Open photo ${i + 1} of ${foto.length}${f.alt ? `: ${f.alt}` : ''}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img

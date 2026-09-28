@@ -278,7 +278,7 @@ export function TutteLeFoto({
                   setScelte(n);
                 }}
               />
-              <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>
+              {f.alt && <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>}
               {f.caption && <Text size="xs" c="dimmed" lineClamp={1}>{f.caption}</Text>}
 
               <Text size="xs" c="dimmed">
@@ -351,7 +351,7 @@ export function TutteLeFoto({
                       /* La conferma c'e' perche' questa e' l'unica azione
                          del pannello che non si annulla: va via la riga E
                          il file dallo storage. */
-                      if (!window.confirm(`Eliminare «${f.alt}»? Il file viene cancellato e non si recupera.`)) return;
+                      if (!window.confirm(`Eliminare ${f.alt ? `«${f.alt}»` : 'questa foto'}? Il file viene cancellato e non si recupera.`)) return;
                       avvia(async () => {
                         const r = await elimina(f.id);
                         if (!r.ok) { setMessaggio({ ok: false, testo: r.errore ?? 'Non è andata.' }); return; }
@@ -383,7 +383,7 @@ export function TutteLeFoto({
         onClose={() => setGrande(null)}
         size="xl"
         centered
-        title={grande?.alt}
+        title={grande?.alt || 'Foto'}
       >
         {grande?.anteprima && (
           <Stack gap="sm">
@@ -407,7 +407,7 @@ export function TutteLeFoto({
       >
         <Stack gap="md">
           <TextInput
-            label="Descrizione in inglese"
+            label="Descrizione in inglese (facoltativa)"
             description="Cosa si vede nella foto. La leggono Google e chi non può vedere l’immagine."
             value={bozza.alt}
             onChange={(e) => setBozza({ ...bozza, alt: e.currentTarget.value })}

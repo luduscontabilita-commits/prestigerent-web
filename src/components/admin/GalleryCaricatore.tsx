@@ -39,7 +39,8 @@ import type { DaRegistrare, Firma } from '@/app/admin/gallery/azioni';
  *     letti dall'EXIF, rotazione applicata ai pixel, ridimensionamento a
  *     2400px, conversione in WebP. Da qui in poi i metadati non ci sono
  *     piu', GPS compreso;
- *  3. si scrive la descrizione in inglese e si scelgono le pagine;
+ *  3. si scelgono le pagine -- e basta: dal 28/09/2026 niente
+ *     descrizione ne' didascalia, per nessun ruolo (vedi `puoInviare`);
  *  4. "Invia per approvazione" chiede gli indirizzi firmati, carica i file
  *     dritti nello storage e poi registra le righe.
  *
@@ -66,8 +67,6 @@ type Scheda = {
   anteprima: string;
   pronta: Preparata | null;
   errore: string | null;
-  alt: string;
-  caption: string;
   tag: string[];
   lavorando: boolean;
 };
@@ -107,8 +106,6 @@ export function GalleryCaricatore({
       anteprima: URL.createObjectURL(f),
       pronta: null,
       errore: null,
-      alt: '',
-      caption: '',
       tag: [],
       lavorando: true,
     }));
@@ -159,9 +156,12 @@ export function GalleryCaricatore({
   /* ── cosa manca ────────────────────────────────────────────────────── */
 
   const valide = schede.filter((s) => s.pronta && !s.errore);
-  const senzaAlt = valide.filter((s) => s.alt.trim().length < 3).length;
+  /* Solo la PAGINA e' obbligatoria. Descrizione e didascalia non ci sono
+     piu' (28/09/2026, decisione della proprieta': «la guida non le
+     inserirebbe mai»): la foto si salva con descrizione vuota, e chi
+     vuole la scrive dopo da «Tutte le foto». */
   const senzaPagina = valide.filter((s) => !s.tag.length).length;
-  const puoInviare = valide.length > 0 && !senzaAlt && !senzaPagina && !invio;
+  const puoInviare = valide.length > 0 && !senzaPagina && !invio;
 
   /* ── invio ─────────────────────────────────────────────────────────── */
 
@@ -201,8 +201,8 @@ export function GalleryCaricatore({
           storage_path: firma.percorso,
           width: s.pronta!.width,
           height: s.pronta!.height,
-          alt: s.alt,
-          caption: s.caption.trim() || null,
+          alt: '',
+          caption: null,
           colore: s.pronta!.colore,
           scattata: s.pronta!.scattata ? s.pronta!.scattata.toISOString() : null,
           tag: s.tag,
@@ -347,30 +347,6 @@ export function GalleryCaricatore({
                               <Text key={i} size="xs" c="orange">{a}</Text>
                             ))}
 
-                            <TextInput
-                              label={<>Descrizione in inglese <b>obbligatoria</b></>}
-                              size="sm"
-                              value={s.alt}
-                              placeholder="Guests tasting wine at a Chianti winery"
-                              error={s.alt.trim().length > 0 && s.alt.trim().length < 3 ? 'Troppo corta' : undefined}
-                              description="Cosa si vede nella foto, in inglese. La leggono Google e chi non può vedere l’immagine. Non «foto 1» o «Toscana»."
-                              onChange={(e) => {
-                                const v = e.currentTarget.value;
-                                setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, alt: v } : y)));
-                              }}
-                            />
-
-                            <TextInput
-                              label={<>Didascalia <Text span size="xs" c="dimmed">facoltativa</Text></>}
-                              size="sm"
-                              value={s.caption}
-                              placeholder="Harvest week in Chianti"
-                              onChange={(e) => {
-                                const v = e.currentTarget.value;
-                                setSchede((x) => x.map((y) => (y.id === s.id ? { ...y, caption: v } : y)));
-                              }}
-                            />
-
                             <Group gap={6}>
                               {s.tag.length === 0 ? (
                                 <Text size="xs" c="red">Nessuna pagina scelta</Text>
@@ -505,11 +481,6 @@ export function GalleryCaricatore({
               <Alert color="yellow" icon={<IconAlertTriangle size={18} />} title="Manca ancora qualcosa">
                 <List size="sm" spacing={2}>
                   {!valide.length && <List.Item>Nessuna foto pronta da inviare.</List.Item>}
-                  {senzaAlt > 0 && (
-                    <List.Item>
-                      {senzaAlt === 1 ? 'Una foto non ha' : `${senzaAlt} foto non hanno`} la descrizione in inglese.
-                    </List.Item>
-                  )}
                   {senzaPagina > 0 && (
                     <List.Item>
                       {senzaPagina === 1 ? 'Una foto non ha' : `${senzaPagina} foto non hanno`} nessuna pagina.

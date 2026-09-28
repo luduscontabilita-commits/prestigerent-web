@@ -137,7 +137,7 @@ export function GalleryProposte({
               style={{ flex: '0 0 auto' }}
             />
             <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-              <Text size="sm" fw={600} lineClamp={1}>{p.alt}</Text>
+              <Text size="sm" fw={600} lineClamp={1} c={p.alt ? undefined : 'dimmed'}>{p.alt || 'Senza descrizione'}</Text>
               <Text size="xs">
                 → <b>{p.pagina}</b>
               </Text>
