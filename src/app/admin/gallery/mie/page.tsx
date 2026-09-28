@@ -1,7 +1,7 @@
 import { comeSiChiama } from '@/lib/accesso';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
-import { chiSono, haRuolo, RUOLI_CARICAMENTO, supabaseServer } from '@/lib/auth';
+import { chiSono, haRuolo, RUOLI_CARICAMENTO, RUOLI_GESTIONE, supabaseServer } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
@@ -108,6 +108,7 @@ export default async function Mie() {
         elimina={elimina}
         aggiornaFoto={aggiornaFoto}
         tagInBlocco={tagInBlocco}
+        inBlocco={haRuolo(io, RUOLI_GESTIONE)}
       />
     </Guscio>
   );

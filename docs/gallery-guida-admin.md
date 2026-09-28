@@ -165,9 +165,7 @@ Una volta approvata, la tocca solo un amministratore. Chiedi a lui:
 
 **Ho sbagliato la pagina.**
 Se la foto è ancora in attesa, correggila da «Le mie foto». Se è già
-approvata, aggiungi la pagina giusta con la barra in fondo: resta in
-attesa finché un amministratore non la approva. Per toglierne una, chiedi
-a lui.
+approvata, chiedi a un amministratore: la tocca solo lui.
 
 **Le foto pesano, consumo i dati del telefono?**
 Poco: il telefono le rimpicciolisce **prima** di mandarle. Una foto da 5 MB

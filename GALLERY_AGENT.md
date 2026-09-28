@@ -268,6 +268,15 @@ che esisteva ma non la chiamava nessuno.
 
 ## Una pagina su più foto, e le pagine proposte (dal 28/09/2026)
 
+> 🔴 **Aggiornamento 28/09/2026, su richiesta della proprietà:** alla guida la
+> barra è stata tolta **sia dal caricamento sia da «Le mie foto»** (caselle
+> «Seleziona» comprese; prop `inBlocco` di `GalleryMie`, `approvaSubito`
+> nel caricatore). Resta all'admin, nel caricamento e in «Tutte le foto».
+> Conseguenza: dal pannello una guida **non crea più proposte** su foto già
+> approvate. Il meccanismo resta intatto (colonna `in_attesa`, policy,
+> coda «Pagine proposte», `tagInBlocco` che le crea per il ruolo guida):
+> riaccenderlo è passare `inBlocco` anche alla guida.
+
 Chiesto dalla proprietà il 28/09/2026. Si selezionano le foto, si sceglie
 **una** pagina dal menu della barra fissa in basso (`BarraTag.tsx`), si
 preme **Aggiungi** o **Togli**. La stessa barra sta in tre posti: il

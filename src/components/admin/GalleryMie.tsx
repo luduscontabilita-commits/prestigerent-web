@@ -68,6 +68,7 @@ export function GalleryMie({
   elimina,
   aggiornaFoto,
   tagInBlocco,
+  inBlocco = false,
 }: {
   foto: MiaFoto[];
   /** tutte le pagine taggabili, per il modulo di correzione */
@@ -76,6 +77,11 @@ export function GalleryMie({
   elimina: (id: string) => Promise<Esito>;
   aggiornaFoto: (id: string, d: { alt: string; caption: string | null; tag: string[] }) => Promise<Esito>;
   tagInBlocco: (ids: string[], chiave: string, metti: boolean) => Promise<EsitoBlocco>;
+  /** 🔴 «Una pagina su piu' foto» (barra in fondo + caselle Seleziona):
+   *  SOLO per l'admin. Tolta alla guida il 28/09/2026 su richiesta della
+   *  proprieta'. Conseguenza voluta: dal pannello una guida non propone
+   *  piu' pagine nuove per le sue foto gia' approvate; lo fa un admin. */
+  inBlocco?: boolean;
 }) {
   const router = useRouter();
   const conta = (s: string) =>
@@ -197,7 +203,7 @@ export function GalleryMie({
         <Alert color="gray" variant="light" radius="md">Niente in questa scheda.</Alert>
       )}
 
-      {visibili.length > 0 && (
+      {inBlocco && visibili.length > 0 && (
         <Group justify="space-between" gap="xs">
           <Text size="sm" c="dimmed">
             {scelte.size ? `${scelte.size} foto selezionate` : 'Seleziona le foto per cambiare le loro pagine tutte insieme.'}
@@ -238,7 +244,7 @@ export function GalleryMie({
             </Card.Section>
 
             <Stack gap={6} p="sm">
-              {f.stato !== 'nascosta' && (
+              {inBlocco && f.stato !== 'nascosta' && (
                 <Checkbox
                   size="sm"
                   label="Seleziona"
@@ -406,6 +412,7 @@ export function GalleryMie({
         ))}
       </SimpleGrid>
 
+      {inBlocco && (
       <BarraTag
         quante={scelte.size}
         descrizione={scelte.size ? `${scelte.size} foto selezionate` : 'Nessuna foto selezionata'}
@@ -414,6 +421,7 @@ export function GalleryMie({
         occupato={inCorso}
         nota="Sulle foto già approvate la pagina nuova resta «in attesa» finché un amministratore non la approva: fino ad allora la foto resta solo dove è già."
       />
+      )}
     </Stack>
   );
 }
