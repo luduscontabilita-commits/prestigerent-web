@@ -5,7 +5,7 @@ import { soloGestione, supabaseServer } from '@/lib/auth';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { TutteLeFoto, type FotoAdmin } from '@/components/admin/TutteLeFoto';
-import { aggiornaFoto, cambiaVisibilita, elimina, pagineTaggabili } from '../azioni';
+import { aggiornaFoto, cambiaVisibilita, elimina, pagineTaggabili, tagInBlocco } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -43,7 +43,7 @@ type Riga = {
   taken_at: string | null;
   review_note: string | null;
   profili: { nome: string | null; username: string | null; email: string } | null;
-  gallery_image_tags: { gallery_tags: { key: string; label: string } | null }[];
+  gallery_image_tags: { in_attesa: boolean; gallery_tags: { key: string; label: string } | null }[];
 };
 
 export default async function Tutte({
@@ -59,7 +59,7 @@ export default async function Tutte({
     .from('gallery_images')
     .select(
       'id,alt,caption,status,bucket,storage_path,width,height,blur_data_url,created_at,taken_at,review_note,' +
-        'profili:uploaded_by(nome,username,email),gallery_image_tags(gallery_tags(key,label))'
+        'profili:uploaded_by(nome,username,email),gallery_image_tags(in_attesa,gallery_tags(key,label))'
     )
     .order('created_at', { ascending: false });
 
@@ -80,7 +80,9 @@ export default async function Tutte({
      continua a vedere, per ogni foto, TUTTE le pagine a cui appartiene. */
   if (pagina) {
     righe = righe.filter((r) =>
-      r.gallery_image_tags.some((t) => t.gallery_tags?.key === pagina)
+      /* solo le pagine dove la foto c'e' davvero: una proposta in attesa
+         non la mette su quella pagina */
+      r.gallery_image_tags.some((t) => !t.in_attesa && t.gallery_tags?.key === pagina)
     );
   }
 
@@ -109,6 +111,11 @@ export default async function Tutte({
        prova e per le foto di chi e' stato cancellato. */
     chi: r.profili ? comeSiChiama(r.profili) : null,
     tag: r.gallery_image_tags
+      .filter((t) => !t.in_attesa)
+      .map((t) => t.gallery_tags)
+      .filter((t): t is { key: string; label: string } => !!t),
+    proposte: r.gallery_image_tags
+      .filter((t) => t.in_attesa)
       .map((t) => t.gallery_tags)
       .filter((t): t is { key: string; label: string } => !!t),
   }));
@@ -143,6 +150,7 @@ export default async function Tutte({
         cambiaVisibilita={cambiaVisibilita}
         elimina={elimina}
         aggiornaFoto={aggiornaFoto}
+        tagInBlocco={tagInBlocco}
       />
     </Guscio>
   );

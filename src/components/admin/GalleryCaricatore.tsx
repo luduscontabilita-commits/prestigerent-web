@@ -25,6 +25,8 @@ import {
   IconSend,
 } from '@tabler/icons-react';
 import { preparaFoto, type Preparata } from './preparaFoto';
+import { BarraTag } from './BarraTag';
+import { GRUPPI } from './gruppi-pagine';
 import type { TipoTag } from '@/lib/gallery-tag';
 import type { DaRegistrare, Firma } from '@/app/admin/gallery/azioni';
 
@@ -70,16 +72,6 @@ type Scheda = {
   lavorando: boolean;
 };
 
-/* L'album per primo: e' il tag che una guida usa piu' spesso, e non e' una
-   pagina di prodotto da cercare nell'albero -- e' "metti questa foto
-   nell'album del sito". */
-const GRUPPI: { tipo: TipoTag; titolo: string }[] = [
-  { tipo: 'album', titolo: 'Album del sito' },
-  { tipo: 'home', titolo: 'Home' },
-  { tipo: 'cat', titolo: 'Categorie' },
-  { tipo: 'port', titolo: 'Porti' },
-  { tipo: 'tour', titolo: 'Tour' },
-];
 
 export function GalleryCaricatore({
   pagine,
@@ -485,6 +477,23 @@ export function GalleryCaricatore({
             </Card>
           </Grid.Col>
         </Grid>
+      )}
+
+      {/* La stessa scelta delle spunte qui sopra, ma sempre a portata di
+          dito: sul telefono l'elenco delle pagine sta sotto tutte le foto.
+          Agisce sulle foto selezionate, o su tutte se non ne e' selezionata
+          nessuna -- esattamente come le spunte. */}
+      {schede.length > 0 && (
+        <BarraTag
+          quante={bersagli.length}
+          descrizione={
+            selezione.size
+              ? `${selezione.size} foto selezionate`
+              : `Tutte le ${schede.length} foto`
+          }
+          pagine={pagine}
+          applica={(chiave, metti) => tocca(bersagli, chiave, metti)}
+        />
       )}
 
       {schede.length > 0 && (

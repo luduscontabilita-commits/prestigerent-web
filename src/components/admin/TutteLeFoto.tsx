@@ -1,8 +1,10 @@
 'use client';
 
 import { SceltaPagine } from './SceltaPagine';
+import { BarraTag } from './BarraTag';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import {
   ActionIcon,
@@ -12,6 +14,7 @@ import {
   Badge,
   Button,
   Card,
+  Checkbox,
   Group,
   Image,
   Modal,
@@ -66,9 +69,12 @@ export type FotoAdmin = {
   scattata: string | null;
   chi: string | null;
   tag: { key: string; label: string }[];
+  /** pagine proposte da una guida, in attesa di approvazione dalla coda */
+  proposte: { key: string; label: string }[];
 };
 
 type Esito = { ok: boolean; errore?: string };
+type EsitoBlocco = Esito & { testo?: string };
 
 const STATO: Record<FotoAdmin['stato'], { testo: string; colore: string }> = {
   approvata: { testo: 'sul sito', colore: 'teal' },
@@ -86,6 +92,7 @@ export function TutteLeFoto({
   cambiaVisibilita,
   elimina,
   aggiornaFoto,
+  tagInBlocco,
 }: {
   foto: FotoAdmin[];
   pagine: Pagina[];
@@ -98,13 +105,35 @@ export function TutteLeFoto({
     id: string,
     d: { alt: string; caption: string | null; tag: string[] }
   ) => Promise<Esito>;
+  tagInBlocco: (ids: string[], chiave: string, metti: boolean) => Promise<EsitoBlocco>;
 }) {
+  const router = useRouter();
   const [lista, setLista] = useState(foto);
+  /* Dopo un gesto in blocco si rilegge dal server: le nuove `foto`
+     arrivano come props e vanno riportate nello stato locale. */
+  const [fotoPrima, setFotoPrima] = useState(foto);
+  if (foto !== fotoPrima) {
+    /* lo schema di React per «lo stato segue una prop»: si aggiorna
+       durante il render, non in un effetto (che renderebbe due volte) */
+    setFotoPrima(foto);
+    setLista(foto);
+  }
+  /* «Una pagina su piu' foto» (28/09/2026). Per un admin il gesto agisce
+     subito, anche sulle foto gia' pubblicate. */
+  const [scelte, setScelte] = useState<Set<string>>(new Set());
   const [grande, setGrande] = useState<FotoAdmin | null>(null);
   const [modifica, setModifica] = useState<FotoAdmin | null>(null);
   const [bozza, setBozza] = useState({ alt: '', caption: '', tag: [] as string[] });
   const [messaggio, setMessaggio] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, avvia] = useTransition();
+
+  const applicaInBlocco = (chiave: string, metti: boolean) =>
+    avvia(async () => {
+      setMessaggio(null);
+      const r = await tagInBlocco([...scelte], chiave, metti);
+      setMessaggio({ ok: r.ok, testo: r.testo ?? r.errore ?? (r.ok ? 'Fatto.' : 'Non è andata.') });
+      if (r.ok) router.refresh();
+    });
 
   const indirizzo = (s: string, p: string) => {
     const q = new URLSearchParams();
@@ -177,6 +206,23 @@ export function TutteLeFoto({
         </Alert>
       )}
 
+      {lista.length > 0 && (
+        <Group justify="space-between" gap="xs">
+          <Text size="sm" c="dimmed">
+            {scelte.size ? `${scelte.size} foto selezionate` : 'Seleziona le foto per cambiare le loro pagine tutte insieme.'}
+          </Text>
+          <Button
+            variant="subtle"
+            size="compact-sm"
+            onClick={() =>
+              setScelte(lista.every((f) => scelte.has(f.id)) ? new Set() : new Set(lista.map((f) => f.id)))
+            }
+          >
+            {lista.every((f) => scelte.has(f.id)) ? 'Deseleziona tutte' : 'Seleziona tutte quelle mostrate'}
+          </Button>
+        </Group>
+      )}
+
       <SimpleGrid cols={{ base: 1, xs: 2, md: 3, xl: 4 }} spacing="md">
         {lista.map((f) => (
           <Card key={f.id} withBorder radius="md" padding={0} opacity={f.stato === 'nascosta' ? 0.65 : 1}>
@@ -222,6 +268,16 @@ export function TutteLeFoto({
             </Card.Section>
 
             <Stack gap={6} p="sm">
+              <Checkbox
+                size="sm"
+                label="Seleziona"
+                checked={scelte.has(f.id)}
+                onChange={(e) => {
+                  const n = new Set(scelte);
+                  if (e.currentTarget.checked) n.add(f.id); else n.delete(f.id);
+                  setScelte(n);
+                }}
+              />
               <Text fw={600} size="sm" lineClamp={2}>{f.alt}</Text>
               {f.caption && <Text size="xs" c="dimmed" lineClamp={1}>{f.caption}</Text>}
 
@@ -243,6 +299,11 @@ export function TutteLeFoto({
                     nessuna pagina: non si vede da nessuna parte
                   </Badge>
                 )}
+                {f.proposte.map((t) => (
+                  <Badge key={`p-${t.key}`} variant="outline" color="orange" size="sm" radius="sm">
+                    {t.label} · proposta
+                  </Badge>
+                ))}
               </Group>
 
               {f.stato === 'rifiutata' && f.motivo && (
@@ -307,6 +368,14 @@ export function TutteLeFoto({
           </Card>
         ))}
       </SimpleGrid>
+
+      <BarraTag
+        quante={scelte.size}
+        descrizione={scelte.size ? `${scelte.size} foto selezionate` : 'Nessuna foto selezionata'}
+        pagine={pagine}
+        applica={applicaInBlocco}
+        occupato={inCorso}
+      />
 
       {/* ── la foto grande ── */}
       <Modal

@@ -68,6 +68,25 @@ Se dieci foto vanno sulla stessa pagina: spunta **«Seleziona tutte»** in
 cima alle schede, poi spunta la pagina una volta sola. Vale per tutte le
 foto selezionate insieme.
 
+In fondo allo schermo c'è sempre una **barra**: scegli una pagina dal menu
+e premi **Aggiungi** (o **Togli**). Vale per le foto selezionate, o per
+tutte se non ne hai selezionata nessuna. Sul telefono è comodo: non devi
+scorrere fino all'elenco delle pagine.
+
+### Mettere su una pagina foto che hai già caricato
+
+Da **«Le mie foto»**: spunta **«Seleziona»** sulle foto (o «Seleziona
+tutta la scheda»), scegli la pagina nella barra in basso e premi
+**Aggiungi**.
+
+- Se le foto **aspettano ancora** l'approvazione, la pagina si aggiunge
+  subito.
+- Se le foto sono **già sul sito**, restano dove sono. Sulla pagina nuova
+  compaiono solo quando un amministratore approva: fino ad allora la vedi
+  in arancione con scritto **«in attesa»**.
+- Una pagina da una foto già sul sito la può togliere solo un
+  amministratore. Tu puoi ritirare le tue proposte ancora in attesa.
+
 ---
 
 ## Le cose che il pannello ti dice

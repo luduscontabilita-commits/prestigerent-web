@@ -455,13 +455,39 @@ export async function aggiornaFoto(
      il legame. */
   const { data: attuali } = await sb
     .from('gallery_image_tags')
-    .select('tag_id,gallery_tags(path)')
+    .select('tag_id,in_attesa,gallery_tags(path)')
     .eq('image_id', id);
-  const legamiAttuali = (attuali ?? []) as unknown as { tag_id: string; gallery_tags: { path: string } | null }[];
+  const legamiAttuali = (attuali ?? []) as unknown as {
+    tag_id: string;
+    in_attesa: boolean;
+    gallery_tags: { path: string } | null;
+  }[];
+  /* 🔴 I TAG PROPOSTI (28/09/2026) NON ENTRANO NEL CONFRONTO. Il modulo di
+     correzione mostra solo le pagine pubblicate: senza questa esclusione
+     un admin che sistema una didascalia cancellerebbe in silenzio le
+     proposte di una guida su quella foto, perche' «non spuntate». Le
+     proposte si decidono dalla coda. Unica eccezione: se l'admin spunta
+     proprio una pagina che era proposta, la proposta diventa pubblicata
+     -- e' quello che ha chiesto. */
+  const pubblicati = legamiAttuali.filter((r) => !r.in_attesa);
+  const proposti = new Set(legamiAttuali.filter((r) => r.in_attesa).map((r) => r.tag_id));
   const vuole = new Set(trovati.map((t) => t.id));
-  const ha = new Set(legamiAttuali.map((r) => r.tag_id));
-  const via = legamiAttuali.filter((r) => !vuole.has(r.tag_id));
-  const nuove = trovati.filter((t) => !ha.has(t.id));
+  const ha = new Set(pubblicati.map((r) => r.tag_id));
+  const via = pubblicati.filter((r) => !vuole.has(r.tag_id));
+  const promosse = trovati.filter((t) => proposti.has(t.id));
+  const nuove = trovati.filter((t) => !ha.has(t.id) && !proposti.has(t.id));
+
+  if (promosse.length) {
+    const inCoda = await legamiDi(sb, promosse.map((t) => t.id));
+    for (const t of promosse) {
+      const { error: ep } = await sb
+        .from('gallery_image_tags')
+        .update({ in_attesa: false, position: inFondo(inCoda, t.id, id) })
+        .eq('image_id', id)
+        .eq('tag_id', t.id);
+      if (ep) return { ok: false, errore: ep.message };
+    }
+  }
 
   if (via.length) {
     const { error: e1 } = await sb
@@ -944,4 +970,227 @@ export async function pagineTaggabili(): Promise<{ key: string; label: string; t
     .order('type')
     .order('label');
   return (data ?? []) as { key: string; label: string; type: TipoTag; path: string }[];
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. UNA PAGINA SU PIU' FOTO INSIEME, E I TAG PROPOSTI
+   ═══════════════════════════════════════════════════════════════════
+
+   Chiesto dalla proprieta' il 28/09/2026: la guida, e allo stesso modo
+   l'admin, deve poter mettere lo stesso tag su piu' foto in un gesto solo.
+   Una funzione per tutti e due i ruoli, e le differenze stanno QUI:
+
+     admin          -> agisce subito, su qualunque foto;
+     guida, foto    -> agisce subito sulle PROPRIE foto in attesa o
+     non approvate     rifiutate (non sono sul sito, niente da proteggere);
+     guida, foto    -> non tocca la foto pubblicata: crea un tag
+     approvate         IN ATTESA, che un admin approva dalla coda. La foto
+                       resta online dov'era (decisione del 28/09/2026).
+
+   La RLS lo garantisce anche se qualcuno chiamasse questa azione a mano:
+   su una foto approvata una guida puo' scrivere SOLO legami `in_attesa`
+   firmati da lei (policy `proposte_gallery_image_tags_mie`). */
+
+export type EsitoBlocco = Esito & { testo?: string };
+
+type FotoBlocco = { id: string; status: string; uploaded_by: string | null };
+type LegameBlocco = { image_id: string; tag_id: string; in_attesa: boolean };
+
+/** Una foto non resta mai senza pagine per un «togli» in blocco: senza
+ *  pagine e' invisibile ovunque, e chi l'ha tolta crede di averla solo
+ *  spostata. Per toglierla dal sito ci sono «Nascondi» ed «Elimina». */
+function ultimaPagina(legami: readonly LegameBlocco[], idFoto: string): boolean {
+  return legami.filter((l) => l.image_id === idFoto && !l.in_attesa).length <= 1;
+}
+
+export async function tagInBlocco(
+  ids: string[],
+  chiave: string,
+  metti: boolean
+): Promise<EsitoBlocco> {
+  const agente = await chiAgisce(RUOLI_CARICAMENTO);
+  if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
+  const io = agente.io;
+  const admin = RUOLI_GESTIONE.includes(io.ruolo);
+
+  /* 200 e' largo: e' un tetto contro un invio sbagliato, non un limite
+     d'uso. Le foto arrivano nell'ordine in cui sono state selezionate, ed
+     e' l'ordine in cui finiscono in fondo alla pagina. */
+  const unici = [...new Set(ids)].slice(0, 200);
+  if (!unici.length) return { ok: false, errore: 'Nessuna foto selezionata.' };
+
+  const sb = await supabaseServer();
+  const { data: t } = await sb
+    .from('gallery_tags')
+    .select('id,key,path,label,is_orphan')
+    .eq('key', chiave)
+    .maybeSingle();
+  const tag = t as { id: string; key: string; path: string; label: string; is_orphan: boolean } | null;
+  if (!tag || tag.is_orphan) return { ok: false, errore: 'Questa pagina non è nel registro.' };
+
+  const [{ data: fr }, { data: lr }] = await Promise.all([
+    sb.from('gallery_images').select('id,status,uploaded_by').in('id', unici),
+    sb.from('gallery_image_tags').select('image_id,tag_id,in_attesa').in('image_id', unici),
+  ]);
+  const perId = new Map(((fr ?? []) as FotoBlocco[]).map((f) => [f.id, f]));
+  const legami = (lr ?? []) as LegameBlocco[];
+  const foto = unici.map((id) => perId.get(id)).filter((f): f is FotoBlocco => !!f);
+
+  let fatte = 0;
+  let proposte = 0;
+  let gia = 0;
+  const saltate: string[] = [];
+  let sulSito = false;
+
+  if (metti) {
+    const esistenti = await legamiDi(sb, [tag.id]);
+    const nuovi: (Legame & { in_attesa?: boolean; proposto_da?: string; proposto_il?: string })[] = [];
+
+    for (const f of foto) {
+      if (!admin && f.uploaded_by !== io.id) { saltate.push('non tua'); continue; }
+      if (legami.some((l) => l.image_id === f.id && l.tag_id === tag.id)) { gia++; continue; }
+
+      const posizione = inFondo([...esistenti, ...nuovi], tag.id);
+      if (admin || f.status === 'in_attesa' || f.status === 'rifiutata') {
+        nuovi.push({ image_id: f.id, tag_id: tag.id, position: posizione });
+        fatte++;
+        if (f.status === 'approvata') sulSito = true;
+      } else if (f.status === 'approvata') {
+        nuovi.push({
+          image_id: f.id,
+          tag_id: tag.id,
+          position: posizione,
+          in_attesa: true,
+          proposto_da: io.id,
+          proposto_il: new Date().toISOString(),
+        });
+        proposte++;
+      } else {
+        /* `nascosta`: l'ha tolta dal sito un admin, una guida non la
+           rimette in circolo aggiungendole pagine. */
+        saltate.push('nascosta dal sito');
+      }
+    }
+
+    if (nuovi.length) {
+      const { error } = await sb.from('gallery_image_tags').insert(nuovi);
+      if (error) return { ok: false, errore: error.message };
+    }
+  } else {
+    const daTogliere: string[] = [];
+    for (const f of foto) {
+      if (!admin && f.uploaded_by !== io.id) { saltate.push('non tua'); continue; }
+      const l = legami.find((x) => x.image_id === f.id && x.tag_id === tag.id);
+      if (!l) { gia++; continue; }
+
+      /* Una guida ritira le PROPRIE proposte e toglie pagine dalle foto
+         non ancora approvate. Da una foto pubblicata una pagina la toglie
+         solo un admin: e' una modifica di cio' che il sito mostra. */
+      const puo =
+        admin ||
+        f.status === 'in_attesa' ||
+        f.status === 'rifiutata' ||
+        (l.in_attesa && f.status === 'approvata');
+      if (!puo) { saltate.push('già sul sito: la toglie solo un admin'); continue; }
+      if (!l.in_attesa && ultimaPagina(legami, f.id)) { saltate.push('è la sua unica pagina'); continue; }
+
+      daTogliere.push(f.id);
+      if (f.status === 'approvata' && !l.in_attesa) sulSito = true;
+    }
+
+    if (daTogliere.length) {
+      const { error } = await sb
+        .from('gallery_image_tags')
+        .delete()
+        .eq('tag_id', tag.id)
+        .in('image_id', daTogliere);
+      if (error) return { ok: false, errore: error.message };
+      fatte = daTogliere.length;
+    }
+  }
+
+  if (sulSito) rinfresca([tag.path]);
+  if (proposte) await avvisaProposte(io.nome ?? io.email, proposte, tag.label);
+
+  /* Il resoconto, in parole. «Fatto» su dieci foto quando tre sono state
+     saltate farebbe credere che siano tutte a posto. */
+  const pezzi: string[] = [];
+  if (fatte) pezzi.push(`${fatte} ${metti ? 'aggiunte' : 'tolte'}`);
+  if (proposte) pezzi.push(`${proposte} proposte: le vedrà un admin, fino ad allora lì non compaiono`);
+  if (gia) pezzi.push(`${gia} ${metti ? 'c’erano già' : 'non c’erano'}`);
+  if (saltate.length) pezzi.push(`${saltate.length} saltate (${[...new Set(saltate)].join(', ')})`);
+  const testo = `«${tag.label}»: ${pezzi.join(' · ') || 'nessuna modifica'}.`;
+
+  const qualcosa = fatte + proposte + gia > 0;
+  return qualcosa ? { ok: true, testo } : { ok: false, errore: testo };
+}
+
+/** Una email per GESTO, come per i caricamenti. */
+async function avvisaProposte(chi: string, quante: number, pagina: string) {
+  if (!postaConfigurata()) return;
+  const a = process.env.RICHIESTE_A;
+  if (!a) return;
+  const quali = quante === 1 ? 'una foto' : `${quante} foto`;
+  await invia({
+    a,
+    oggetto: `${chi} propone di mettere ${quali} in «${pagina}»`,
+    testo:
+      `${chi} vuole aggiungere ${quali} già pubblicate alla pagina «${pagina}».\n\n` +
+      `Le foto restano dove sono; su «${pagina}» compaiono solo dopo l'approvazione.\n` +
+      `Per decidere: https://prestigerent.com/admin/gallery/approva/\n`,
+  });
+}
+
+/** L'admin decide sui tag proposti: approvati compaiono sul sito, in fondo
+ *  alla pagina; rifiutati spariscono. La foto non si tocca in nessuno dei
+ *  due casi -- era gia' approvata, e resta dov'era. */
+export async function decidiProposte(
+  voci: { image_id: string; tag_id: string }[],
+  approva: boolean
+): Promise<Esito & { quante?: number }> {
+  const agente = await chiAgisce(RUOLI_GESTIONE);
+  if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
+  if (!voci.length) return { ok: false, errore: 'Nessuna proposta selezionata.' };
+
+  const sb = await supabaseServer();
+  let quante = 0;
+  const tagToccati = [...new Set(voci.map((v) => v.tag_id))];
+
+  if (approva) {
+    /* In fondo ADESSO, come le foto approvate dalla coda: compaiono ora. */
+    const esistenti = await legamiDi(sb, tagToccati);
+    for (const v of voci) {
+      const posizione = inFondo(esistenti, v.tag_id, v.image_id);
+      const { error, count } = await sb
+        .from('gallery_image_tags')
+        .update({ in_attesa: false, position: posizione }, { count: 'exact' })
+        .eq('image_id', v.image_id)
+        .eq('tag_id', v.tag_id)
+        .eq('in_attesa', true);
+      if (error) return { ok: false, errore: error.message };
+      if (count) {
+        quante += count;
+        /* la prossima approvata sulla stessa pagina va DOPO questa */
+        esistenti.push({ image_id: v.image_id, tag_id: v.tag_id, position: posizione });
+      }
+    }
+    if (quante) {
+      const { data: tr } = await sb.from('gallery_tags').select('path').in('id', tagToccati);
+      rinfresca(((tr ?? []) as { path: string }[]).map((r) => r.path));
+    }
+  } else {
+    for (const v of voci) {
+      const { error, count } = await sb
+        .from('gallery_image_tags')
+        .delete({ count: 'exact' })
+        .eq('image_id', v.image_id)
+        .eq('tag_id', v.tag_id)
+        .eq('in_attesa', true);
+      if (error) return { ok: false, errore: error.message };
+      quante += count ?? 0;
+    }
+  }
+
+  if (!quante) return { ok: false, errore: 'Nessuna di queste proposte è ancora in attesa.' };
+  return { ok: true, quante };
 }

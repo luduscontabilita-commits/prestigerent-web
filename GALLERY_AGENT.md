@@ -154,6 +154,8 @@ Si usano i ruoli che c'erano già in `profili`, **senza aggiungerne**:
 | approva / rifiuta / nasconde | sì | no |
 | corregge foto altrui | sì | no |
 | corregge le proprie | sempre | solo in attesa o rifiutate |
+| una pagina su più foto (`BarraTag`) | sì, subito, su qualunque foto | sulle proprie: subito se in attesa o rifiutate; **proposta** se già approvate |
+| toglie una pagina da una foto pubblicata | sì | no (ritira solo le proprie proposte) |
 | Pagine, Impostazioni | sì | non le vede |
 | resto di `/admin` | sì | no |
 
@@ -261,6 +263,52 @@ pagina (`GalleryFotoPagina.tsx`). Deciso con la proprietà il 27/09/2026:
 Azioni: `fotoDellaPagina()` e `salvaFotoPagina()` in `azioni.ts`, tutte e
 due dietro `chiAgisce(RUOLI_GESTIONE)`. Hanno sostituito `riordinaPagina()`,
 che esisteva ma non la chiamava nessuno.
+
+---
+
+## Una pagina su più foto, e le pagine proposte (dal 28/09/2026)
+
+Chiesto dalla proprietà il 28/09/2026. Si selezionano le foto, si sceglie
+**una** pagina dal menu della barra fissa in basso (`BarraTag.tsx`), si
+preme **Aggiungi** o **Togli**. La stessa barra sta in tre posti: il
+caricamento, «Le mie foto», «Tutte le foto». I gruppi del menu (Album,
+Home, Categorie, Porti, Tour) stanno in `gruppi-pagine.ts`, un modulo
+**senza** `'use client'` perché è solo dati.
+
+Le regole stanno tutte in `tagInBlocco()` (`azioni.ts`), una per i due ruoli:
+
+- **admin**: agisce subito, su qualunque foto. Aggiungere mette la foto in
+  fondo (`inFondo()`), più foto nell'ordine in cui sono state selezionate;
+- **guida, foto in attesa o rifiutate**: agisce subito, tanto non sono sul
+  sito;
+- 🔴 **guida, foto già approvate**: la foto **resta online dov'era** e la
+  pagina nuova diventa una **proposta** — un legame con `in_attesa = true`,
+  firmato (`proposto_da`, `proposto_il`). Parte un'email agli admin, una per
+  gesto. L'admin la decide dalla coda «Da approvare», nel riquadro «Pagine
+  proposte su foto già pubblicate» (`GalleryProposte.tsx`,
+  `decidiProposte()`): approvata va **in fondo** a quella pagina, rifiutata
+  sparisce. La foto non si tocca in nessuno dei due casi;
+- una guida **non toglie** una pagina da una foto pubblicata (lo fa un
+  admin) e **non tocca** le foto nascoste;
+- **nessuno** toglie con un «Togli» in blocco l'**ultima** pagina di una
+  foto: senza pagine sarebbe invisibile ovunque. Per toglierla dal sito ci
+  sono «Nascondi» ed «Elimina».
+
+🔴 **Una proposta non esiste per il sito, per costruzione** (migrazione
+`20260928_gallery_tag_proposti.sql`): la vista `gallery_public` — l'unica
+che le pagine leggono, e da cui contano soglia e ordine — esclude
+`in_attesa`, e la lettura pubblica dei legami pure. La RLS lascia a una
+guida, sulle proprie foto approvate, **solo** legami `in_attesa` firmati da
+lei: non può pubblicarsi un tag da sola nemmeno chiamando l'azione a mano.
+
+`aggiornaFoto()` («Correggi») **non tocca le proposte**: il modulo mostra
+solo le pagine pubblicate, e senza questa esclusione un admin che sistema
+una didascalia cancellerebbe in silenzio le proposte di una guida. Se
+l'admin spunta proprio una pagina proposta, la proposta diventa pubblicata.
+
+Nel pannello le proposte si vedono come etichette arancioni «· in attesa»
+(Le mie foto) o «· proposta» (Tutte le foto); il filtro per pagina di
+«Tutte le foto» considera solo le pagine dove la foto c'è davvero.
 
 ---
 

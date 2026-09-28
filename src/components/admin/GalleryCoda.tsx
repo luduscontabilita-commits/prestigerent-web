@@ -122,7 +122,7 @@ export function GalleryCoda({
   if (!resto.length) {
     return (
       <Alert color="green" icon={<IconCheck size={18} />}>
-        Niente da approvare. {messaggio?.ok && messaggio.testo}
+        Nessuna foto nuova da approvare. {messaggio?.ok && messaggio.testo}
       </Alert>
     );
   }

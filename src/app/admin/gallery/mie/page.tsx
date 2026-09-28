@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { urlFoto } from '@/lib/gallery-dati';
 import { GalleryMie, type MiaFoto } from '@/components/admin/GalleryMie';
-import { aggiornaFoto, elimina, pagineTaggabili, reinvia } from '../azioni';
+import { aggiornaFoto, elimina, pagineTaggabili, reinvia, tagInBlocco } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -21,7 +21,7 @@ type Riga = {
   storage_path: string;
   created_at: string;
   blur_data_url: string | null;
-  gallery_image_tags: { gallery_tags: { key: string; label: string } | null }[];
+  gallery_image_tags: { in_attesa: boolean; gallery_tags: { key: string; label: string } | null }[];
 };
 
 /* «LE MIE FOTO»: dove una guida vede cosa e' successo a quello che ha
@@ -43,7 +43,7 @@ export default async function Mie() {
     .from('gallery_images')
     .select(
       'id,alt,caption,status,review_note,bucket,storage_path,created_at,blur_data_url,' +
-        'gallery_image_tags(gallery_tags(key,label))'
+        'gallery_image_tags(in_attesa,gallery_tags(key,label))'
     )
     .eq('uploaded_by', io.id)
     .order('created_at', { ascending: false });
@@ -73,10 +73,23 @@ export default async function Mie() {
         ? urlFoto({ bucket: r.bucket, storage_path: r.storage_path })
         : (firme[r.storage_path] ?? null),
     caricata: r.created_at,
-    pagine: r.gallery_image_tags.map((t) => t.gallery_tags?.label).filter((l): l is string => !!l),
+    /* Le pagine PUBBLICATE da una parte, quelle PROPOSTE e in attesa
+       dell'admin dall'altra (28/09/2026): una proposta non e' una pagina
+       su cui la foto si vede, e confonderle farebbe credere il contrario. */
+    pagine: r.gallery_image_tags
+      .filter((t) => !t.in_attesa)
+      .map((t) => t.gallery_tags?.label)
+      .filter((l): l is string => !!l),
+    proposte: r.gallery_image_tags
+      .filter((t) => t.in_attesa)
+      .map((t) => t.gallery_tags?.label)
+      .filter((l): l is string => !!l),
     /* Le CHIAVI oltre alle etichette: servono al modulo di correzione,
        che deve poter rimettere le spunte su quello che c'era. */
-    chiavi: r.gallery_image_tags.map((t) => t.gallery_tags?.key).filter((k): k is string => !!k),
+    chiavi: r.gallery_image_tags
+      .filter((t) => !t.in_attesa)
+      .map((t) => t.gallery_tags?.key)
+      .filter((k): k is string => !!k),
   }));
 
   return (
@@ -94,6 +107,7 @@ export default async function Mie() {
         reinvia={reinvia}
         elimina={elimina}
         aggiornaFoto={aggiornaFoto}
+        tagInBlocco={tagInBlocco}
       />
     </Guscio>
   );

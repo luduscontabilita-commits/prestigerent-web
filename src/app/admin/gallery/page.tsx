@@ -59,14 +59,19 @@ export default async function GalleryIndice() {
 
   /* `head: true` e `count`: torna solo il numero, non le righe. La coda
      puo' avere centinaia di foto e qui serve un contatore. */
-  const [{ count: inAttesa }, { count: approvate }, { count: pagine }, { data: imp }] = sb
+  const [{ count: fotoInAttesa }, { count: approvate }, { count: pagine }, { data: imp }, { count: proposte }] = sb
     ? await Promise.all([
         sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'in_attesa'),
         sb.from('gallery_images').select('id', { count: 'exact', head: true }).eq('status', 'approvata'),
         sb.from('gallery_tags').select('id', { count: 'exact', head: true }).eq('is_orphan', false),
         sb.from('gallery_settings').select('galleries_enabled,min_images').eq('id', 1).maybeSingle(),
+        /* le pagine proposte dalle guide su foto gia' approvate: anche
+           quelle aspettano un admin (28/09/2026) */
+        sb.from('gallery_image_tags').select('image_id', { count: 'exact', head: true }).eq('in_attesa', true),
       ])
-    : [{ count: 0 }, { count: 0 }, { count: 0 }, { data: null }];
+    : [{ count: 0 }, { count: 0 }, { count: 0 }, { data: null }, { count: 0 }];
+
+  const inAttesa = (fotoInAttesa ?? 0) + (proposte ?? 0);
 
   const impostazioni = imp as { galleries_enabled: boolean; min_images: number } | null;
   const accesa = impostazioni?.galleries_enabled ?? false;

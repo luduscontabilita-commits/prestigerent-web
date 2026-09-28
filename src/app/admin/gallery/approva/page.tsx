@@ -5,7 +5,9 @@ import { soloGestione, supabaseServer } from '@/lib/auth';
 import { firmaAnteprime } from '@/lib/gallery-file';
 import { bassaRisoluzione, verraRitagliata } from '@/lib/gallery-tag';
 import { GalleryCoda, type InCoda } from '@/components/admin/GalleryCoda';
-import { aggiornaFoto, approva, pagineTaggabili, rifiuta } from '../azioni';
+import { GalleryProposte, type Proposta } from '@/components/admin/GalleryProposte';
+import { urlFoto } from '@/lib/gallery-dati';
+import { aggiornaFoto, approva, decidiProposte, pagineTaggabili, rifiuta } from '../azioni';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -28,7 +30,7 @@ export default async function Approva() {
   const io = await soloGestione();
 
   const sb = await supabaseServer();
-  const [{ data }, pagine] = await Promise.all([
+  const [{ data }, pagine, { data: pr }] = await Promise.all([
     sb
       .from('gallery_images')
       .select(
@@ -40,7 +42,40 @@ export default async function Approva() {
          guardato per primo. */
       .order('created_at', { ascending: true }),
     pagineTaggabili(),
+    /* Le pagine proposte dalle guide su foto GIA' approvate (28/09/2026).
+       Le foto stanno nel bucket pubblico: l'indirizzo non va firmato. */
+    sb
+      .from('gallery_image_tags')
+      .select(
+        'image_id,tag_id,proposto_il,gallery_tags(label,path),' +
+          'gallery_images(alt,bucket,storage_path,blur_data_url),profili:proposto_da(nome,email)'
+      )
+      .eq('in_attesa', true)
+      .order('proposto_il', { ascending: true }),
   ]);
+
+  type RigaProposta = {
+    image_id: string;
+    tag_id: string;
+    proposto_il: string;
+    gallery_tags: { label: string; path: string } | null;
+    gallery_images: { alt: string; bucket: string; storage_path: string; blur_data_url: string | null } | null;
+    profili: { nome: string | null; email: string } | null;
+  };
+  const proposte: Proposta[] = ((pr ?? []) as unknown as RigaProposta[])
+    .filter((r) => r.gallery_tags && r.gallery_images)
+    .map((r) => ({
+      image_id: r.image_id,
+      tag_id: r.tag_id,
+      pagina: r.gallery_tags!.label,
+      path: r.gallery_tags!.path,
+      alt: r.gallery_images!.alt,
+      anteprima: urlFoto({ bucket: r.gallery_images!.bucket, storage_path: r.gallery_images!.storage_path }),
+      colore: r.gallery_images!.blur_data_url,
+      /* Mai l'email di una guida: e' l'indirizzo interno finto. */
+      chi: r.profili?.nome ?? 'una guida',
+      quando: r.proposto_il,
+    }));
 
   const righe = (data ?? []) as unknown as Riga[];
 
@@ -80,13 +115,14 @@ export default async function Approva() {
       chi={comeSiChiama(io)}
       ruolo={io.ruolo}
       voci={vociPerRuolo(io.ruolo)}
-      titolo={`Da approvare${foto.length ? ` (${foto.length})` : ''}`}
+      titolo={`Da approvare${foto.length + proposte.length ? ` (${foto.length + proposte.length})` : ''}`}
       sottotitolo={<>
           Si approva la foto <b>insieme</b> alla sua descrizione e alle sue pagine: un tag
           messo da una guida arriva sul sito solo da qui.
         </>}
     >
 
+      <GalleryProposte proposte={proposte} decidiProposte={decidiProposte} />
       <GalleryCoda
         foto={foto}
         pagine={pagine}
