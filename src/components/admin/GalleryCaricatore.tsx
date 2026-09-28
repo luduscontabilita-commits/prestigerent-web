@@ -458,8 +458,12 @@ export function GalleryCaricatore({
       {/* La stessa scelta delle spunte qui sopra, ma sempre a portata di
           dito: sul telefono l'elenco delle pagine sta sotto tutte le foto.
           Agisce sulle foto selezionate, o su tutte se non ne e' selezionata
-          nessuna -- esattamente come le spunte. */}
-      {schede.length > 0 && (
+          nessuna -- esattamente come le spunte.
+          🔴 SOLO PER L'ADMIN (`approvaSubito`). Tolta alla guida il
+          28/09/2026 su richiesta della proprieta': nel suo caricamento
+          basta l'elenco delle pagine con le spunte, che fa la stessa cosa.
+          In «Le mie foto» la guida la barra ce l'ha ancora. */}
+      {schede.length > 0 && approvaSubito && (
         <BarraTag
           quante={bersagli.length}
           descrizione={

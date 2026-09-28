@@ -40,9 +40,9 @@ Tocca **«Foto della gallery»**, poi **«Carica e tagga»**.
    selezionarne quante vuoi, fino a 40 per volta.
 2. Ogni foto compare come una scheda. Aspetta un attimo: il telefono la
    sta rimpicciolendo.
-3. Scegli **le pagine** dove la foto deve comparire: a destra (o sotto,
-   sul telefono), oppure dalla barra in fondo allo schermo. Puoi
-   sceglierne più di una. **Non c'è niente da scrivere**: nessuna
+3. Scegli **le pagine** dove la foto deve comparire, spuntandole
+   nell'elenco a destra (o sotto, sul telefono). Puoi sceglierne più di
+   una. **Non c'è niente da scrivere**: nessuna
    descrizione, nessuna didascalia.
 4. **«Invia per approvazione»**.
 
