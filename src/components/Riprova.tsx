@@ -61,8 +61,9 @@ export function FasciaFiducia({ dati, compatta }: { dati: Dati; compatta?: boole
           : ''
       }`.trim(),
     });
-  if (TUTTI && azienda?.mezzi_minibus)
-    voci.push({ n: `${azienda.mezzi_minibus}`, t: 'minibuses we own, plus our Mercedes cars' });
+  /* Il conteggio dei minibus ("11 minibuses we own") e' stato tolto il
+     03/10/2026 su decisione della proprieta': fa sembrare piccoli. Il dato
+     resta in `azienda.mezzi_minibus`, ma non si stampa. */
 
   if (!voci.length) return null;
 

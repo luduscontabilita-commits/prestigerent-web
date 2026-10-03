@@ -56,7 +56,8 @@ const FLOTTA = BASE + 'lp/img/flotta-prestige-toscana.webp';
 const COPERTINA = BASE + 'wp/2021/09/PVT-6.jpg';
 
 /* I posti del van piu' grande (Sprinter, vedi /our-vehicles/) e dei bus.
-   La tabella `azienda` ha quanti bus ci sono (`mezzi_minibus`) ma non i
+   Il NUMERO dei bus non si scrive (03/10/2026, decisione della proprieta':
+   "11" fa sembrare piccoli). La tabella `azienda` ha quanti bus ci sono ma non i
    posti: questi due numeri vengono dalla proprieta' (02/10/2026). */
 const POSTI_VAN = 8;
 const POSTI_BUS = 25;
@@ -383,8 +384,8 @@ export default async function Matrimoni({
         <article>
           <h2>For all the guests</h2>
           <p>
-            {a?.mezzi_minibus ?? 11} coaches with {POSTI_BUS} seats each, so a whole guest
-            list moves together.
+            {POSTI_BUS}-seat coaches for all the guests, so a whole guest list moves
+            together.
           </p>
         </article>
       </section>

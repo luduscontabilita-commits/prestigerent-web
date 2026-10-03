@@ -590,7 +590,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             )}
             <span><i>🏆</i> Viator Experience Award &amp; Travelers&rsquo; Choice</span>
             <span><i>🛡️</i> Free cancellation up to 24 hours</span>
-            <span><i>🚐</i> Our own {az?.mezzi_minibus} minibuses, our own drivers</span>
+            <span><i>🚐</i> Our own minibuses, our own drivers</span>
           </div>
 
           <div className="hm-cta">
@@ -728,13 +728,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </p>
           </div>
 
-          {/* I numeri della flotta vengono dal database, non da qui.
-              Erano scritti a mano, e quello delle auto diceva 10 mentre
-              sono 8: e' una promessa al cliente, e stava nell'unico posto
-              dove nessuno sarebbe andato a correggerlo. */}
+          {/* 🔴 IL CONTEGGIO DEI MEZZI NON SI MOSTRA PIU' (03/10/2026,
+              decisione della proprieta': "11 minibus" e "8 auto" fanno
+              sembrare piccoli). Resta il tipo di mezzo, senza il numero. */}
           <div className="hm-fleet-count">
-            <div><b>{az?.mezzi_minibus ?? 11}</b><span>25-seat minibuses</span></div>
-            <div><b>{az?.mezzi_auto_numero ?? 8}</b><span>Mercedes cars &amp; vans</span></div>
+            <div><b>25</b><span>seats on our minibuses</span></div>
+            <div><b>Mercedes</b><span>cars &amp; vans, our own</span></div>
             {/* 🔴 QUI C'ERA "25 guests in one vehicle". Tolto: lo dice gia'
                 il riquadro di fianco, "25-seat minibuses". Due numeri
                 uguali affiancati che raccontano lo stesso fatto non fanno
@@ -763,7 +762,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               <img className="photo" src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/Piazzale-Montelungo-minibuses-2022.webp" alt="Prestige Rent 25-seat minibuses in Florence" loading="lazy" />
               <em>Minibus</em>
               <b>25-seat coach</b>
-              <span>Eleven in our fleet</span>
+              <span>Up to 25 guests</span>
             </figure>
           </div>
         </div>

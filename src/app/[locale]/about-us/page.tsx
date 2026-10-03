@@ -96,7 +96,7 @@ export default async function ChiSiamo({
         <article>
           <h2>Our own vehicles, not a phone number</h2>
           <p>
-            We own and maintain {a?.mezzi_minibus} minibuses and our {a?.mezzi_auto},
+            We own and maintain our 25-seat minibuses and our {a?.mezzi_auto},
             garaged here in {a?.citta}. When you book a tour with us, you already know
             which company will be at your hotel — because it is the same one that took
             your money.

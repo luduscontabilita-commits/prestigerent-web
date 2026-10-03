@@ -233,10 +233,11 @@ export async function Footer({ locale }: { locale: string }) {
         <div className="ft-col ft-about">
           <strong>Prestige Rent</strong>
           <p>
-            Tours and private transfers across Italy, from {a?.citta ?? 'Florence'} since{' '}
-            {a?.anno_fondazione}. We own our fleet &mdash; {a?.mezzi_minibus} minibuses and
-            our {a?.mezzi_auto} &mdash; and our drivers are our own staff, not
-            subcontractors.
+            {/* Testo della proprieta', alla lettera (03/10/2026). Fisso e non
+                dal database: il conteggio dei minibus non va piu' mostrato. */}
+            Tours and private transfers across Italy, from Florence since 2000. Direct
+            ownership and management of top-of-the-line Mercedes-Benz E Class &amp; S Class
+            Sedans, V-Class MPVs, Sprinter Vans, Minibuses and Buses.
           </p>
           <p className="ft-nap">
             {a?.indirizzo}<br />
