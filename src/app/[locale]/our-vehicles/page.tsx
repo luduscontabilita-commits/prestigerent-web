@@ -152,35 +152,30 @@ export default async function Mezzi({
         </p>
       </header>
 
-      {/* %s LA FOTO DELLA FLOTTA INTERA, e non e' decorazione.
-          Chiesta dalla proprieta' -- sul sito vecchio stava in cima a
-          questa pagina -- e vale piu' delle quattro schede messe insieme:
-          dieci mezzi veri, in fila nel loro piazzale, con le targhe. Le
-          quattro foto qui sotto sono immagini di catalogo Mercedes, che
-          chiunque puo' scaricare; questa no, e dice la sola cosa che i
-          concorrenti non possono dire -- che i mezzi sono suoi.
+      {/* LA FLOTTA IN CIMA ALLA PAGINA (03/10/2026, decisione della
+          proprieta'): l'immagine della flotta davanti a una villa toscana
+          ha preso il posto della foto del piazzale (`our-veichles-bg.jpg`),
+          ed e' l'unica foto della flotta in pagina. E' illustrativa: alt e
+          didascalia restano neutri, non dicono "foto" ne' "il nostro
+          piazzale".
 
-          Sotto il titolo e non dietro, con la scritta sopra: il cielo di
-          questa foto e' bianco, e un testo chiaro sopra un cielo bianco
-          non si legge. Scurirla con un velo per far stare la scritta
-          significherebbe rovinare l'unica cosa che la foto deve fare,
-          cioe' farsi guardare.
+          Sotto il titolo e non dietro, con la scritta sopra: il testo sopra
+          la foto si leggerebbe male, e scurirla con un velo rovinerebbe
+          l'unica cosa che deve fare, cioe' farsi guardare.
 
           `priority`: e' l'immagine grande in cima, quella che decide
           quanto la pagina SEMBRA veloce. Senza, Next la carica pigra e
           resta un rettangolo grigio per mezzo secondo. */}
       <figure className="vh-flotta">
         <Image
-          src={BASE + 'wp/2021/09/our-veichles-bg.jpg'}
-          alt="The Prestige Rent fleet lined up: Mercedes V Class, E Class, S Class, Sprinter vans and a minibus"
-          width={1920}
-          height={1080}
+          src={BASE + 'lp/img/flotta-prestige-toscana.webp'}
+          alt="Prestige Rent fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
+          width={1600}
+          height={872}
           priority
           sizes="(max-width: 1180px) 100vw, 1140px"
         />
-        <figcaption>
-          Our fleet, in our yard in Florence. Every vehicle on this page is one of these.
-        </figcaption>
+        <figcaption>Our fleet: Mercedes sedans, vans and minibuses</figcaption>
       </figure>
 
       <FasciaFiducia dati={d} />
@@ -197,23 +192,6 @@ export default async function Mezzi({
           not at the edge of the restricted area with your luggage.
         </p>
       </section>
-
-      {/* LA FLOTTA DAVANTI A UNA VILLA TOSCANA, in evidenza prima delle
-          schede (03/10/2026). E' un'immagine illustrativa: per questo alt e
-          didascalia restano neutri e non dicono "foto" ne' "il nostro
-          piazzale" -- quella prova la da' la foto vera qui sopra, che resta.
-          Sotto la piega: pigra. */}
-      <figure className="vh-flotta">
-        <Image
-          src={BASE + 'lp/img/flotta-prestige-toscana.webp'}
-          alt="Prestige Rent fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
-          width={1600}
-          height={872}
-          loading="lazy"
-          sizes="(max-width: 1180px) 100vw, 1140px"
-        />
-        <figcaption>Our fleet: Mercedes sedans, vans and minibuses</figcaption>
-      </figure>
 
       <section className="vh-mezzi">
         {MEZZI.map((m) => (
