@@ -3746,3 +3746,79 @@ html[data-theme="dark"] .pr-paybanner img{
 @media (max-width:760px){
   .vh-mezzi{ grid-template-columns:1fr; gap:26px; }
 }
+
+/* ─── PAGINA /weddings/ (bozza 02/10/2026) ──────────────────────────────
+   Riusa i blocchi di "chi siamo" (.ab-*), della flotta (.vh-flotta) e la
+   griglia delle categorie (.ct-griglia/.ct-card): qui solo quello che
+   quelle pagine non hanno -- i tre momenti, la giornata tipo, Cortine. */
+.wd-cta{ margin:22px 0 0; display:flex; gap:14px; justify-content:center; align-items:center; flex-wrap:wrap; }
+.wd-cta span{ font-size:.86rem; font-weight:700; color:var(--ink-soft); }
+.wd-btn{
+  display:inline-block; background:var(--orange); color:#fff; font-weight:800;
+  padding:13px 22px; border-radius:999px; text-decoration:none;
+}
+.wd-btn:hover{ background:var(--orange-d); }
+/* Il video e' verticale (9:16): accanto al titolo su schermo largo,
+   sotto e centrato su telefono. A tutta larghezza andrebbe tagliato. */
+.wd-apertura{ display:grid; grid-template-columns:1fr minmax(260px,360px); gap:36px; align-items:center; }
+.wd-apertura .ab-hero{ text-align:left; }
+.wd-apertura .ab-lead{ margin-left:0; }
+.wd-apertura .wd-cta{ justify-content:flex-start; }
+.wd-video{ margin:26px 0 0; }
+.wd-video img, .wd-video video{
+  width:100%; height:auto; display:block; border-radius:14px; background:var(--ph);
+  aspect-ratio:9/16; object-fit:cover; max-height:78svh;
+}
+.wd-contatti{ margin:22px 0 0; display:flex; gap:14px; flex-wrap:wrap; }
+.wd-contatti a{
+  display:flex; flex-direction:column; gap:2px; text-decoration:none;
+  background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 18px;
+}
+.wd-contatti a:hover{ border-color:var(--orange); }
+.wd-contatti span{ font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); }
+.wd-contatti b{ font-size:1.08rem; color:var(--ink); font-variant-numeric:tabular-nums; }
+.wd-sez{ margin:46px 0 0; }
+.wd-tit{ font-size:clamp(1.4rem,3vw,1.9rem); font-weight:800; color:var(--ink); margin:0; line-height:1.18; }
+.wd-intro{ max-width:760px; margin:12px 0 22px; color:var(--ink-soft); font-size:1rem; line-height:1.66; }
+.wd-momenti{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.wd-momenti article{
+  background:var(--card); border:1px solid var(--line); border-top:3px solid var(--orange);
+  border-radius:16px; padding:22px; display:flex; flex-direction:column;
+}
+.wd-n{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-size:1.8rem; color:var(--orange); line-height:1; }
+.wd-momenti h3{ margin:8px 0 8px; font-size:1.1rem; font-weight:800; color:var(--ink); }
+.wd-momenti ul{ margin:0; padding-left:18px; color:var(--ink-soft); font-size:.93rem; line-height:1.6; }
+.wd-momenti li + li{ margin-top:4px; }
+.wd-prezzo{ margin:auto 0 0; padding-top:14px; font-size:.78rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--wine); }
+.wd-giornata{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+.wd-giornata li{
+  display:grid; grid-template-columns:70px 200px 1fr; gap:14px; align-items:baseline;
+  padding:13px 4px; border-bottom:1px solid var(--line); font-size:.95rem;
+}
+.wd-giornata b{ color:var(--orange); font-variant-numeric:tabular-nums; }
+.wd-giornata strong{ color:var(--ink); }
+.wd-giornata span{ color:var(--ink-soft); }
+.wd-nota{ margin:10px 0 0; font-size:.84rem; color:var(--ink-soft); }
+.wd-cortine{
+  margin:46px 0 0; display:grid; grid-template-columns:1fr 1.3fr; gap:26px; align-items:center;
+  background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px;
+}
+.wd-cortine-foto img{ width:100%; height:auto; display:block; border-radius:12px; }
+.wd-cortine p:not(.ab-kicker){ margin:10px 0 0; color:var(--ink-soft); line-height:1.66; }
+.wd-passi{ margin:18px 0 0; padding-left:22px; color:var(--ink-soft); line-height:1.66; }
+.wd-passi li + li{ margin-top:10px; }
+.wd-passi b{ color:var(--ink); }
+.wd-citazione{
+  margin:24px 0 0; padding:6px 0 6px 18px; border-left:3px solid var(--orange);
+  font-family:'Fraunces',Georgia,serif; font-style:italic; font-size:1.25rem; line-height:1.4; color:var(--ink);
+}
+@media (max-width:760px){
+  .wd-apertura{ grid-template-columns:1fr; gap:0; }
+  .wd-apertura .ab-hero{ text-align:center; }
+  .wd-apertura .ab-lead{ margin-left:auto; }
+  .wd-apertura .wd-cta{ justify-content:center; }
+  .wd-video{ max-width:340px; margin:22px auto 0; }
+  .wd-giornata li{ grid-template-columns:60px 1fr; }
+  .wd-giornata span{ grid-column:2; }
+  .wd-cortine{ grid-template-columns:1fr; }
+}

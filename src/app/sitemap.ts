@@ -80,6 +80,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: alternative('/contact-us/'),
     },
 
+    /* I matrimoni (03/10): fuori dal menu, si manda via link, ma indicizzata. */
+    {
+      url: percorso(DEFAULT_LOCALE, '/weddings/'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: alternative('/weddings/'),
+    },
+
     /* Le 145 domande: e' la pagina con piu' testo del sito e risponde a
        ricerche che nessun'altra pagina copre. */
     {

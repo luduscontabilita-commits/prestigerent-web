@@ -29,6 +29,8 @@ export function ContactSection({
   locale = DEFAULT_LOCALE,
   tour,
   soloAiuto = false,
+  intestazione,
+  maxPersone,
 }: {
   /** la lingua della pagina: senza, il modulo parlerebbe inglese ovunque */
   locale?: string;
@@ -42,8 +44,20 @@ export function ContactSection({
    * cursore nell'altro modulo. Per lo stesso motivo qui sparisce
    * anche `id="contact"`: un'ancora ripetuta non e' un'ancora. */
   soloAiuto?: boolean;
+  /* Il titolo sopra il modulo, quando la pagina ne vuole uno suo (es.
+   * /weddings/: "Ask for a transport plan"). Senza, resta quello di
+   * `testiModulo`, come su tutte le altre pagine. */
+  intestazione?: {
+    occhiello: string;
+    titolo: string;
+    accento: string;
+    titoloCoda: string;
+    sottotitolo: string;
+  };
+  /** il tetto del campo ospiti: vedi `ModuloRichiesta` */
+  maxPersone?: number;
 } = {}) {
-  const t = testiModulo(locale);
+  const t = { ...testiModulo(locale), ...(intestazione ?? {}) };
 
   return (
     <section
@@ -136,7 +150,7 @@ export function ContactSection({
           <p className="pr-lead">{t.sottotitolo}</p>
         </div>
 
-        <ModuloRichiesta locale={locale} tour={tour} />
+        <ModuloRichiesta locale={locale} tour={tour} maxPersone={maxPersone} />
           </>
         )}
       </div>

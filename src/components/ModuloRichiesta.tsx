@@ -41,11 +41,16 @@ type Props = {
   locale: string;
   /** il nome del tour da cui si arriva, se si arriva da una scheda tour */
   tour?: string;
+  /* Il tetto del campo "Number of guests". 60 basta per un tour; per un
+     matrimonio no (80-150 invitati sono normali), e un tetto troppo basso
+     blocca l'invio senza che chi scrive capisca perche'. Il server accetta
+     fino a 30.000 (vedi api/richieste): qui si alza solo dove serve. */
+  maxPersone?: number;
 };
 
 type Stato = 'fermo' | 'invio' | 'fatto';
 
-export function ModuloRichiesta({ locale, tour }: Props) {
+export function ModuloRichiesta({ locale, tour, maxPersone = 60 }: Props) {
   const t = testiModulo(locale);
   /* L'inglese sta alla radice, le altre lingue sotto il loro prefisso:
      la privacy va aperta nella lingua che si sta leggendo, altrimenti
@@ -278,7 +283,7 @@ export function ModuloRichiesta({ locale, tour }: Props) {
         <label className="mr-campo">
           <span>{t.persone}{obb}</span>
           <input
-            name="persone" type="number" required min={1} max={60} inputMode="numeric"
+            name="persone" type="number" required min={1} max={maxPersone} inputMode="numeric"
             placeholder="4" className={rotto('persone')}
           />
         </label>
