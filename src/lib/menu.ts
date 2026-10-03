@@ -489,6 +489,15 @@ export const SEZIONI: Sezione[] = [
           { testo: 'Florence train station', href: '/tour/transfer-florence-train-station/', slug: 'transfer-florence-train-station' },
         ],
       },
+      /* 03/10/2026: la pagina dei matrimoni entra nel menu qui, e non come
+         voce di primo livello: la barra in alto e' gia' piena (sei pannelli
+         piu' FAQ, richiesta, lingue e WhatsApp). */
+      {
+        titolo: 'Chauffeur service',
+        voci: [
+          { testo: 'Weddings in Tuscany', href: '/weddings/', nota: 'Couple’s car & guest shuttles' },
+        ],
+      },
     ],
   },
 

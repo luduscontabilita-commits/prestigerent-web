@@ -13,7 +13,8 @@ import { affiancato, cambi } from '@/lib/cambi';
 import { ogDiPagina } from '@/lib/og';
 import { FasciaFiducia } from '@/components/Riprova';
 import { ContactSection } from '@/components/ContactSection';
-import { organization, breadcrumb, grafo, hreflangDi } from '@/lib/schema';
+import { organization, breadcrumb, grafo, hreflangDi, SITE, ORG_ID } from '@/lib/schema';
+import { ANNO_FONDAZIONE } from '@/lib/anni';
 import '@/styles/home.css';
 
 export const revalidate = 3600;
@@ -42,8 +43,10 @@ export const revalidate = 3600;
  * al titolo e non a tutta larghezza, dove andrebbe tagliato.
  *
  * ── PUBBLICAZIONE ────────────────────────────────────────────────────
- * Approvata il 03/10/2026: indicizzata e nella sitemap, ma fuori dal menu
- * (si manda ai wedding planner via link).
+ * Approvata il 03/10/2026: indicizzata e nella sitemap. Dal 03/10/2026 e' anche
+ * nel menu (pannello Transfers, colonna "Chauffeur service") e nel footer.
+ * Stesso giorno: title/description/H1 per "wedding chauffeur Tuscany",
+ * nodi Service e FAQPage, sezioni navette e localita', FAQ.
  */
 
 const BASE = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/';
@@ -128,6 +131,46 @@ const GIORNATA = [
   { ora: '00:30', cosa: 'Last dance', come: "Coaches back to every hotel; the couple's car on call" },
 ];
 
+/* SEO (03/10/2026): le localita' per cui si cercano i trasporti dei
+   matrimoni. Finiscono in `areaServed` del nodo Service e nella sezione
+   "Weddings across Tuscany". Solo posti dove lavoriamo davvero (tour e
+   transfer esistenti). */
+const LUOGHI = [
+  'Florence',
+  'Siena',
+  'Chianti',
+  "Val d'Orcia",
+  'San Gimignano',
+  'Lucca',
+  'Cortona',
+  'Montepulciano',
+];
+
+/* Le FAQ: solo cose gia' dette nella pagina (niente promesse nuove).
+   Le stesse domande vanno nel nodo FAQPage dei dati strutturati. */
+const FAQ: [string, string][] = [
+  [
+    'How much does wedding transportation in Tuscany cost?',
+    'Every wedding is quoted on its own, because it depends on the date, the number of guests, the venues and the hotels. Send us the basics and we usually send a transport plan with a tailored quote the same day.',
+  ],
+  [
+    'Do you use your own cars and drivers?',
+    'Yes. The Mercedes sedans, vans, minibuses and coaches are our own, and so are the English-speaking drivers. Nothing is subcontracted, and one dispatch team coordinates every vehicle on the day.',
+  ],
+  [
+    'Can you shuttle guests between several hotels and the wedding villa?',
+    'Yes. Coaches pick up guests at each hotel, timed so every group arrives together before the ceremony. At night, vans take families and older guests back first, and the last coaches leave after the last dance.',
+  ],
+  [
+    'Which areas of Tuscany do you cover?',
+    "Florence and all of Tuscany: Siena, Chianti, Val d'Orcia, San Gimignano, Lucca, Cortona, Montepulciano and the villas and castles in between. We also work in Rome, Venice, Milan and most of Italy.",
+  ],
+  [
+    'Can you also handle airport arrivals and tours for our guests?',
+    'Yes. We meet guests at Florence, Pisa or Rome airport and at the train station, and we run welcome-day and post-wedding tours to the Chianti wineries, Siena, San Gimignano, Cinque Terre and Val d’Orcia, all in the same transport plan.',
+  ],
+];
+
 const PASSI = [
   ['Send us the basics.', 'Wedding date, number of guests, the venue and the hotels. A rough idea is enough to start.'],
   ['We send a transport plan and a quote.', 'Vehicles, timings and drivers for arrivals, the wedding day and any tours, usually the same day.'],
@@ -191,11 +234,13 @@ export async function generateMetadata({
   const { locale } = await params;
   const m = await metaDi('/weddings/', 'en');
   return {
-    title: m?.title ?? 'Wedding Transport in Tuscany — chauffeurs & guest shuttles | Prestige Rent',
+    /* SEO 03/10/2026: title <= 60 e description <= 155 caratteri. Se un
+       giorno si scrive una riga in `seo` per /weddings/, vince quella. */
+    title: m?.title ?? 'Tuscany Wedding Chauffeur & Guest Shuttles | Prestige Rent',
     description:
       m?.description ??
-      'Private chauffeur service for destination weddings in Tuscany: the couple’s car, airport arrivals, ' +
-        'guest shuttles on the day and tours for the guests. Our own cars and drivers, from Florence.',
+      'Wedding chauffeur service in Tuscany: a Mercedes for the couple, guest shuttles from villas ' +
+        `and hotels, airport transfers. Own fleet, Florence since ${ANNO_FONDAZIONE}.`,
     alternates: hreflangDi((l) => (l === DEFAULT_LOCALE ? '/weddings/' : `/${l}/weddings/`), locale),
     openGraph: ogDiPagina({
       locale,
@@ -279,6 +324,30 @@ export default async function Matrimoni({
                 { nome: 'Home', path: '/' },
                 { nome: 'Weddings', path: '/weddings/' },
               ]),
+              /* Il servizio, senza offerte ne' prezzi: i trasporti dei
+                 matrimoni sono sempre su misura. */
+              {
+                '@type': 'Service',
+                '@id': `${SITE}/weddings/#service`,
+                name: 'Wedding chauffeur and guest transportation in Tuscany',
+                serviceType: 'Wedding transportation',
+                url: `${SITE}/weddings/`,
+                provider: { '@id': ORG_ID },
+                description:
+                  'Chauffeur-driven Mercedes cars for the couple, vans, minibuses and coaches for the guests, airport arrivals and guest tours for destination weddings in Tuscany. Own vehicles and drivers, no subcontractors.',
+                areaServed: [
+                  { '@type': 'AdministrativeArea', name: 'Tuscany' },
+                  ...LUOGHI.map((n) => ({ '@type': 'Place', name: `${n}, Tuscany, Italy` })),
+                ],
+              },
+              {
+                '@type': 'FAQPage',
+                mainEntity: FAQ.map(([q, r]) => ({
+                  '@type': 'Question',
+                  name: q,
+                  acceptedAnswer: { '@type': 'Answer', text: r },
+                })),
+              },
             ])
           ),
         }}
@@ -286,14 +355,14 @@ export default async function Matrimoni({
 
       <div className="wd-apertura">
       <header className="ab-hero">
-        <p className="ab-kicker">Wedding transport in Italy</p>
+        <p className="ab-kicker">Every guest, in the right place, on time</p>
         <h1>
-          Every guest, in the right place, <em className="hl place">on time</em>
+          Wedding chauffeur &amp; guest transportation <em className="hl place">in Tuscany</em>
         </h1>
         <p className="ab-lead">
-          Private chauffeur service for destination weddings in Tuscany and across Italy: the
-          couple&rsquo;s car, guest arrivals, shuttles on the day, and the tours around it. One
-          plan, one team, one person to call.
+          Private chauffeur service for destination weddings in Florence, Chianti, Siena and the
+          Tuscan countryside: the couple&rsquo;s car, guest arrivals, shuttles on the day and the
+          tours around it. Our own vehicles and drivers, from Florence since {ANNO_FONDAZIONE}.
         </p>
         <p className="wd-cta">
           <a className="wd-btn" href="#richiesta">Ask for a transport plan</a>
@@ -314,7 +383,7 @@ export default async function Matrimoni({
             loop
             playsInline
             preload="metadata"
-            aria-label="A proposal among the vineyards in Tuscany"
+            aria-label="A wedding proposal among the vineyards in Tuscany"
           />
         ) : (
           <Image
@@ -357,14 +426,19 @@ export default async function Matrimoni({
 
       <section className="wd-sez">
         <p className="ab-kicker">Our fleet</p>
-        <h2 className="wd-tit">Many solutions, one for every group</h2>
+        <h2 className="wd-tit">The wedding fleet: from the couple&rsquo;s car to the guest coaches</h2>
+        <p className="wd-intro">
+          Mercedes E Class and S Class sedans, V Class and Sprinter vans, minibuses and coaches,
+          all owned and maintained by us. See every model on{' '}
+          <a href={p('/our-vehicles/')}>our vehicles</a> page.
+        </p>
       </section>
       {/* L'immagine principale della sezione flotta. Sotto la piega: pigra
           (il comportamento predefinito di next/image senza `priority`). */}
       <figure className="vh-flotta">
         <Image
           src={FLOTTA}
-          alt="Prestige Rent fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
+          alt="Prestige Rent wedding fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
           width={1600}
           height={872}
           loading="lazy"
@@ -374,17 +448,23 @@ export default async function Matrimoni({
       </figure>
       <section className="ab-cols">
         <article>
-          <h2>For the couple</h2>
-          <p>A Mercedes sedan for the couple, the parents and VIP guests.</p>
-        </article>
-        <article>
-          <h2>For families</h2>
-          <p>Mercedes vans with up to {POSTI_VAN} seats, for families and small groups.</p>
-        </article>
-        <article>
-          <h2>For all the guests</h2>
+          <h3>For the couple</h3>
           <p>
-            {POSTI_BUS}-seat coaches for all the guests, so a whole guest list moves
+            Wedding car hire with a chauffeur: a Mercedes E Class or S Class for the couple, the
+            parents and VIP guests.
+          </p>
+        </article>
+        <article>
+          <h3>For families</h3>
+          <p>
+            Mercedes V Class and Sprinter vans with up to {POSTI_VAN} seats, for families and small
+            groups.
+          </p>
+        </article>
+        <article>
+          <h3>For all the guests</h3>
+          <p>
+            Minibuses and {POSTI_BUS}-seat coaches for all the guests, so a whole guest list moves
             together.
           </p>
         </article>
@@ -392,21 +472,56 @@ export default async function Matrimoni({
 
       <section className="ab-cols">
         <article>
-          <h2>Nothing subcontracted</h2>
+          <h3>Nothing subcontracted</h3>
           <p>Our own cars, our own English-speaking drivers, one dispatch team.</p>
         </article>
         <article>
-          <h2>One contact for you</h2>
+          <h3>One contact for you</h3>
           <p>One plan for the whole wedding, one person to call on the day.</p>
         </article>
         <article>
-          <h2>We answer the same day</h2>
+          <h3>We answer the same day</h3>
           <p>Send a date and a guest count, and you have a transport plan.</p>
         </article>
         <article>
-          <h2>Where we work</h2>
+          <h3>Where we work</h3>
           <p>Florence and all of Tuscany, Rome, Venice, Milan and most of Italy.</p>
         </article>
+      </section>
+
+      <section className="wd-sez">
+        <p className="ab-kicker">Guest shuttles</p>
+        <h2 className="wd-tit">Shuttles for your guests, from hotels and villas to the venue</h2>
+        <p className="wd-intro">
+          Guests are often split between hotels in Florence or Siena and villas out in the
+          countryside, and the venue sits at the end of a narrow country road. We plan a pickup at
+          every hotel, so all the guests arrive together before the ceremony, and we take them back
+          in groups through the evening: vans for families and older guests first, coaches after
+          the last dance. Arriving guests are met at the airport or the train station with our{' '}
+          <a href={p('/transfers/direct-transfers/florence-direct-transfers/')}>
+            Florence transfers
+          </a>{' '}
+          and driven straight to where they are staying.
+        </p>
+      </section>
+
+      <section className="wd-sez">
+        <p className="ab-kicker">Where we drive</p>
+        <h2 className="wd-tit">Weddings in Florence, Siena, Chianti and across Tuscany</h2>
+        <p className="wd-intro">
+          A city wedding in Florence, a villa in the Chianti hills, a castle near Siena or a
+          farmhouse in Val d&rsquo;Orcia: we know these roads because our tours run on them, to <a href={p('/tour/private-tour-to-chianti-wineries/')}>the Chianti wineries</a>,{' '}
+          <a href={p('/tour/private-tour-siena-and-san-gimignano/')}>Siena and San Gimignano</a>,{' '}
+          <a href={p('/tour/private-tour-of-lucca-from-florence/')}>Lucca</a> and{' '}
+          <a href={p('/tour/tour-to-montepulciano-and-cortona/')}>Montepulciano and Cortona</a>.
+          Pickup and return times are agreed in advance with you and the venue.
+        </p>
+        <p className="wd-luoghi">
+          {LUOGHI.map((l) => (
+            <span key={l}>{l}</span>
+          ))}
+          <span>Villas &amp; castles</span>
+        </p>
       </section>
 
       <section className="wd-sez">
@@ -469,8 +584,8 @@ export default async function Matrimoni({
       </section>
 
       <section className="wd-sez">
-        <p className="ab-kicker">Working together</p>
-        <h2 className="wd-tit">From a date to a transport plan</h2>
+        <p className="ab-kicker">How to book</p>
+        <h2 className="wd-tit">From a date to a transport plan, in four steps</h2>
         <ol className="wd-passi">
           {PASSI.map(([t, x]) => (
             <li key={t}>
@@ -492,6 +607,35 @@ export default async function Matrimoni({
             <b>{numeroLeggibile(a?.whatsapp ?? '393338424047')}</b>
           </a>
         </p>
+      </section>
+
+      {/* Le FAQ, con lo stesso markup di /faqs/: `<details>` nativo, il
+          testo resta nel sorgente. Le stesse voci sono nel nodo FAQPage. */}
+      <section className="wd-sez">
+        <p className="ab-kicker">Questions</p>
+        <h2 className="wd-tit">Wedding transportation in Tuscany: common questions</h2>
+        <div className="faq-lista wd-faq">
+          {FAQ.map(([q, r]) => (
+            <details key={q} className="faq-voce">
+              <summary>
+                <span>{q}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M6 9l6 6 6-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </summary>
+              <div className="faq-r">
+                <p>{r}</p>
+              </div>
+            </details>
+          ))}
+        </div>
       </section>
 
       <ContactSection

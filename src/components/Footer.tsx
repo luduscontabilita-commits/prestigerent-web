@@ -54,6 +54,7 @@ const ESPERIENZE = [
   ['Wine and food experiences', '/wine-and-food-experiences/'],
   ['Direct transfers', '/transfers/direct-transfers/'],
   ['Transfers with a stop', '/transfers/transfers-with-stop-enroute/'],
+  ['Wedding transportation', '/weddings/'],
   ['Tours of Italy', '/tours-of-italy/'],
 ];
 

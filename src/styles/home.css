@@ -3812,6 +3812,17 @@ html[data-theme="dark"] .pr-paybanner img{
   margin:24px 0 0; padding:6px 0 6px 18px; border-left:3px solid var(--orange);
   font-family:'Fraunces',Georgia,serif; font-style:italic; font-size:1.25rem; line-height:1.4; color:var(--ink);
 }
+/* SEO 03/10/2026: i titoli delle schede flotta passano da h2 a h3 (un h2 per
+   sezione), con lo stesso aspetto; link nel testo; le localita' in pillole. */
+.wd .ab-cols h3{ font-size:1.06rem; font-weight:800; color:var(--ink); margin:0 0 9px; }
+.wd-intro a{ color:var(--orange); font-weight:700; text-decoration:none; }
+.wd-intro a:hover{ text-decoration:underline; }
+.wd-luoghi{ display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; }
+.wd-luoghi span{
+  font-size:.82rem; font-weight:700; color:var(--ink); background:var(--card);
+  border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+}
+.wd-faq{ max-width:820px; }
 @media (max-width:760px){
   .wd-apertura{ grid-template-columns:1fr; gap:0; }
   .wd-apertura .ab-hero{ text-align:center; }
