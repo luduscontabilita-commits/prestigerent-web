@@ -50,6 +50,9 @@ const BASE = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/
 
 const VIDEO: string | null = BASE + 'lp/video/weddings.mp4';
 const POSTER = BASE + 'lp/video/weddings-poster.jpg';
+/* La flotta davanti a una villa toscana (WebP 1600x872, 284 KB; c'e' anche
+   `-800.webp`). Didascalia neutra: e' un'immagine illustrativa. */
+const FLOTTA = BASE + 'lp/img/flotta-prestige-toscana.webp';
 const COPERTINA = BASE + 'wp/2021/09/PVT-6.jpg';
 
 /* I posti del van piu' grande (Sprinter, vedi /our-vehicles/) e dei bus.
@@ -351,24 +354,23 @@ export default async function Matrimoni({
         </div>
       </section>
 
-      <figure className="vh-flotta">
-        <Image
-          src={BASE + 'wp/2021/09/our-veichles-bg.jpg'}
-          alt="The Prestige Rent fleet lined up: Mercedes V Class, E Class, S Class, Sprinter vans and a minibus"
-          width={1920}
-          height={1080}
-          sizes="(max-width: 1180px) 100vw, 1140px"
-        />
-        <figcaption>
-          Our fleet, in our yard in {a?.citta ?? 'Florence'}: the same cars and drivers on your
-          wedding day.
-        </figcaption>
-      </figure>
-
       <section className="wd-sez">
         <p className="ab-kicker">Our fleet</p>
         <h2 className="wd-tit">Many solutions, one for every group</h2>
       </section>
+      {/* L'immagine principale della sezione flotta. Sotto la piega: pigra
+          (il comportamento predefinito di next/image senza `priority`). */}
+      <figure className="vh-flotta">
+        <Image
+          src={FLOTTA}
+          alt="Prestige Rent fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
+          width={1600}
+          height={872}
+          loading="lazy"
+          sizes="(max-width: 1180px) 100vw, 1140px"
+        />
+        <figcaption>Our fleet: Mercedes sedans, vans and minibuses</figcaption>
+      </figure>
       <section className="ab-cols">
         <article>
           <h2>For the couple</h2>

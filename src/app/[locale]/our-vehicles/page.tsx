@@ -198,6 +198,23 @@ export default async function Mezzi({
         </p>
       </section>
 
+      {/* LA FLOTTA DAVANTI A UNA VILLA TOSCANA, in evidenza prima delle
+          schede (03/10/2026). E' un'immagine illustrativa: per questo alt e
+          didascalia restano neutri e non dicono "foto" ne' "il nostro
+          piazzale" -- quella prova la da' la foto vera qui sopra, che resta.
+          Sotto la piega: pigra. */}
+      <figure className="vh-flotta">
+        <Image
+          src={BASE + 'lp/img/flotta-prestige-toscana.webp'}
+          alt="Prestige Rent fleet: black Mercedes sedans, vans and minibuses at a Tuscan villa"
+          width={1600}
+          height={872}
+          loading="lazy"
+          sizes="(max-width: 1180px) 100vw, 1140px"
+        />
+        <figcaption>Our fleet: Mercedes sedans, vans and minibuses</figcaption>
+      </figure>
+
       <section className="vh-mezzi">
         {MEZZI.map((m) => (
           <article key={m.nome} className="vh-card">
