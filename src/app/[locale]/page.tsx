@@ -590,7 +590,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             )}
             <span><i>🏆</i> Viator Experience Award &amp; Travelers&rsquo; Choice</span>
             <span><i>🛡️</i> Free cancellation up to 24 hours</span>
-            <span><i>🚐</i> Our own minibuses, our own drivers</span>
+            <span><i>🚐</i> Our own vehicles &amp; drivers (no subcontractors)</span>
           </div>
 
           <div className="hm-cta">
