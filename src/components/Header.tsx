@@ -574,7 +574,7 @@ export function Header({
               dell'azienda -- ma resta nel menu, dove c'era gia'. */}
           {/* I MATRIMONI IN TESTATA (03/10/2026): servizio con autista per sposi e ospiti, non un tour --
               per questo non sta in Small Group o Private Tours ma qui, accanto alle FAQ, e in Transfers. */}
-          <a className="hd-faq hd-solo-desk" href={p('/weddings/')}>
+          <a className="hd-faq hd-solo-desk hd-solo-larga" href={p('/weddings/')}>
             Weddings
           </a>
           <a className="hd-faq hd-solo-desk" href={p('/faqs/')}>

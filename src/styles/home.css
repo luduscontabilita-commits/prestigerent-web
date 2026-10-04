@@ -719,6 +719,9 @@
 }
 .hd-faq:active{ transform:translateY(1px); }
 @media (max-width:1179px){ .hd-solo-desk{ display:none; } }
+/* "Weddings" in testata solo sugli schermi molto larghi: sotto, la barra si sovrapponeva al menu (04/10/2026).
+   Resta comunque in Transfers e nel footer. */
+@media (max-width:1499px){ .hd-solo-larga{ display:none; } }
 
 .hd-lang{ position:relative; }
 .hd-lang > button{
