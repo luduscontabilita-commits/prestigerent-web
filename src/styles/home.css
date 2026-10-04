@@ -719,9 +719,6 @@
 }
 .hd-faq:active{ transform:translateY(1px); }
 @media (max-width:1179px){ .hd-solo-desk{ display:none; } }
-/* "Weddings" in testata solo sugli schermi molto larghi: sotto, la barra si sovrapponeva al menu (04/10/2026).
-   Resta comunque in Transfers e nel footer. */
-@media (max-width:1499px){ .hd-solo-larga{ display:none; } }
 
 .hd-lang{ position:relative; }
 .hd-lang > button{
@@ -3836,3 +3833,14 @@ html[data-theme="dark"] .pr-paybanner img{
   .wd-giornata span{ grid-column:2; }
   .wd-cortine{ grid-template-columns:1fr; }
 }
+
+/* LA SECONDA FILA DELLA TESTATA: i matrimoni (Header.tsx). Sottile, a tutta larghezza, mai sopra le voci. */
+.hd-sotto{ border-top:1px solid var(--line); background:color-mix(in srgb, var(--orange) 6%, var(--card)); }
+.hd-sotto a{
+  display:block; max-width:1500px; margin:0 auto; padding:6px 18px; text-align:center;
+  font-size:.8rem; font-weight:600; color:var(--ink); text-decoration:none;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.hd-sotto a:hover{ color:var(--orange); }
+.hd-sotto-k{ font-weight:800; color:var(--orange); margin-right:6px; text-transform:uppercase; letter-spacing:.04em; font-size:.72rem; }
+@media (max-width:560px){ .hd-sotto a{ font-size:.74rem; padding:5px 12px; } }

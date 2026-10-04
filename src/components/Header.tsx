@@ -572,11 +572,6 @@ export function Header({
               pulsante arancione mezzo centimetro piu' in la'.
               Sul telefono sparisce -- lo spazio in testata e' per il nome
               dell'azienda -- ma resta nel menu, dove c'era gia'. */}
-          {/* I MATRIMONI IN TESTATA (03/10/2026): servizio con autista per sposi e ospiti, non un tour --
-              per questo non sta in Small Group o Private Tours ma qui, accanto alle FAQ, e in Transfers. */}
-          <a className="hd-faq hd-solo-desk hd-solo-larga" href={p('/weddings/')}>
-            Weddings
-          </a>
           <a className="hd-faq hd-solo-desk" href={p('/faqs/')}>
             FAQ
           </a>
@@ -662,6 +657,14 @@ export function Header({
           markup: `.hd-nav` diventa un pannello verticale, i pannelli si
           aprono in linea e la vetrina diventa una striscia che si
           trascina col dito. Un solo link per destinazione, sempre. */}
+      {/* LA SECONDA FILA (04/10/2026): i matrimoni sempre visibili. Nella barra non ci stanno -- e' misurata al pixel
+          (vedi .hd-in in home.css) e un pulsante in piu' si sovrapponeva al menu sui 15 pollici. Una fila sottile
+          sotto non tocca le voci e si vede su ogni schermo, telefono compreso. */}
+      <div className="hd-sotto">
+        <a href={p('/weddings/')}>
+          <span className="hd-sotto-k">Weddings</span> Chauffeur &amp; guest shuttles in Florence, Siena and the Chianti <span aria-hidden="true">→</span>
+        </a>
+      </div>
       {(aperta || lingue) && <button className="hd-veil" aria-label="Close menu" onClick={chiudi} />}
     </header>
   );
