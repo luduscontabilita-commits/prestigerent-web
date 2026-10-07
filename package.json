@@ -13,6 +13,7 @@
     "prova:lightbox": "node scripts/misura-lightbox.mjs",
     "prova:foto": "node scripts/prova-foto-in-chrome.mjs",
     "prova:menu": "node scripts/prova-menu.mjs",
+    "prova:tendine": "node scripts/prova-tendine.mjs",
     "prova:ordine": "node scripts/prova-ordine-pagina.mjs"
   },
   "dependencies": {

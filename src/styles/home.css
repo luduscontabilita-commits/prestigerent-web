@@ -3834,13 +3834,31 @@ html[data-theme="dark"] .pr-paybanner img{
   .wd-cortine{ grid-template-columns:1fr; }
 }
 
-/* LA SECONDA FILA DELLA TESTATA: i matrimoni (Header.tsx). Sottile, a tutta larghezza, mai sopra le voci. */
-.hd-sotto{ border-top:1px solid var(--line); background:color-mix(in srgb, var(--orange) 6%, var(--card)); }
+/* LA SECONDA FILA DELLA TESTATA: i matrimoni (Header.tsx). Sottile, a tutta larghezza, mai sopra le voci.
+   L'altezza e' una VARIABILE, bordo compreso, e non il risultato di padding + riga: la usa anche il
+   pannello delle tendine qui sotto, e due numeri che devono combaciare vanno scritti una volta sola. */
+.hd{ --hd-sotto:31px; }
+@media (max-width:560px){ .hd{ --hd-sotto:28px; } }
+.hd-sotto{
+  box-sizing:border-box; height:var(--hd-sotto);
+  border-top:1px solid var(--line); background:color-mix(in srgb, var(--orange) 6%, var(--card));
+}
 .hd-sotto a{
-  display:block; max-width:1500px; margin:0 auto; padding:6px 18px; text-align:center;
+  display:block; max-width:1500px; margin:0 auto; padding:0 18px; text-align:center;
+  line-height:calc(var(--hd-sotto) - 1px);
   font-size:.8rem; font-weight:600; color:var(--ink); text-decoration:none;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .hd-sotto a:hover{ color:var(--orange); }
 .hd-sotto-k{ font-weight:800; color:var(--orange); margin-right:6px; text-transform:uppercase; letter-spacing:.04em; font-size:.72rem; }
-@media (max-width:560px){ .hd-sotto a{ font-size:.74rem; padding:5px 12px; } }
+@media (max-width:560px){ .hd-sotto a{ font-size:.74rem; padding:0 12px; } }
+
+/* 🔴 LE TENDINE SI CHIUDEVANO SOTTO IL MOUSE (segnalato il 07/10/2026).
+   `.hd-mega` ha `top:100%` e si aggancia al fondo di TUTTA la testata `.hd` (`.hd-in` non e' posizionata,
+   e non va resa tale: il pannello diventerebbe largo 1500px invece che a tutto schermo). Da quando la
+   fila qui sopra sta dentro la testata, il pannello si apriva 32px piu' in basso della voce: scendendo,
+   il mouse attraversava la fila, usciva da `.hd-item`, e `onPointerLeave` in Header.tsx chiudeva.
+   Ora il pannello parte dal fondo della BARRA, coprendo la fila mentre e' aperto, e la sovrappone di 1px
+   perche' non resti nemmeno un filo da attraversare. Solo desktop: sotto i 1280px `.hd-mega` e' statico
+   e `top` non conta. Provato col mouse sul sito pubblicato: `npm run prova:tendine`. */
+.hd-mega{ top:calc(100% - var(--hd-sotto) - 1px); }
