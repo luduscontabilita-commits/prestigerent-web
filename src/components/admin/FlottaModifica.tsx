@@ -193,7 +193,7 @@ export function FlottaModifica({
         withOverlay={false}
         lockScroll={false}
         trapFocus
-        title={mezzo && def ? `${mezzo.nome} · ${def.nome}` : ''}
+        title={mezzo && def ? `${testiMezzo(mezzo, lingua, modifiche).nome} · ${def.nome}` : ''}
         /* Alta quanto il contenuto, non una misura fissa: `size="auto"` di
            Mantine diventa `var(--drawer-size-auto)`, che non esiste, e la
            finestra copriva tutto lo schermo (visto in Chrome, 12/10/2026). */

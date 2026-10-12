@@ -11,7 +11,14 @@ const atego = FLOTTA.find((m) => m.chiave === 'atego')!;
 describe('testiMezzo', () => {
   it('senza modifiche restituisce i testi del codice', () => {
     expect(testiMezzo(classeE, 'en').descrizione).toBe(classeE.descrizione);
-    expect(testiMezzo(classeE, 'it')).toEqual(classeE.it);
+    expect(testiMezzo(classeE, 'it')).toEqual({ nome: classeE.nome, ...classeE.it });
+  });
+
+  it('il nome e\' lo stesso nelle due lingue finche\' non lo si cambia, poi vale per una sola', () => {
+    expect(testiMezzo(classeE, 'it').nome).toBe('Mercedes E-Class');
+    const mod: ModificaTesto[] = [{ chiave: 'classe-e', lingua: 'it', campo: 'nome', testo: 'Mercedes Classe E' }];
+    expect(testiMezzo(classeE, 'it', mod).nome).toBe('Mercedes Classe E');
+    expect(testiMezzo(classeE, 'en', mod).nome).toBe('Mercedes E-Class');
   });
 
   it('la modifica vale solo per il suo mezzo e la sua lingua', () => {
@@ -28,11 +35,11 @@ describe('testiMezzo', () => {
 
   it('un campo facoltativo svuotato sparisce, uno obbligatorio resta', () => {
     const mod: ModificaTesto[] = [
-      { chiave: 'atego', lingua: 'en', campo: 'notaPosti', testo: '   ' },
+      { chiave: 'atego', lingua: 'en', campo: 'dettagli', testo: '   ' },
       { chiave: 'atego', lingua: 'en', campo: 'descrizione', testo: '' },
     ];
     const t = testiMezzo(atego, 'en', mod);
-    expect(t.notaPosti).toBeNull();
+    expect(t.dettagli).toBeNull();
     expect(t.descrizione).toBe(atego.descrizione);
   });
 

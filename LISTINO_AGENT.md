@@ -26,7 +26,7 @@ nell'indirizzo.
 | `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, con le descrizioni modificabili in italiano e inglese |
 | `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
 | `/admin/partners/attivi/` | Partners → Partner attivi | chi ha accesso: «Dati», «Nuova password», «Chiudi l'accesso» |
-| `/admin/partners/qrcode/` | Partners → QR code | il QR con il logo per brochure e stand, PNG trasparente, destinazione modificabile |
+| `/admin/partners/qrcode/` | Partners → QR code | il QR con il logo per brochure e stand, PNG su sfondo bianco, destinazione modificabile |
 
 Gli indirizzi vecchi (`/admin/listino/…`, compresi `login/` e
 `register/`) rimandano ai nuovi: alcuni sono già scritti in email
@@ -140,7 +140,8 @@ Lo si trova in **Partners → QR code** (`/admin/partners/qrcode/`).
   - un codice che non esiste porta alla home;
   - `/qr/` è escluso dalle lingue nel proxy.
 - **Il PNG** lo genera `src/lib/qr-logo.ts`:
-  - sfondo trasparente, moduli quasi neri;
+  - sfondo bianco (proprietà, 12/10/2026: prima era trasparente), moduli
+    quasi neri, margine di 4 moduli già compreso nel PNG;
   - correzione d'errore «H», cioè leggibile anche con il 30% coperto;
   - un tondo vuoto al centro con il logo, che ne copre circa il 6%.
   - `qr-logo.test.ts` lo **rilegge** con `jsqr`, come un telefono.
@@ -316,11 +317,15 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
     chiusura o al cambio di lingua;
   - «Ripristina il testo originale» torna a quello di `src/lib/flotta.ts`.
 
-  Campi modificabili: tipo, descrizione, nota sui posti, bagagli, «per
-  cosa si usa» (solo l'Atego: per gli altri lo dice la regola dei posti).
-  Tipo e descrizione non possono restare vuoti; gli altri, svuotati,
-  spariscono dalla pagina. Nome, posti, foto e numero di mezzi restano
-  nel codice.
+  Campi modificabili: nome del mezzo, tipo, descrizione, «posti e
+  bagagli», «per cosa si usa» (solo l'Atego: per gli altri lo dice la
+  regola dei posti). **Ogni riga è un testo intero** (proprietà,
+  12/10/2026: «fammi modificare tutta la riga, non a porzioni»): nota sui
+  posti e bagagli, che erano due pezzi della stessa riga, sono un campo
+  solo, `dettagli`. Il nome è lo stesso nelle due lingue finché non lo si
+  cambia in una. Nome, tipo e descrizione non possono restare vuoti; gli
+  altri, svuotati, spariscono dalla pagina. Posti, foto e numero di
+  mezzi restano nel codice.
 
   Le modifiche stanno in **`flotta_testi`** (chiave, lingua, campo, testo;
   migrazione `20261012_flotta_testi.sql`, lettura per tutti, scrittura

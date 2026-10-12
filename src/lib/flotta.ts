@@ -5,12 +5,15 @@
  * sia le righe e l'editor (client).
  *
  * ── I TESTI SI CAMBIANO DAL PANNELLO (dal 12/10/2026) ────────────────
- * Tipo, descrizione, nota sui posti, bagagli e «per cosa si usa», in
- * inglese e in italiano, si modificano in /admin/partners/flotta/ (clic
- * sul testo). Le modifiche stanno nella tabella `flotta_testi` e vincono
- * su quelle scritte qui (`testiMezzo`); «Ripristina» cancella la riga e
- * torna il testo di questo file. Quindi: chi cambia un testo QUI non lo
- * vede in pagina se l'admin l'aveva gia' modificato. Nome, posti, foto e
+ * Nome, tipo, descrizione, la riga «posti e bagagli» e «per cosa si
+ * usa», in inglese e in italiano, si modificano in /admin/partners/flotta/
+ * (clic sul testo). Ogni riga della pagina e' UN testo intero: la
+ * proprieta' ha chiesto di non modificarla a pezzi (12/10/2026), per
+ * questo nota sui posti e bagagli sono diventate un campo solo
+ * (`dettagli`). Le modifiche stanno nella tabella `flotta_testi` e
+ * vincono su quelle scritte qui (`testiMezzo`); «Ripristina» cancella la
+ * riga e torna il testo di questo file. Quindi: chi cambia un testo QUI
+ * non lo vede in pagina se l'admin l'aveva gia' modificato. Posti, foto e
  * numero di mezzi restano solo qui.
  *
  * ── DA DOVE VENGONO I NUMERI ─────────────────────────────────────────
@@ -62,9 +65,9 @@ export type Mezzo = {
   /** quanti ne abbiamo, quando la proprieta' l'ha detto */
   quanti: number | null;
   postiMax: number;
-  /** una riga sulla capienza, quando il numero da solo non basta */
-  notaPosti: string | null;
-  bagagli: string | null;
+  /** la riga sotto la descrizione: capienza, quando il numero da solo
+   *  non basta, e bagagli. Un testo solo, si modifica per intero. */
+  dettagli: string | null;
   descrizione: string;
   /** per quali gruppi si usa, per i servizi «per party» */
   persone: [da: number, a: number] | null;
@@ -76,22 +79,23 @@ export type Mezzo = {
   /** solo per le foto che non sono nostre (licenza CC) */
   credito: Credito | null;
   /** gli stessi testi in italiano, per l'area partner con il selettore
-   *  EN/IT (src/lib/partners-testi.ts). Il nome del modello non si
-   *  traduce. */
-  it: { tipo: string; notaPosti: string | null; bagagli: string | null; descrizione: string; suRichiesta: string | null };
+   *  EN/IT (src/lib/partners-testi.ts). Il nome del modello qui non si
+   *  traduce: e' lo stesso nelle due lingue, finche' l'admin non lo cambia
+   *  dal pannello. */
+  it: { tipo: string; dettagli: string | null; descrizione: string; suRichiesta: string | null };
 };
 
-export type TestiMezzo = Mezzo['it'];
+export type TestiMezzo = { nome: string } & Mezzo['it'];
 export type CampoTesto = keyof TestiMezzo;
 
 /** I testi che l'admin puo' cambiare da /admin/partners/flotta/, in
- *  quest'ordine nella finestra. Il nome del modello, i posti e le foto
- *  restano nel codice: sono fatti, non testi. */
+ *  quest'ordine nella finestra. I posti e le foto restano nel codice:
+ *  sono fatti, non testi. */
 export const CAMPI_TESTO: { campo: CampoTesto; nome: string; obbligatorio: boolean }[] = [
+  { campo: 'nome', nome: 'Nome del mezzo', obbligatorio: true },
   { campo: 'tipo', nome: 'Tipo di mezzo', obbligatorio: true },
   { campo: 'descrizione', nome: 'Descrizione', obbligatorio: true },
-  { campo: 'notaPosti', nome: 'Nota sui posti', obbligatorio: false },
-  { campo: 'bagagli', nome: 'Bagagli', obbligatorio: false },
+  { campo: 'dettagli', nome: 'Posti e bagagli', obbligatorio: false },
   { campo: 'suRichiesta', nome: 'Per cosa si usa', obbligatorio: false },
 ];
 
@@ -107,8 +111,8 @@ export const MAX_TESTO = 1000;
  *  rifiuta l'azione, ma se capitasse resta l'originale. */
 export function testiMezzo(m: Mezzo, lingua: 'en' | 'it', modifiche: ModificaTesto[] = []): TestiMezzo {
   const base: TestiMezzo = lingua === 'it'
-    ? { ...m.it }
-    : { tipo: m.tipo, notaPosti: m.notaPosti, bagagli: m.bagagli, descrizione: m.descrizione, suRichiesta: m.suRichiesta };
+    ? { nome: m.nome, ...m.it }
+    : { nome: m.nome, tipo: m.tipo, dettagli: m.dettagli, descrizione: m.descrizione, suRichiesta: m.suRichiesta };
   const campi = base as Record<CampoTesto, string | null>;
   for (const x of modifiche) {
     if (x.chiave !== m.chiave || x.lingua !== lingua) continue;
@@ -128,8 +132,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'Sedan',
     quanti: null,
     postiMax: 4,
-    notaPosti: 'Most comfortable with up to 3 adults, or 3 adults and a child.',
-    bagagli: '2 suitcases + 2 carry-on bags',
+    dettagli: 'Most comfortable with up to 3 adults, or 3 adults and a child. Luggage: 2 suitcases + 2 carry-on bags.',
     descrizione:
       'Our everyday car for private tours and transfers: leather seats, climate control, Wi-Fi and bottled water on board. It enters the restricted traffic zones of Florence and other historic centres with our permits.',
     persone: [1, 3],
@@ -139,8 +142,7 @@ export const FLOTTA: Mezzo[] = [
     credito: null,
     it: {
       tipo: 'Berlina',
-      notaPosti: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino.',
-      bagagli: '2 valigie + 2 bagagli a mano',
+      dettagli: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino. Bagagli: 2 valigie + 2 bagagli a mano.',
       descrizione:
         'La nostra auto di ogni giorno per tour privati e transfer: sedili in pelle, climatizzatore, Wi-Fi e acqua a bordo. Entra nelle zone a traffico limitato di Firenze e degli altri centri storici con i nostri permessi.',
       suRichiesta: null,
@@ -152,8 +154,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'Executive sedan',
     quanti: null,
     postiMax: 4,
-    notaPosti: 'Most comfortable with up to 3 adults, or 3 adults and a child.',
-    bagagli: '2 suitcases + 2 carry-on bags',
+    dettagli: 'Most comfortable with up to 3 adults, or 3 adults and a child. Luggage: 2 suitcases + 2 carry-on bags.',
     descrizione:
       'The executive version of the private car, for clients who ask for it. Same services as the E-Class, on request.',
     persone: [1, 3],
@@ -163,8 +164,7 @@ export const FLOTTA: Mezzo[] = [
     credito: null,
     it: {
       tipo: 'Berlina executive',
-      notaPosti: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino.',
-      bagagli: '2 valigie + 2 bagagli a mano',
+      dettagli: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino. Bagagli: 2 valigie + 2 bagagli a mano.',
       descrizione:
         'La versione executive dell\'auto privata, per i clienti che la chiedono. Stessi servizi della Classe E, su richiesta.',
       suRichiesta: null,
@@ -176,8 +176,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'MPV',
     quanti: null,
     postiMax: 6,
-    notaPosti: null,
-    bagagli: '6 suitcases + 6 carry-on bags',
+    dettagli: 'Luggage: 6 suitcases + 6 carry-on bags.',
     descrizione:
       'Six passenger seats, sliding doors and room for everyone’s luggage. The car for families and small parties on private tours and transfers, with Wi-Fi and bottled water on board.',
     persone: [4, 6],
@@ -187,8 +186,7 @@ export const FLOTTA: Mezzo[] = [
     credito: null,
     it: {
       tipo: 'Monovolume',
-      notaPosti: null,
-      bagagli: '6 valigie + 6 bagagli a mano',
+      dettagli: 'Bagagli: 6 valigie + 6 bagagli a mano.',
       descrizione:
         'Sei posti passeggero, porte scorrevoli e spazio per i bagagli di tutti. L\'auto per famiglie e piccoli gruppi nei tour privati e nei transfer, con Wi-Fi e acqua a bordo.',
       suRichiesta: null,
@@ -200,8 +198,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'Minivan',
     quanti: null,
     postiMax: 8,
-    notaPosti: null,
-    bagagli: '8 suitcases + 8 carry-on bags',
+    dettagli: 'Luggage: 8 suitcases + 8 carry-on bags.',
     descrizione:
       'Eight passenger seats and room for a suitcase each. Used when the party is too large for the V-Class.',
     persone: [7, 8],
@@ -211,8 +208,7 @@ export const FLOTTA: Mezzo[] = [
     credito: null,
     it: {
       tipo: 'Minivan',
-      notaPosti: null,
-      bagagli: '8 valigie + 8 bagagli a mano',
+      dettagli: 'Bagagli: 8 valigie + 8 bagagli a mano.',
       descrizione:
         'Otto posti passeggero e spazio per una valigia a testa. Si usa quando il gruppo è troppo numeroso per la Classe V.',
       suRichiesta: null,
@@ -224,8 +220,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'Minibus',
     quanti: 6,
     postiMax: 25,
-    notaPosti: null,
-    bagagli: null,
+    dettagli: null,
     descrizione:
       'The minibus of our small group tours, never more than 25 guests. Our own vehicles, driven by our own drivers.',
     persone: null,
@@ -235,8 +230,7 @@ export const FLOTTA: Mezzo[] = [
     credito: null,
     it: {
       tipo: 'Minibus',
-      notaPosti: null,
-      bagagli: null,
+      dettagli: null,
       descrizione:
         'Il minibus dei nostri tour in piccolo gruppo, mai più di 25 ospiti. Mezzi nostri, guidati dai nostri autisti.',
       suRichiesta: null,
@@ -248,8 +242,7 @@ export const FLOTTA: Mezzo[] = [
     tipo: 'Coach',
     quanti: 4,
     postiMax: 36,
-    notaPosti: 'One of the four has an on-board toilet and 28 seats.',
-    bagagli: null,
+    dettagli: 'One of the four has an on-board toilet and 28 seats.',
     descrizione:
       'Our largest vehicles, for groups that do not fit a minibus, weddings and events.',
     persone: null,
@@ -264,8 +257,7 @@ export const FLOTTA: Mezzo[] = [
     },
     it: {
       tipo: 'Pullman',
-      notaPosti: 'Uno dei quattro ha il bagno a bordo e 28 posti.',
-      bagagli: null,
+      dettagli: 'Uno dei quattro ha il bagno a bordo e 28 posti.',
       descrizione:
         'I nostri mezzi più grandi, per i gruppi che non entrano in un minibus, matrimoni ed eventi.',
       suRichiesta: 'Gruppi da 9 persone in su, eventi e matrimoni, su richiesta.',

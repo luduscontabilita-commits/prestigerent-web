@@ -73,8 +73,8 @@ export function FlottaRighe({
           );
         };
 
-        const nota = tm.notaPosti || modifica;
-        const bagagli = tm.bagagli || modifica;
+        /* la riga sotto la descrizione e' UN testo, si modifica intera */
+        const dettagli = tm.dettagli || modifica;
         /* «Per cosa si usa» e' un testo solo per i mezzi che non hanno una
            regola (l'Atego): per gli altri lo scrive la regola stessa. */
         const usoLibero = !m.persone && !m.gruppi;
@@ -108,7 +108,7 @@ export function FlottaRighe({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={m.foto}
-                alt={`${m.nome}, ${tm.tipo.toLowerCase()}: ${T.finoA(m.postiMax).toLowerCase()}`}
+                alt={`${tm.nome}, ${tm.tipo.toLowerCase()}: ${T.finoA(m.postiMax).toLowerCase()}`}
                 loading="lazy"
                 width={800}
                 height={400}
@@ -119,7 +119,7 @@ export function FlottaRighe({
             <Stack gap={6} style={{ flex: '1 1 340px', minWidth: 0 }}>
               <Group justify="space-between" align="baseline" wrap="wrap" gap="xs">
                 <div style={{ minWidth: 0 }}>
-                  <Title order={2} size="h3">{m.nome}</Title>
+                  <Title order={2} size="h3">{testo('nome', tm.nome)}</Title>
                   <Text size="sm" c="dimmed">
                     {testo('tipo', tm.tipo)}
                     {m.quanti ? ` · ${T.inFlotta(m.quanti)}` : ''}
@@ -131,15 +131,9 @@ export function FlottaRighe({
               </Group>
 
               <Text size="sm">{testo('descrizione', tm.descrizione)}</Text>
-              {(nota || bagagli) && (
+              {dettagli && (
                 <Text size="sm" c="dimmed">
-                  {nota && testo('notaPosti', tm.notaPosti)}
-                  {nota && bagagli ? ' ' : ''}
-                  {bagagli && (
-                    <>
-                      {T.bagagli}: {testo('bagagli', tm.bagagli)}.
-                    </>
-                  )}
+                  {testo('dettagli', tm.dettagli)}
                 </Text>
               )}
 

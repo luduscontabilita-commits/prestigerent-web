@@ -11,6 +11,7 @@
 create table public.flotta_testi (
   chiave text not null check (chiave ~ '^[a-z0-9-]{2,40}$'),
   lingua text not null check (lingua in ('en', 'it')),
+  -- i campi cambiano in 20261012_flotta_testi_nome_dettagli.sql
   campo text not null check (campo in ('tipo', 'descrizione', 'notaPosti', 'bagagli', 'suRichiesta')),
   testo text not null check (char_length(testo) <= 1000),
   aggiornato_il timestamptz not null default now(),
