@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDict, PDFDocument, PDFName, PDFString } from 'pdf-lib';
 import { creaPdfListino } from './listino-pdf';
 import type { Servizio } from './listino';
 
@@ -50,6 +50,21 @@ describe('creaPdfListino', () => {
       const pdf = await PDFDocument.load(file);
       expect(pdf.getPageCount()).toBeGreaterThan(2);
       expect(pdf.getTitle()).toMatch(/Partner price list 2026|Listino partner 2026/);
+    });
+
+    it(`${lingua}: il nome di ogni servizio e' un link alla sua pagina sul sito`, async () => {
+      const pdf = await PDFDocument.load(await creaPdfListino({ servizi: catalogo(95), lingua, azienda: {}, logoPng: null, data: '2026' }));
+      const link: string[] = [];
+      for (const p of pdf.getPages()) {
+        const annots = p.node.Annots();
+        for (let i = 0; i < (annots?.size() ?? 0); i++) {
+          const a = pdf.context.lookup(annots!.get(i), PDFDict);
+          const azione = a.lookup(PDFName.of('A'), PDFDict);
+          link.push(azione.lookup(PDFName.of('URI'), PDFString).decodeText());
+        }
+      }
+      expect(new Set(link).size).toBe(95);
+      expect(link).toContain('https://prestigerent.com/tour/tour-0/');
     });
   }
 });

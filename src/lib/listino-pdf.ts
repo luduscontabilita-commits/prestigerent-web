@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import { PDFDocument, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
 import { raggruppa, righeDelServizio, type Servizio, type Variante } from './listino';
 import { testiDi, type Lingua } from './partners-testi';
 import { scomponi, tipoCommissione, type Commissioni } from './commissioni';
@@ -136,6 +136,8 @@ type Riga =
       testoPrezzi: string | null;
       /** solo nel PDF dei partner: la commissione del servizio */
       percentuale?: number | null;
+      /** la pagina del tour sul sito: il nome diventa un link */
+      url?: string;
     };
 
 /** Due titoli di varianti uniti senza ripetere l'inizio comune:
@@ -196,14 +198,15 @@ function righeDelPdf(servizi: Servizio[], lingua: Lingua, commissioni?: Commissi
             })
             .join('  ·  ');
         const nome = s.unita === 'per person' ? `${s.nome} (${P.perPersona})` : s.nome;
+        const url = `https://prestigerent.com/tour/${s.slug}/`;
         if (uniche.length === 1) {
           righe.push(
             perPersone
-              ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null, percentuale }
-              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v), percentuale }
+              ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null, percentuale, url }
+              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v), percentuale, url }
           );
         } else {
-          righe.push({ tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: null });
+          righe.push({ tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: null, url });
           for (const u of uniche) {
             righe.push(
               perPersone
@@ -304,6 +307,25 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     p.drawText(pulito(t), { x, y: yy, size: m, font: f, color: colore });
   const aDestra = (p: PDFPage, t: string, xDestra: number, yy: number, m: number, f: PDFFont = font, colore: RGB = INCHIOSTRO) =>
     testo(p, t, xDestra - f.widthOfTextAtSize(pulito(t), m), yy, m, f, colore);
+  /** Il nome del servizio, cliccabile verso la sua pagina sul sito
+   *  (proprieta', 12/10/2026): un'annotazione «Link» grande quanto il
+   *  testo scritto. Stampato non si vede niente; sullo schermo si apre la
+   *  scheda del tour. */
+  const nomeConLink = (p: PDFPage, t: string, x: number, yy: number, m: number, f: PDFFont, url?: string) => {
+    testo(p, t, x, yy, m, f);
+    if (!url) return;
+    const w = f.widthOfTextAtSize(pulito(t), m);
+    const link = pdf.context.register(
+      pdf.context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: [x, yy - m * 0.25, x + w, yy + m * 0.85],
+        Border: [0, 0, 0],
+        A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) },
+      })
+    );
+    p.node.addAnnot(link);
+  };
 
   /* ── TESTATA ── */
   const lato = 46;
@@ -378,7 +400,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     const rientro = r.rientro ? 10 : 2;
     const fNome = r.rientro ? font : grassetto;
     if (r.prezzi) {
-      testo(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome);
+      nomeConLink(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome, r.url);
       const sotto = passo * 0.95;
       if (tre) {
         aDestra(pagina, P.net, MARGINE + larghezzaNome - 6, y - sotto, misura * 0.9, font, GRIGIO);
@@ -394,14 +416,15 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
         const s = scomponi(p, r.percentuale!);
         aDestra(pagina, cifra(s.retail, lingua), x, y, misura, grassetto);
         aDestra(pagina, cifra(s.net, lingua), x, y - sotto, misura * 0.95);
-        aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.95, font, GRIGIO);
+        /* commissione come il Net: stessa misura, stesso colore (proprieta') */
+        aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.95);
       });
     } else if (r.testoPrezzi) {
       const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);
-      testo(pagina, nome, MARGINE + rientro, y, misura, fNome);
+      nomeConLink(pagina, nome, MARGINE + rientro, y, misura, fNome, r.url);
       testo(pagina, taglia(r.testoPrezzi, font, misura, COLONNE * larghezzaPrezzo - 4), MARGINE + larghezzaNome + 4, y, misura);
     } else {
-      testo(pagina, taglia(r.nome, fNome, misura, L - rientro), MARGINE + rientro, y, misura, fNome);
+      nomeConLink(pagina, taglia(r.nome, fNome, misura, L - rientro), MARGINE + rientro, y, misura, fNome, r.url);
     }
     y -= h;
   }

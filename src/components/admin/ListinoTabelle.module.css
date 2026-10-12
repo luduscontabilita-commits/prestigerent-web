@@ -154,10 +154,10 @@
 }
 
 .c {
-  /* stessa misura del Net (proprieta', 12/10/2026: a 12px era troppo
-     piccola); resta solo piu' chiara */
+  /* come il Net, misura e colore (proprieta', 12/10/2026: piu' piccola
+     e grigia si leggeva male) */
   font-size: 13px;
-  color: var(--mantine-color-gray-6);
+  color: var(--mantine-color-dark-5);
 }
 
 .titoloRiga {
@@ -197,7 +197,7 @@
 
 .comm {
   text-align: right;
-  color: var(--mantine-color-gray-6);
+  color: var(--mantine-color-dark-5);
 }
 
 .variantePiccola {
