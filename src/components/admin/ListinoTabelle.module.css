@@ -154,7 +154,9 @@
 }
 
 .c {
-  font-size: 12px;
+  /* stessa misura del Net (proprieta', 12/10/2026: a 12px era troppo
+     piccola); resta solo piu' chiara */
+  font-size: 13px;
   color: var(--mantine-color-gray-6);
 }
 
@@ -195,7 +197,6 @@
 
 .comm {
   text-align: right;
-  font-size: 13px;
   color: var(--mantine-color-gray-6);
 }
 

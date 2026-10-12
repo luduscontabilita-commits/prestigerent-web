@@ -394,7 +394,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
         const s = scomponi(p, r.percentuale!);
         aDestra(pagina, cifra(s.retail, lingua), x, y, misura, grassetto);
         aDestra(pagina, cifra(s.net, lingua), x, y - sotto, misura * 0.95);
-        aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.9, font, GRIGIO);
+        aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.95, font, GRIGIO);
       });
     } else if (r.testoPrezzi) {
       const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);
