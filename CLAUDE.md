@@ -293,8 +293,22 @@ solo calendario resta in inglese. Va detto al lettore, non nascosto.
 
 ## Stato dei tour
 
-87 righe in `tours`, **49 con prodotto Regiondo agganciato**, 38 senza. Di
-questi 38 alcuni il prodotto ce l'hanno davvero e non era mai stato
-montato sul sito (`wine-experience-in-tuscany` -> `T-PR193-210790`,
-`private-tour-siena-and-san-gimignano` -> `T-PR193-210791`). Vanno
-agganciati quando arriva l'export completo dal pannello Regiondo.
+Al 12/10/2026: **86 tour pubblicati, tutti con prodotto Regiondo
+agganciato**. Il vecchio conteggio «49 su 87» è superato.
+
+## Il listino prezzi e la flotta — `LISTINO_AGENT.md`
+
+`/admin/listino/` raccoglie tutti i servizi con i prezzi di ogni
+variante, letti da Regiondo. Lo vedono l'admin e i **partner** (ruolo
+`listino`: agenzie, hotel), che si registrano da
+`/admin/listino/register/` e **li approva sempre l'admin**. I partner
+vedono solo il listino e la flotta, in inglese.
+
+- 🔴 **Sito → Regiondo non si può fare.** L'API ufficiale non ha nessuna
+  scrittura su prodotti o prezzi.
+- 🔴 **Le tab PRICES delle schede contengono una copia dei prezzi.** Si
+  allineano a Regiondo solo col pulsante in
+  `/admin/listino/sincronizza/`, dopo aver visto la tabella prima/dopo,
+  e cambiano solo le cifre. È l'eccezione dichiarata alla regola 3.
+
+Come sta insieme e perché: `LISTINO_AGENT.md`.

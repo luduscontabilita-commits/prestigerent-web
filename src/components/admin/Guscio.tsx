@@ -16,10 +16,12 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
+  IconBus,
   IconCamera,
   IconChartBar,
   IconLogout,
   IconPhoto,
+  IconReceiptEuro,
   IconSearch,
   IconUsers,
 } from '@tabler/icons-react';
@@ -53,6 +55,17 @@ const ICONE = {
   seo: IconSearch,
   numeri: IconChartBar,
   utenti: IconUsers,
+  listino: IconReceiptEuro,
+  flotta: IconBus,
+};
+
+/** Come si chiama il ruolo in testata. L'utente del listino e' un
+ *  partner esterno e legge in inglese: «guida» sotto il suo nome sarebbe
+ *  sbagliato in due modi. */
+const NOME_RUOLO: Record<string, string> = {
+  admin: 'amministratore',
+  guida: 'guida',
+  listino: 'partner',
 };
 
 export function Guscio({
@@ -75,6 +88,15 @@ export function Guscio({
 }) {
   const [aperta, { toggle, close }] = useDisclosure();
   const percorso = usePathname();
+  const inglese = ruolo === 'listino';
+  /* La voce accesa e' quella col prefisso PIU' LUNGO che combacia. Con il
+     solo prefisso, dentro /admin/listino/flotta/ si accendevano insieme
+     «Price list» (/admin/listino/) e «Our fleet»: la prima e' prefisso
+     della seconda. */
+  const combacia = (href: string) => percorso.startsWith(href.replace(/\/$/, ''));
+  const migliore = voci
+    .filter((v) => v.href !== '/admin/' && combacia(v.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <AppShell
@@ -114,12 +136,12 @@ export function Guscio({
             <Stack gap={0} visibleFrom="xs" align="flex-end">
               <Text size="sm" fw={600} lh={1.2}>{chi}</Text>
               <Text size="xs" c="dimmed" lh={1.2}>
-                {ruolo === 'admin' ? 'amministratore' : 'guida'}
+                {NOME_RUOLO[ruolo] ?? ruolo}
               </Text>
             </Stack>
             <form action={esciEVai}>
               <Button type="submit" variant="default" size="xs" leftSection={<IconLogout size={15} />}>
-                Esci
+                {inglese ? 'Sign out' : 'Esci'}
               </Button>
             </form>
           </Group>
@@ -135,7 +157,7 @@ export function Guscio({
                restare accesa, o si perde il senso di dove si e'. */
             const attiva = v.href === '/admin/'
               ? percorso === '/admin' || percorso === '/admin/'
-              : percorso.startsWith(v.href.replace(/\/$/, ''));
+              : v.href === migliore;
             /* 🔴 LE SOTTOVOCI NON VANNO DENTRO `<NavLink>` COME FIGLI.
                Il 26/09/2026 le ci ho messe, e il clic su «Foto della
                gallery» ha smesso del tutto di funzionare. Il motivo sta
@@ -189,7 +211,9 @@ export function Guscio({
 
         <AppShell.Section>
           <Text size="xs" c="dimmed" px="xs" py="sm">
-            Il pannello non è raggiungibile dal sito: l’indirizzo si scrive a mano.
+            {inglese
+              ? 'Prices are read live from our booking system, in euro.'
+              : 'Il pannello non è raggiungibile dal sito: l’indirizzo si scrive a mano.'}
           </Text>
         </AppShell.Section>
       </AppShell.Navbar>

@@ -48,7 +48,8 @@ export type Profilo = {
    I RUOLI, SCRITTI IN UN POSTO SOLO
    ─────────────────────────────────────────────────────────────────────
 
-   In `profili` il vincolo ammette `admin` e `guida`. Cosa puo' fare
+   In `profili` il vincolo ammette `admin`, `guida` e (dal 12/10/2026)
+   `listino`. Cosa puo' fare
    ognuno si dice QUI, e le pagine e le azioni chiedono a queste liste:
    aggiungere un ruolo domani e' una riga in un elenco, non una caccia ai
    controlli sparsi.
@@ -64,6 +65,15 @@ export const RUOLI_GESTIONE: readonly string[] = ['admin'];
 /** Chi puo' caricare e taggare le foto della gallery. Le guide caricano,
  *  gli admin caricano e approvano. */
 export const RUOLI_CARICAMENTO: readonly string[] = ['admin', 'guida'];
+
+/** Chi vede il listino prezzi e la flotta (/admin/listino/). Il ruolo
+ *  `listino` e' quello degli utenti esterni -- agenzie, hotel, partner --
+ *  che si registrano da /admin/listino/register/ e che un admin approva.
+ *  Vedono SOLO il listino: tutte le altre pagine del pannello chiedono
+ *  `RUOLI_GESTIONE` o `RUOLI_CARICAMENTO`, che `listino` non lo
+ *  contengono, e le funzioni RLS `e_admin()`/`e_caricatore()` non lo
+ *  riconoscono. Vedi LISTINO_AGENT.md. */
+export const RUOLI_LISTINO: readonly string[] = ['admin', 'listino'];
 
 /** `readonly string[]` e non `as const`: cosi' `includes(io.ruolo)`
  *  funziona senza cast. Il tipo letterale non serve a nessuno qui, e
@@ -153,6 +163,17 @@ export async function soloCaricatori(): Promise<Profilo> {
   const io = await chiSono();
   if (!io) redirect('/admin/entra/');
   if (!haRuolo(io, RUOLI_CARICAMENTO)) redirect('/admin/');
+  return io;
+}
+
+/** Per le PAGINE del listino: admin e utenti del listino. Chi non ha
+ *  fatto l'accesso va alla SUA schermata, in inglese, e non a quella del
+ *  pannello: un'agenzia che apre il listino senza sessione deve trovare
+ *  «Sign in», non «Nome utente». */
+export async function soloListino(): Promise<Profilo> {
+  const io = await chiSono();
+  if (!io) redirect('/admin/listino/login/');
+  if (!haRuolo(io, RUOLI_LISTINO)) redirect('/admin/');
   return io;
 }
 

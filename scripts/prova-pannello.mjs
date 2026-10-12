@@ -93,7 +93,22 @@ const PAGINE = [
   '/admin/seo/',
   '/admin/foto/',
   '/admin/numeri/',
+  '/admin/listino/',
+  '/admin/listino/sincronizza/',
+  '/admin/listino/richieste/',
+  '/admin/listino/flotta/',
+  /* le due pubbliche: con la sessione rispondono lo stesso, e un errore
+     di confine server/client si vedrebbe anche qui */
+  '/admin/listino/login/',
+  '/admin/listino/register/',
 ];
+
+/* Le pagine che un utente del LISTINO non deve poter aprire: tutte quelle
+   di gestione e della gallery. Per lui devono rispondere con un rimando,
+   mai con 200. */
+const VIETATE_AL_PARTNER = PAGINE.filter(
+  (p) => !p.startsWith('/admin/listino/') || p.startsWith('/admin/listino/sincronizza') || p.startsWith('/admin/listino/richieste')
+);
 
 const cookie = await entra('usa@prestigerent.com', mp[1]);
 if (!cookie) {
@@ -132,6 +147,39 @@ for (const p of PAGINE) {
     rotte++;
   }
   console.log(`   ${p.padEnd(42)} ${esito}`);
+}
+
+/* ── IL RECINTO DEL PARTNER ─────────────────────────────────────────
+   Solo se ci sono le credenziali di un utente `listino` di prova
+   (PROVA_PARTNER_EMAIL e PROVA_PARTNER_PASSWORD nell'ambiente o in
+   .env.local). Entra come lui e controlla le due cose che contano: il
+   listino e la flotta si aprono, TUTTO il resto lo rimanda indietro. */
+const pEmail = process.env.PROVA_PARTNER_EMAIL ?? env.PROVA_PARTNER_EMAIL;
+const pPass = process.env.PROVA_PARTNER_PASSWORD ?? env.PROVA_PARTNER_PASSWORD;
+if (pEmail && pPass) {
+  const cp = await entra(pEmail, pPass);
+  if (!cp) {
+    console.log('\n🔴 ACCESSO DEL PARTNER DI PROVA FALLITO');
+    rotte++;
+  } else {
+    console.log(`\n${SITO} — entrato come partner del listino (${pEmail})\n`);
+    for (const p of ['/admin/listino/', '/admin/listino/flotta/']) {
+      const res = await fetch(SITO + p, { headers: { cookie: cp }, redirect: 'manual' });
+      const html = await res.text();
+      const bene = res.status === 200 && !/This page couldn.t load|Application error/i.test(html) && html.length > 2000;
+      if (!bene) rotte++;
+      console.log(`   ${p.padEnd(42)} ${bene ? '200  si apre' : `🔴 HTTP ${res.status}`}`);
+    }
+    for (const p of VIETATE_AL_PARTNER) {
+      const res = await fetch(SITO + p, { headers: { cookie: cp }, redirect: 'manual' });
+      const dove = res.headers.get('location') ?? '';
+      const chiusa = res.status >= 300 && res.status < 400;
+      if (!chiusa) rotte++;
+      console.log(`   ${p.padEnd(42)} ${chiusa ? `${res.status} -> ${dove}` : `🔴 HTTP ${res.status}: IL PARTNER LA VEDE`}`);
+    }
+  }
+} else {
+  console.log('\n(nessun partner di prova: PROVA_PARTNER_EMAIL/PROVA_PARTNER_PASSWORD non impostate, recinto non provato)');
 }
 
 console.log(`\n${rotte === 0 ? '✓ tutte le pagine reggono' : `🔴 ${rotte} pagine rotte`}`);

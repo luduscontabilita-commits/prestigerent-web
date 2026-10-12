@@ -27,7 +27,7 @@ export type VoceMenu = {
   /** il nome dell'icona, non l'icona: una funzione non attraversa il
    *  confine fra server e client. La traduzione in componente avviene
    *  dentro il guscio, che e' gia' nel browser. */
-  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti';
+  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta';
   /** Le pagine dentro questa sezione, mostrate quando la sezione e'
    *  aperta. SOLO I TITOLI: la spiegazione di ognuna sta gia' sulla
    *  pagina della sezione, e ripeterla in una barra laterale larga 260px
@@ -41,6 +41,15 @@ export type VoceMenu = {
  *  `soloGestione()` e le loro azioni chiamano `chiAgisce()`. Qui si toglie
  *  il rumore a chi non ne ha bisogno -- la porta e' chiusa altrove. */
 export function vociPerRuolo(ruolo: string): VoceMenu[] {
+  /* L'utente del listino (un'agenzia, un hotel) vede due pagine e
+     nient'altro, in inglese: niente gallery, che e' delle guide. */
+  if (ruolo === 'listino') {
+    return [
+      { href: '/admin/listino/', testo: 'Price list', icona: 'listino' },
+      { href: '/admin/listino/flotta/', testo: 'Our fleet', icona: 'flotta' },
+    ];
+  }
+
   /* Le due che valgono per tutti: una guida carica e guarda le sue. Le
      altre quattro sono di gestione, e stanno dietro `soloGestione()`
      sulle pagine -- qui si toglie il rumore, non si chiude la porta. */
@@ -67,6 +76,17 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
     { href: '/admin/foto/', testo: 'Foto dei tour', icona: 'foto' },
     { href: '/admin/seo/', testo: 'Title e description', icona: 'seo' },
     { href: '/admin/numeri/', testo: 'Numeri da Regiondo', icona: 'numeri' },
+    {
+      href: '/admin/listino/',
+      testo: 'Listino prezzi',
+      icona: 'listino',
+      sotto: [
+        { href: '/admin/listino/', testo: 'Listino' },
+        { href: '/admin/listino/sincronizza/', testo: 'Sincronizza tab PRICES' },
+        { href: '/admin/listino/richieste/', testo: 'Richieste di accesso' },
+        { href: '/admin/listino/flotta/', testo: 'Flotta' },
+      ],
+    },
     { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },
   ];
 }

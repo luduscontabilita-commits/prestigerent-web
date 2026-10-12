@@ -6,6 +6,7 @@ import {
   IconChartBar,
   IconChevronRight,
   IconPhoto,
+  IconReceiptEuro,
   IconSearch,
   IconUsers,
 } from '@tabler/icons-react';
@@ -26,6 +27,11 @@ export const dynamic = 'force-dynamic';
 export default async function Pannello() {
   const io = await chiSono();
   if (!io) redirect('/admin/entra/');
+  /* L'utente del listino non ha un indice: ha due pagine, e la prima e'
+     il listino. E' anche il posto dove lo rimandano tutte le altre pagine
+     del pannello (`soloGestione()` manda qui chi non gestisce), quindi
+     questa riga e' quella che lo tiene dentro il suo recinto. */
+  if (io.ruolo === 'listino') redirect('/admin/listino/');
 
   const gestisce = haRuolo(io, RUOLI_GESTIONE);
 
@@ -61,6 +67,14 @@ export default async function Pannello() {
             'Recensioni, prenotazioni e disponibilità. Si riaggiornano con un pulsante e dicono quanti anni hanno.',
           icona: IconChartBar,
           colore: 'teal',
+        },
+        {
+          href: '/admin/listino/',
+          titolo: 'Listino prezzi',
+          testo:
+            'Tutti i servizi con i prezzi di ogni opzione, letti da Regiondo. Da qui si allineano le tab PRICES e si approvano le agenzie che chiedono l’accesso.',
+          icona: IconReceiptEuro,
+          colore: 'orange',
         },
         {
           href: '/admin/utenti/',
