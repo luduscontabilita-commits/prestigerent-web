@@ -56,13 +56,16 @@ function pulito(s: string): string {
     .replace(/[^\x20-\x7E -ÿ€–—•·]/g, '');
 }
 
-function euro(n: number, lingua: Lingua): string {
+/** Una cifra della tabella, SENZA il simbolo €: ripetuto su ogni prezzo
+ *  era rumore (proprieta', 12/10/2026). Che sono euro lo dice la nota
+ *  sopra la tabella («Prezzi in euro...»). */
+function cifra(n: number, lingua: Lingua): string {
   const intero = Number.isInteger(n);
   const [i, d] = n.toFixed(intero ? 0 : 2).split('.');
   const sep = lingua === 'it' ? '.' : ',';
   const migliaia = i.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
   const dec = d ? (lingua === 'it' ? ',' : '.') + d : '';
-  return lingua === 'it' ? `€ ${migliaia}${dec}` : `€${migliaia}${dec}`;
+  return `${migliaia}${dec}`;
 }
 
 const TESTI_PDF = {
@@ -155,7 +158,7 @@ function righeDelPdf(servizi: Servizio[], lingua: Lingua): Riga[] {
         const { perPersone } = righeDelServizio(uniche.map((u) => u.v));
         const prezziPersone = (v: Variante) =>
           Array.from({ length: 8 }, (_, i) => v.opzioni.find((o) => Number(o.nome.trim().match(/^\d+/)?.[0]) === i + 1)?.prezzo ?? null);
-        const testoOpzioni = (v: Variante) => v.opzioni.map((o) => `${o.nome.trim()} ${euro(o.prezzo, lingua)}`).join('  ·  ');
+        const testoOpzioni = (v: Variante) => v.opzioni.map((o) => `${o.nome.trim()} ${cifra(o.prezzo, lingua)}`).join('  ·  ');
         const nome = s.unita === 'per person' ? `${s.nome} (${P.perPersona})` : s.nome;
         if (uniche.length === 1) {
           righe.push(
@@ -208,7 +211,9 @@ type DatiPdf = {
   lingua: Lingua;
   azienda: DatiAzienda;
   logoPng: Uint8Array | null;
-  /** la data di lettura dei prezzi, gia' scritta (es. «12 ott 2026») */
+  /** l'anno del listino, gia' scritto («2026»): solo l'anno, senza giorno
+   *  e mese, per decisione della proprieta' (12/10/2026) -- la brochure
+   *  si stampa per una fiera e deve valere tutto l'anno */
   data: string;
 };
 
@@ -266,8 +271,9 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
   testo(pagina, P.sottotitolo, xTitolo, y - 34, 8.4, font, GRIGIO);
   const contatti = [azienda.telefono ?? '+39 055 286059', azienda.email ?? 'usa@prestigerent.com', 'prestigerent.com'];
   contatti.forEach((c, i) => aDestra(pagina, c, A4[0] - MARGINE, y - 12 - i * 11, 8.4, i === 2 ? grassetto : font));
+  /* niente filetto arancione sotto il logo: tolto su richiesta della
+     proprieta' (12/10/2026) */
   y -= 58;
-  pagina.drawRectangle({ x: MARGINE, y: y + 6, width: 40, height: 2, color: ARANCIO });
   for (const r of intro) {
     y -= 11;
     testo(pagina, r, MARGINE, y, 8.6);
@@ -323,7 +329,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
       testo(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome);
       r.prezzi.forEach((p, i) => {
         if (p == null) return;
-        aDestra(pagina, euro(p, lingua), MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4, y, misura);
+        aDestra(pagina, cifra(p, lingua), MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4, y, misura);
       });
     } else if (r.testoPrezzi) {
       const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);

@@ -34,12 +34,10 @@ export async function GET(req: Request) {
   ]);
 
   const quando = new Date(letto);
-  const data = quando.toLocaleDateString(lingua === 'it' ? 'it-IT' : 'en-GB', {
-    timeZone: 'Europe/Rome',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  /* «Price list 2026», «Listino prezzi 2026»: solo l'anno (proprieta',
+     12/10/2026). Il giorno resta nel nome del file, per distinguere le
+     versioni scaricate. */
+  const data = quando.toLocaleDateString('it-IT', { timeZone: 'Europe/Rome', year: 'numeric' });
   const file = await creaPdfListino({
     servizi,
     lingua,

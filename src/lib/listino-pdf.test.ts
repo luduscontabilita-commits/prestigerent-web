@@ -31,7 +31,7 @@ function catalogo(quanti: number): Servizio[] {
 describe('creaPdfListino', () => {
   for (const lingua of ['it', 'en'] as const) {
     it(`${lingua}: 95 servizi stanno in due pagine A4, anche con caratteri che Helvetica non ha`, async () => {
-      const file = await creaPdfListino({ servizi: catalogo(95), lingua, azienda: { anno_fondazione: 2000, voto_medio: 4.9 }, logoPng: null, data: '12 ottobre 2026' });
+      const file = await creaPdfListino({ servizi: catalogo(95), lingua, azienda: { anno_fondazione: 2000, voto_medio: 4.9 }, logoPng: null, data: '2026' });
       const pdf = await PDFDocument.load(file);
       expect(pdf.getPageCount()).toBe(2);
       const [l, a] = [pdf.getPage(0).getWidth(), pdf.getPage(0).getHeight()];
