@@ -111,44 +111,48 @@ export default async function Flotta() {
                     </Text>
                   )}
                   {m.suRichiesta && <Text size="sm">{m.suRichiesta}</Text>}
-                  {usati.length > 0 && (
-                    m.gruppi ? (
-                      <Group gap={6}>
-                        {usati.map((s) => (
-                          <Badge key={s.slug} variant="light" radius="xl" style={{ textTransform: 'none' }}>
-                            {s.nome}
-                          </Badge>
-                        ))}
-                      </Group>
-                    ) : (
-                      <details>
-                        <summary style={{ cursor: 'pointer', fontSize: 14 }}>
-                          Show the {usati.length} services
-                        </summary>
-                        <Text size="sm" mt={6} c="dimmed" lh={1.7}>
-                          {usati.map((s) => s.nome).join(' · ')}
-                        </Text>
-                      </details>
-                    )
+                  {/* L'elenco intero dei servizi c'e' solo per il minibus (tre
+                      tour). Per le auto era «Show the 83 services», tolto su
+                      richiesta della proprieta' il 12/10/2026: la riga sopra
+                      dice gia' per chi sono. */}
+                  {m.gruppi && usati.length > 0 && (
+                    <Group gap={6}>
+                      {usati.map((s) => (
+                        <Badge key={s.slug} variant="light" radius="xl" style={{ textTransform: 'none' }}>
+                          {s.nome}
+                        </Badge>
+                      ))}
+                    </Group>
                   )}
                 </div>
-
-                <Text size="xs" c="dimmed">
-                  Photo of the model, not of our vehicle: {m.credito.autore},{' '}
-                  <Anchor href={m.credito.licenzaUrl} target="_blank" rel="noopener" size="xs">
-                    {m.credito.licenza}
-                  </Anchor>
-                  , via{' '}
-                  <Anchor href={m.credito.fonte} target="_blank" rel="noopener" size="xs">
-                    Wikimedia Commons
-                  </Anchor>
-                  ; background removed.
-                </Text>
               </Stack>
             </Card>
           );
         })}
       </SimpleGrid>
+
+      {/* 🔴 I CREDITI DELLE FOTO NON SI TOLGONO DEL TUTTO.
+          Stavano sotto ogni scheda; la proprieta' (12/10/2026) li ha
+          chiesti via dalle schede. Ma le licenze CC BY e CC BY-SA
+          OBBLIGANO a citare autore e licenza: senza, le foto si usano in
+          violazione. Quindi stanno qui, una riga sola in fondo. */}
+      <Text size="xs" c="dimmed" mt="xl" lh={1.7}>
+        Vehicle photos show the model, not our own vehicles; backgrounds removed. Credits:{' '}
+        {FLOTTA.map((m, i) => (
+          <span key={m.chiave}>
+            {i > 0 ? ' · ' : ''}
+            {m.nome}:{' '}
+            <Anchor href={m.credito.fonte} target="_blank" rel="noopener" size="xs" c="dimmed" underline="always">
+              {m.credito.autore}
+            </Anchor>
+            ,{' '}
+            <Anchor href={m.credito.licenzaUrl} target="_blank" rel="noopener" size="xs" c="dimmed" underline="always">
+              {m.credito.licenza}
+            </Anchor>
+          </span>
+        ))}
+        , via Wikimedia Commons.
+      </Text>
     </Guscio>
   );
 }

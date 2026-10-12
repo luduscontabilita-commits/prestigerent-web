@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Alert, Anchor, Badge, Button, Card, Code, Group, SegmentedControl, Stack, Table, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Badge, Button, Card, Code, Drawer, Group, SegmentedControl, Stack, Table, Text, Title } from '@mantine/core';
 import type { Esito, EsitoApprova } from '@/app/admin/listino/azioni';
 
 /* LE RICHIESTE DI ACCESSO E GLI UTENTI DEL LISTINO.
@@ -41,10 +41,52 @@ export type Partner = {
   /** dalla richiesta di accesso: `profili` non li conserva */
   telefono: string | null;
   azienda: string | null;
+  /** la richiesta da cui e' nato l'accesso, intera; null per un accesso
+   *  creato a mano (il partner di prova) */
+  richiesta: RichiestaListino | null;
 };
 
 const data = (s: string | null) =>
   s ? new Date(s).toLocaleString('it-IT', { timeZone: 'Europe/Rome', dateStyle: 'medium', timeStyle: 'short' }) : '—';
+
+/** Il pannello con TUTTO quello che la persona ha scritto registrandosi,
+ *  per decisione della proprieta' (12/10/2026): l'admin deve poter
+ *  vedere i dati di chi ha accesso, non solo nome ed email. Si apre da
+ *  una richiesta o da un partner gia' approvato. */
+function SchedaDati({ r, p }: { r: RichiestaListino | null; p?: Partner }) {
+  const riga = (etichetta: string, valore: React.ReactNode) => (
+    <Table.Tr key={etichetta}>
+      <Table.Th w={150} style={{ verticalAlign: 'top' }}>{etichetta}</Table.Th>
+      <Table.Td style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{valore || '—'}</Table.Td>
+    </Table.Tr>
+  );
+  return (
+    <Stack gap="md">
+      {!r && (
+        <Alert color="gray" variant="light">
+          Questo accesso non è nato da una registrazione (è stato creato a mano): non ci sono dati inseriti dall’utente.
+        </Alert>
+      )}
+      <Table withRowBorders verticalSpacing="xs">
+        <Table.Tbody>
+          {r && riga('Nome', r.nome)}
+          {r && riga('Cognome', r.cognome)}
+          {r && riga('Azienda', r.azienda)}
+          {r && riga('Tipo di attività', r.tipo_attivita)}
+          {r && riga('Paese', r.paese)}
+          {riga('Email', <Anchor href={`mailto:${r?.email ?? p?.email}`}>{r?.email ?? p?.email}</Anchor>)}
+          {r && riga('Telefono', r.telefono ? <Anchor href={`tel:${r.telefono.replace(/[^\d+]/g, '')}`}>{r.telefono}</Anchor> : null)}
+          {r && riga('Sito', r.sito_web ? <Anchor href={r.sito_web} target="_blank" rel="noopener noreferrer">{r.sito_web}</Anchor> : null)}
+          {r && riga('Note', r.note)}
+          {r && riga('Richiesta arrivata', data(r.creata_il))}
+          {r && riga('Stato', r.stato === 'in_attesa' ? 'in attesa' : r.stato === 'approvata' ? `approvata il ${data(r.decisa_il)}` : `rifiutata il ${data(r.decisa_il)}`)}
+          {p && riga('Accesso', p.attivo ? 'attivo' : 'chiuso')}
+          {p && riga('Ultimo accesso', data(p.ultimo_accesso))}
+        </Table.Tbody>
+      </Table>
+    </Stack>
+  );
+}
 
 export function RichiesteListino({
   richieste,
@@ -65,6 +107,7 @@ export function RichiesteListino({
   const [vista, setVista] = useState<'in_attesa' | 'decise'>('in_attesa');
   const [lavoro, setLavoro] = useState<string | null>(null);
   const [esito, setEsito] = useState<{ colore: string; titolo: string; testo?: string; password?: string } | null>(null);
+  const [scheda, setScheda] = useState<{ titolo: string; r: RichiestaListino | null; p?: Partner } | null>(null);
 
   const inAttesa = richieste.filter((r) => r.stato === 'in_attesa');
   const decise = richieste.filter((r) => r.stato !== 'in_attesa');
@@ -90,6 +133,16 @@ export function RichiesteListino({
 
   return (
     <Stack gap="xl">
+      <Drawer
+        opened={!!scheda}
+        onClose={() => setScheda(null)}
+        position="right"
+        size="md"
+        title={<Text fw={800}>{scheda?.titolo}</Text>}
+      >
+        {scheda && <SchedaDati r={scheda.r} p={scheda.p} />}
+      </Drawer>
+
       {esito && (
         <Alert color={esito.colore} variant="light" title={esito.titolo} withCloseButton onClose={() => setEsito(null)}>
           {esito.testo && <Text size="sm">{esito.testo}</Text>}
@@ -145,6 +198,9 @@ export function RichiesteListino({
                 </Stack>
                 {r.stato === 'in_attesa' ? (
                   <Group gap="xs">
+                    <Button size="sm" variant="subtle" onClick={() => setScheda({ titolo: `${r.nome} ${r.cognome}`, r })}>
+                      Dati
+                    </Button>
                     <Button
                       size="sm"
                       loading={lavoro === 'ok:' + r.id}
@@ -169,9 +225,14 @@ export function RichiesteListino({
                     </Button>
                   </Group>
                 ) : (
-                  <Badge variant="light" color={r.stato === 'approvata' ? 'teal' : 'gray'}>
-                    {r.stato === 'approvata' ? 'approvata' : 'rifiutata'}
-                  </Badge>
+                  <Group gap="xs">
+                    <Button size="sm" variant="subtle" onClick={() => setScheda({ titolo: `${r.nome} ${r.cognome}`, r })}>
+                      Dati
+                    </Button>
+                    <Badge variant="light" color={r.stato === 'approvata' ? 'teal' : 'gray'}>
+                      {r.stato === 'approvata' ? 'approvata' : 'rifiutata'}
+                    </Badge>
+                  </Group>
                 )}
               </Group>
             </Card>
@@ -215,6 +276,13 @@ export function RichiesteListino({
                     </Table.Td>
                     <Table.Td>
                       <Group gap="xs" justify="flex-end" wrap="nowrap">
+                        <Button
+                          size="xs"
+                          variant="subtle"
+                          onClick={() => setScheda({ titolo: p.nome ?? p.email, r: p.richiesta, p })}
+                        >
+                          Dati
+                        </Button>
                         <Button
                           size="xs"
                           variant="default"

@@ -23,7 +23,7 @@ export const metadata = { robots: { index: false, follow: false } };
  *  email. Senza, l'elenco «Chi vede il listino» mostrerebbe solo nome ed
  *  email -- e la proprieta' vuole poter richiamare chiunque abbia
  *  accesso. */
-function conRecapiti(partner: Omit<Partner, 'telefono' | 'azienda'>[], richieste: RichiestaListino[]): Partner[] {
+function conRecapiti(partner: Omit<Partner, 'telefono' | 'azienda' | 'richiesta'>[], richieste: RichiestaListino[]): Partner[] {
   const per = new Map<string, RichiestaListino>();
   /* le richieste arrivano dalla piu' recente: vince l'ultima approvata */
   for (const r of richieste) {
@@ -32,7 +32,9 @@ function conRecapiti(partner: Omit<Partner, 'telefono' | 'azienda'>[], richieste
   }
   return partner.map((p) => {
     const r = per.get(p.email.toLowerCase());
-    return { ...p, telefono: r?.telefono ?? null, azienda: r?.azienda ?? null };
+    /* La richiesta intera: il pannello «Dati» mostra tutto quello che la
+       persona ha scritto registrandosi, non solo i recapiti. */
+    return { ...p, telefono: r?.telefono ?? null, azienda: r?.azienda ?? null, richiesta: r ?? null };
   });
 }
 
@@ -54,12 +56,12 @@ export default async function Richieste() {
       chi={comeSiChiama(io)}
       ruolo={io.ruolo}
       voci={vociPerRuolo(io.ruolo)}
-      titolo="Richieste di accesso al listino"
-      sottotitolo="Chi si registra da prestigerent.com/admin/listino/register/ compare qui. Approvando, il sito crea l’accesso e manda all’utente un’email con la password: potrà vedere solo il listino e la flotta."
+      titolo="Accessi listino e flotta"
+      sottotitolo="Chi si registra da prestigerent.com/admin/listino/register/ compare qui. Approvando, il sito crea l’accesso e manda all’utente un’email con la password: potrà vedere solo il listino e la flotta. Sotto, chi li vede già."
     >
       <RichiesteListino
         richieste={(richieste ?? []) as RichiestaListino[]}
-        partner={conRecapiti((partner ?? []) as Omit<Partner, 'telefono' | 'azienda'>[], (richieste ?? []) as RichiestaListino[])}
+        partner={conRecapiti((partner ?? []) as Omit<Partner, 'telefono' | 'azienda' | 'richiesta'>[], (richieste ?? []) as RichiestaListino[])}
         approva={approvaRichiesta}
         rifiuta={rifiutaRichiesta}
         nuovaPassword={nuovaPasswordPartner}

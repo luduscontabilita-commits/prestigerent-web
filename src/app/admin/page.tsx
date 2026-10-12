@@ -8,6 +8,7 @@ import {
   IconPhoto,
   IconReceiptEuro,
   IconSearch,
+  IconUserShield,
   IconUsers,
 } from '@tabler/icons-react';
 import { chiSono, haRuolo, RUOLI_GESTIONE } from '@/lib/auth';
@@ -72,9 +73,17 @@ export default async function Pannello() {
           href: '/admin/listino/',
           titolo: 'Listino prezzi',
           testo:
-            'Tutti i servizi con i prezzi di ogni opzione, letti da Regiondo. Da qui si allineano le tab PRICES e si approvano le agenzie che chiedono l’accesso.',
+            'Tutti i servizi con i prezzi di ogni opzione, letti da Regiondo, e la flotta. Da qui si allineano le tab PRICES delle schede.',
           icona: IconReceiptEuro,
           colore: 'orange',
+        },
+        {
+          href: '/admin/listino/richieste/',
+          titolo: 'Accessi listino e flotta',
+          testo:
+            'Agenzie, hotel e partner che chiedono di vedere il listino: si approvano o si rifiutano. Qui anche chi lo vede già, con i suoi recapiti.',
+          icona: IconUserShield,
+          colore: 'red',
         },
         {
           href: '/admin/utenti/',

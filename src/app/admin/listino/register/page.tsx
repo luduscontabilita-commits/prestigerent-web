@@ -72,6 +72,16 @@ export default function RichiestaAccesso() {
       <Center mih="calc(100dvh - 2rem)">
         <Paper shadow="xl" radius="lg" p={{ base: 'lg', sm: 40 }} w="100%" maw={560}>
           <Stack gap="xs" mb="lg">
+            {/* Lo stesso logo di /admin/listino/login/ e /admin/entra/: sta
+                su Supabase Storage, una copia sola per tutto il sito. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png"
+              alt="Prestige Rent"
+              width={72}
+              height={72}
+              style={{ display: 'block', margin: '0 auto 8px' }}
+            />
             <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
               PRESTIGE RENT · PARTNERS
             </Text>

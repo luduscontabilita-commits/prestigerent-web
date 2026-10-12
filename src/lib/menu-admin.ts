@@ -27,7 +27,7 @@ export type VoceMenu = {
   /** il nome dell'icona, non l'icona: una funzione non attraversa il
    *  confine fra server e client. La traduzione in componente avviene
    *  dentro il guscio, che e' gia' nel browser. */
-  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta';
+  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta' | 'accessi';
   /** Le pagine dentro questa sezione, mostrate quando la sezione e'
    *  aperta. SOLO I TITOLI: la spiegazione di ognuna sta gia' sulla
    *  pagina della sezione, e ripeterla in una barra laterale larga 260px
@@ -83,10 +83,16 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       sotto: [
         { href: '/admin/listino/', testo: 'Listino' },
         { href: '/admin/listino/sincronizza/', testo: 'Sincronizza tab PRICES' },
-        { href: '/admin/listino/richieste/', testo: 'Richieste di accesso' },
         { href: '/admin/listino/flotta/', testo: 'Flotta' },
       ],
     },
+    /* Voce a se' per decisione della proprieta' (12/10/2026): chi entra
+       nel listino e nella flotta e' una faccenda di PERSONE, non di
+       prezzi. L'indirizzo resta sotto /admin/listino/ perche' e' gia'
+       scritto nelle email di avviso; la voce accesa la decide il prefisso
+       piu' lungo (vedi `migliore` in Guscio.tsx), quindi su questa pagina
+       si accende questa e non «Listino prezzi». */
+    { href: '/admin/listino/richieste/', testo: 'Accessi listino e flotta', icona: 'accessi' },
     { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },
   ];
 }

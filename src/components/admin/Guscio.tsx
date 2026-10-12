@@ -23,6 +23,7 @@ import {
   IconPhoto,
   IconReceiptEuro,
   IconSearch,
+  IconUserShield,
   IconUsers,
 } from '@tabler/icons-react';
 import { esciEVai } from '@/app/admin/entra/azioni';
@@ -57,6 +58,7 @@ const ICONE = {
   utenti: IconUsers,
   listino: IconReceiptEuro,
   flotta: IconBus,
+  accessi: IconUserShield,
 };
 
 /** Come si chiama il ruolo in testata. L'utente del listino e' un

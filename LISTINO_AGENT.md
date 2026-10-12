@@ -11,7 +11,7 @@ qualcosa non va.
 | `/admin/listino/` | admin + partner | tutti i servizi con i prezzi di ogni variante e opzione, da Regiondo |
 | `/admin/listino/flotta/` | admin + partner | i 6 mezzi, posti massimi, a quali servizi servono |
 | `/admin/listino/sincronizza/` | solo admin | tabella prima/dopo delle tab PRICES e pulsante per allinearle |
-| `/admin/listino/richieste/` | solo admin | richieste di accesso: approva / rifiuta; partner: password nuova, chiudi accesso |
+| `/admin/listino/richieste/` | solo admin | voce di menu a sé, «Accessi listino e flotta»: richieste da approvare o rifiutare; partner già approvati con i recapiti, password nuova, chiudi accesso |
 | `/admin/listino/login/` | pubblico | accesso dei partner (email + password), in inglese |
 | `/admin/listino/register/` | pubblico | richiesta di accesso, in inglese |
 
@@ -128,9 +128,11 @@ la modifica prima che vada online.
   - **telefono**, obbligatorio per decisione della proprietà del
     12/10/2026: nome, email e telefono sono il minimo.
 
-  Facoltativi: sito e note. L'admin vede tutto in «Richieste di accesso»
-  e nell'email di avviso. Per i partner già approvati, telefono e azienda
-  si leggono dalla loro richiesta.
+  Facoltativi: sito e note. L'admin vede tutto in «Accessi listino e
+  flotta» e nell'email di avviso. Il pulsante **«Dati»** apre il pannello
+  laterale con tutti i campi scritti alla registrazione. Lo si trova su
+  ogni richiesta e su ogni partner già approvato: per questi i dati si
+  leggono dalla loro richiesta, perché `profili` non li conserva.
 - **Freni alla registrazione:**
   - un campo esca;
   - una sola richiesta in attesa per indirizzo;
@@ -150,13 +152,16 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
 | Isuzu minibus (6 in flotta) | 25 | i 3 small group |
 | Mercedes Atego (4 in flotta) | 36 | gruppi da 9 in su, eventi e matrimoni, su richiesta; uno ha il bagno e 28 posti |
 
-- **Abbinamento mezzo → tour:** confermato dalla proprietà. L'elenco dei
-  tour sotto ogni mezzo si calcola dal catalogo (`impiegoDi`): i servizi
-  «per party» vanno alle auto, quelli «per person» al minibus.
+- **Abbinamento mezzo → tour:** confermato dalla proprietà. Per le auto la
+  pagina dice solo per quante persone sono: l'elenco «Show the 83
+  services» è stato tolto su richiesta della proprietà. Per il minibus
+  elenca i 3 small group, calcolati dal catalogo (`impiegoDi`).
 - I 25 posti dell'Isuzu sono stati confermati dalla proprietà.
 - 🔴 **Le foto non sono dei nostri mezzi.** Vengono da Wikimedia Commons
-  (CC BY-SA). La pagina lo dice e cita autore, licenza e fonte di
-  ognuna.
+  (CC BY-SA). I crediti (autore, licenza, fonte) stanno in **una riga in
+  fondo alla pagina**. Dalle schede li ha fatti togliere la proprietà, ma
+  del tutto non si possono togliere: la licenza obbliga a citare
+  l'autore.
 - 🔴 **Niente marchi di altre aziende** (proprietà, 12/10/2026). Restano
   solo quelli del costruttore. Le prime foto dei bus portavano la livrea
   di altre compagnie e sono state sostituite: l'Isuzu ora è un Turquoise
