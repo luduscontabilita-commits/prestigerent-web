@@ -120,6 +120,17 @@ la modifica prima che vada online.
   3. si manda l'email con la password.
 
   Se l'email non parte, il pannello mostra la password all'admin.
+- **I dati della registrazione.** Obbligatori:
+  - nome e cognome;
+  - azienda e tipo di attività;
+  - paese;
+  - email;
+  - **telefono**, obbligatorio per decisione della proprietà del
+    12/10/2026: nome, email e telefono sono il minimo.
+
+  Facoltativi: sito e note. L'admin vede tutto in «Richieste di accesso»
+  e nell'email di avviso. Per i partner già approvati, telefono e azienda
+  si leggono dalla loro richiesta.
 - **Freni alla registrazione:**
   - un campo esca;
   - una sola richiesta in attesa per indirizzo;

@@ -18,6 +18,24 @@ export const metadata = { robots: { index: false, follow: false } };
  * Gli utenti gia' approvati si gestiscono SOLO qui: /admin/utenti/ elenca
  * guide e admin e non li mostra. Qui ci sono i due comandi che servono:
  * chiudere l'accesso e mandare una password nuova. */
+/** Telefono e azienda dei partner gia' approvati. `profili` non li ha:
+ *  stanno nella richiesta da cui il partner e' nato, e si ritrovano per
+ *  email. Senza, l'elenco «Chi vede il listino» mostrerebbe solo nome ed
+ *  email -- e la proprieta' vuole poter richiamare chiunque abbia
+ *  accesso. */
+function conRecapiti(partner: Omit<Partner, 'telefono' | 'azienda'>[], richieste: RichiestaListino[]): Partner[] {
+  const per = new Map<string, RichiestaListino>();
+  /* le richieste arrivano dalla piu' recente: vince l'ultima approvata */
+  for (const r of richieste) {
+    const k = r.email.toLowerCase();
+    if (r.stato === 'approvata' && !per.has(k)) per.set(k, r);
+  }
+  return partner.map((p) => {
+    const r = per.get(p.email.toLowerCase());
+    return { ...p, telefono: r?.telefono ?? null, azienda: r?.azienda ?? null };
+  });
+}
+
 export default async function Richieste() {
   const io = await soloGestione();
   const sb = await supabaseServer();
@@ -41,7 +59,7 @@ export default async function Richieste() {
     >
       <RichiesteListino
         richieste={(richieste ?? []) as RichiestaListino[]}
-        partner={(partner ?? []) as Partner[]}
+        partner={conRecapiti((partner ?? []) as Omit<Partner, 'telefono' | 'azienda'>[], (richieste ?? []) as RichiestaListino[])}
         approva={approvaRichiesta}
         rifiuta={rifiutaRichiesta}
         nuovaPassword={nuovaPasswordPartner}

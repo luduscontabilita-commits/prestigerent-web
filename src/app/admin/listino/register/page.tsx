@@ -110,7 +110,7 @@ export default function RichiestaAccesso() {
                 </SimpleGrid>
                 <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="md">
                   <TextInput id="email" label="Email" type="email" required autoComplete="email" description="Your password will be sent here" {...campo('email')} />
-                  <TextInput id="telefono" label="Phone" type="tel" autoComplete="tel" {...campo('telefono')} />
+                  <TextInput id="telefono" label="Phone" type="tel" required autoComplete="tel" description="With country code, e.g. +44 20 1234 5678" {...campo('telefono')} />
                 </SimpleGrid>
                 <TextInput id="sito" label="Website" placeholder="https://" autoComplete="url" {...campo('sito')} />
                 <Textarea id="note" label="Anything we should know?" autosize minRows={2} maxRows={6} {...campo('note')} />

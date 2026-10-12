@@ -73,6 +73,13 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
     return { ok: false, errore: 'Please check your email address.' };
   }
   if (paese.length < 2) return { ok: false, errore: 'Please write your country.' };
+  /* OBBLIGATORIO per decisione della proprieta' (12/10/2026): nome, email
+     e telefono sono il minimo per richiamare chi chiede l'accesso. Almeno
+     sei cifre, e solo caratteri da numero di telefono: «n/a» o «-» non
+     richiamano nessuno. */
+  if ((telefono.match(/\d/g) ?? []).length < 6 || !/^[+\d\s().\-/]+$/.test(telefono)) {
+    return { ok: false, errore: 'Please write a phone number where we can reach you, with country code.' };
+  }
   if (sito && !/^https?:\/\//i.test(sito)) sito = `https://${sito}`;
 
   const sb = clientSegreto();
@@ -107,7 +114,7 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
     tipo_attivita: tipo,
     paese,
     email,
-    telefono: telefono || null,
+    telefono,
     sito_web: sito || null,
     note: note || null,
     /* per riconoscere a colpo d'occhio un'ondata di richieste finte */
@@ -124,7 +131,7 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
       oggetto: `Listino: richiesta di accesso da ${azienda}`,
       testo:
         `${nome} ${cognome} (${azienda}, ${tipo}, ${paese}) chiede di vedere il listino prezzi.\n\n` +
-        `Email: ${email}\nTelefono: ${telefono || '—'}\nSito: ${sito || '—'}\n` +
+        `Email: ${email}\nTelefono: ${telefono}\nSito: ${sito || '—'}\n` +
         (note ? `\nNote:\n${note}\n` : '') +
         `\nPer approvarla o rifiutarla: https://prestigerent.com/admin/listino/richieste/`,
     });

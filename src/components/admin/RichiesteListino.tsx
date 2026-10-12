@@ -38,6 +38,9 @@ export type Partner = {
   nome: string | null;
   attivo: boolean;
   ultimo_accesso: string | null;
+  /** dalla richiesta di accesso: `profili` non li conserva */
+  telefono: string | null;
+  azienda: string | null;
 };
 
 const data = (s: string | null) =>
@@ -197,8 +200,14 @@ export function RichiesteListino({
                 {partner.map((p) => (
                   <Table.Tr key={p.id}>
                     <Table.Td>
-                      <Text size="sm" fw={600}>{p.nome ?? p.email}</Text>
-                      <Text size="xs" c="dimmed">{p.email}</Text>
+                      <Text size="sm" fw={600}>
+                        {p.nome ?? p.email}
+                        {p.azienda ? <Text span c="dimmed" fw={500}> · {p.azienda}</Text> : null}
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        {p.email}
+                        {p.telefono ? ` · ${p.telefono}` : ''}
+                      </Text>
                     </Table.Td>
                     <Table.Td><Text size="sm">{data(p.ultimo_accesso)}</Text></Table.Td>
                     <Table.Td>
