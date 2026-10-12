@@ -56,9 +56,20 @@ export default async function Listino({
       titolo="Listino prezzi"
       sottotitolo={`Tutti i servizi del sito con i prezzi di ogni variante e opzione, letti da Regiondo il ${quando}. Si rileggono da soli ogni cinque minuti. I partner lo vedono, in inglese, su prestigerent.com/partners/.`}
       azioni={
-        <Button component="a" href="/admin/partners/listino/?fresco=1" variant="default" size="sm">
-          Rileggi adesso da Regiondo
-        </Button>
+        <>
+          {/* La brochure da stampare per le fiere: due facciate A4, con i
+              prezzi letti adesso (src/lib/listino-pdf.ts). Link normali e
+              non bottoni d'azione: e' un file da scaricare. */}
+          <Button component="a" href="/admin/partners/listino/pdf/?lingua=it" variant="filled" size="sm">
+            PDF italiano
+          </Button>
+          <Button component="a" href="/admin/partners/listino/pdf/?lingua=en" variant="filled" size="sm">
+            PDF English
+          </Button>
+          <Button component="a" href="/admin/partners/listino/?fresco=1" variant="default" size="sm">
+            Rileggi adesso da Regiondo
+          </Button>
+        </>
       }
     >
       {daAggiornare > 0 && (

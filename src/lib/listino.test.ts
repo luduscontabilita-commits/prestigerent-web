@@ -50,6 +50,12 @@ describe('righeDelServizio', () => {
     ]);
   });
 
+  it('anche «1person» attaccato, come lo scrivono alcune schede di Regiondo', () => {
+    const r = righeDelServizio([v('Private', [['1person', 590], ['2 people', 680]])]);
+    expect(r.perPersone).toBe(true);
+    expect(r.righe.map((x) => x.etichetta)).toEqual(['1', '2']);
+  });
+
   it('le varianti in colonna; un’opzione che manca in una variante resta vuota', () => {
     const r = righeDelServizio([v('AM', [['Adult', 89], ['Youth', 79]]), v('Semi', [['Adult', 129]])]);
     expect(r.perPersone).toBe(false);

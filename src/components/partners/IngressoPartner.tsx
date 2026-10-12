@@ -11,11 +11,10 @@ import {
   Select,
   SimpleGrid,
   Stack,
-  Tabs,
+  VisuallyHidden,
   Text,
   TextInput,
   Textarea,
-  Title,
 } from '@mantine/core';
 import { IconAlertCircle, IconAt, IconCircleCheck, IconLock } from '@tabler/icons-react';
 import { accedi, registraRichiesta, type DatiRegistrazione } from '@/app/partners/azioni';
@@ -65,34 +64,32 @@ export function IngressoPartner({ lingua }: { lingua: Lingua }) {
   return (
     <Box mih="100dvh" bg="dark.8" p="md">
       <Center mih="calc(100dvh - 2rem)">
-        <Paper shadow="xl" radius="lg" p={{ base: 'lg', sm: 40 }} w="100%" maw={560}>
+        {/* 760px su desktop: a 560 il modulo di richiesta, con i campi a due
+            colonne, era troppo stretto (proprieta', 12/10/2026). */}
+        <Paper shadow="xl" radius="lg" p={{ base: 'lg', sm: 40 }} w="100%" maw={760}>
           <Stack gap={4} mb="lg" align="center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={LOGO} alt="Prestige Rent" width={72} height={72} style={{ display: 'block', marginBottom: 6 }} />
             <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
               {T.marchio}
             </Text>
-            <Title order={1} size="h3" ta="center">{T.titoloIngresso}</Title>
-            <Text size="sm" c="dimmed" ta="center" maw={420}>
-              {T.perChi}
-            </Text>
+            {/* Titolo, sottotitolo e la barra «Accedi / Richiedi l'accesso»
+                tolti su richiesta della proprieta' (12/10/2026). Il titolo
+                resta per i lettori di schermo; da una scheda all'altra si
+                passa coi link in fondo a ciascun modulo. */}
+            <VisuallyHidden>
+              <h1>{scheda === 'request' ? T.schedaRichiesta : T.schedaAccesso}</h1>
+            </VisuallyHidden>
             <Box mt={6}>
               <SelettoreLingua lingua={lingua} size="sm" />
             </Box>
           </Stack>
 
-          <Tabs value={scheda} onChange={setScheda} variant="pills" radius="xl">
-            <Tabs.List grow mb="lg">
-              <Tabs.Tab value="signin">{T.schedaAccesso}</Tabs.Tab>
-              <Tabs.Tab value="request">{T.schedaRichiesta}</Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel value="signin">
-              <Accesso T={T} lingua={lingua} vaiARichiesta={() => setScheda('request')} />
-            </Tabs.Panel>
-            <Tabs.Panel value="request">
-              <Richiesta T={T} lingua={lingua} vaiAdAccesso={() => setScheda('signin')} />
-            </Tabs.Panel>
-          </Tabs>
+          {scheda === 'request' ? (
+            <Richiesta T={T} lingua={lingua} vaiAdAccesso={() => setScheda('signin')} />
+          ) : (
+            <Accesso T={T} lingua={lingua} vaiARichiesta={() => setScheda('request')} />
+          )}
         </Paper>
       </Center>
     </Box>
@@ -254,6 +251,12 @@ function Richiesta({ T, lingua, vaiAdAccesso }: { T: Testi; lingua: Lingua; vaiA
             {errore}
           </Alert>
         )}
+        <Text size="sm" ta="center">
+          {T.haiGiaAccesso}{' '}
+          <Text span c="prestige.7" fw={700} style={{ cursor: 'pointer' }} onClick={vaiAdAccesso}>
+            {T.schedaAccesso}
+          </Text>
+        </Text>
         <Text size="xs" c="dimmed" ta="center">
           {T.privacy}
         </Text>

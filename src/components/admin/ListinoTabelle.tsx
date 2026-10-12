@@ -26,6 +26,7 @@ import {
   IconUsersGroup,
   IconGlassFull,
   IconExternalLink,
+  IconPencil,
 } from '@tabler/icons-react';
 import { raggruppa, righeDelServizio, type ChiaveSezione, type Servizio } from '@/lib/listino';
 import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
@@ -221,6 +222,17 @@ export function ListinoTabelle({
   );
 }
 
+/** La pagina dei PREZZI del prodotto nel pannello di Regiondo (passo 3
+ *  della scheda prodotto). Il numero e' la parte finale dello SKU:
+ *  T-PR193-299825 -> 299825. L'indirizzo che usa Regiondo porta anche un
+ *  `draft_id`, che cambia a ogni modifica e da qui non si conosce: senza,
+ *  Regiondo apre la scheda e ne crea uno. Serve aver fatto l'accesso a
+ *  Regiondo nello stesso browser. */
+function linkRegiondo(sku: string): string | null {
+  const n = sku.match(/^T-PR\d+-(\d+)$/)?.[1];
+  return n ? `https://www.regiondo.it/product/ticket/create/step/3/edit/${n}/lang/3` : null;
+}
+
 /** Le variabili della tinta di una scheda, lette da ListinoTabelle.module.css. */
 function tinta(colore: string): React.CSSProperties {
   const v: Record<string, string> = {};
@@ -255,7 +267,28 @@ function Scheda({ s, T, admin, stato, colore, lingua }: { s: Servizio; T: Testi;
             )}
           </Group>
         </Group>
-        {admin && s.sku && <Text size="xs" c="dimmed" ff="monospace" mt={2}>{s.sku}</Text>}
+        {admin && s.sku && (
+          <Group gap="xs" mt={4} wrap="wrap">
+            <Text size="xs" c="dimmed" ff="monospace">{s.sku}</Text>
+            {linkRegiondo(s.sku) && (
+              /* Dalla tabella alla pagina dei prezzi del prodotto su
+                 Regiondo, per correggerli al volo (richiesta della
+                 proprieta', 12/10/2026). Solo per l'admin: al partner lo
+                 SKU non arriva nemmeno. */
+              <Button
+                component="a"
+                href={linkRegiondo(s.sku)!}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="compact-xs"
+                variant="default"
+                leftSection={<IconPencil size={13} />}
+              >
+                Modifica prezzi su Regiondo
+              </Button>
+            )}
+          </Group>
+        )}
       </div>
 
       <div>

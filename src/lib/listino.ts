@@ -95,11 +95,13 @@ export function righeDelServizio(varianti: Variante[]): {
 } {
   const nomi: string[] = [];
   for (const v of varianti) for (const o of v.opzioni) if (!nomi.includes(o.nome)) nomi.push(o.nome);
-  const perPersone = nomi.length > 0 && nomi.every((n) => /^\d+\s+(person|people)$/i.test(n));
+  /* `\s*` e non `\s+`: su Regiondo alcune opzioni sono scritte «1person»,
+     attaccato (trovato il 12/10/2026 su tre servizi). */
+  const perPersone = nomi.length > 0 && nomi.every((n) => /^\d+\s*(person|people)$/i.test(n));
   return {
     perPersone,
     righe: nomi.map((n) => ({
-      etichetta: perPersone ? n.replace(/\s+(person|people)$/i, '') : n,
+      etichetta: perPersone ? n.replace(/\s*(person|people)$/i, '') : n,
       prezzi: varianti.map((v) => v.opzioni.find((o) => o.nome === n)?.prezzo ?? null),
     })),
   };

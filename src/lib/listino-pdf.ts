@@ -1,0 +1,347 @@
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import { raggruppa, righeDelServizio, type Servizio, type Variante } from './listino';
+import { testiDi, type Lingua } from './partners-testi';
+
+/* IL LISTINO IN PDF, DA STAMPARE COME BROCHURE (richiesta della
+ * proprieta' del 12/10/2026: «da mostrare ai clienti a una fiera»).
+ *
+ * Due facciate A4, in italiano o in inglese: in cima logo, presentazione
+ * e contatti; poi TUTTI i servizi in una tabella compatta, una riga per
+ * servizio (o per variante) con le colonne «1 … 8 persone». I servizi a
+ * persona (Adult/Youth) scrivono i loro prezzi nella riga.
+ *
+ * Funzione PURA: riceve i dati e restituisce il file. La legge la rotta
+ * /admin/partners/listino/pdf/ (solo admin), e la si puo' provare fuori
+ * da Next sui prezzi veri.
+ *
+ * ── STARE IN DUE PAGINE ──────────────────────────────────────────────
+ * Le righe sono ~110. La misura del carattere si sceglie da sola: si
+ * impagina a 8 pt e si scende finche' tutto sta in due facciate (mai
+ * sotto 5,8 pt, che stampato e' ancora leggibile) -- vedi
+ * `creaPdfListino`. Se un giorno i servizi
+ * raddoppiassero, il PDF passerebbe a tre pagine invece di diventare
+ * illeggibile.
+ *
+ * ── I CARATTERI ──────────────────────────────────────────────────────
+ * Helvetica dei font standard del PDF: nessun file da incorporare, e il
+ * PDF pesa pochi KB. Copre l'euro e le lettere accentate italiane, non
+ * simboli come le stelle: `pulito()` li toglie, altrimenti pdf-lib
+ * fermerebbe la generazione con un errore. */
+
+export type DatiAzienda = {
+  anno_fondazione?: number | null;
+  telefono?: string | null;
+  email?: string | null;
+  indirizzo?: string | null;
+  whatsapp?: string | null;
+  voto_medio?: number | null;
+  tour_effettuati?: number | null;
+};
+
+const A4: [number, number] = [595.28, 841.89];
+const MARGINE = 30;
+const INCHIOSTRO = rgb(0.141, 0.2, 0.247); // #24333F, l'inchiostro del sito
+const GRIGIO = rgb(0.42, 0.46, 0.5);
+const RIGA = rgb(0.95, 0.96, 0.97);
+const LINEA = rgb(0.85, 0.87, 0.89);
+const ARANCIO = rgb(0.929, 0.404, 0.027); // #ED6707, l'arancio Prestige
+
+/** Solo caratteri che Helvetica (WinAnsi) sa scrivere. */
+function pulito(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/…/g, '...')
+    .replace(/[^\x20-\x7E -ÿ€–—•·]/g, '');
+}
+
+function euro(n: number, lingua: Lingua): string {
+  const intero = Number.isInteger(n);
+  const [i, d] = n.toFixed(intero ? 0 : 2).split('.');
+  const sep = lingua === 'it' ? '.' : ',';
+  const migliaia = i.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+  const dec = d ? (lingua === 'it' ? ',' : '.') + d : '';
+  return lingua === 'it' ? `€ ${migliaia}${dec}` : `€${migliaia}${dec}`;
+}
+
+const TESTI_PDF = {
+  en: {
+    sottotitolo: 'Private tours, small group tours, shore excursions and transfers in Tuscany and Italy',
+    intro: (anno: number) =>
+      `Since ${anno} Prestige Rent has been driving travellers across Tuscany and Italy from its base in Florence. ` +
+      'We own and maintain our fleet of Mercedes cars, vans, minibuses and coaches, driven by our own employed drivers, ' +
+      'and we run every tour ourselves: private days in Chianti, Siena and the Val d’Orcia, small group tours, wine experiences, ' +
+      'shore excursions from the cruise ports and transfers between cities, ports and airports.',
+    fatti: (anno: number, voto: number | null, tour: number | null) =>
+      [`Since ${anno}`, 'Based in Florence', 'Our own fleet and drivers', voto ? `Rated ${voto}/5 by our guests` : null, tour ? `${tour.toLocaleString('en-GB')}+ tours` : null]
+        .filter(Boolean)
+        .join('  ·  '),
+    titoloListino: (data: string) => `Price list ${data}`,
+    nota: 'Prices in euro for the whole vehicle and party, unless marked "per person". Columns: number of people in the party.',
+    persone: 'People',
+    perPersona: 'per person',
+    piede: 'Prices may change: the current price is always the one on prestigerent.com and at the time of booking.',
+    pagina: (n: number, di: number) => `Page ${n} of ${di}`,
+  },
+  it: {
+    sottotitolo: 'Tour privati, tour in piccolo gruppo, escursioni dai porti e transfer in Toscana e in Italia',
+    intro: (anno: number) =>
+      `Dal ${anno} Prestige Rent accompagna i viaggiatori in Toscana e in tutta Italia, partendo da Firenze. ` +
+      'La flotta è nostra – auto, van, minibus e pullman Mercedes e Isuzu – e la guidano i nostri autisti, ' +
+      'e ogni tour lo facciamo noi: giornate private nel Chianti, a Siena e in Val d’Orcia, tour in piccolo gruppo, esperienze di vino, ' +
+      'escursioni dai porti delle navi da crociera e transfer fra città, porti e aeroporti.',
+    fatti: (anno: number, voto: number | null, tour: number | null) =>
+      [`Dal ${anno}`, 'Sede a Firenze', 'Flotta e autisti nostri', voto ? `Voto ${String(voto).replace('.', ',')}/5 dai nostri ospiti` : null, tour ? `Oltre ${tour.toLocaleString('it-IT')} tour` : null]
+        .filter(Boolean)
+        .join('  ·  '),
+    titoloListino: (data: string) => `Listino prezzi ${data}`,
+    nota: 'Prezzi in euro per l’intero veicolo e gruppo, salvo dove è indicato «a persona». Colonne: numero di persone del gruppo.',
+    persone: 'Persone',
+    perPersona: 'a persona',
+    piede: 'I prezzi possono cambiare: vale sempre quello su prestigerent.com e al momento della prenotazione.',
+    pagina: (n: number, di: number) => `Pagina ${n} di ${di}`,
+  },
+};
+
+type Riga =
+  | { tipo: 'sezione'; testo: string }
+  | { tipo: 'gruppo'; testo: string }
+  | { tipo: 'servizio'; nome: string; rientro: boolean; prezzi: (number | null)[] | null; testoPrezzi: string | null };
+
+/** Due titoli di varianti uniti senza ripetere l'inizio comune:
+ *  «Driver + Guide in Florence + Accademia tickets» e «… + Uffizi
+ *  tickets» diventano «Driver + Guide in Florence + Accademia tickets /
+ *  Uffizi tickets». Altrimenti si scriverebbe due volte la stessa frase e
+ *  la riga verrebbe tagliata. */
+function unisciTitoli(a: string, b: string): string {
+  const pa = a.split(' ');
+  const pb = b.split(' ');
+  let i = 0;
+  while (i < pa.length - 1 && i < pb.length - 1 && pa[i] === pb[i]) i++;
+  return i >= 2 ? `${a} / ${pb.slice(i).join(' ')}` : `${a} / ${b}`;
+}
+
+/** Le varianti identiche (stesse opzioni, stessi prezzi: mattina e
+ *  pomeriggio) si scrivono una volta sola, coi titoli uniti. */
+function variantiUniche(varianti: Variante[]): { titolo: string; v: Variante }[] {
+  const fuori: { titolo: string; v: Variante; firma: string }[] = [];
+  for (const v of varianti) {
+    if (!v.opzioni.length) continue;
+    const firma = JSON.stringify(v.opzioni.map((o) => [o.nome, o.prezzo]));
+    const gia = fuori.find((x) => x.firma === firma);
+    if (gia) gia.titolo = unisciTitoli(gia.titolo, v.titolo);
+    else fuori.push({ titolo: v.titolo, v, firma });
+  }
+  return fuori;
+}
+
+function righeDelPdf(servizi: Servizio[], lingua: Lingua): Riga[] {
+  const T = testiDi(lingua);
+  const P = TESTI_PDF[lingua];
+  const righe: Riga[] = [];
+  for (const sez of raggruppa(servizi)) {
+    righe.push({ tipo: 'sezione', testo: T.sezioni[sez.chiave] });
+    for (const g of sez.gruppi) {
+      if (g.gruppo) {
+        righe.push({
+          tipo: 'gruppo',
+          testo: sez.chiave === 'cruise' && g.gruppo !== 'Other ports' ? T.porto + g.gruppo : T.gruppi[g.gruppo] ?? g.gruppo,
+        });
+      }
+      for (const s of g.servizi) {
+        const uniche = variantiUniche(s.varianti ?? []);
+        if (!uniche.length) continue;
+        const { perPersone } = righeDelServizio(uniche.map((u) => u.v));
+        const prezziPersone = (v: Variante) =>
+          Array.from({ length: 8 }, (_, i) => v.opzioni.find((o) => Number(o.nome.trim().match(/^\d+/)?.[0]) === i + 1)?.prezzo ?? null);
+        const testoOpzioni = (v: Variante) => v.opzioni.map((o) => `${o.nome.trim()} ${euro(o.prezzo, lingua)}`).join('  ·  ');
+        const nome = s.unita === 'per person' ? `${s.nome} (${P.perPersona})` : s.nome;
+        if (uniche.length === 1) {
+          righe.push(
+            perPersone
+              ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null }
+              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v) }
+          );
+        } else {
+          righe.push({ tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: null });
+          for (const u of uniche) {
+            righe.push(
+              perPersone
+                ? { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: prezziPersone(u.v), testoPrezzi: null }
+                : { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: null, testoPrezzi: testoOpzioni(u.v) }
+            );
+          }
+        }
+      }
+    }
+  }
+  return righe;
+}
+
+/** Il testo tagliato con «...» se non sta nella larghezza. */
+function taglia(t: string, font: PDFFont, misura: number, larghezza: number): string {
+  let s = pulito(t);
+  if (font.widthOfTextAtSize(s, misura) <= larghezza) return s;
+  while (s.length > 1 && font.widthOfTextAtSize(s + '...', misura) > larghezza) s = s.slice(0, -1);
+  return s.trimEnd() + '...';
+}
+
+/** Le righe di un paragrafo che sta in `larghezza`. */
+function aCapo(t: string, font: PDFFont, misura: number, larghezza: number): string[] {
+  const parole = pulito(t).split(/\s+/);
+  const righe: string[] = [];
+  let r = '';
+  for (const p of parole) {
+    const prova = r ? r + ' ' + p : p;
+    if (font.widthOfTextAtSize(prova, misura) > larghezza && r) {
+      righe.push(r);
+      r = p;
+    } else r = prova;
+  }
+  if (r) righe.push(r);
+  return righe;
+}
+
+type DatiPdf = {
+  servizi: Servizio[];
+  lingua: Lingua;
+  azienda: DatiAzienda;
+  logoPng: Uint8Array | null;
+  /** la data di lettura dei prezzi, gia' scritta (es. «12 ott 2026») */
+  data: string;
+};
+
+/** Il PDF piu' leggibile che stia in DUE facciate: si impagina davvero a
+ *  8 pt e, se escono tre pagine, si riprova un poco piu' piccolo. Una
+ *  stima dell'altezza sbagliava di due righe (l'introduzione inglese e'
+ *  piu' lunga di quella italiana): contare le pagine vere non sbaglia. */
+export async function creaPdfListino(dati: DatiPdf): Promise<Uint8Array> {
+  let ultimo: Uint8Array | null = null;
+  for (let misura = 8; misura >= 5.8; misura -= 0.2) {
+    const { file, pagine } = await componi(dati, misura);
+    ultimo = file;
+    if (pagine <= 2) return file;
+  }
+  return ultimo!;
+}
+
+async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Array; pagine: number }> {
+  const { lingua, azienda } = dati;
+  const P = TESTI_PDF[lingua];
+  const pdf = await PDFDocument.create();
+  pdf.setTitle(pulito(`Prestige Rent - ${P.titoloListino(dati.data)}`));
+  pdf.setAuthor('Prestige Rent');
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const grassetto = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const logo = dati.logoPng ? await pdf.embedPng(dati.logoPng).catch(() => null) : null;
+  const righe = righeDelPdf(dati.servizi, lingua);
+
+  const L = A4[0] - 2 * MARGINE; // larghezza utile
+  const COLONNE = 8;
+  const larghezzaPrezzo = 34;
+  const larghezzaNome = L - COLONNE * larghezzaPrezzo;
+
+  /* ── la testata della prima pagina: si misura prima, per sapere quanto
+     spazio resta alla tabella ── */
+  const anno = azienda.anno_fondazione ?? 2000;
+  const intro = aCapo(P.intro(anno), font, 8.6, L);
+  const piede = 26;
+  const passo = misura * 1.42;
+
+  let pagina: PDFPage = pdf.addPage(A4);
+  const pagine: PDFPage[] = [pagina];
+  let y = A4[1] - MARGINE;
+
+  const testo = (p: PDFPage, t: string, x: number, yy: number, m: number, f: PDFFont = font, colore: RGB = INCHIOSTRO) =>
+    p.drawText(pulito(t), { x, y: yy, size: m, font: f, color: colore });
+  const aDestra = (p: PDFPage, t: string, xDestra: number, yy: number, m: number, f: PDFFont = font, colore: RGB = INCHIOSTRO) =>
+    testo(p, t, xDestra - f.widthOfTextAtSize(pulito(t), m), yy, m, f, colore);
+
+  /* ── TESTATA ── */
+  const lato = 46;
+  if (logo) pagina.drawImage(logo, { x: MARGINE, y: y - lato, width: lato, height: lato });
+  const xTitolo = MARGINE + (logo ? lato + 12 : 0);
+  testo(pagina, 'PRESTIGE RENT', xTitolo, y - 20, 20, grassetto);
+  testo(pagina, P.sottotitolo, xTitolo, y - 34, 8.4, font, GRIGIO);
+  const contatti = [azienda.telefono ?? '+39 055 286059', azienda.email ?? 'usa@prestigerent.com', 'prestigerent.com'];
+  contatti.forEach((c, i) => aDestra(pagina, c, A4[0] - MARGINE, y - 12 - i * 11, 8.4, i === 2 ? grassetto : font));
+  y -= 58;
+  pagina.drawRectangle({ x: MARGINE, y: y + 6, width: 40, height: 2, color: ARANCIO });
+  for (const r of intro) {
+    y -= 11;
+    testo(pagina, r, MARGINE, y, 8.6);
+  }
+  y -= 14;
+  testo(pagina, P.fatti(anno, azienda.voto_medio ?? null, azienda.tour_effettuati ?? null), MARGINE, y, 8.2, grassetto);
+  y -= 20;
+
+  /* ── la tabella ── */
+  const intestazione = (p: PDFPage) => {
+    testo(p, P.titoloListino(dati.data), MARGINE, y, misura * 1.5, grassetto);
+    y -= passo * 1.3;
+    p.drawRectangle({ x: MARGINE, y: y - 3, width: L, height: passo + 2, color: INCHIOSTRO });
+    testo(p, P.persone.toUpperCase(), MARGINE + 4, y, misura * 0.92, grassetto, rgb(1, 1, 1));
+    for (let i = 0; i < COLONNE; i++) {
+      aDestra(p, String(i + 1), MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4, y, misura, grassetto, rgb(1, 1, 1));
+    }
+    y -= passo * 1.4;
+  };
+  testo(pagina, taglia(P.nota, font, misura, L), MARGINE, y + 4 - 0, misura, font, GRIGIO);
+  y -= passo * 1.6;
+  intestazione(pagina);
+
+  let pari = false;
+  for (const r of righe) {
+    const h = r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : passo;
+    if (y - h < MARGINE + piede) {
+      pagina = pdf.addPage(A4);
+      pagine.push(pagina);
+      y = A4[1] - MARGINE - 4;
+      intestazione(pagina);
+    }
+    if (r.tipo === 'sezione') {
+      y -= passo * 0.7;
+      pagina.drawRectangle({ x: MARGINE, y: y - 2, width: 3, height: passo, color: ARANCIO });
+      testo(pagina, r.testo.toUpperCase(), MARGINE + 7, y, misura * 1.08, grassetto);
+      pagina.drawLine({ start: { x: MARGINE, y: y - 3.5 }, end: { x: MARGINE + L, y: y - 3.5 }, thickness: 0.6, color: LINEA });
+      y -= passo * 1.2;
+      pari = false;
+      continue;
+    }
+    if (r.tipo === 'gruppo') {
+      testo(pagina, r.testo, MARGINE + 2, y, misura * 0.95, grassetto, GRIGIO);
+      y -= passo * 1.25;
+      pari = false;
+      continue;
+    }
+    if (pari) pagina.drawRectangle({ x: MARGINE, y: y - passo * 0.3, width: L, height: passo, color: RIGA });
+    pari = !pari;
+    const rientro = r.rientro ? 10 : 2;
+    const fNome = r.rientro ? font : grassetto;
+    if (r.prezzi) {
+      testo(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome);
+      r.prezzi.forEach((p, i) => {
+        if (p == null) return;
+        aDestra(pagina, euro(p, lingua), MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4, y, misura);
+      });
+    } else if (r.testoPrezzi) {
+      const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);
+      testo(pagina, nome, MARGINE + rientro, y, misura, fNome);
+      testo(pagina, taglia(r.testoPrezzi, font, misura, COLONNE * larghezzaPrezzo - 4), MARGINE + larghezzaNome + 4, y, misura);
+    } else {
+      testo(pagina, taglia(r.nome, fNome, misura, L - rientro), MARGINE + rientro, y, misura, fNome);
+    }
+    y -= passo;
+  }
+
+  /* ── il piede, su ogni pagina ── */
+  const indirizzo = azienda.indirizzo ?? 'Via Della Saggina 98, 50145 Florence, Italy';
+  pagine.forEach((p, i) => {
+    p.drawLine({ start: { x: MARGINE, y: MARGINE + 14 }, end: { x: A4[0] - MARGINE, y: MARGINE + 14 }, thickness: 0.5, color: LINEA });
+    testo(p, taglia(`Prestige Rent  ·  ${indirizzo}  ·  ${P.piede}`, font, 6.4, L - 60), MARGINE, MARGINE + 4, 6.4, font, GRIGIO);
+    aDestra(p, P.pagina(i + 1, pagine.length), A4[0] - MARGINE, MARGINE + 4, 6.4, font, GRIGIO);
+  });
+
+  return { file: await pdf.save(), pagine: pagine.length };
+}

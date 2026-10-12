@@ -11,7 +11,7 @@ nell'indirizzo.
 
 | Indirizzo | Chi | Cosa |
 |---|---|---|
-| `/partners/` | pubblico | una pagina con due schede, «Sign in» e «Request access» |
+| `/partners/` | pubblico | accesso; il link «Richiedilo / Request access» porta al modulo di richiesta (o `/partners/#request`) |
 | `/partners/enter/?t=…` | chi ha il link dell'email | entra senza scrivere niente (vedi sotto) |
 | `/partners/price-list/` | partner, admin | il listino, senza codici Regiondo |
 | `/partners/fleet/` | partner, admin | i 6 mezzi, una riga per mezzo |
@@ -20,7 +20,8 @@ nell'indirizzo.
 
 | Indirizzo | Voce di menu | Cosa |
 |---|---|---|
-| `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU e stato della tab PRICES |
+| `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU, stato della tab PRICES, link «Modifica prezzi su Regiondo» per ogni servizio, pulsanti «PDF italiano / PDF English» |
+| `/admin/partners/listino/pdf/?lingua=it\|en` | (pulsanti) | la brochure in PDF, solo admin |
 | `/admin/partners/sincronizza/` | Listino prezzi → Sincronizza tab PRICES | tabella prima/dopo e pulsante per allineare |
 | `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, in italiano |
 | `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
@@ -94,6 +95,40 @@ un tour operator. Vede **solo** listino e flotta.
   riconosceva la versione del sito e ricaricava la pagina **per intero**
   a ogni aggiornamento, in tutto il pannello. Spiegato in
   `src/app/admin/layout.tsx`.
+
+## La brochure in PDF
+
+Il PDF si scarica dai pulsanti **«PDF italiano» / «PDF English»** in
+`/admin/partners/listino/`. È fatto per essere stampato e mostrato ai
+clienti in fiera (proprietà, 12/10/2026).
+
+- **Cosa contiene:** due facciate A4. In cima logo, presentazione,
+  contatti e i numeri dell'azienda (dalla tabella `azienda`). Poi tutti
+  i servizi con i prezzi letti da Regiondo in quel momento: una riga per
+  servizio o per variante, colonne da 1 a 8 persone; i servizi a persona
+  hanno «Adult € … · Youth € …» nella riga.
+- **Il codice:** `src/lib/listino-pdf.ts` (funzione pura, provata da
+  `listino-pdf.test.ts`) e la rotta `/admin/partners/listino/pdf/`, che
+  controlla il ruolo e risponde 403 a chi non è admin.
+- **Due pagine sempre:** il generatore impagina davvero a 8 pt e, se
+  escono tre pagine, riprova con un carattere più piccolo, fino a 5,8 pt.
+  Con 86 servizi oggi stanno in due pagine a 8 pt in italiano, poco
+  meno in inglese.
+- **Helvetica standard:** niente font da incorporare, il file pesa circa
+  34 KB. I caratteri che non conosce (stelle e simili) li toglie
+  `pulito()`.
+- **Varianti uguali:** mattina e pomeriggio con gli stessi prezzi stanno
+  in una riga sola; «Accademia» e «Uffizi» si scrivono senza ripetere
+  l'inizio comune.
+
+## Il link a Regiondo dal listino dell'admin
+
+Ogni scheda del listino dell'admin ha **«Modifica prezzi su Regiondo»**,
+che apre `regiondo.it/product/ticket/create/step/3/edit/<numero>/lang/3`.
+Il numero è la parte finale dello SKU (T-PR193-**299825**). L'indirizzo
+che usa Regiondo ha anche un `draft_id`, che cambia a ogni modifica e da
+qui non si conosce. Serve aver fatto l'accesso a Regiondo nello stesso
+browser. Il partner non lo vede: a lui lo SKU non arriva.
 
 ## L'email di accesso e il link diretto
 
