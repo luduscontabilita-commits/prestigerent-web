@@ -154,8 +154,9 @@
 }
 
 .c {
-  /* come il Net, misura e colore (proprieta', 12/10/2026: piu' piccola
-     e grigia si leggeva male) */
+  /* IDENTICA al Net: misura, colore e spessore (proprieta', 12/10/2026:
+     «il commission deve essere visivamente uguale al net») */
+  font-weight: 600;
   font-size: 13px;
   color: var(--mantine-color-dark-5);
 }
@@ -197,6 +198,7 @@
 
 .comm {
   text-align: right;
+  font-weight: 600;
   color: var(--mantine-color-dark-5);
 }
 
