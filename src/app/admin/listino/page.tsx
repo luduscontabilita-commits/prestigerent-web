@@ -88,7 +88,14 @@ export default async function Listino({
             : 'Some prices could not be loaded right now. Please reload the page in a few minutes.'}
         </Alert>
       )}
-      <ListinoTabelle servizi={servizi} lingua={admin ? 'it' : 'en'} statiTab={statiTab} />
+      {/* Al partner non si mandano i codici Regiondo: non li vede a
+          schermo, ma senza questa riga viaggerebbero comunque nei dati
+          della pagina (provato il 12/10/2026 sull'HTML pubblicato). */}
+      <ListinoTabelle
+        servizi={admin ? servizi : servizi.map((s) => ({ ...s, sku: '' }))}
+        lingua={admin ? 'it' : 'en'}
+        statiTab={statiTab}
+      />
       {!admin && (
         <Text size="sm" c="dimmed" mt="xl">
           Prices per party are for the whole vehicle and group, not per person. For larger parties or custom itineraries,
