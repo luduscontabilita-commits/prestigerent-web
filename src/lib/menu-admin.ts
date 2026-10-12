@@ -21,6 +21,8 @@
  * per i componenti.
  */
 
+import { testiDi, type Lingua } from './partners-testi';
+
 export type VoceMenu = {
   href: string;
   testo: string;
@@ -43,12 +45,7 @@ export type VoceMenu = {
 export function vociPerRuolo(ruolo: string): VoceMenu[] {
   /* L'utente del listino (un'agenzia, un hotel) vede due pagine e
      nient'altro, in inglese: niente gallery, che e' delle guide. */
-  if (ruolo === 'listino') {
-    return [
-      { href: '/partners/price-list/', testo: 'Price list', icona: 'listino' },
-      { href: '/partners/fleet/', testo: 'Our fleet', icona: 'flotta' },
-    ];
-  }
+  if (ruolo === 'listino') return vociPartner('en');
 
   /* Le due che valgono per tutti: una guida carica e guarda le sue. Le
      altre quattro sono di gestione, e stanno dietro `soloGestione()`
@@ -83,9 +80,12 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       sotto: [
         { href: '/admin/partners/listino/', testo: 'Listino' },
         { href: '/admin/partners/sincronizza/', testo: 'Sincronizza tab PRICES' },
-        { href: '/admin/partners/flotta/', testo: 'Flotta' },
       ],
     },
+    /* Voce a se' per decisione della proprieta' (12/10/2026): la flotta
+       non e' un pezzo del listino. Stessa pagina che vede il partner su
+       /partners/fleet/. */
+    { href: '/admin/partners/flotta/', testo: 'Flotta', icona: 'flotta' },
     /* «Partners»: chi entra nell'area partner (prestigerent.com/partners/).
        Voce a se' per decisione della proprieta' (12/10/2026): e' una
        faccenda di PERSONE, non di prezzi -- per questo non sta sotto
@@ -100,5 +100,14 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       ],
     },
     { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },
+  ];
+}
+
+/** Le due voci dell'area partner, nella lingua scelta col selettore. */
+export function vociPartner(lingua: Lingua): VoceMenu[] {
+  const T = testiDi(lingua);
+  return [
+    { href: '/partners/price-list/', testo: T.menuListino, icona: 'listino' },
+    { href: '/partners/fleet/', testo: T.menuFlotta, icona: 'flotta' },
   ];
 }

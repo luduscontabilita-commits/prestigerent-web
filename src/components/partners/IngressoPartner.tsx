@@ -19,6 +19,8 @@ import {
 } from '@mantine/core';
 import { IconAlertCircle, IconAt, IconCircleCheck, IconLock } from '@tabler/icons-react';
 import { accedi, registraRichiesta, type DatiRegistrazione } from '@/app/partners/azioni';
+import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
+import { SelettoreLingua } from './SelettoreLingua';
 
 /* L'INGRESSO DEI PARTNER: prestigerent.com/partners/, in inglese.
  *
@@ -45,7 +47,7 @@ const VUOTI: DatiRegistrazione = {
   nome: '',
   cognome: '',
   azienda: '',
-  tipo: 'Travel agency',
+  tipo: '',
   paese: '',
   email: '',
   telefono: '',
@@ -54,7 +56,8 @@ const VUOTI: DatiRegistrazione = {
   sitoWeb2: '',
 };
 
-export function IngressoPartner() {
+export function IngressoPartner({ lingua }: { lingua: Lingua }) {
+  const T = testiDi(lingua);
   const [scheda, setScheda] = useState<string | null>(() =>
     typeof window !== 'undefined' && window.location.hash === '#request' ? 'request' : 'signin'
   );
@@ -67,24 +70,27 @@ export function IngressoPartner() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={LOGO} alt="Prestige Rent" width={72} height={72} style={{ display: 'block', marginBottom: 6 }} />
             <Text size="xs" fw={800} c="dimmed" style={{ letterSpacing: '.1em' }}>
-              PRESTIGE RENT · PARTNERS
+              {T.marchio}
             </Text>
-            <Title order={1} size="h3" ta="center">Price list and fleet</Title>
+            <Title order={1} size="h3" ta="center">{T.titoloIngresso}</Title>
             <Text size="sm" c="dimmed" ta="center" maw={420}>
-              For travel agencies, tour operators, hotels and concierges.
+              {T.perChi}
             </Text>
+            <Box mt={6}>
+              <SelettoreLingua lingua={lingua} size="sm" />
+            </Box>
           </Stack>
 
           <Tabs value={scheda} onChange={setScheda} variant="pills" radius="xl">
             <Tabs.List grow mb="lg">
-              <Tabs.Tab value="signin">Sign in</Tabs.Tab>
-              <Tabs.Tab value="request">Request access</Tabs.Tab>
+              <Tabs.Tab value="signin">{T.schedaAccesso}</Tabs.Tab>
+              <Tabs.Tab value="request">{T.schedaRichiesta}</Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value="signin">
-              <Accesso vaiARichiesta={() => setScheda('request')} />
+              <Accesso T={T} lingua={lingua} vaiARichiesta={() => setScheda('request')} />
             </Tabs.Panel>
             <Tabs.Panel value="request">
-              <Richiesta vaiAdAccesso={() => setScheda('signin')} />
+              <Richiesta T={T} lingua={lingua} vaiAdAccesso={() => setScheda('signin')} />
             </Tabs.Panel>
           </Tabs>
         </Paper>
@@ -93,7 +99,7 @@ export function IngressoPartner() {
   );
 }
 
-function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
+function Accesso({ T, lingua, vaiARichiesta }: { T: Testi; lingua: Lingua; vaiARichiesta: () => void }) {
   /* /partners/?email=... arriva da un link dell'email scaduto
      (EntraDalLink): l'indirizzo si scrive da solo, resta la password. */
   const [email, setEmail] = useState(() =>
@@ -107,10 +113,10 @@ function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
     e.preventDefault();
     setInvio(true);
     setErrore('');
-    const r = await accedi(email, pw);
+    const r = await accedi(email, pw, lingua);
     if (!r.ok) {
       setInvio(false);
-      setErrore(r.errore ?? 'Something went wrong. Please try again.');
+      setErrore(r.errore ?? T.erroreGenerico);
       return;
     }
     /* Voluto, come in /admin/entra/: un caricamento vero ricostruisce la
@@ -125,7 +131,7 @@ function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
       <Stack gap="md">
         <TextInput
           id="email"
-          label="Email"
+          label={T.email}
           placeholder="you@company.com"
           required
           size="md"
@@ -140,7 +146,7 @@ function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
         />
         <PasswordInput
           id="password"
-          label="Password"
+          label={T.password}
           required
           size="md"
           leftSection={<IconLock size={17} stroke={1.6} />}
@@ -149,7 +155,7 @@ function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
           autoComplete="current-password"
         />
         <Button type="submit" size="md" fullWidth loading={invio} mt="xs">
-          Sign in
+          {T.entra}
         </Button>
         {errore && (
           <Alert color="red" variant="light" icon={<IconAlertCircle size={18} />} role="alert">
@@ -157,21 +163,21 @@ function Accesso({ vaiARichiesta }: { vaiARichiesta: () => void }) {
           </Alert>
         )}
         <Text size="sm" ta="center">
-          No access yet?{' '}
+          {T.nonHaiAccesso}{' '}
           <Text span c="prestige.7" fw={700} style={{ cursor: 'pointer' }} onClick={vaiARichiesta}>
-            Request access
+            {T.chiediAccesso}
           </Text>
         </Text>
         <Text size="xs" c="dimmed" lh={1.6} ta="center">
-          Lost your password? Write to usa@prestigerent.com and we will send you a new one.
+          {T.passwordPersa}
         </Text>
       </Stack>
     </form>
   );
 }
 
-function Richiesta({ vaiAdAccesso }: { vaiAdAccesso: () => void }) {
-  const [d, setD] = useState<DatiRegistrazione>(VUOTI);
+function Richiesta({ T, lingua, vaiAdAccesso }: { T: Testi; lingua: Lingua; vaiAdAccesso: () => void }) {
+  const [d, setD] = useState<DatiRegistrazione>({ ...VUOTI, tipo: T.tipi[0] });
   const [invio, setInvio] = useState(false);
   const [errore, setErrore] = useState('');
   const [fatto, setFatto] = useState(false);
@@ -188,19 +194,19 @@ function Richiesta({ vaiAdAccesso }: { vaiAdAccesso: () => void }) {
     e.preventDefault();
     setInvio(true);
     setErrore('');
-    const r = await registraRichiesta(d);
+    const r = await registraRichiesta(d, lingua);
     setInvio(false);
-    if (!r.ok) return setErrore(r.errore ?? 'Something went wrong. Please try again.');
+    if (!r.ok) return setErrore(r.errore ?? T.erroreGenerico);
     setFatto(true);
   };
 
   if (fatto) {
     return (
       <Stack gap="md">
-        <Alert color="teal" variant="light" icon={<IconCircleCheck size={18} />} title="Thank you, we have your request">
-          We will email you at {d.email} as soon as your access is approved, usually within one working day.
+        <Alert color="teal" variant="light" icon={<IconCircleCheck size={18} />} title={T.grazieTitolo}>
+          {T.grazieTesto(d.email)}
         </Alert>
-        <Button variant="default" onClick={vaiAdAccesso}>Go to sign in</Button>
+        <Button variant="default" onClick={vaiAdAccesso}>{T.vaiAccesso}</Button>
       </Stack>
     );
   }
@@ -209,30 +215,30 @@ function Richiesta({ vaiAdAccesso }: { vaiAdAccesso: () => void }) {
     <form onSubmit={invia}>
       <Stack gap="md">
         <Text size="sm" c="dimmed">
-          Tell us who you are. We review every request and email you your password once it is approved.
+          {T.spiegaRichiesta}
         </Text>
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="md">
-          <TextInput id="nome" label="First name" required autoComplete="given-name" {...campo('nome')} />
-          <TextInput id="cognome" label="Last name" required autoComplete="family-name" {...campo('cognome')} />
+          <TextInput id="nome" label={T.nome} required autoComplete="given-name" {...campo('nome')} />
+          <TextInput id="cognome" label={T.cognome} required autoComplete="family-name" {...campo('cognome')} />
         </SimpleGrid>
-        <TextInput id="azienda" label="Company" required autoComplete="organization" {...campo('azienda')} />
+        <TextInput id="azienda" label={T.azienda} required autoComplete="organization" {...campo('azienda')} />
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="md">
           <Select
             id="tipo"
-            label="Business type"
-            data={['Travel agency', 'Tour operator', 'Hotel', 'Cruise line', 'Concierge', 'Other']}
+            label={T.tipo}
+            data={T.tipi}
             value={d.tipo}
-            onChange={(v) => setD((x) => ({ ...x, tipo: v ?? 'Other' }))}
+            onChange={(v) => setD((x) => ({ ...x, tipo: v ?? T.tipi[T.tipi.length - 1] }))}
             allowDeselect={false}
           />
-          <TextInput id="paese" label="Country" required autoComplete="country-name" {...campo('paese')} />
+          <TextInput id="paese" label={T.paese} required autoComplete="country-name" {...campo('paese')} />
         </SimpleGrid>
         <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="md">
-          <TextInput id="email-richiesta" label="Email" type="email" required autoComplete="email" description="Your password will be sent here" {...campo('email')} />
-          <TextInput id="telefono" label="Phone" type="tel" required autoComplete="tel" description="With country code, e.g. +44 20 1234 5678" {...campo('telefono')} />
+          <TextInput id="email-richiesta" label={T.email} type="email" required autoComplete="email" description={T.emailNota} {...campo('email')} />
+          <TextInput id="telefono" label={T.telefono} type="tel" required autoComplete="tel" description={T.telefonoNota} {...campo('telefono')} />
         </SimpleGrid>
-        <TextInput id="sito" label="Website" placeholder="https://" autoComplete="url" {...campo('sito')} />
-        <Textarea id="note" label="Anything we should know?" autosize minRows={2} maxRows={6} {...campo('note')} />
+        <TextInput id="sito" label={T.sito} placeholder="https://" autoComplete="url" {...campo('sito')} />
+        <Textarea id="note" label={T.note} autosize minRows={2} maxRows={6} {...campo('note')} />
 
         {/* il campo esca */}
         <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
@@ -241,7 +247,7 @@ function Richiesta({ vaiAdAccesso }: { vaiAdAccesso: () => void }) {
         </div>
 
         <Button type="submit" size="md" loading={invio}>
-          Send request
+          {T.invia}
         </Button>
         {errore && (
           <Alert color="red" variant="light" icon={<IconAlertCircle size={18} />} role="alert">
@@ -249,7 +255,7 @@ function Richiesta({ vaiAdAccesso }: { vaiAdAccesso: () => void }) {
           </Alert>
         )}
         <Text size="xs" c="dimmed" ta="center">
-          We use these details only to review your request and to contact you about it.
+          {T.privacy}
         </Text>
       </Stack>
     </form>

@@ -29,6 +29,8 @@ import {
 import { esciEVai } from '@/app/admin/entra/azioni';
 import { esciPartner } from '@/app/partners/azioni';
 import type { VoceMenu } from '@/lib/menu-admin';
+import { testiDi, type Lingua } from '@/lib/partners-testi';
+import { SelettoreLingua } from '@/components/partners/SelettoreLingua';
 
 /* IL GUSCIO DEL PANNELLO: barra laterale, intestazione, uscita.
  *
@@ -78,6 +80,7 @@ export function Guscio({
   titolo,
   sottotitolo,
   azioni,
+  lingua,
   children,
 }: {
   chi: string;
@@ -87,11 +90,16 @@ export function Guscio({
   sottotitolo?: React.ReactNode;
   /** comandi propri della pagina, in alto a destra */
   azioni?: React.ReactNode;
+  /** solo per l'area partner: la lingua scelta col selettore EN/IT */
+  lingua?: Lingua;
   children: React.ReactNode;
 }) {
   const [aperta, { toggle, close }] = useDisclosure();
   const percorso = usePathname();
-  const inglese = ruolo === 'listino';
+  /* Il partner ha la sua area, in inglese o in italiano a scelta
+     (src/lib/partners-testi.ts); il pannello dell'admin e' in italiano. */
+  const partner = ruolo === 'listino';
+  const T = testiDi(lingua);
   /* La voce accesa e' quella col prefisso PIU' LUNGO che combacia. Con il
      solo prefisso, dentro la flotta si accendevano insieme «Price list»
      e «Our fleet»: la prima era prefisso della seconda. Oggi vale per
@@ -114,7 +122,9 @@ export function Guscio({
             {/* Il panino compare solo sotto la soglia: sopra, la barra
                 laterale c'e' sempre e un pulsante per aprirla sarebbe un
                 comando che non fa niente. */}
-            <Burger opened={aperta} onClick={toggle} hiddenFrom="sm" size="sm" aria-label="Menu" />
+            {/* 44px di bersaglio: e' il pulsante che si preme di piu' dal
+                telefono, e a 28px (la misura di prima) lo si mancava. */}
+            <Burger opened={aperta} onClick={toggle} hiddenFrom="sm" size="sm" aria-label="Menu" style={{ width: 44, height: 44 }} />
             {/* Lo stesso logo trasparente della schermata di accesso e
                 dell'intestazione del sito: sta su Supabase Storage, non in
                 `public/`, quindi non c'e' una seconda copia da tenere
@@ -140,15 +150,16 @@ export function Guscio({
             <Stack gap={0} visibleFrom="xs" align="flex-end">
               <Text size="sm" fw={600} lh={1.2}>{chi}</Text>
               <Text size="xs" c="dimmed" lh={1.2}>
-                {NOME_RUOLO[ruolo] ?? ruolo}
+                {partner ? T.ruolo : NOME_RUOLO[ruolo] ?? ruolo}
               </Text>
             </Stack>
             {/* Il partner esce verso /partners/, non verso la schermata di
                 accesso del pannello: quella e' in italiano e chiede un nome
                 utente che lui non ha. */}
-            <form action={inglese ? esciPartner : esciEVai}>
-              <Button type="submit" variant="default" size="xs" leftSection={<IconLogout size={15} />}>
-                {inglese ? 'Sign out' : 'Esci'}
+            {partner && <SelettoreLingua lingua={lingua ?? 'en'} />}
+            <form action={partner ? esciPartner : esciEVai}>
+              <Button type="submit" variant="default" size="sm" leftSection={<IconLogout size={15} />}>
+                {partner ? T.esci : 'Esci'}
               </Button>
             </form>
           </Group>
@@ -218,8 +229,8 @@ export function Guscio({
 
         <AppShell.Section>
           <Text size="xs" c="dimmed" px="xs" py="sm">
-            {inglese
-              ? 'Prices are read live from our booking system, in euro.'
+            {partner
+              ? T.piede
               : 'Il pannello non è raggiungibile dal sito: l’indirizzo si scrive a mano.'}
           </Text>
         </AppShell.Section>

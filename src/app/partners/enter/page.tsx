@@ -1,4 +1,5 @@
 import { EntraDalLink } from '@/components/partners/EntraDalLink';
+import { linguaPartner } from '@/lib/partners-lingua';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,5 +10,5 @@ export const dynamic = 'force-dynamic';
  * scritta. Come funziona il gettone: src/lib/link-partner.ts. */
 export default async function Entra({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
   const { t } = await searchParams;
-  return <EntraDalLink t={t ?? ''} />;
+  return <EntraDalLink t={t ?? ''} lingua={await linguaPartner()} />;
 }

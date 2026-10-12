@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Anchor, Badge, Button, Card, Code, Drawer, Group, SegmentedControl, Stack, Table, Text, Title } from '@mantine/core';
 import type { Esito, EsitoApprova } from '@/app/admin/partners/azioni';
@@ -110,7 +110,38 @@ export function RichiesteListino({
   const router = useRouter();
   const [vista, setVista] = useState<'in_attesa' | 'decise'>('in_attesa');
   const [lavoro, setLavoro] = useState<string | null>(null);
-  const [esito, setEsito] = useState<{ colore: string; titolo: string; testo?: string; password?: string } | null>(null);
+  /* 🔴 L'ESITO SOPRAVVIVE AL RICARICAMENTO DELLA PAGINA.
+     Provato il 12/10/2026 in Chrome sul sito pubblicato: dopo un'azione
+     il `router.refresh()` riceve dal server un identificativo di build
+     diverso da quello del client e Next ricarica la pagina per intero
+     (fetch-server-response.js, «The server build does not match the
+     client build»). Lo stato del componente si perde, e con lui il
+     riquadro con la PASSWORD appena creata: si vedeva per un istante e
+     spariva. Qui l'esito passa dalla sessione del browser: si scrive
+     prima del ricaricamento e si cancella appena riletto. */
+  const [esito, setEsitoVero] = useState<{ colore: string; titolo: string; testo?: string; password?: string } | null>(null);
+  const setEsito = (e: { colore: string; titolo: string; testo?: string; password?: string } | null) => {
+    setEsitoVero(e);
+    try {
+      if (e) sessionStorage.setItem('partners-esito', JSON.stringify(e));
+      else sessionStorage.removeItem('partners-esito');
+    } catch {}
+  };
+  /* Riletto DOPO il montaggio e non nel valore iniziale: cosi' il primo
+     disegno nel browser e' identico a quello del server (niente errore di
+     idratazione). `queueMicrotask` perche' l'aggiornamento non avvenga
+     dentro il corpo dell'effetto. */
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const s = sessionStorage.getItem('partners-esito');
+        if (s) {
+          sessionStorage.removeItem('partners-esito');
+          setEsitoVero(JSON.parse(s));
+        }
+      } catch {}
+    });
+  }, []);
   const [scheda, setScheda] = useState<{ titolo: string; r: RichiestaListino | null; p?: Partner } | null>(null);
 
   const inAttesa = richieste.filter((r) => r.stato === 'in_attesa');

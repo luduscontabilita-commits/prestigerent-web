@@ -34,6 +34,14 @@ const tema = createTheme({
       '#FFF4EC', '#FFE3CE', '#FFC59B', '#FFA564', '#FD8A37',
       '#FD7A1A', '#FD720B', '#E26000', '#C95400', '#AF4700',
     ],
+    /* Il bordeaux delle esperienze di vino nel listino dei partner
+       (ListinoTabelle): ogni sezione del listino ha la sua tinta, e il
+       rosso di Mantine e' un rosso d'allarme, non un vino. Gli ultimi
+       toni riprendono il `--wine` del sito (src/styles/landing.css). */
+    vino: [
+      '#FBF0F3', '#F4DCE3', '#E8B6C4', '#DB8DA3', '#CF6884',
+      '#C04E6E', '#A83A5A', '#8E2E4A', '#7E1F33', '#6E1B2C',
+    ],
   },
   defaultRadius: 'md',
   fontFamily:

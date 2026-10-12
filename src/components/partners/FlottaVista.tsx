@@ -1,5 +1,6 @@
-import { Anchor, Badge, Group, Stack, Text, Title } from '@mantine/core';
-import { FLOTTA, impiegoDi } from '@/lib/flotta';
+import { Anchor, Badge, Box, Group, Stack, Text, Title } from '@mantine/core';
+import { FLOTTA, impiegoDi, testiMezzo } from '@/lib/flotta';
+import { testiDi, type Lingua } from '@/lib/partners-testi';
 import { tourDelListino } from '@/lib/regiondo-listino';
 import { sezioneDi, type Servizio } from '@/lib/listino';
 import { unitaDi } from '@/lib/prezzi';
@@ -18,7 +19,8 @@ import { unitaDi } from '@/lib/prezzi';
  *
  * Server Component: solo componenti Mantine SEMPLICI, senza notazione col
  * punto (regola del confine in CLAUDE.md). */
-export async function FlottaVista() {
+export async function FlottaVista({ lingua }: { lingua: Lingua }) {
+  const T = testiDi(lingua);
   /* I tour di ogni mezzo si calcolano dal catalogo, senza chiedere i
      prezzi a Regiondo: qui servono solo nome, sezione e unita'. */
   const tour = await tourDelListino();
@@ -36,6 +38,7 @@ export async function FlottaVista() {
     <Stack gap={0}>
       {FLOTTA.map((m, i) => {
         const usati = impiegoDi(m, servizi).sort((a, b) => a.nome.localeCompare(b.nome));
+        const tm = testiMezzo(m, lingua);
         return (
           <Group
             key={m.chiave}
@@ -48,11 +51,13 @@ export async function FlottaVista() {
               borderBottom: '1px solid var(--mantine-color-gray-3)',
             }}
           >
-            {/* L'immagine: riquadro fisso 2:1, uguale per tutti i mezzi. */}
-            <div
+            {/* L'immagine: riquadro fisso 2:1, uguale per tutti i mezzi.
+                Largo 320px accanto al testo; sul telefono a tutta
+                larghezza, sopra il testo (prima restava largo 320 con un
+                vuoto a destra). */}
+            <Box
+              w={{ base: '100%', xs: 320 }}
               style={{
-                width: 320,
-                maxWidth: '100%',
                 aspectRatio: '2 / 1',
                 flexShrink: 0,
                 background: 'linear-gradient(180deg, var(--mantine-color-gray-0), var(--mantine-color-gray-1))',
@@ -64,42 +69,38 @@ export async function FlottaVista() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={m.foto}
-                alt={`${m.nome}, ${m.tipo.toLowerCase()} for up to ${m.postiMax} passengers`}
+                alt={`${m.nome}, ${tm.tipo.toLowerCase()}: ${T.finoA(m.postiMax).toLowerCase()}`}
                 loading="lazy"
                 width={800}
                 height={400}
                 style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
               />
-            </div>
+            </Box>
 
             <Stack gap={6} style={{ flex: '1 1 340px', minWidth: 0 }}>
               <Group justify="space-between" align="baseline" wrap="wrap" gap="xs">
                 <div style={{ minWidth: 0 }}>
                   <Title order={2} size="h3">{m.nome}</Title>
                   <Text size="sm" c="dimmed">
-                    {m.tipo}
-                    {m.quanti ? ` · ${m.quanti} in our fleet` : ''}
+                    {tm.tipo}
+                    {m.quanti ? ` · ${T.inFlotta(m.quanti)}` : ''}
                   </Text>
                 </div>
                 <Badge size="lg" variant="light" radius="sm" style={{ textTransform: 'none' }}>
-                  Up to {m.postiMax} passengers
+                  {T.finoA(m.postiMax)}
                 </Badge>
               </Group>
 
-              <Text size="sm">{m.descrizione}</Text>
-              {(m.notaPosti || m.bagagli) && (
+              <Text size="sm">{tm.descrizione}</Text>
+              {(tm.notaPosti || tm.bagagli) && (
                 <Text size="sm" c="dimmed">
-                  {[m.notaPosti, m.bagagli ? `Luggage: ${m.bagagli}.` : null].filter(Boolean).join(' ')}
+                  {[tm.notaPosti, tm.bagagli ? `${T.bagagli}: ${tm.bagagli}.` : null].filter(Boolean).join(' ')}
                 </Text>
               )}
 
               <Text size="sm">
-                <Text span fw={700}>Used for: </Text>
-                {m.persone
-                  ? `private tours, cruise port tours and transfers for parties of ${m.persone[0]} to ${m.persone[1]} people.`
-                  : m.gruppi
-                    ? 'our small group tours.'
-                    : m.suRichiesta}
+                <Text span fw={700}>{T.usatoPer} </Text>
+                {m.persone ? T.perGruppiDi(m.persone[0], m.persone[1]) : m.gruppi ? T.perSmallGroup : tm.suRichiesta}
               </Text>
               {/* L'elenco dei tour solo per il minibus (tre): per le auto
                   erano 83, tolto su richiesta della proprieta'. */}
@@ -124,7 +125,7 @@ export async function FlottaVista() {
           {conCrediti.map((m, i) => (
             <span key={m.chiave}>
               {i > 0 ? ' · ' : ''}
-              {m.nome}: photo of the model, not of our vehicle, by{' '}
+              {m.nome}: {T.creditoFoto}{' '}
               <Anchor href={m.credito!.fonte} target="_blank" rel="noopener" size="xs" c="dimmed" underline="always">
                 {m.credito!.autore}
               </Anchor>
@@ -132,7 +133,7 @@ export async function FlottaVista() {
               <Anchor href={m.credito!.licenzaUrl} target="_blank" rel="noopener" size="xs" c="dimmed" underline="always">
                 {m.credito!.licenza}
               </Anchor>
-              , via Wikimedia Commons, background removed.
+              , {T.creditoVia}
             </span>
           ))}
         </Text>

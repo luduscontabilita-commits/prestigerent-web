@@ -7,6 +7,7 @@ import { clientSegreto } from '@/lib/chiave-segreta';
 import { normalizza, pareEmail } from '@/lib/accesso';
 import { invia } from '@/lib/posta';
 import { leggiLinkPartner } from '@/lib/link-partner';
+import { testiDi, tipoInInglese, type Lingua } from '@/lib/partners-testi';
 
 /* LE AZIONI DELL'AREA PARTNER (prestigerent.com/partners/): chiedere di
  * vedere il listino, entrare, uscire. Le prime due si chiamano senza aver
@@ -52,7 +53,9 @@ const TIPI = ['Travel agency', 'Tour operator', 'Hotel', 'Cruise line', 'Concier
 
 const corto = (s: unknown, max: number) => (typeof s === 'string' ? s.trim().slice(0, max) : '');
 
-export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
+export async function registraRichiesta(d: DatiRegistrazione, lingua: Lingua = 'en'): Promise<Esito> {
+  /* I messaggi nella lingua dell'area (selettore EN/IT): src/lib/partners-testi.ts */
+  const T = testiDi(lingua);
   /* Il robot che riempie tutto riceve un «ok» e non scrive niente: un
      errore gli direbbe quale campo evitare la volta dopo. */
   if (corto(d?.sitoWeb2, 200)) return { ok: true };
@@ -60,33 +63,36 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
   const nome = corto(d.nome, 80);
   const cognome = corto(d.cognome, 80);
   const azienda = corto(d.azienda, 160);
-  const tipo = TIPI.includes(d.tipo) ? d.tipo : 'Other';
+  /* Il tipo si salva sempre in inglese: nel pannello e nell'email
+     all'admin ce n'e' uno solo, qualunque lingua abbia scelto chi scrive. */
+  const tipoEn = tipoInInglese(String(d.tipo ?? ''));
+  const tipo = TIPI.includes(tipoEn) ? tipoEn : 'Other';
   const paese = corto(d.paese, 80);
   const email = normalizza(corto(d.email, 200));
   const telefono = corto(d.telefono, 40);
   let sito = corto(d.sito, 200);
   const note = corto(d.note, 1500);
 
-  if (nome.length < 2 || cognome.length < 2) return { ok: false, errore: 'Please write your first and last name.' };
-  if (azienda.length < 2) return { ok: false, errore: 'Please write the name of your company.' };
+  if (nome.length < 2 || cognome.length < 2) return { ok: false, errore: T.errScriviNome };
+  if (azienda.length < 2) return { ok: false, errore: T.errAzienda };
   /* Piu' stretto di `pareEmail()`, che guarda solo la chiocciola: qui
      l'indirizzo e' quello a cui partira' la password. E i domini interni
      (.invalid: guide e pannello TURNI) non sono indirizzi veri. */
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.endsWith('.invalid')) {
-    return { ok: false, errore: 'Please check your email address.' };
+    return { ok: false, errore: T.errEmail };
   }
-  if (paese.length < 2) return { ok: false, errore: 'Please write your country.' };
+  if (paese.length < 2) return { ok: false, errore: T.errPaese };
   /* OBBLIGATORIO per decisione della proprieta' (12/10/2026): nome, email
      e telefono sono il minimo per richiamare chi chiede l'accesso. Almeno
      sei cifre, e solo caratteri da numero di telefono: «n/a» o «-» non
      richiamano nessuno. */
   if ((telefono.match(/\d/g) ?? []).length < 6 || !/^[+\d\s().\-/]+$/.test(telefono)) {
-    return { ok: false, errore: 'Please write a phone number where we can reach you, with country code.' };
+    return { ok: false, errore: T.errTelefono };
   }
   if (sito && !/^https?:\/\//i.test(sito)) sito = `https://${sito}`;
 
   const sb = clientSegreto();
-  if (!sb) return { ok: false, errore: 'We cannot receive requests right now. Please write to usa@prestigerent.com.' };
+  if (!sb) return { ok: false, errore: T.errNonRicevo };
 
   /* UN FRENO, NON UN MURO. Una richiesta gia' in attesa per lo stesso
      indirizzo non se ne aggiunge una seconda (e la persona riceve
@@ -106,7 +112,7 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
     .select('id', { count: 'exact', head: true })
     .gte('creata_il', unOraFa);
   if ((recenti ?? 0) > 30) {
-    return { ok: false, errore: 'Too many requests right now. Please try again later or write to usa@prestigerent.com.' };
+    return { ok: false, errore: T.errTroppe };
   }
 
   const h = await headers();
@@ -123,7 +129,7 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
     /* per riconoscere a colpo d'occhio un'ondata di richieste finte */
     origine: (h.get('x-forwarded-for') ?? '').split(',')[0].trim().slice(0, 64) || null,
   });
-  if (error) return { ok: false, errore: 'We could not save your request. Please try again or write to usa@prestigerent.com.' };
+  if (error) return { ok: false, errore: T.errSalvataggio };
 
   /* L'avviso all'admin non deve far fallire la richiesta: se la posta e'
      giu', la richiesta resta comunque nel pannello. */
@@ -148,16 +154,17 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
  *  sola: quella risponde in italiano («Nome utente o password non
  *  corretti»). La logica e' la stessa -- un solo messaggio qualunque sia
  *  la causa, per non dire a chi prova quali indirizzi esistono. */
-export async function accedi(email: string, password: string): Promise<Esito> {
+export async function accedi(email: string, password: string, lingua: Lingua = 'en'): Promise<Esito> {
+  const T = testiDi(lingua);
   const indirizzo = normalizza(email ?? '');
-  if (!pareEmail(indirizzo) || !password) return { ok: false, errore: 'Please write your email and password.' };
+  if (!pareEmail(indirizzo) || !password) return { ok: false, errore: T.errAccessoCampi };
   try {
     const sb = await supabaseServer();
     const { error } = await sb.auth.signInWithPassword({ email: indirizzo, password });
-    if (error) return { ok: false, errore: 'Email or password not correct.' };
+    if (error) return { ok: false, errore: T.errAccesso };
     return { ok: true };
   } catch {
-    return { ok: false, errore: 'We cannot reach the server. Please try again in a moment.' };
+    return { ok: false, errore: T.errRete };
   }
 }
 
@@ -171,38 +178,37 @@ export async function accedi(email: string, password: string): Promise<Esito> {
  *
  *  Solo per il ruolo `listino`: un link che aprisse una sessione da admin
  *  sarebbe la chiave del pannello dentro un'email. */
-export async function entraConLink(t: string): Promise<Esito & { email?: string }> {
+export async function entraConLink(t: string, lingua: Lingua = 'en'): Promise<Esito & { email?: string }> {
+  const T = testiDi(lingua);
   const l = leggiLinkPartner(t);
   if ('errore' in l) {
     return {
       ok: false,
       email: l.email,
       errore:
-        l.errore === 'scaduto'
-          ? 'This link has expired. Please sign in with your email and password.'
-          : 'This link is not valid. Please sign in with your email and password.',
+        l.errore === 'scaduto' ? T.errLinkScaduto : T.errLinkNonValido,
     };
   }
 
   const segreto = clientSegreto();
-  if (!segreto) return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+  if (!segreto) return { ok: false, email: l.email, errore: T.errLinkServizio };
 
   const { data: p } = await segreto.from('profili').select('ruolo, attivo').eq('email', l.email).maybeSingle();
   const prof = p as { ruolo: string; attivo: boolean } | null;
   if (!prof || prof.ruolo !== 'listino' || !prof.attivo) {
-    return { ok: false, email: l.email, errore: 'This access is not active. Please write to usa@prestigerent.com.' };
+    return { ok: false, email: l.email, errore: T.errLinkNonAttivo };
   }
 
   const { data, error } = await segreto.auth.admin.generateLink({ type: 'magiclink', email: l.email });
   const tokenHash = data?.properties?.hashed_token;
   if (error || !tokenHash) {
-    return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+    return { ok: false, email: l.email, errore: T.errLinkServizio };
   }
 
   const sb = await supabaseServer();
   const { error: e2 } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: 'magiclink' });
   if (e2) {
-    return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+    return { ok: false, email: l.email, errore: T.errLinkServizio };
   }
   return { ok: true };
 }

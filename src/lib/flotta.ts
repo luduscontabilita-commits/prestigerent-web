@@ -67,7 +67,18 @@ export type Mezzo = {
   foto: string;
   /** solo per le foto che non sono nostre (licenza CC) */
   credito: Credito | null;
+  /** gli stessi testi in italiano, per l'area partner con il selettore
+   *  EN/IT (src/lib/partners-testi.ts). Il nome del modello non si
+   *  traduce. */
+  it: { tipo: string; notaPosti: string | null; bagagli: string | null; descrizione: string; suRichiesta: string | null };
 };
+
+/** I testi di un mezzo nella lingua dell'area partner. */
+export function testiMezzo(m: Mezzo, lingua: 'en' | 'it') {
+  return lingua === 'it'
+    ? m.it
+    : { tipo: m.tipo, notaPosti: m.notaPosti, bagagli: m.bagagli, descrizione: m.descrizione, suRichiesta: m.suRichiesta };
+}
 
 export const FLOTTA: Mezzo[] = [
   {
@@ -85,6 +96,14 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/classe-e.webp?v=2',
     credito: null,
+    it: {
+      tipo: 'Berlina',
+      notaPosti: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino.',
+      bagagli: '2 valigie + 2 bagagli a mano',
+      descrizione:
+        'La nostra auto di ogni giorno per tour privati e transfer: sedili in pelle, climatizzatore, Wi-Fi e acqua a bordo. Entra nelle zone a traffico limitato di Firenze e degli altri centri storici con i nostri permessi.',
+      suRichiesta: null,
+    },
   },
   {
     chiave: 'classe-s',
@@ -101,6 +120,14 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/classe-s.webp?v=2',
     credito: null,
+    it: {
+      tipo: 'Berlina executive',
+      notaPosti: 'Più comoda fino a 3 adulti, o 3 adulti e un bambino.',
+      bagagli: '2 valigie + 2 bagagli a mano',
+      descrizione:
+        'La versione executive dell\'auto privata, per i clienti che la chiedono. Stessi servizi della Classe E, su richiesta.',
+      suRichiesta: null,
+    },
   },
   {
     chiave: 'classe-v',
@@ -117,6 +144,14 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/classe-v.webp?v=2',
     credito: null,
+    it: {
+      tipo: 'Monovolume',
+      notaPosti: null,
+      bagagli: '6 valigie + 6 bagagli a mano',
+      descrizione:
+        'Sei posti passeggero, porte scorrevoli e spazio per i bagagli di tutti. L\'auto per famiglie e piccoli gruppi nei tour privati e nei transfer, con Wi-Fi e acqua a bordo.',
+      suRichiesta: null,
+    },
   },
   {
     chiave: 'sprinter',
@@ -133,6 +168,14 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/sprinter.webp?v=2',
     credito: null,
+    it: {
+      tipo: 'Minivan',
+      notaPosti: null,
+      bagagli: '8 valigie + 8 bagagli a mano',
+      descrizione:
+        'Otto posti passeggero e spazio per una valigia a testa. Si usa quando il gruppo è troppo numeroso per la Classe V.',
+      suRichiesta: null,
+    },
   },
   {
     chiave: 'isuzu',
@@ -149,6 +192,14 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/isuzu.webp?v=2',
     credito: null,
+    it: {
+      tipo: 'Minibus',
+      notaPosti: null,
+      bagagli: null,
+      descrizione:
+        'Il minibus dei nostri tour in piccolo gruppo, mai più di 25 ospiti. Mezzi nostri, guidati dai nostri autisti.',
+      suRichiesta: null,
+    },
   },
   {
     chiave: 'atego',
@@ -169,6 +220,14 @@ export const FLOTTA: Mezzo[] = [
       licenza: 'CC BY-SA 2.0',
       licenzaUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
       fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes_Benz_Atego_bus_(16456228222).jpg',
+    },
+    it: {
+      tipo: 'Pullman',
+      notaPosti: 'Uno dei quattro ha il bagno a bordo e 28 posti.',
+      bagagli: null,
+      descrizione:
+        'I nostri mezzi più grandi, per i gruppi che non entrano in un minibus, matrimoni ed eventi.',
+      suRichiesta: 'Gruppi da 9 persone in su, eventi e matrimoni, su richiesta.',
     },
   },
 ];

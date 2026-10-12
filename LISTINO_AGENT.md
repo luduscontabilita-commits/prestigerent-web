@@ -5,8 +5,9 @@ fatto la proprietà e cosa guardare quando qualcosa non va.
 
 ## Cosa c'è
 
-**L'area dei partner**, in inglese, fuori da `/admin`: il partner non
-vede mai «admin» nell'indirizzo.
+**L'area dei partner**, in **inglese o italiano** a scelta (selettore
+EN/IT), fuori da `/admin`: il partner non vede mai «admin»
+nell'indirizzo.
 
 | Indirizzo | Chi | Cosa |
 |---|---|---|
@@ -21,7 +22,7 @@ vede mai «admin» nell'indirizzo.
 |---|---|---|
 | `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU e stato della tab PRICES |
 | `/admin/partners/sincronizza/` | Listino prezzi → Sincronizza tab PRICES | tabella prima/dopo e pulsante per allineare |
-| `/admin/partners/flotta/` | Listino prezzi → Flotta | la flotta come la vede il partner |
+| `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, in italiano |
 | `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
 | `/admin/partners/attivi/` | Partners → Partner attivi | chi ha accesso: «Dati», «Nuova password», «Chiudi l'accesso» |
 
@@ -39,8 +40,9 @@ un tour operator. Vede **solo** listino e flotta.
 - L'accesso lo dà **sempre l'admin**. La richiesta resta in attesa;
   all'approvazione parte l'email con il link di accesso diretto e con
   email e password.
-- L'area del partner è **in inglese** e sta su **`/partners`**. Il
-  pannello dell'admin è in italiano, sotto `/admin/partners/`.
+- L'area del partner sta su **`/partners`**, in **inglese o italiano**
+  col selettore EN/IT. Il pannello dell'admin è in italiano, sotto
+  `/admin/partners/`. La flotta ha una voce di menu propria.
 - Nel listino il **numero di persone sta sulle righe** e le varianti
   stanno in colonna. È stata scelta fra due anteprime.
 - **Le tab PRICES non si rigenerano.** Il testo resta quello scritto e si
@@ -48,6 +50,39 @@ un tour operator. Vede **solo** listino e flotta.
   pulsante, dopo aver visto la tabella con le modifiche.
 - **La flotta è a righe**, con le immagini tutte della stessa misura e
   prese dal sito quando ci sono. Vedi sotto.
+
+## Le due lingue dell'area partner
+
+- **I testi** stanno tutti in `src/lib/partners-testi.ts`, inglese e
+  italiano uno accanto all'altro. Il tipo `Testi` impedisce che una
+  chiave esista in una lingua sola. I testi italiani dei mezzi sono in
+  `src/lib/flotta.ts` (campo `it`).
+- **La lingua** si decide in `src/lib/partners-lingua.ts`:
+  1. il cookie `partners_lang`, scritto dal selettore;
+  2. altrimenti la lingua del browser;
+  3. altrimenti l'inglese.
+- **Perché un cookie e non `/partners/it/`:** gli indirizzi sono già
+  nelle email partite e nei preferiti, e devono aprirsi nella lingua
+  giusta.
+- **Restano in inglese:** i nomi dei tour e delle opzioni (vengono da
+  Regiondo e dal sito) e le email ai partner. Il tipo di attività si
+  salva sempre in inglese (`tipoInInglese`), anche se il partner l'ha
+  scelto in italiano.
+
+## Aspetto e telefono
+
+- **Ogni sezione del listino ha la sua tinta e la sua icona**: porti
+  blu mare, transfer indaco, small group arancio Prestige, vino
+  bordeaux (`vino`, definita in `Tema.tsx`), privati verde. Le
+  ritrovi nei bottoni di navigazione, nel titolo della sezione, nella
+  fascia di ogni scheda e nell'intestazione delle tabelle. La richiesta
+  della proprietà era «è tutto molto piatto, sii professionale ma anche
+  creativo».
+- **Telefono** (provato a 390 px):
+  - niente scorrimento laterale;
+  - bottoni di almeno 36 px, menu a 44 px;
+  - un pulsante «torna in cima» nel listino;
+  - le immagini della flotta a tutta larghezza.
 
 ## L'email di accesso e il link diretto
 

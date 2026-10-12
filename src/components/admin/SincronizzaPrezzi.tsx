@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Anchor, Badge, Button, Card, Checkbox, Group, Stack, Table, Text } from '@mantine/core';
 import type { EsitoSync, Esito } from '@/app/admin/partners/azioni';
@@ -40,16 +40,7 @@ export function SincronizzaPrezzi({
   /* Il valore iniziale si legge UNA volta, al montaggio: e' proprio il
      caso del componente rimontato dopo l'azione. Sul server non c'e'
      sessionStorage e il try lo lascia vuoto. */
-  const [esito, setEsitoVero] = useState<{ colore: string; testo: string } | null>(() => {
-    try {
-      const s = typeof window === 'undefined' ? null : sessionStorage.getItem('listino-sync-esito');
-      if (!s) return null;
-      sessionStorage.removeItem('listino-sync-esito');
-      return JSON.parse(s);
-    } catch {
-      return null;
-    }
-  });
+  const [esito, setEsitoVero] = useState<{ colore: string; testo: string } | null>(null);
   /* 🔴 L'ESITO PASSA ANCHE DALLA SESSIONE DEL BROWSER. La sincronizzazione
      deve rinnovare le pagine PUBBLICHE dei tour (`revalidatePath`), e il
      12/10/2026 si e' visto che un `revalidatePath` dentro un'azione puo'
@@ -64,6 +55,21 @@ export function SincronizzaPrezzi({
       else sessionStorage.removeItem('listino-sync-esito');
     } catch {}
   };
+  /* Riletto DOPO il montaggio e non nel valore iniziale: cosi' il primo
+     disegno nel browser e' identico a quello del server (niente errore di
+     idratazione). `queueMicrotask` perche' l'aggiornamento non avvenga
+     dentro il corpo dell'effetto. */
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const s = sessionStorage.getItem('listino-sync-esito');
+        if (s) {
+          sessionStorage.removeItem('listino-sync-esito');
+          setEsitoVero(JSON.parse(s));
+        }
+      } catch {}
+    });
+  }, []);
 
   const diverse = tabs.filter((t) => t.stato === 'diverso');
   const nonAbbinabili = tabs.filter((t) => t.stato === 'non_abbinabile');
