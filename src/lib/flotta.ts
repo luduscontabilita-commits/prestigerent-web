@@ -1,4 +1,4 @@
-/* LA FLOTTA, COME LA VEDE CHI HA ACCESSO AL LISTINO (/admin/listino/flotta/).
+/* LA FLOTTA, COME LA VEDE CHI HA ACCESSO ALL'AREA PARTNER (/partners/fleet/).
  *
  * Dati scritti qui e non nel database: sono sei mezzi, cambiano una volta
  * l'anno, e una tabella con il suo pannello costerebbe piu' di quanto
@@ -23,18 +23,24 @@
  * mezzo giusto da solo.
  *
  * ── LE FOTO ──────────────────────────────────────────────────────────
- * Da Wikimedia Commons, con licenza libera, scontornate. NON sono i
- * nostri mezzi: sono il modello. La pagina lo dice, e cita autore e
- * licenza di ognuna come le licenze CC BY-SA chiedono.
+ * Dal 12/10/2026 (proprieta': «le immagini devono essere tutte delle
+ * stesse dimensioni, con un layout ordinato; prendile dal sito se ne
+ * trovi di migliori»):
+ *  - le quattro AUTO sono le immagini di studio gia' usate dal sito
+ *    (/our-vehicles/, media/wp/2021/09/Mercedes-Benz-*-black.png);
+ *  - l'ISUZU e' un nostro minibus vero, con la livrea «Wine Experience»
+ *    (media/wp/2021/04/Wine-bus-at-a-Tuscan-winery-1.jpg), scontornato;
+ *  - l'ATEGO resta la foto di Wikimedia Commons, senza marchi di altre
+ *    aziende e con la targa sfocata: sul sito l'unica foto del nostro
+ *    (media/lp/img/Piazzale-Montelungo-minibuses-2022.webp) e' troppo
+ *    piccola. E' l'unica che chiede i crediti (`credito`).
  *
- * 🔴 NIENTE MARCHI DI ALTRE AZIENDE (proprieta', 12/10/2026). Restano
- * solo quelli del costruttore (Mercedes, Isuzu, il nome del modello). Le
- * prime foto dei bus portavano la livrea di altre compagnie («KIWI»,
- * «Acorn Travel») e sono state sostituite: l'Isuzu e' ora un Turquoise
- * senza scritte, l'Atego un bus bianco a cui e' stato cancellato il
- * blocco con i dati del proprietario sulla fiancata. Targhe sfocate su
- * entrambi. Chi cambia una foto deve rifare lo stesso controllo.
- * File in public/listino/flotta/.
+ * TUTTE SULLA STESSA TELA: 800x400, trasparente, il mezzo ridotto a
+ * stare in un riquadro di 740x330, centrato e appoggiato a 24px dal
+ * fondo. Cosi' nelle righe della pagina hanno tutte la stessa misura.
+ * Chi cambia una foto la rifaccia uguale, e niente marchi di altre
+ * aziende. File in public/listino/flotta/; `?v=` nel nome si alza a ogni
+ * cambio, perche' i browser non tengano la vecchia.
  */
 
 import type { Servizio } from './listino';
@@ -59,10 +65,9 @@ export type Mezzo = {
   /** quando non e' legato a un tour del sito */
   suRichiesta: string | null;
   foto: string;
-  credito: Credito;
+  /** solo per le foto che non sono nostre (licenza CC) */
+  credito: Credito | null;
 };
-
-const BY_SA_4 = 'https://creativecommons.org/licenses/by-sa/4.0/';
 
 export const FLOTTA: Mezzo[] = [
   {
@@ -78,13 +83,8 @@ export const FLOTTA: Mezzo[] = [
     persone: [1, 3],
     gruppi: false,
     suRichiesta: null,
-    foto: '/listino/flotta/classe-e.webp',
-    credito: {
-      autore: 'Damian B Oh',
-      licenza: 'CC BY-SA 4.0',
-      licenzaUrl: BY_SA_4,
-      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W213_FL_E_350_4MATIC_AMG_Line_Obsidian_Black_Metallic_(1).jpg',
-    },
+    foto: '/listino/flotta/classe-e.webp?v=2',
+    credito: null,
   },
   {
     chiave: 'classe-s',
@@ -99,13 +99,8 @@ export const FLOTTA: Mezzo[] = [
     persone: [1, 3],
     gruppi: false,
     suRichiesta: null,
-    foto: '/listino/flotta/classe-s.webp',
-    credito: {
-      autore: 'Damian B Oh',
-      licenza: 'CC BY-SA 4.0',
-      licenzaUrl: BY_SA_4,
-      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W223_S_400d_4MATIC_AMG_Line_Obsidian_Black_(17).jpg',
-    },
+    foto: '/listino/flotta/classe-s.webp?v=2',
+    credito: null,
   },
   {
     chiave: 'classe-v',
@@ -120,13 +115,8 @@ export const FLOTTA: Mezzo[] = [
     persone: [4, 6],
     gruppi: false,
     suRichiesta: null,
-    foto: '/listino/flotta/classe-v.webp',
-    credito: {
-      autore: 'Damian B Oh',
-      licenza: 'CC BY-SA 4.0',
-      licenzaUrl: BY_SA_4,
-      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W447_V_250d_AMG_Line_Black_(1).jpg',
-    },
+    foto: '/listino/flotta/classe-v.webp?v=2',
+    credito: null,
   },
   {
     chiave: 'sprinter',
@@ -141,13 +131,8 @@ export const FLOTTA: Mezzo[] = [
     persone: [7, 8],
     gruppi: false,
     suRichiesta: null,
-    foto: '/listino/flotta/sprinter.webp',
-    credito: {
-      autore: 'Damian B Oh',
-      licenza: 'CC BY-SA 4.0',
-      licenzaUrl: BY_SA_4,
-      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes-Benz_VS30_Sprinter_Tourer_319_CDI_Jet_Black_(1).jpg',
-    },
+    foto: '/listino/flotta/sprinter.webp?v=2',
+    credito: null,
   },
   {
     chiave: 'isuzu',
@@ -162,13 +147,8 @@ export const FLOTTA: Mezzo[] = [
     persone: null,
     gruppi: true,
     suRichiesta: null,
-    foto: '/listino/flotta/isuzu.webp',
-    credito: {
-      autore: 'Anatoliy-024',
-      licenza: 'CC BY-SA 3.0',
-      licenzaUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
-      fonte: 'https://commons.wikimedia.org/wiki/File:Isuzu_Turquoise.jpg',
-    },
+    foto: '/listino/flotta/isuzu.webp?v=2',
+    credito: null,
   },
   {
     chiave: 'atego',
@@ -183,7 +163,7 @@ export const FLOTTA: Mezzo[] = [
     persone: null,
     gruppi: false,
     suRichiesta: 'Groups of 9 or more, events and weddings, on request.',
-    foto: '/listino/flotta/atego.webp',
+    foto: '/listino/flotta/atego.webp?v=2',
     credito: {
       autore: 'Bob Adams',
       licenza: 'CC BY-SA 2.0',

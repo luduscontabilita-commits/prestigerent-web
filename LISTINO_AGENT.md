@@ -1,40 +1,81 @@
-# Il listino prezzi, la flotta e la sincronizzazione delle tab PRICES
+# L'area partner: listino prezzi, flotta, sincronizzazione delle tab PRICES
 
-Sezione del pannello nata il 12/10/2026. Questo file dice come sta
-insieme, quali scelte ha fatto la proprietà e cosa guardare quando
-qualcosa non va.
+Nata il 12/10/2026. Questo file dice come sta insieme, quali scelte ha
+fatto la proprietà e cosa guardare quando qualcosa non va.
 
 ## Cosa c'è
 
-| Indirizzo | Chi lo vede | Cosa fa |
+**L'area dei partner**, in inglese, fuori da `/admin`: il partner non
+vede mai «admin» nell'indirizzo.
+
+| Indirizzo | Chi | Cosa |
 |---|---|---|
-| `/admin/listino/` | admin + partner | tutti i servizi con i prezzi di ogni variante e opzione, da Regiondo |
-| `/admin/listino/flotta/` | admin + partner | i 6 mezzi, posti massimi, a quali servizi servono |
-| `/admin/listino/sincronizza/` | solo admin | tabella prima/dopo delle tab PRICES e pulsante per allinearle |
-| `/admin/listino/richieste/` | solo admin | voce di menu a sé, «Accessi listino e flotta»: richieste da approvare o rifiutare; partner già approvati con i recapiti, password nuova, chiudi accesso |
-| `/admin/listino/login/` | pubblico | accesso dei partner (email + password), in inglese |
-| `/admin/listino/register/` | pubblico | richiesta di accesso, in inglese |
+| `/partners/` | pubblico | una pagina con due schede, «Sign in» e «Request access» |
+| `/partners/enter/?t=…` | chi ha il link dell'email | entra senza scrivere niente (vedi sotto) |
+| `/partners/price-list/` | partner, admin | il listino, senza codici Regiondo |
+| `/partners/fleet/` | partner, admin | i 6 mezzi, una riga per mezzo |
+
+**Il pannello dell'admin**, in italiano, tutto sotto `/admin/partners/`:
+
+| Indirizzo | Voce di menu | Cosa |
+|---|---|---|
+| `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU e stato della tab PRICES |
+| `/admin/partners/sincronizza/` | Listino prezzi → Sincronizza tab PRICES | tabella prima/dopo e pulsante per allineare |
+| `/admin/partners/flotta/` | Listino prezzi → Flotta | la flotta come la vede il partner |
+| `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
+| `/admin/partners/attivi/` | Partners → Partner attivi | chi ha accesso: «Dati», «Nuova password», «Chiudi l'accesso» |
+
+Gli indirizzi vecchi (`/admin/listino/…`, compresi `login/` e
+`register/`) rimandano ai nuovi: alcuni sono già scritti in email
+partite.
 
 Il **partner** è un utente con ruolo `listino`: un'agenzia, un hotel,
-un tour operator. Vede **solo** il listino e la flotta, in inglese.
-L'admin vede le stesse pagine in italiano, con in più lo stato delle
-tab PRICES.
+un tour operator. Vede **solo** listino e flotta.
 
 ## Le decisioni della proprietà (12/10/2026)
 
 - I prezzi sono **quelli al pubblico** di Regiondo. Niente netti, niente
   commissioni.
-- L'accesso lo dà **sempre l'admin**. La registrazione lascia solo una
-  richiesta. All'approvazione il sito genera una password e la manda per
-  email.
-- L'area del partner è **in inglese**, il pannello dell'admin in italiano.
+- L'accesso lo dà **sempre l'admin**. La richiesta resta in attesa;
+  all'approvazione parte l'email con il link di accesso diretto e con
+  email e password.
+- L'area del partner è **in inglese** e sta su **`/partners`**. Il
+  pannello dell'admin è in italiano, sotto `/admin/partners/`.
 - Nel listino il **numero di persone sta sulle righe** e le varianti
   stanno in colonna. È stata scelta fra due anteprime.
 - **Le tab PRICES non si rigenerano.** Il testo resta quello scritto e si
   cambiano **solo le cifre**. Non si cambiano da sole: lo fa l'admin col
   pulsante, dopo aver visto la tabella con le modifiche.
-- **Foto della flotta** prese dal web: Wikimedia Commons, licenze libere,
-  scontornate. Vedi sotto.
+- **La flotta è a righe**, con le immagini tutte della stessa misura e
+  prese dal sito quando ci sono. Vedi sotto.
+
+## L'email di accesso e il link diretto
+
+L'email si scrive in `letteraAccesso()` (`src/app/admin/partners/azioni.ts`).
+Parla di «Partners area», non di «price list». Contiene:
+
+1. un **link che porta dentro senza scrivere niente**:
+   `/partners/enter/?t=…`, valido **14 giorni**;
+2. sotto, `prestigerent.com/partners/` con email e password, per quando
+   il link è scaduto o da un altro dispositivo.
+
+La richiesta era un link «con user e password già precompilate». Il
+link **non contiene la password**: una password in un indirizzo finisce
+nella cronologia, nei log e in chi riceve l'email inoltrata. Contiene un
+gettone firmato dal sito (`src/lib/link-partner.ts`, HMAC con chiave
+derivata da `SUPABASE_SECRET_KEY`), che dice «questa persona, fino a
+questa data». Il gettone non si può fabbricare né modificare. All'apertura:
+- l'azione `entraConLink()` controlla la firma, la scadenza e che il
+  partner sia ancora attivo;
+- apre la sessione con `generateLink` + `verifyOtp` di Supabase, senza
+  mandare email;
+- porta al listino.
+
+Se il link è scaduto, la pagina lo dice e porta a `/partners/` con
+l'email già scritta. **Non è monouso, apposta**: i filtri antispam
+«aprono» i link per controllarli, e un link monouso arriverebbe già
+consumato. Il rischio non cresce, perché la stessa email contiene già la
+password. Chiudere l'accesso del partner spegne anche il link.
 
 ## Da dove vengono i prezzi
 
@@ -128,8 +169,8 @@ la modifica prima che vada online.
   - **telefono**, obbligatorio per decisione della proprietà del
     12/10/2026: nome, email e telefono sono il minimo.
 
-  Facoltativi: sito e note. L'admin vede tutto in «Accessi listino e
-  flotta» e nell'email di avviso. Il pulsante **«Dati»** apre il pannello
+  Facoltativi: sito e note. L'admin vede tutto in «Partners»
+  (Richieste e Partner attivi) e nell'email di avviso. Il pulsante **«Dati»** apre il pannello
   laterale con tutti i campi scritti alla registrazione. Lo si trova su
   ogni richiesta e su ogni partner già approvato: per questi i dati si
   leggono dalla loro richiesta, perché `profili` non li conserva.
@@ -152,6 +193,17 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
 | Isuzu minibus (6 in flotta) | 25 | i 3 small group |
 | Mercedes Atego (4 in flotta) | 36 | gruppi da 9 in su, eventi e matrimoni, su richiesta; uno ha il bagno e 28 posti |
 
+- **Una riga per mezzo**, non schede (proprietà, 12/10/2026):
+  l'immagine a sinistra in un riquadro fisso 2:1, accanto nome, posti,
+  descrizione e servizi. Sul telefono l'immagine va sopra
+  (`src/components/partners/FlottaVista.tsx`).
+- **Foto tutte uguali**: tela 800×400 trasparente, il mezzo dentro un
+  riquadro 740×330, centrato, a 24 px dal fondo. Le **4 auto** sono le
+  immagini di studio già usate dal sito (`/our-vehicles/`). L'**Isuzu** è
+  un nostro minibus vero, con la livrea «Wine Experience», scontornato.
+  L'**Atego** resta la foto di Wikimedia Commons: l'unica nostra, a
+  Piazzale Montelungo, è troppo piccola. È l'unica con i crediti, in
+  fondo alla pagina.
 - **Abbinamento mezzo → tour:** confermato dalla proprietà. Per le auto la
   pagina dice solo per quante persone sono: l'elenco «Show the 83
   services» è stato tolto su richiesta della proprietà. Per il minibus
@@ -193,6 +245,6 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
   un'opzione su Regiondo, o una variante non è più identica alla sua
   gemella. Si corregge il testo della tab a mano; il pulsante non lo fa,
   apposta.
-- **Un partner dice che la password non va.** Da «Richieste di accesso»,
+- **Un partner dice che la password non va.** Da «Partners → Partner attivi»,
   premere «Nuova password». Il sito gliela manda per email e la mostra
   anche a te.

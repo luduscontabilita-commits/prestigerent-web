@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Anchor, Badge, Button, Card, Checkbox, Group, Stack, Table, Text } from '@mantine/core';
-import type { EsitoSync, Esito } from '@/app/admin/listino/azioni';
+import type { EsitoSync, Esito } from '@/app/admin/partners/azioni';
 
 /* LA TABELLA PRIMA/DOPO DELLE TAB PRICES, CON I PULSANTI.
  *
- * Riceve solo dati gia' calcolati sul server (src/app/admin/listino/
+ * Riceve solo dati gia' calcolati sul server (src/app/admin/partners/
  * sincronizza/page.tsx) e le due azioni. Il pulsante «Sincronizza tutto»
  * non agisce al primo clic: apre una conferma che dice quante pagine e
  * quanti importi cambiano -- `confirm()` del browser no, perche' su
@@ -37,7 +37,33 @@ export function SincronizzaPrezzi({
   const [soloDiverse, setSoloDiverse] = useState(true);
   const [conferma, setConferma] = useState(false);
   const [lavoro, setLavoro] = useState<string | null>(null);
-  const [esito, setEsito] = useState<{ colore: string; testo: string } | null>(null);
+  /* Il valore iniziale si legge UNA volta, al montaggio: e' proprio il
+     caso del componente rimontato dopo l'azione. Sul server non c'e'
+     sessionStorage e il try lo lascia vuoto. */
+  const [esito, setEsitoVero] = useState<{ colore: string; testo: string } | null>(() => {
+    try {
+      const s = typeof window === 'undefined' ? null : sessionStorage.getItem('listino-sync-esito');
+      if (!s) return null;
+      sessionStorage.removeItem('listino-sync-esito');
+      return JSON.parse(s);
+    } catch {
+      return null;
+    }
+  });
+  /* 🔴 L'ESITO PASSA ANCHE DALLA SESSIONE DEL BROWSER. La sincronizzazione
+     deve rinnovare le pagine PUBBLICHE dei tour (`revalidatePath`), e il
+     12/10/2026 si e' visto che un `revalidatePath` dentro un'azione puo'
+     ridisegnare questa pagina portandosi via lo stato: il messaggio
+     «Aggiornate N pagine» sparirebbe appena comparso. Salvato qui, si
+     ritrova al rendering successivo. Nessun dato riservato: solo il testo
+     dell'esito. */
+  const setEsito = (e: { colore: string; testo: string } | null) => {
+    setEsitoVero(e);
+    try {
+      if (e) sessionStorage.setItem('listino-sync-esito', JSON.stringify(e));
+      else sessionStorage.removeItem('listino-sync-esito');
+    } catch {}
+  };
 
   const diverse = tabs.filter((t) => t.stato === 'diverso');
   const nonAbbinabili = tabs.filter((t) => t.stato === 'non_abbinabile');

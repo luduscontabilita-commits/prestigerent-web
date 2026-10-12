@@ -93,22 +93,32 @@ const PAGINE = [
   '/admin/seo/',
   '/admin/foto/',
   '/admin/numeri/',
-  '/admin/listino/',
-  '/admin/listino/sincronizza/',
-  '/admin/listino/richieste/',
-  '/admin/listino/flotta/',
-  /* le due pubbliche: con la sessione rispondono lo stesso, e un errore
-     di confine server/client si vedrebbe anche qui */
-  '/admin/listino/login/',
-  '/admin/listino/register/',
+  /* «Partners» e «Listino prezzi» (dal 12/10/2026 tutto sotto
+     /admin/partners/) */
+  '/admin/partners/',
+  '/admin/partners/attivi/',
+  '/admin/partners/listino/',
+  '/admin/partners/sincronizza/',
+  '/admin/partners/flotta/',
+  /* l'area dei partner vista dall'admin: deve aprirsi anche a lui */
+  '/partners/price-list/',
+  '/partners/fleet/',
 ];
 
-/* Le pagine che un utente del LISTINO non deve poter aprire: tutte quelle
-   di gestione e della gallery. Per lui devono rispondere con un rimando,
-   mai con 200. */
-const VIETATE_AL_PARTNER = PAGINE.filter(
-  (p) => !p.startsWith('/admin/listino/') || p.startsWith('/admin/listino/sincronizza') || p.startsWith('/admin/listino/richieste')
-);
+/* Il partner (ruolo `listino`) non deve poter aprire NESSUNA pagina del
+   pannello: per lui ogni /admin/... risponde con un rimando, mai 200. */
+const VIETATE_AL_PARTNER = PAGINE.filter((p) => p.startsWith('/admin/'));
+
+/* Gli indirizzi vecchi (fino al 12/10/2026), gia' scritti in email
+   partite: devono rimandare a quelli nuovi, non dare 404. */
+const SPOSTATE = [
+  ['/admin/listino/', '/admin/partners/listino/'],
+  ['/admin/listino/sincronizza/', '/admin/partners/sincronizza/'],
+  ['/admin/listino/flotta/', '/admin/partners/flotta/'],
+  ['/admin/listino/richieste/', '/admin/partners/'],
+  ['/admin/listino/login/', '/partners/'],
+  ['/admin/listino/register/', '/partners/'],
+];
 
 const cookie = await entra('usa@prestigerent.com', mp[1]);
 if (!cookie) {
@@ -163,7 +173,7 @@ if (pEmail && pPass) {
     rotte++;
   } else {
     console.log(`\n${SITO} — entrato come partner del listino (${pEmail})\n`);
-    for (const p of ['/admin/listino/', '/admin/listino/flotta/']) {
+    for (const p of ['/partners/price-list/', '/partners/fleet/']) {
       const res = await fetch(SITO + p, { headers: { cookie: cp }, redirect: 'manual' });
       const html = await res.text();
       const bene = res.status === 200 && !/This page couldn.t load|Application error/i.test(html) && html.length > 2000;
@@ -180,6 +190,30 @@ if (pEmail && pPass) {
   }
 } else {
   console.log('\n(nessun partner di prova: PROVA_PARTNER_EMAIL/PROVA_PARTNER_PASSWORD non impostate, recinto non provato)');
+}
+
+/* ── SENZA SESSIONE: l'ingresso dei partner e gli indirizzi vecchi ──── */
+console.log(`\n${SITO} — senza sessione\n`);
+{
+  const res = await fetch(SITO + '/partners/', { redirect: 'manual' });
+  const html = await res.text();
+  const bene = res.status === 200 && /Sign in/.test(html) && /Request access/.test(html);
+  if (!bene) rotte++;
+  console.log(`   ${'/partners/'.padEnd(42)} ${bene ? '200  Sign in + Request access' : `🔴 HTTP ${res.status}`}`);
+  for (const p of ['/partners/price-list/', '/partners/fleet/']) {
+    const r = await fetch(SITO + p, { redirect: 'manual' });
+    const dove = r.headers.get('location') ?? '';
+    const chiusa = r.status >= 300 && r.status < 400 && dove.includes('/partners/');
+    if (!chiusa) rotte++;
+    console.log(`   ${p.padEnd(42)} ${chiusa ? `${r.status} -> ${dove}` : `🔴 HTTP ${r.status}: SI VEDE SENZA ACCESSO`}`);
+  }
+}
+for (const [vecchio, nuovo] of SPOSTATE) {
+  const res = await fetch(SITO + vecchio, { headers: { cookie }, redirect: 'manual' });
+  const dove = res.headers.get('location') ?? '';
+  const bene = res.status >= 300 && res.status < 400 && dove.endsWith(nuovo);
+  if (!bene) rotte++;
+  console.log(`   ${vecchio.padEnd(42)} ${bene ? `${res.status} -> ${dove}` : `🔴 HTTP ${res.status} ${dove}`}`);
 }
 
 console.log(`\n${rotte === 0 ? '✓ tutte le pagine reggono' : `🔴 ${rotte} pagine rotte`}`);

@@ -45,8 +45,8 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
      nient'altro, in inglese: niente gallery, che e' delle guide. */
   if (ruolo === 'listino') {
     return [
-      { href: '/admin/listino/', testo: 'Price list', icona: 'listino' },
-      { href: '/admin/listino/flotta/', testo: 'Our fleet', icona: 'flotta' },
+      { href: '/partners/price-list/', testo: 'Price list', icona: 'listino' },
+      { href: '/partners/fleet/', testo: 'Our fleet', icona: 'flotta' },
     ];
   }
 
@@ -77,22 +77,28 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
     { href: '/admin/seo/', testo: 'Title e description', icona: 'seo' },
     { href: '/admin/numeri/', testo: 'Numeri da Regiondo', icona: 'numeri' },
     {
-      href: '/admin/listino/',
+      href: '/admin/partners/listino/',
       testo: 'Listino prezzi',
       icona: 'listino',
       sotto: [
-        { href: '/admin/listino/', testo: 'Listino' },
-        { href: '/admin/listino/sincronizza/', testo: 'Sincronizza tab PRICES' },
-        { href: '/admin/listino/flotta/', testo: 'Flotta' },
+        { href: '/admin/partners/listino/', testo: 'Listino' },
+        { href: '/admin/partners/sincronizza/', testo: 'Sincronizza tab PRICES' },
+        { href: '/admin/partners/flotta/', testo: 'Flotta' },
       ],
     },
-    /* Voce a se' per decisione della proprieta' (12/10/2026): chi entra
-       nel listino e nella flotta e' una faccenda di PERSONE, non di
-       prezzi. L'indirizzo resta sotto /admin/listino/ perche' e' gia'
-       scritto nelle email di avviso; la voce accesa la decide il prefisso
-       piu' lungo (vedi `migliore` in Guscio.tsx), quindi su questa pagina
-       si accende questa e non «Listino prezzi». */
-    { href: '/admin/listino/richieste/', testo: 'Accessi listino e flotta', icona: 'accessi' },
+    /* «Partners»: chi entra nell'area partner (prestigerent.com/partners/).
+       Voce a se' per decisione della proprieta' (12/10/2026): e' una
+       faccenda di PERSONE, non di prezzi -- per questo non sta sotto
+       «Listino prezzi». */
+    {
+      href: '/admin/partners/',
+      testo: 'Partners',
+      icona: 'accessi',
+      sotto: [
+        { href: '/admin/partners/', testo: 'Richieste' },
+        { href: '/admin/partners/attivi/', testo: 'Partner attivi' },
+      ],
+    },
     { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },
   ];
 }

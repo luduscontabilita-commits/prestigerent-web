@@ -104,11 +104,17 @@ describe('flotta', () => {
     for (const m of FLOTTA) if (m.persone) expect(m.postiMax).toBeGreaterThanOrEqual(m.persone[1]);
   });
 
-  it('ogni foto ha autore, licenza e fonte', () => {
+  it('le foto non nostre hanno autore, licenza e fonte; quelle del sito no', () => {
     for (const m of FLOTTA) {
+      if (!m.credito) continue;
       expect(m.credito.autore).toBeTruthy();
       expect(m.credito.licenzaUrl).toMatch(/^https:\/\/creativecommons\.org\//);
       expect(m.credito.fonte).toMatch(/^https:\/\/commons\.wikimedia\.org\//);
     }
+    expect(FLOTTA.filter((m) => m.credito).map((m) => m.chiave)).toEqual(['atego']);
+  });
+
+  it('tutte le foto stanno in public/listino/flotta/, con la versione', () => {
+    for (const m of FLOTTA) expect(m.foto).toMatch(/^\/listino\/flotta\/[a-z-]+\.webp\?v=\d+$/);
   });
 });

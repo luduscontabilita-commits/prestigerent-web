@@ -1,20 +1,23 @@
 'use server';
 
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/auth';
 import { clientSegreto } from '@/lib/chiave-segreta';
 import { normalizza, pareEmail } from '@/lib/accesso';
 import { invia } from '@/lib/posta';
+import { leggiLinkPartner } from '@/lib/link-partner';
 
-/* LE DUE AZIONI CHE SI CHIAMANO SENZA AVER FATTO L'ACCESSO: chiedere di
- * vedere il listino, ed entrare.
+/* LE AZIONI DELL'AREA PARTNER (prestigerent.com/partners/): chiedere di
+ * vedere il listino, entrare, uscire. Le prime due si chiamano senza aver
+ * fatto l'accesso.
  *
  * In inglese, come le pagine che le usano: chi le vede e' un'agenzia o un
  * hotel, spesso all'estero.
  *
  * ── LA REGISTRAZIONE NON CREA UN UTENTE ──────────────────────────────
  * Lascia una riga in `richieste_listino` e basta. L'utente nasce solo
- * quando un admin approva (src/app/admin/listino/azioni.ts). Due motivi:
+ * quando un admin approva (src/app/admin/partners/azioni.ts). Due motivi:
  *  1. Supabase Auth e' condiviso con il pannello TURNI, e il trigger
  *     `crea_profilo()` rifiuta chi non e' in `autorizzati`: aprire le
  *     iscrizioni vorrebbe dire toccare quel trigger per tutti;
@@ -133,7 +136,7 @@ export async function registraRichiesta(d: DatiRegistrazione): Promise<Esito> {
         `${nome} ${cognome} (${azienda}, ${tipo}, ${paese}) chiede di vedere il listino prezzi.\n\n` +
         `Email: ${email}\nTelefono: ${telefono}\nSito: ${sito || '—'}\n` +
         (note ? `\nNote:\n${note}\n` : '') +
-        `\nPer approvarla o rifiutarla: https://prestigerent.com/admin/listino/richieste/`,
+        `\nPer approvarla o rifiutarla: https://prestigerent.com/admin/partners/`,
     });
   }
   return { ok: true };
@@ -156,4 +159,61 @@ export async function accedi(email: string, password: string): Promise<Esito> {
   } catch {
     return { ok: false, errore: 'We cannot reach the server. Please try again in a moment.' };
   }
+}
+
+/** L'ACCESSO DAL LINK DELL'EMAIL (/partners/enter/?t=...).
+ *
+ *  Il gettone e' firmato dal sito (src/lib/link-partner.ts). Se e' buono
+ *  e il partner e' ancora attivo, si apre la sessione SENZA password:
+ *  Supabase genera un link monouso (`generateLink`, che non manda email)
+ *  e lo si consuma qui stesso con `verifyOtp`, che scrive i cookie di
+ *  sessione come un accesso normale.
+ *
+ *  Solo per il ruolo `listino`: un link che aprisse una sessione da admin
+ *  sarebbe la chiave del pannello dentro un'email. */
+export async function entraConLink(t: string): Promise<Esito & { email?: string }> {
+  const l = leggiLinkPartner(t);
+  if ('errore' in l) {
+    return {
+      ok: false,
+      email: l.email,
+      errore:
+        l.errore === 'scaduto'
+          ? 'This link has expired. Please sign in with your email and password.'
+          : 'This link is not valid. Please sign in with your email and password.',
+    };
+  }
+
+  const segreto = clientSegreto();
+  if (!segreto) return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+
+  const { data: p } = await segreto.from('profili').select('ruolo, attivo').eq('email', l.email).maybeSingle();
+  const prof = p as { ruolo: string; attivo: boolean } | null;
+  if (!prof || prof.ruolo !== 'listino' || !prof.attivo) {
+    return { ok: false, email: l.email, errore: 'This access is not active. Please write to usa@prestigerent.com.' };
+  }
+
+  const { data, error } = await segreto.auth.admin.generateLink({ type: 'magiclink', email: l.email });
+  const tokenHash = data?.properties?.hashed_token;
+  if (error || !tokenHash) {
+    return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+  }
+
+  const sb = await supabaseServer();
+  const { error: e2 } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: 'magiclink' });
+  if (e2) {
+    return { ok: false, email: l.email, errore: 'We cannot sign you in right now. Please use your email and password.' };
+  }
+  return { ok: true };
+}
+
+/** L'uscita dei partner: chiude la sessione su questo dispositivo e
+ *  torna a /partners/, non alla schermata di accesso del pannello (che e'
+ *  in italiano e chiede un «nome utente» che il partner non ha).
+ *  `redirect()` fuori da ogni try/catch: vedi `esciEVai()` in
+ *  src/app/admin/entra/azioni.ts. */
+export async function esciPartner(): Promise<void> {
+  const sb = await supabaseServer();
+  await sb.auth.signOut({ scope: 'local' });
+  redirect('/partners/');
 }

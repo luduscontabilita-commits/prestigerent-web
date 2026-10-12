@@ -30,6 +30,11 @@ export default function proxy(req: NextRequest) {
        /en/admin e non esisterebbe. */
     pathname.startsWith('/admin') ||
     pathname.startsWith('/auth') ||
+    /* L'area dei partner (agenzie, hotel): accesso, richiesta, listino e
+       flotta. Come il pannello non ha lingua -- e' in inglese e basta --
+       e senza questa riga /partners diventerebbe /en/partners e un 404.
+       Vedi LISTINO_AGENT.md. */
+    pathname.startsWith('/partners') ||
     /* LE LANDING E LA PAGINA DI CONFERMA NON SONO PAGINE DI QUESTO SITO.
      *
      * `/lp/...` sono le quattro landing su cui atterrano tutte le campagne

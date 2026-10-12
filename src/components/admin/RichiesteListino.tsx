@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Anchor, Badge, Button, Card, Code, Drawer, Group, SegmentedControl, Stack, Table, Text, Title } from '@mantine/core';
-import type { Esito, EsitoApprova } from '@/app/admin/listino/azioni';
+import type { Esito, EsitoApprova } from '@/app/admin/partners/azioni';
 
-/* LE RICHIESTE DI ACCESSO E GLI UTENTI DEL LISTINO.
+/* LE DUE PAGINE «PARTNERS» DEL PANNELLO: le richieste di accesso
+ * (/admin/partners/) e i partner attivi (/admin/partners/attivi/).
  *
  * Client per i pulsanti e per la notazione col punto di Mantine
  * (`Table.Tr`), che in un Server Component non si puo' usare -- vedi
@@ -89,6 +90,7 @@ function SchedaDati({ r, p }: { r: RichiestaListino | null; p?: Partner }) {
 }
 
 export function RichiesteListino({
+  mostra,
   richieste,
   partner,
   approva,
@@ -96,6 +98,8 @@ export function RichiesteListino({
   nuovaPassword,
   cambiaAttivo,
 }: {
+  /** quale delle due pagine «Partners»: le richieste, o chi ha gia' accesso */
+  mostra: 'richieste' | 'attivi';
   richieste: RichiestaListino[];
   partner: Partner[];
   approva: (id: string) => Promise<EsitoApprova>;
@@ -118,7 +122,7 @@ export function RichiesteListino({
     setEsito({
       colore: r.inviata ? 'teal' : 'orange',
       titolo: r.inviata ? `${cosa}: email con la password mandata a ${r.email}.` : `${cosa}, ma l’email a ${r.email} NON è partita.`,
-      testo: r.inviata ? 'La password è anche qui sotto, se serve.' : 'Consegna tu la password: indirizzo di accesso prestigerent.com/admin/listino/login/',
+      testo: r.inviata ? 'La password è anche qui sotto, se serve.' : 'Consegna tu la password: si entra da prestigerent.com/partners/ con email e password.',
       password: r.password,
     });
   };
@@ -154,6 +158,7 @@ export function RichiesteListino({
         </Alert>
       )}
 
+      {mostra === 'richieste' && (
       <Stack gap="sm">
         <Group justify="space-between" wrap="wrap">
           <Title order={2} size="h3">Richieste</Title>
@@ -239,9 +244,11 @@ export function RichiesteListino({
           ))
         )}
       </Stack>
+      )}
 
+      {mostra === 'attivi' && (
       <Stack gap="sm">
-        <Title order={2} size="h3">Chi vede il listino ({partner.length})</Title>
+        <Title order={2} size="h3">Partner attivi ({partner.length})</Title>
         {!partner.length ? (
           <Card withBorder radius="md" padding="lg">
             <Text c="dimmed">Ancora nessuno: compariranno qui dopo la prima approvazione.</Text>
@@ -316,6 +323,7 @@ export function RichiesteListino({
           </Table.ScrollContainer>
         )}
       </Stack>
+      )}
     </Stack>
   );
 }

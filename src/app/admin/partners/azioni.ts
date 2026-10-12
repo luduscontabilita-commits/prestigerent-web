@@ -7,6 +7,7 @@ import { LOCALE_CODES } from '@/lib/locales';
 import { invia } from '@/lib/posta';
 import { confronta, riscriviImporti } from '@/lib/prezzi-tab';
 import { opzioniDi } from '@/lib/regiondo-listino';
+import { creaLinkPartner, DURATA_LINK_GIORNI } from '@/lib/link-partner';
 
 /* LE AZIONI DEL LISTINO, TUTTE DI GESTIONE.
  *
@@ -31,7 +32,7 @@ const LOCALE = 'en';
    ═══════════════════════════════════════════════════════════════════
 
    Solo su richiesta, dopo che l'admin ha visto la tabella prima/dopo in
-   /admin/listino/sincronizza/. Si cambiano SOLO LE CIFRE (src/lib/
+   /admin/partners/sincronizza/. Si cambiano SOLO LE CIFRE (src/lib/
    prezzi-tab.ts): testo, note e formattazione restano quelli scritti.
 
    🔴 SI RILEGGE TUTTO QUI, NON SI FIDA DELLA TABELLA. Fra quando la
@@ -133,7 +134,14 @@ export async function sincronizzaTab(slugs: string[]): Promise<EsitoSync> {
     rinnovaPagina(slug);
   }
 
-  revalidatePath('/admin/listino', 'layout');
+  /* 🔴 NIENTE `revalidatePath` SULLE PAGINE DEL PANNELLO. Il 12/10/2026,
+     nella prova completa, «Approva» lo chiamava su questa stessa pagina e
+     il riquadro con l'esito (e la password!) spariva appena comparso: il
+     nuovo rendering si portava via lo stato del componente. Le pagine del
+     pannello sono `force-dynamic` e il componente chiama gia'
+     `router.refresh()`: non serve. Le pagine PUBBLICHE dei tour invece si
+     rinnovano (sopra, `rinnovaPagina`), ed e' l'unico motivo per cui
+     queste due azioni toccano la cache. */
   return { ok: true, fatte, saltate };
 }
 
@@ -182,33 +190,41 @@ export async function annullaSincronizzazione(slug: string): Promise<Esito> {
 
   await sb.from('prezzi_tab_storico').update({ annullata: true }).eq('id', ultima.id);
   rinnovaPagina(slug);
-  revalidatePath('/admin/listino', 'layout');
   return { ok: true };
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   LE RICHIESTE DI ACCESSO AL LISTINO
+   LE RICHIESTE DI ACCESSO ALL'AREA PARTNER
    ═══════════════════════════════════════════════════════════════════
 
-   Chi si registra da /admin/listino/register/ lascia una riga in
+   Chi chiede l'accesso da prestigerent.com/partners/ lascia una riga in
    `richieste_listino` e NON ha ancora un utente: l'utente nasce qui,
    quando l'admin approva. Cosi' una registrazione non approvata non
    lascia niente in Supabase Auth -- che e' condiviso col pannello TURNI,
    e dove il trigger `crea_profilo()` rifiuta chi non e' in
    `autorizzati`. */
 
-const INDIRIZZO_LOGIN = 'https://prestigerent.com/admin/listino/login/';
+const INDIRIZZO_PARTNERS = 'https://prestigerent.com/partners/';
 
-function letteraPassword(nome: string, email: string, password: string, nuova: boolean): string {
+/** L'email con l'accesso. Per decisione della proprieta' (12/10/2026)
+ *  parla di «Partners area», non di «price list», e comincia con il LINK
+ *  per entrare senza scrivere niente (src/lib/link-partner.ts, 14
+ *  giorni). Sotto restano email e password: servono quando il link e'
+ *  scaduto, o da un altro dispositivo. */
+function letteraAccesso(nome: string, email: string, password: string, nuova: boolean): string {
+  const link = creaLinkPartner(email);
   return (
     `Dear ${nome || 'partner'},\n\n` +
     (nuova
-      ? 'here is your new password for the Prestige Rent price list. The old one no longer works.\n\n'
-      : 'your access to the Prestige Rent price list has been approved.\n\n') +
-    `Sign in: ${INDIRIZZO_LOGIN}\n` +
+      ? 'here are your new access details for the Prestige Rent Partners area. The old password no longer works.\n\n'
+      : 'welcome! Your access to the Prestige Rent Partners area has been approved.\n\n') +
+    (link
+      ? `Enter the Partners area directly, no password needed (link valid for ${DURATA_LINK_GIORNI} days):\n${link}\n\n`
+      : '') +
+    `You can always sign in at ${INDIRIZZO_PARTNERS}\n` +
     `Email: ${email}\n` +
     `Password: ${password}\n\n` +
-    'Prices are read live from our booking system, so what you see is always current.\n' +
+    'In the Partners area you will find our price list, with live prices for every service and option, and our fleet.\n' +
     'If you lose your password, reply to this email and we will send you a new one.\n\n' +
     'Prestige Rent\nusa@prestigerent.com · +39 055 286059'
   );
@@ -284,11 +300,13 @@ export async function approvaRichiesta(id: string): Promise<EsitoApprova> {
 
   const inviata = await invia({
     a: email,
-    oggetto: 'Your access to the Prestige Rent price list',
-    testo: letteraPassword(r.nome, email, password, false),
+    oggetto: 'Your access to the Prestige Rent Partners area',
+    testo: letteraAccesso(r.nome, email, password, false),
   });
 
-  revalidatePath('/admin/listino/richieste');
+  /* Niente `revalidatePath` qui: cancellava il riquadro con la password
+     appena mostrato (vedi la nota in `sincronizzaTab`). Aggiorna la
+     pagina il `router.refresh()` del componente. */
   return { ok: true, email, password, inviata };
 }
 
@@ -303,7 +321,6 @@ export async function rifiutaRichiesta(id: string): Promise<Esito> {
     .eq('id', id)
     .eq('stato', 'in_attesa');
   if (error) return { ok: false, errore: error.message };
-  revalidatePath('/admin/listino/richieste');
   return { ok: true };
 }
 
@@ -329,8 +346,8 @@ export async function nuovaPasswordPartner(idProfilo: string): Promise<EsitoAppr
 
   const inviata = await invia({
     a: p.email,
-    oggetto: 'Your new password for the Prestige Rent price list',
-    testo: letteraPassword((p.nome ?? '').split(' ')[0], p.email, password, true),
+    oggetto: 'Your new access to the Prestige Rent Partners area',
+    testo: letteraAccesso((p.nome ?? '').split(' ')[0], p.email, password, true),
   });
   return { ok: true, email: p.email, password, inviata };
 }

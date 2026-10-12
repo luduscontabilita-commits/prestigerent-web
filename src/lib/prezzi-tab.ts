@@ -9,7 +9,7 @@
  * Per decisione della proprieta' la tab NON si rigenera: il testo, le
  * note, i limiti d'eta', i «contact us» restano quelli scritti. Si
  * cambiano SOLO LE CIFRE, e solo quando l'admin preme il pulsante in
- * /admin/listino/sincronizza/ dopo aver visto la tabella prima/dopo.
+ * /admin/partners/sincronizza/ dopo aver visto la tabella prima/dopo.
  *
  * Questo file e' logica pura (nessuna rete, nessun database) ed e'
  * provato da `prezzi-tab.test.ts`. Non importa niente di proposito: lo si

@@ -59,12 +59,15 @@ const TRAINING = [
  * fuori dall'indice e' il `noindex` in src/app/admin/layout.tsx, e quello
  * che lo tiene chiuso e' il controllo d'accesso in ogni pagina. */
 const PANNELLO = '/admin/';
+/* L'area dei partner: stesse ragioni del pannello. Il `noindex` vero sta
+   in src/app/partners/layout.tsx. */
+const PARTNERS = '/partners/';
 
 export default function robots(): MetadataRoute.Robots {
   const consentiti = [...RICERCA_CLASSICA, ...RICERCA_AI, ...TRAINING].map((userAgent) => ({
     userAgent,
     allow: '/',
-    disallow: PANNELLO,
+    disallow: [PANNELLO, PARTNERS],
   }));
 
   return {
@@ -76,7 +79,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // parametri di tracciamento: pagine identiche a URL diversi
-        disallow: [PANNELLO, '/*?utm_', '/*?fbclid', '/*?gclid'],
+        disallow: [PANNELLO, PARTNERS, '/*?utm_', '/*?fbclid', '/*?gclid'],
       },
     ],
     sitemap: `${SITE}/sitemap.xml`,

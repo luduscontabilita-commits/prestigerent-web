@@ -5,7 +5,7 @@ import { ALFABETO_PASSWORD, LUNGHEZZA_PASSWORD } from './accesso';
  *
  * Stavano dentro src/app/admin/utenti/azioni.ts; dal 12/10/2026 servono
  * anche all'approvazione degli utenti del listino
- * (src/app/admin/listino/azioni.ts). Un file `'use server'` puo'
+ * (src/app/admin/partners/azioni.ts). Un file `'use server'` puo'
  * esportare solo funzioni asincrone chiamabili dal browser: queste due
  * NON devono esserlo, quindi stanno qui, in un modulo normale che solo il
  * server importa.

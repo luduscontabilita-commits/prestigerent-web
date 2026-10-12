@@ -27,6 +27,7 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { esciEVai } from '@/app/admin/entra/azioni';
+import { esciPartner } from '@/app/partners/azioni';
 import type { VoceMenu } from '@/lib/menu-admin';
 
 /* IL GUSCIO DEL PANNELLO: barra laterale, intestazione, uscita.
@@ -92,9 +93,10 @@ export function Guscio({
   const percorso = usePathname();
   const inglese = ruolo === 'listino';
   /* La voce accesa e' quella col prefisso PIU' LUNGO che combacia. Con il
-     solo prefisso, dentro /admin/listino/flotta/ si accendevano insieme
-     «Price list» (/admin/listino/) e «Our fleet»: la prima e' prefisso
-     della seconda. */
+     solo prefisso, dentro la flotta si accendevano insieme «Price list»
+     e «Our fleet»: la prima era prefisso della seconda. Oggi vale per
+     «Partners» (/admin/partners/) e «Listino prezzi»
+     (/admin/partners/listino/). */
   const combacia = (href: string) => percorso.startsWith(href.replace(/\/$/, ''));
   const migliore = voci
     .filter((v) => v.href !== '/admin/' && combacia(v.href))
@@ -141,7 +143,10 @@ export function Guscio({
                 {NOME_RUOLO[ruolo] ?? ruolo}
               </Text>
             </Stack>
-            <form action={esciEVai}>
+            {/* Il partner esce verso /partners/, non verso la schermata di
+                accesso del pannello: quella e' in italiano e chiede un nome
+                utente che lui non ha. */}
+            <form action={inglese ? esciPartner : esciEVai}>
               <Button type="submit" variant="default" size="xs" leftSection={<IconLogout size={15} />}>
                 {inglese ? 'Sign out' : 'Esci'}
               </Button>

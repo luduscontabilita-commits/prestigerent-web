@@ -66,10 +66,10 @@ export const RUOLI_GESTIONE: readonly string[] = ['admin'];
  *  gli admin caricano e approvano. */
 export const RUOLI_CARICAMENTO: readonly string[] = ['admin', 'guida'];
 
-/** Chi vede il listino prezzi e la flotta (/admin/listino/). Il ruolo
+/** Chi entra nell'area partner (/partners/: listino e flotta). Il ruolo
  *  `listino` e' quello degli utenti esterni -- agenzie, hotel, partner --
- *  che si registrano da /admin/listino/register/ e che un admin approva.
- *  Vedono SOLO il listino: tutte le altre pagine del pannello chiedono
+ *  che chiedono l'accesso da /partners/ e che un admin approva.
+ *  Vedono SOLO l'area partner: tutte le pagine del pannello chiedono
  *  `RUOLI_GESTIONE` o `RUOLI_CARICAMENTO`, che `listino` non lo
  *  contengono, e le funzioni RLS `e_admin()`/`e_caricatore()` non lo
  *  riconoscono. Vedi LISTINO_AGENT.md. */
@@ -166,13 +166,14 @@ export async function soloCaricatori(): Promise<Profilo> {
   return io;
 }
 
-/** Per le PAGINE del listino: admin e utenti del listino. Chi non ha
- *  fatto l'accesso va alla SUA schermata, in inglese, e non a quella del
- *  pannello: un'agenzia che apre il listino senza sessione deve trovare
- *  «Sign in», non «Nome utente». */
-export async function soloListino(): Promise<Profilo> {
+/** Per le PAGINE dell'area partner (/partners/price-list/,
+ *  /partners/fleet/): admin e utenti del listino. Chi non ha fatto
+ *  l'accesso va alla SUA schermata, /partners/, in inglese, e non a
+ *  quella del pannello: un'agenzia senza sessione deve trovare «Sign in»,
+ *  non «Nome utente». Una guida torna al pannello. */
+export async function soloPartner(): Promise<Profilo> {
   const io = await chiSono();
-  if (!io) redirect('/admin/listino/login/');
+  if (!io) redirect('/partners/');
   if (!haRuolo(io, RUOLI_LISTINO)) redirect('/admin/');
   return io;
 }

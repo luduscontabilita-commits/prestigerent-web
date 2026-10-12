@@ -32,7 +32,7 @@ export default async function Pannello() {
      il listino. E' anche il posto dove lo rimandano tutte le altre pagine
      del pannello (`soloGestione()` manda qui chi non gestisce), quindi
      questa riga e' quella che lo tiene dentro il suo recinto. */
-  if (io.ruolo === 'listino') redirect('/admin/listino/');
+  if (io.ruolo === 'listino') redirect('/partners/price-list/');
 
   const gestisce = haRuolo(io, RUOLI_GESTIONE);
 
@@ -70,7 +70,7 @@ export default async function Pannello() {
           colore: 'teal',
         },
         {
-          href: '/admin/listino/',
+          href: '/admin/partners/listino/',
           titolo: 'Listino prezzi',
           testo:
             'Tutti i servizi con i prezzi di ogni opzione, letti da Regiondo, e la flotta. Da qui si allineano le tab PRICES delle schede.',
@@ -78,10 +78,10 @@ export default async function Pannello() {
           colore: 'orange',
         },
         {
-          href: '/admin/listino/richieste/',
-          titolo: 'Accessi listino e flotta',
+          href: '/admin/partners/',
+          titolo: 'Partners',
           testo:
-            'Agenzie, hotel e partner che chiedono di vedere il listino: si approvano o si rifiutano. Qui anche chi lo vede già, con i suoi recapiti.',
+            'Agenzie, hotel e tour operator dell’area prestigerent.com/partners/ (listino e flotta): le richieste da approvare e chi ha già accesso, con i suoi dati.',
           icona: IconUserShield,
           colore: 'red',
         },
