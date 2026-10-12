@@ -18,30 +18,20 @@ function logoFinto(lato = 200): Uint8Array {
   return new Uint8Array(PNG.sync.write(p));
 }
 
-/** Come lo vede un telefono su carta bianca: il trasparente diventa bianco. */
-function suBianco(png: PNG): Uint8ClampedArray {
-  const d = new Uint8ClampedArray(png.data.length);
-  for (let i = 0; i < png.data.length; i += 4) {
-    const a = png.data[i + 3] / 255;
-    for (let k = 0; k < 3; k++) d[i + k] = Math.round(png.data[i + k] * a + 255 * (1 - a));
-    d[i + 3] = 255;
-  }
-  return d;
-}
-
 describe('qrConLogo', () => {
   for (const misura of [512, 1024]) {
     it(`${misura}px: si legge con il logo al centro e porta all'indirizzo giusto`, async () => {
       const file = await qrConLogo('https://prestigerent.com/qr/partners', logoFinto(), misura);
       const png = PNG.sync.read(file);
       expect([png.width, png.height]).toEqual([misura, misura]);
-      const letto = jsQR(suBianco(png), png.width, png.height);
+      const letto = jsQR(new Uint8ClampedArray(png.data), png.width, png.height);
       expect(letto?.data).toBe('https://prestigerent.com/qr/partners');
     });
   }
 
-  it('lo sfondo e’ trasparente: l’angolo e’ vuoto', async () => {
-    const png = PNG.sync.read(await qrConLogo('https://prestigerent.com/qr/partners', null, 256));
-    expect(png.data[3]).toBe(0);
+  it('lo sfondo e’ bianco e opaco, anche dietro il logo', async () => {
+    const png = PNG.sync.read(await qrConLogo('https://prestigerent.com/qr/partners', logoFinto(), 256));
+    expect([...png.data.subarray(0, 4)]).toEqual([255, 255, 255, 255]);
+    for (let i = 3; i < png.data.length; i += 4) if (png.data[i] !== 255) throw new Error('pixel trasparente in ' + (i - 3) / 4);
   });
 });

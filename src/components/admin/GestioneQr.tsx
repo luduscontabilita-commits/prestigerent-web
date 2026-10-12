@@ -47,23 +47,23 @@ export function GestioneQr({
     <Group align="flex-start" gap="xl" wrap="wrap">
       <Card withBorder radius="md" padding="lg" style={{ flex: '0 0 auto' }}>
         <Stack gap="sm" align="center">
-          {/* sfondo a scacchi: si vede che il PNG e' trasparente */}
+          {/* Su bianco, come il file: il bordo sottile fa vedere dove
+              finisce il PNG, margine bianco compreso. */}
           <div
             style={{
               width: 260,
               height: 260,
-              backgroundImage:
-                'linear-gradient(45deg,#eee 25%,transparent 25%),linear-gradient(-45deg,#eee 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#eee 75%),linear-gradient(-45deg,transparent 75%,#eee 75%)',
-              backgroundSize: '16px 16px',
-              backgroundPosition: '0 0,0 8px,8px -8px,-8px 0',
+              background: '#fff',
+              border: '1px solid var(--mantine-color-gray-3)',
               borderRadius: 8,
+              overflow: 'hidden',
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/admin/partners/qrcode/png/?misura=520" alt="QR code verso l’area partner" width={260} height={260} />
+            <img src="/admin/partners/qrcode/png/?misura=520" alt="QR code verso l’area partner" width={260} height={260} style={{ display: 'block' }} />
           </div>
           <Text size="xs" c="dimmed" ta="center" maw={260}>
-            PNG trasparente: va stampato su un fondo chiaro.
+            PNG su sfondo bianco, con il margine già compreso.
           </Text>
           <Group gap="xs" justify="center">
             {MISURE.map((m) => (

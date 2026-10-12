@@ -1,25 +1,28 @@
 import QRCode from 'qrcode';
 import { PNG } from 'pngjs';
 
-/* IL QR CODE CON IL LOGO AL CENTRO, IN PNG TRASPARENTE.
+/* IL QR CODE CON IL LOGO AL CENTRO, IN PNG SU SFONDO BIANCO.
  *
  * Per le brochure e lo stand in fiera (proprieta', 12/10/2026). Si
  * disegna a mano, modulo per modulo, invece di usare il PNG che la
- * libreria sa fare da sola, per tre ragioni:
- *  - lo sfondo deve essere TRASPARENTE (va stampato su grafiche diverse);
+ * libreria sa fare da sola, per due ragioni:
  *  - al centro serve un tondo VUOTO dove appoggiare il logo, non il logo
  *    incollato sopra i moduli;
  *  - la misura in pixel deve essere esattamente quella chiesta.
+ *
+ * Sfondo BIANCO e non trasparente, su richiesta della proprieta' (stesso
+ * giorno): il trasparente stampato su un fondo scuro non lo legge nessun
+ * telefono, il bianco si legge ovunque lo si appoggi.
  *
  * ── PERCHE' IL LOGO NON LO RENDE ILLEGGIBILE ─────────────────────────
  * Correzione d'errore «H»: il QR si legge anche con il 30% dei moduli
  * coperti. Il tondo del logo ne copre circa il 6%, con margine
  * abbondante. Lo prova `qr-logo.test.ts`, che rilegge il PNG generato.
  *
- * ── STAMPARLO ────────────────────────────────────────────────────────
- * Lo sfondo trasparente vuol dire che il colore dietro lo decide la
- * grafica: i moduli sono quasi neri, quindi va stampato su un fondo
- * CHIARO. Su un fondo scuro nessun telefono lo legge. */
+ * ── IL MARGINE ───────────────────────────────────────────────────────
+ * 4 moduli bianchi attorno al codice, la «zona di quiete» dello standard:
+ * fa parte del PNG, quindi chi lo impagina non deve ricordarsi di
+ * lasciarla. */
 
 /** L'indirizzo FISSO stampato nel QR delle brochure: dove porta lo decide
  *  la tabella `qr_link` (src/app/qr/[codice]/route.ts). Con la barra
@@ -29,17 +32,17 @@ export const INDIRIZZO_QR = 'https://prestigerent.com/qr/partners/';
 
 const SCURO = [17, 24, 31]; // #11181F: quasi nero, il massimo contrasto su carta
 
-/** Il PNG del QR: `misura` x `misura` pixel, sfondo trasparente, logo
- *  (PNG, anche trasparente) al centro. */
+/** Il PNG del QR: `misura` x `misura` pixel, sfondo bianco, logo (PNG,
+ *  anche trasparente) al centro. */
 export async function qrConLogo(testo: string, logoPng: Uint8Array | null, misura = 1024): Promise<Buffer> {
   const qr = QRCode.create(testo, { errorCorrectionLevel: 'H' });
   const n = qr.modules.size;
-  const quiete = 2; // il margine bianco attorno, in moduli (trasparente)
+  const quiete = 4; // il margine bianco attorno, in moduli
   const totale = n + 2 * quiete;
   const lato = misura / totale; // pixel per modulo, anche non intero
 
   const png = new PNG({ width: misura, height: misura, colorType: 6 });
-  png.data.fill(0); // tutto trasparente
+  png.data.fill(255); // tutto bianco, opaco
 
   /* Il tondo vuoto al centro: diametro 22% del QR, piu' un poco di aria. */
   const centro = misura / 2;
