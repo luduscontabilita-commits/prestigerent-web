@@ -71,18 +71,29 @@ un tour operator. Vede **solo** listino e flotta.
 
 ## Aspetto e telefono
 
-- **Ogni sezione del listino ha la sua tinta e la sua icona**: porti
-  blu mare, transfer indaco, small group arancio Prestige, vino
-  bordeaux (`vino`, definita in `Tema.tsx`), privati verde. Le
-  ritrovi nei bottoni di navigazione, nel titolo della sezione, nella
-  fascia di ogni scheda e nell'intestazione delle tabelle. La richiesta
-  della proprietà era «è tutto molto piatto, sii professionale ma anche
-  creativo».
+- **Tabelle sobrie** (proprietà, 12/10/2026). La prima versione a
+  colori, con fasce sfumate e intestazioni piene, è stata giudicata
+  «troppo pacchiana». Oggi le tabelle sono grigio e inchiostro, e della
+  sezione resta un accento minimo: l'icona del titolo e dei bottoni e una
+  barra sottile a sinistra di ogni scheda (porti blu, transfer indaco,
+  small group arancio, vino bordeaux, privati verde). Gli stili stanno in
+  `ListinoTabelle.module.css` e non inline: inline la pagina pesava
+  ~790 KB.
+- **Prezzi nella lingua di chi legge**: «€1,000» in inglese, «€ 1.000»
+  in italiano. Il punto delle migliaia si mette a mano, perché in
+  italiano il browser non separa i numeri di quattro cifre.
 - **Telefono** (provato a 390 px):
   - niente scorrimento laterale;
   - bottoni di almeno 36 px, menu a 44 px;
   - un pulsante «torna in cima» nel listino;
-  - le immagini della flotta a tutta larghezza.
+  - le immagini della flotta a tutta larghezza;
+  - sotto i 576 px la scritta «PRESTIGE RENT» lascia il posto al solo
+    logo, così il selettore EN|IT e «Esci» stanno su una riga.
+- **`<html>` e `<body>` nei layout di `/admin` e `/partners`.** Mancavano,
+  e senza `<html>` Next non scrive `data-dpl-id`. Il browser non
+  riconosceva la versione del sito e ricaricava la pagina **per intero**
+  a ogni aggiornamento, in tutto il pannello. Spiegato in
+  `src/app/admin/layout.tsx`.
 
 ## L'email di accesso e il link diretto
 

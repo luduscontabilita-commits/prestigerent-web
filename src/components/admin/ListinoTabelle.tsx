@@ -4,13 +4,11 @@ import { useMemo, useState } from 'react';
 import {
   ActionIcon,
   Affix,
-  Anchor,
   Badge,
   Box,
   Button,
   Group,
   Stack,
-  Table,
   Text,
   TextInput,
   ThemeIcon,
@@ -31,6 +29,7 @@ import {
 } from '@tabler/icons-react';
 import { raggruppa, righeDelServizio, type ChiaveSezione, type Servizio } from '@/lib/listino';
 import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
+import css from './ListinoTabelle.module.css';
 
 /* LE TABELLE DEL LISTINO, per l'admin (italiano) e per il partner (inglese).
  *
@@ -44,14 +43,14 @@ import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
  * sull'anteprima «a righe»: le persone si leggono scendendo, le varianti
  * stanno in colonna, e le schede con una variante sola si affiancano.
  *
- * ── OGNI SEZIONE HA IL SUO COLORE (proprieta', 12/10/2026: «cosi' e'
- * tutto molto piatto, sii professionale ma anche creativo») ───────────
- * Ottantasei tabelle uguali si leggono come un muro. Qui ogni sezione ha
- * una tinta e un'icona -- il mare per i porti, il vino per le
- * degustazioni -- ripresi dal bottone di navigazione, dal titolo della
- * sezione, dalla fascia di ogni scheda e dall'intestazione della tabella:
- * scorrendo si capisce dove si e' anche senza leggere. Le tinte sono
- * quelle di Mantine piu' `prestige` e `vino`, definite in Tema.tsx.
+ * ── SOBRIO, CON UN SOLO ACCENTO PER SEZIONE ─────────────────────────
+ * Ottantasei tabelle uguali si leggono come un muro, ma la prima versione
+ * a colori (fasce sfumate, intestazioni piene) e' stata giudicata dalla
+ * proprieta' «troppo pacchiana» (12/10/2026). Resta un accento minimo: la
+ * tinta della sezione nell'icona del titolo e dei bottoni e in una barra
+ * sottile a sinistra di ogni scheda -- il resto e' grigio e inchiostro
+ * (ListinoTabelle.module.css). Le tinte: cyan, indigo, prestige, vino,
+ * teal (le ultime due in Tema.tsx).
  *
  * ── PENSATA ANCHE PER IL TELEFONO ───────────────────────────────────
  * Bottoni di navigazione alti 36px (sotto si sbaglia col dito), titoli di
@@ -61,7 +60,15 @@ import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
 
 export type StatoTab = 'uguale' | 'diverso' | 'non_abbinabile';
 
-const eur = (n: number) => '€' + n.toLocaleString('en-GB', { maximumFractionDigits: 2 });
+/** Il prezzo come lo scrive chi legge: «€1,000» in inglese, «€ 1.000» in
+ *  italiano. Il punto delle migliaia si mette a mano: con `it-IT` il
+ *  browser NON separa i numeri di quattro cifre (scriverebbe «1000»), che
+ *  e' la regola di CLDR ma non quella di un listino. */
+function euro(n: number, lingua: Lingua): string {
+  if (lingua !== 'it') return '€' + n.toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  const [intera, dec] = (Math.round(n * 100) / 100).toFixed(Number.isInteger(n) ? 0 : 2).split('.');
+  return '€ ' + intera.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (dec ? ',' + dec : '');
+}
 
 const STILE: Record<ChiaveSezione, { colore: string; Icona: typeof IconShip }> = {
   cruise: { colore: 'cyan', Icona: IconShip },
@@ -121,15 +128,14 @@ export function ListinoTabelle({
                 key={s.chiave}
                 component="a"
                 href={`#sez-${s.chiave}`}
-                variant="light"
-                color={colore}
+                variant="default"
                 size="sm"
                 radius="xl"
-                leftSection={<Icona size={16} stroke={1.7} />}
+                leftSection={<Icona size={16} stroke={1.6} color={t(colore, 7)} />}
                 rightSection={
-                  <Badge size="sm" circle color={colore} variant="filled">
+                  <Text span size="xs" c="dimmed" fw={600}>
                     {s.totale}
-                  </Badge>
+                  </Text>
                 }
               >
                 {T.sezioni[s.chiave]}
@@ -147,12 +153,12 @@ export function ListinoTabelle({
         const { colore, Icona } = STILE[s.chiave];
         return (
           <Stack key={s.chiave} gap="lg" id={`sez-${s.chiave}`} style={{ scrollMarginTop: 80 }}>
-            <Group gap="md" wrap="nowrap" style={{ borderBottom: `3px solid ${t(colore, 6)}`, paddingBottom: 10 }}>
-              <ThemeIcon size={44} radius="md" color={colore} variant="filled">
-                <Icona size={24} stroke={1.6} />
+            <Group gap="sm" wrap="nowrap" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)', paddingBottom: 10 }}>
+              <ThemeIcon size={36} radius="md" color={colore} variant="light">
+                <Icona size={20} stroke={1.6} />
               </ThemeIcon>
               <div style={{ minWidth: 0 }}>
-                <Title order={2} size="h3" c={t(colore, 9)} lh={1.15}>
+                <Title order={2} size="h3" lh={1.15}>
                   {T.sezioni[s.chiave]}
                 </Title>
                 <Text c="dimmed" size="sm">
@@ -166,8 +172,7 @@ export function ListinoTabelle({
                   <Group gap={6}>
                     <Badge
                       size="lg"
-                      variant="light"
-                      color={colore}
+                      variant="default"
                       radius="sm"
                       leftSection={<IconMapPin size={14} />}
                       style={{ textTransform: 'none', letterSpacing: '.02em' }}
@@ -185,7 +190,7 @@ export function ListinoTabelle({
                   }}
                 >
                   {g.servizi.map((x) => (
-                    <Scheda key={x.slug} s={x} T={T} admin={admin} stato={statiTab?.[x.slug]} colore={colore} />
+                    <Scheda key={x.slug} s={x} T={T} admin={admin} stato={statiTab?.[x.slug]} colore={colore} lingua={lingua} />
                   ))}
                 </Box>
               </Stack>
@@ -202,7 +207,7 @@ export function ListinoTabelle({
               style={stile}
               size={48}
               radius="xl"
-              color="prestige"
+              color="dark"
               variant="filled"
               aria-label={T.suTop}
               onClick={() => scrollTo({ y: 0 })}
@@ -216,44 +221,27 @@ export function ListinoTabelle({
   );
 }
 
-function Scheda({ s, T, admin, stato, colore }: { s: Servizio; T: Testi; admin: boolean; stato?: StatoTab; colore: string }) {
+/** Le variabili della tinta di una scheda, lette da ListinoTabelle.module.css. */
+function tinta(colore: string): React.CSSProperties {
+  const v: Record<string, string> = {};
+  for (const k of [0, 1, 2, 3, 6, 7, 8, 9]) v[`--k${k}`] = t(colore, k);
+  return v as React.CSSProperties;
+}
+
+function Scheda({ s, T, admin, stato, colore, lingua }: { s: Servizio; T: Testi; admin: boolean; stato?: StatoTab; colore: string; lingua: Lingua }) {
   const largo = (s.varianti?.length ?? 0) > 1;
   return (
-    <Box
-      style={{
-        gridColumn: largo ? '1 / -1' : undefined,
-        border: `1px solid ${t(colore, 2)}`,
-        borderRadius: 14,
-        overflow: 'hidden',
-        background: 'var(--mantine-color-white)',
-        boxShadow: '0 1px 2px rgba(16, 24, 40, .04), 0 4px 14px rgba(16, 24, 40, .05)',
-      }}
-    >
+    <div className={`${css.scheda} ${largo ? css.larga : ''}`} style={tinta(colore)}>
       {/* La fascia della scheda: nella tinta della sezione, con il nome
           che porta alla pagina del tour. */}
-      <Box
-        px="md"
-        py="sm"
-        style={{
-          background: `linear-gradient(135deg, ${t(colore, 0)}, ${t(colore, 1)})`,
-          borderBottom: `1px solid ${t(colore, 2)}`,
-          borderLeft: `5px solid ${t(colore, 6)}`,
-        }}
-      >
+      <div className={css.fascia}>
         <Group justify="space-between" align="flex-start" gap="xs" wrap="wrap">
-          <Anchor
-            href={`https://prestigerent.com/tour/${s.slug}/`}
-            target="_blank"
-            rel="noopener"
-            fw={800}
-            c={t(colore, 9)}
-            style={{ minWidth: 0, flex: '1 1 200px', display: 'inline-block', paddingBlock: 4, lineHeight: 1.3 }}
-          >
+          <a href={`https://prestigerent.com/tour/${s.slug}/`} target="_blank" rel="noopener" className={css.nome}>
             {s.nome}
             <IconExternalLink size={13} style={{ marginLeft: 5, verticalAlign: '-1px', opacity: 0.55 }} />
-          </Anchor>
+          </a>
           <Group gap={6}>
-            <Badge variant="white" color={colore} radius="xl" style={{ border: `1px solid ${t(colore, 3)}` }}>
+            <Badge variant="default" radius="sm" tt="none" fw={600}>
               {s.unita === 'per person' ? T.perPersona : T.perGruppo}
             </Badge>
             {stato && (
@@ -267,113 +255,61 @@ function Scheda({ s, T, admin, stato, colore }: { s: Servizio; T: Testi; admin: 
             )}
           </Group>
         </Group>
-        {admin && s.sku && <Text size="xs" c={t(colore, 8)} ff="monospace" mt={2}>{s.sku}</Text>}
-      </Box>
+        {admin && s.sku && <Text size="xs" c="dimmed" ff="monospace" mt={2}>{s.sku}</Text>}
+      </div>
 
-      <Box p="sm">
+      <div>
         {s.varianti?.length ? (
-          <Prezzi s={s} T={T} colore={colore} />
+          <Prezzi s={s} T={T} lingua={lingua} />
         ) : (
           <Text size="sm" c="dimmed" p="xs">
             {admin ? 'Regiondo non ha risposto per questo prodotto: riprova fra poco.' : T.nonDisponibile}
           </Text>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 
-function Prezzi({ s, T, colore }: { s: Servizio; T: Testi; colore: string }) {
+/* Una tabella HTML semplice e non `Table` di Mantine: e' la parte che si
+   ripete centinaia di volte, e ogni attributo in piu' per cella pesava
+   sull'HTML della pagina (vedi ListinoTabelle.module.css). */
+function Prezzi({ s, T, lingua }: { s: Servizio; T: Testi; lingua: Lingua }) {
   const varianti = s.varianti!;
   const { perPersone, righe } = righeDelServizio(varianti);
   const una = varianti.length === 1;
-  const testata = {
-    background: t(colore, 7),
-    color: 'var(--mantine-color-white)',
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: '.06em',
-    textTransform: 'uppercase' as const,
-    verticalAlign: 'bottom' as const,
-  };
   return (
-    <Table.ScrollContainer minWidth={una ? 220 : 120 + varianti.length * 130} type="native">
-      <Table
-        withRowBorders={false}
-        verticalSpacing={6}
-        horizontalSpacing="sm"
-        style={{ fontVariantNumeric: 'tabular-nums', borderRadius: 10, overflow: 'hidden', borderCollapse: 'separate', borderSpacing: 0 }}
-      >
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th style={{ ...testata, borderTopLeftRadius: 10 }}>
-              {perPersone ? T.persone : T.opzione}
-            </Table.Th>
+    <div className={css.scorre}>
+      <table className={css.tabella} style={{ minWidth: una ? 220 : 120 + varianti.length * 130 }}>
+        <thead className={css.testa}>
+          <tr>
+            <th>{perPersone ? T.persone : T.opzione}</th>
             {una ? (
-              <Table.Th ta="right" style={{ ...testata, borderTopRightRadius: 10 }}>{T.prezzo}</Table.Th>
+              <th className={css.destra}>{T.prezzo}</th>
             ) : (
-              varianti.map((v, i) => (
-                <Table.Th
-                  key={v.id}
-                  ta="right"
-                  style={{
-                    ...testata,
-                    textTransform: 'none',
-                    letterSpacing: 0,
-                    fontSize: 12,
-                    maxWidth: 220,
-                    borderTopRightRadius: i === varianti.length - 1 ? 10 : undefined,
-                  }}
-                >
+              varianti.map((v) => (
+                <th key={v.id} className={`${css.destra} ${css.variante}`}>
                   {v.titolo}
-                </Table.Th>
+                </th>
               ))
             )}
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {righe.map((r, i) => (
-            <Table.Tr key={r.etichetta} style={{ background: i % 2 ? t(colore, 0) : undefined }}>
-              <Table.Th scope="row" fw={600} style={{ whiteSpace: 'nowrap' }}>
-                {perPersone ? (
-                  /* il numero di persone in un tondo: si trova la propria
-                     riga a colpo d'occhio, anche sul telefono */
-                  <Box
-                    component="span"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 28,
-                      height: 28,
-                      borderRadius: 999,
-                      background: t(colore, 1),
-                      color: t(colore, 9),
-                      fontWeight: 800,
-                      fontSize: 13,
-                    }}
-                  >
-                    {r.etichetta}
-                  </Box>
+          </tr>
+        </thead>
+        <tbody>
+          {righe.map((r) => (
+            <tr key={r.etichetta}>
+              <th scope="row">{r.etichetta}</th>
+              {r.prezzi.map((p, k) =>
+                p == null ? (
+                  <td key={k} className={css.vuoto}>—</td>
                 ) : (
-                  r.etichetta
-                )}
-              </Table.Th>
-              {r.prezzi.map((p, k) => (
-                <Table.Td
-                  key={k}
-                  ta="right"
-                  fw={p == null ? 400 : 800}
-                  c={p == null ? 'dimmed' : t(colore, 9)}
-                  style={{ fontSize: 15 }}
-                >
-                  {p == null ? '—' : eur(p)}
-                </Table.Td>
-              ))}
-            </Table.Tr>
+                  <td key={k} className={css.prezzo}>{euro(p, lingua)}</td>
+                )
+              )}
+            </tr>
           ))}
-        </Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+        </tbody>
+      </table>
+    </div>
   );
 }

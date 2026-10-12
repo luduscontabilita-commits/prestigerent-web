@@ -1,5 +1,6 @@
 import '@mantine/core/styles.css';
 import { Tema } from '@/components/admin/Tema';
+import { linguaPartner } from '@/lib/partners-lingua';
 
 /* L'AREA DEI PARTNER: prestigerent.com/partners/.
  *
@@ -10,16 +11,28 @@ import { Tema } from '@/components/admin/Tema';
  *
  * Fuori da /admin per decisione della proprieta' (12/10/2026): il
  * partner non deve mai vedere «admin» nell'indirizzo. Fuori dalle lingue
- * perche' e' in inglese e basta (il proxy la esclude, src/proxy.ts).
+ * del sito: l'inglese o l'italiano li sceglie il selettore EN/IT
+ * (src/lib/partners-lingua.ts), che decide anche il `lang` qui sotto.
+ *
+ * 🔴 `<html>` E `<body>` SERVONO: senza, Next non scrive `data-dpl-id` e
+ * ricarica la pagina per intero a ogni aggiornamento. La storia intera
+ * sta in src/app/admin/layout.tsx.
  *
  * 🔴 NON E' QUI IL CONTROLLO D'ACCESSO, per le stesse ragioni scritte in
  * src/app/admin/layout.tsx: sta in ogni pagina (`soloPartner()`) e in
- * ogni azione. Qui solo il tema e il `noindex`. */
+ * ogni azione. Qui solo il tema, la lingua e il `noindex`. */
 export const metadata = {
   title: 'Prestige Rent · Partners',
   robots: { index: false, follow: false },
 };
 
-export default function PartnersLayout({ children }: { children: React.ReactNode }) {
-  return <Tema>{children}</Tema>;
+export default async function PartnersLayout({ children }: { children: React.ReactNode }) {
+  const lingua = await linguaPartner();
+  return (
+    <html lang={lingua} data-mantine-color-scheme="light" suppressHydrationWarning>
+      <body>
+        <Tema>{children}</Tema>
+      </body>
+    </html>
+  );
 }

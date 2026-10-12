@@ -1,0 +1,113 @@
+/* LE SCHEDE E LE TABELLE DEL LISTINO.
+ *
+ * SOBRIE PER DECISIONE DELLA PROPRIETA' (12/10/2026): la prima versione a
+ * colori -- fasce sfumate, intestazioni piene, tondi colorati -- e' stata
+ * giudicata «troppo pacchiana, troppo colorata». Restano grigi e
+ * inchiostro; della tinta della sezione (--k6) resta solo una barra
+ * sottile a sinistra dell'intestazione di ogni scheda, che basta a dire
+ * «sei ancora nei transfer» scorrendo.
+ *
+ * Gli stili stanno qui e non inline: con 86 schede e quasi 700 righe di
+ * prezzi, ripeterli in ogni cella portava la pagina a ~790 KB di HTML. */
+
+.scheda {
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--mantine-color-white);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.larga {
+  grid-column: 1 / -1;
+}
+
+.fascia {
+  padding: 10px 14px;
+  background: var(--mantine-color-white);
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  border-left: 3px solid var(--k6);
+}
+
+.nome {
+  min-width: 0;
+  flex: 1 1 200px;
+  display: inline-block;
+  padding-block: 4px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--mantine-color-dark-7);
+  text-decoration: none;
+}
+
+.nome:hover {
+  text-decoration: underline;
+}
+
+.scorre {
+  overflow-x: auto;
+}
+
+.tabella {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.tabella th,
+.tabella td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.tabella tbody tr:last-child th,
+.tabella tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.testa th {
+  background: var(--mantine-color-gray-0);
+  color: var(--mantine-color-gray-7);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: bottom;
+  text-align: left;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.testa .variante {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 220px;
+}
+
+.destra {
+  text-align: right !important;
+}
+
+.tabella tbody tr:hover {
+  background: var(--mantine-color-gray-0);
+}
+
+.tabella tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--mantine-color-gray-7);
+}
+
+.prezzo {
+  text-align: right;
+  font-weight: 700;
+  color: var(--mantine-color-dark-7);
+}
+
+.vuoto {
+  text-align: right;
+  color: var(--mantine-color-gray-5);
+}

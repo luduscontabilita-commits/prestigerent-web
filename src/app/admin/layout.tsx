@@ -38,7 +38,29 @@ export const metadata = { robots: { index: false, follow: false } };
  *
  * Quello che il layout fa, e che nessun altro puo' fare al posto suo, e'
  * caricare il tema: il CSS di Mantine arriva SOLO a chi apre /admin,
- * perche' Next carica i fogli di stile per rotta. */
+ * perche' Next carica i fogli di stile per rotta.
+ *
+ * 🔴 E SCRIVE `<html>` E `<body>`, che fino al 12/10/2026 mancavano.
+ * E' un layout RADICE (non c'e' un src/app/layout.tsx), e senza `<html>`
+ * Next non ha dove mettere `data-dpl-id`, l'identificativo del deploy che
+ * il browser legge all'avvio. Senza, ogni risposta del server sembrava
+ * di «un'altra versione del sito» e Next ricaricava la pagina PER INTERO
+ * a ogni `router.refresh()` e a ogni navigazione: in tutto il pannello.
+ * Trovato perche' il riquadro con la password, dopo «Approva», spariva
+ * col ricaricamento. Il sito pubblico l'attributo l'ha sempre avuto
+ * (src/app/[locale]/layout.tsx scrive il suo `<html>`).
+ *
+ * Gli attributi Mantine sono scritti a mano e non importati
+ * (`mantineHtmlProps`): un oggetto importato da un modulo client in un
+ * Server Component arriva come riferimento, non come oggetto -- e' il
+ * primo dei tre guasti di confine in CLAUDE.md. Il tema e' forzato
+ * chiaro (Tema.tsx), quindi il valore e' fisso. */
 export default async function PannelloLayout({ children }: { children: React.ReactNode }) {
-  return <Tema>{children}</Tema>;
+  return (
+    <html lang="it" data-mantine-color-scheme="light" suppressHydrationWarning>
+      <body>
+        <Tema>{children}</Tema>
+      </body>
+    </html>
+  );
 }

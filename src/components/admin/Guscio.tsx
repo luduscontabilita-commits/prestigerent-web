@@ -141,7 +141,9 @@ export function Guscio({
               height={28}
               style={{ display: 'block', flexShrink: 0 }}
             />
-            <Text fw={800} size="sm" style={{ letterSpacing: '.04em' }}>
+            {/* Sotto i 576px resta solo il logo: con il selettore EN|IT e
+                «Esci» accanto, la scritta andava a capo su due righe. */}
+            <Text fw={800} size="sm" visibleFrom="xs" style={{ letterSpacing: '.04em', whiteSpace: 'nowrap' }}>
               PRESTIGE RENT
             </Text>
           </Group>
