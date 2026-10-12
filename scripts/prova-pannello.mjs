@@ -98,6 +98,7 @@ const PAGINE = [
   '/admin/partners/',
   '/admin/partners/attivi/',
   '/admin/partners/listino/',
+  '/admin/partners/commissioni/',
   '/admin/partners/sincronizza/',
   '/admin/partners/flotta/',
   '/admin/partners/qrcode/',

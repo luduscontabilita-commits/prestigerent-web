@@ -314,4 +314,8 @@ vedono solo il listino e la flotta, in inglese.
   `/admin/partners/sincronizza/`, dopo aver visto la tabella prima/dopo,
   e cambiano solo le cifre. È l'eccezione dichiarata alla regola 3.
 
+- **Commissioni dei partner** (10% privati, 20% gruppo, modificabili in
+  `/admin/partners/commissioni/`): il listino mostra Retail, Net e
+  commissione. Le percentuali stanno in `commissioni`; i prezzi no.
+
 Come sta insieme e perché: `LISTINO_AGENT.md`.

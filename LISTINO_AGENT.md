@@ -22,6 +22,7 @@ nell'indirizzo.
 |---|---|---|
 | `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU, stato della tab PRICES, link «Modifica prezzi su Regiondo» per ogni servizio, pulsanti «PDF italiano / PDF English» |
 | `/admin/partners/listino/pdf/?lingua=it\|en` | (pulsanti) | la brochure in PDF, solo admin |
+| `/admin/partners/commissioni/` | Listino prezzi → Commissioni | le due percentuali dei partner (privati, gruppo), con l'esempio calcolato |
 | `/admin/partners/sincronizza/` | Listino prezzi → Sincronizza tab PRICES | tabella prima/dopo e pulsante per allineare |
 | `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, con le descrizioni modificabili in italiano e inglese |
 | `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
@@ -52,6 +53,44 @@ un tour operator. Vede **solo** listino e flotta.
   pulsante, dopo aver visto la tabella con le modifiche.
 - **La flotta è a righe**, con le immagini tutte della stessa misura e
   prese dal sito quando ci sono. Vedi sotto.
+
+## Le commissioni dei partner: Retail, Net, commissione
+
+Dal 12/10/2026 (proprietà) ogni prezzo del listino si legge in tre:
+
+- **Retail**: il prezzo al pubblico, quello di Regiondo e del sito;
+- **Net**: quello che il partner paga a Prestige Rent, cioè Retail meno
+  la commissione, **arrotondato all'euro**;
+- **Commissione**: Retail − Net. Così Net + commissione fa sempre il
+  Retail. Esempio: Retail 685 al 10% → Net 617 (616,50), commissione 68.
+
+**Due percentuali**, modificabili in `/admin/partners/commissioni/`:
+**10% sui servizi privati** (prezzo per gruppo/veicolo: tour privati,
+escursioni dai porti, transfer: 83 servizi) e **20% sui tour di gruppo**
+(prezzo a persona: i 3 small group). La Wine Experience è al 20% anche
+nelle varianti «semi private» (decisione della proprietà). Il tipo si
+ricava dall'unità del prezzo, quindi un tour nuovo si classifica da solo
+(`tipoCommissione` in `src/lib/commissioni.ts`).
+
+- Le percentuali stanno nella tabella **`commissioni`** (migrazione
+  `20261012_commissioni.sql`). Sono percentuali, non prezzi: la regola 3
+  resta intatta. RLS: solo `e_admin()`. Il listino dei partner le legge
+  sul server con la chiave segreta (`src/lib/commissioni-db.ts`); se la
+  lettura fallisce valgono 10% e 20%.
+- Le vedono **admin e partner**, con una legenda in cima al listino.
+- **Due impaginazioni** in `ListinoTabelle.tsx`, una visibile per volta
+  (CSS, soglia 48em):
+  - desktop: tabella orizzontale, una colonna per opzione (persone,
+    Adult/Youth), una riga per variante, e in ogni colonna il Retail con
+    sotto Net e commissione;
+  - telefono: una riga per opzione, con le tre colonne Retail, Net, Comm.
+
+  Contenendo tutte e due, l'HTML del listino dei partner è passato da
+  ~370 a ~780 KB (compresso pesa molto meno).
+- **PDF per i partner**: `/admin/partners/listino/pdf/?lingua=it|en&partner=1`,
+  dalla pagina PDF brochure. Ha Net e commissione sotto ogni prezzo e non
+  è legato alle due facciate (oggi sono 5 pagine). La brochure da fiera
+  resta solo Retail.
 
 ## Le due lingue dell'area partner
 

@@ -162,7 +162,9 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--mantine-color-dark-6);
-  max-width: 260px;
+  /* largo: a 260px «Wine & Food Experience in Tuscany - Morning with
+     lunch» veniva tagliato a meta' anche con spazio libero accanto */
+  max-width: 520px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
