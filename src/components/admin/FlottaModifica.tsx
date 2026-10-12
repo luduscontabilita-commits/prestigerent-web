@@ -190,13 +190,20 @@ export function FlottaModifica({
         opened={!!aperto}
         onClose={chiudi}
         position="bottom"
-        size="auto"
         withOverlay={false}
         lockScroll={false}
         trapFocus
         title={mezzo && def ? `${mezzo.nome} · ${def.nome}` : ''}
+        /* Alta quanto il contenuto, non una misura fissa: `size="auto"` di
+           Mantine diventa `var(--drawer-size-auto)`, che non esiste, e la
+           finestra copriva tutto lo schermo (visto in Chrome, 12/10/2026). */
         styles={{
-          content: { boxShadow: '0 -6px 24px rgba(0,0,0,.12)', borderTop: '1px solid var(--mantine-color-gray-3)' },
+          content: {
+            height: 'auto',
+            maxHeight: '60dvh',
+            boxShadow: '0 -6px 24px rgba(0,0,0,.12)',
+            borderTop: '1px solid var(--mantine-color-gray-3)',
+          },
           body: { paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom))' },
         }}
       >
