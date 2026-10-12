@@ -54,7 +54,7 @@ const en = {
   menuFlotta: 'Our fleet',
   // listino
   listinoTitolo: 'Price list',
-  listinoSotto: (quando: string) => `Public prices in euro for every service and option, read from our booking system on ${quando}. They always match the prices on prestigerent.com.`,
+  listinoSotto: 'Public prices in euro for every service and option. For further details, please visit prestigerent.com.',
   listinoMancanti: 'Some prices could not be loaded right now. Please reload the page in a few minutes.',
   listinoPiede: 'Prices per party are for the whole vehicle and group, not per person. For larger parties or custom itineraries, write to usa@prestigerent.com.',
   cerca: 'Search a service by name…',
@@ -145,7 +145,7 @@ const it: Testi = {
   menuListino: 'Listino prezzi',
   menuFlotta: 'La flotta',
   listinoTitolo: 'Listino prezzi',
-  listinoSotto: (quando: string) => `Prezzi al pubblico in euro per ogni servizio e opzione, letti dal nostro sistema di prenotazione il ${quando}. Coincidono sempre con i prezzi di prestigerent.com.`,
+  listinoSotto: 'Prezzi al pubblico in euro per ogni servizio e opzione. Per ulteriori dettagli consulta il sito prestigerent.com.',
   listinoMancanti: 'Alcuni prezzi non si sono caricati. Ricarica la pagina fra qualche minuto.',
   listinoPiede: 'I prezzi «per gruppo» valgono per l’intero veicolo e gruppo, non a persona. Per gruppi più numerosi o itinerari su misura scrivi a usa@prestigerent.com.',
   cerca: 'Cerca un servizio per nome…',

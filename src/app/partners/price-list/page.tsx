@@ -25,13 +25,8 @@ export default async function ListinoPartner() {
   const io = await soloPartner();
   const lingua = await linguaPartner();
   const T = testiDi(lingua);
-  const { servizi, letto } = await listino(false);
+  const { servizi } = await listino(false);
   const mancanti = servizi.filter((s) => !s.varianti).length;
-  const quando = new Date(letto).toLocaleString(lingua === 'it' ? 'it-IT' : 'en-GB', {
-    timeZone: 'Europe/Rome',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
 
   return (
     <Guscio
@@ -40,7 +35,9 @@ export default async function ListinoPartner() {
       lingua={lingua}
       voci={vociPartner(lingua)}
       titolo={T.listinoTitolo}
-      sottotitolo={T.listinoSotto(quando)}
+      /* Generico, senza ora di lettura ne' sistema di prenotazione: al
+         partner non interessano (proprieta', 12/10/2026). */
+      sottotitolo={T.listinoSotto}
     >
       {mancanti > 0 && (
         <Alert color="gray" variant="light" mb="lg">
