@@ -1,0 +1,25 @@
+/* I testi cliccabili della flotta, solo nel pannello dell'admin. */
+.modificabile {
+  cursor: text;
+  border-radius: 4px;
+  outline: 1px dashed transparent;
+  outline-offset: 2px;
+  transition: outline-color 120ms, background-color 120ms;
+}
+
+.modificabile:hover,
+.modificabile:focus-visible {
+  outline-color: var(--mantine-color-blue-5);
+  background-color: var(--mantine-color-blue-0);
+}
+
+/* il testo aperto nella finestra: resta evidenziato mentre lo si scrive */
+.aperto {
+  outline: 2px solid var(--mantine-color-blue-6);
+  background-color: var(--mantine-color-blue-0);
+}
+
+.vuoto {
+  color: var(--mantine-color-gray-6);
+  font-style: italic;
+}

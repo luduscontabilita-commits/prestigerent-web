@@ -23,9 +23,10 @@ nell'indirizzo.
 | `/admin/partners/listino/` | Listino prezzi → Listino | il listino con SKU, stato della tab PRICES, link «Modifica prezzi su Regiondo» per ogni servizio, pulsanti «PDF italiano / PDF English» |
 | `/admin/partners/listino/pdf/?lingua=it\|en` | (pulsanti) | la brochure in PDF, solo admin |
 | `/admin/partners/sincronizza/` | Listino prezzi → Sincronizza tab PRICES | tabella prima/dopo e pulsante per allineare |
-| `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, in italiano |
+| `/admin/partners/flotta/` | Flotta (voce a sé) | la flotta come la vede il partner, con le descrizioni modificabili in italiano e inglese |
 | `/admin/partners/` | Partners → Richieste | richieste da approvare o rifiutare, con «Dati» |
 | `/admin/partners/attivi/` | Partners → Partner attivi | chi ha accesso: «Dati», «Nuova password», «Chiudi l'accesso» |
+| `/admin/partners/qrcode/` | Partners → QR code | il QR con il logo per brochure e stand, PNG trasparente, destinazione modificabile |
 
 Gli indirizzi vecchi (`/admin/listino/…`, compresi `login/` e
 `register/`) rimandano ai nuovi: alcuni sono già scritti in email
@@ -57,7 +58,8 @@ un tour operator. Vede **solo** listino e flotta.
 - **I testi** stanno tutti in `src/lib/partners-testi.ts`, inglese e
   italiano uno accanto all'altro. Il tipo `Testi` impedisce che una
   chiave esista in una lingua sola. I testi italiani dei mezzi sono in
-  `src/lib/flotta.ts` (campo `it`).
+  `src/lib/flotta.ts` (campo `it`), e si cambiano dal pannello (vedi
+  «La flotta»).
 - **La lingua** si decide in `src/lib/partners-lingua.ts`:
   1. il cookie `partners_lang`, scritto dal selettore;
   2. altrimenti la lingua del browser;
@@ -98,8 +100,8 @@ un tour operator. Vede **solo** listino e flotta.
 
 ## La brochure in PDF
 
-Il PDF si scarica dai pulsanti **«PDF italiano» / «PDF English»** in
-`/admin/partners/listino/`. È fatto per essere stampato e mostrato ai
+Il PDF si scarica da **Listino prezzi → PDF brochure** (`/admin/partners/pdf/`)
+oppure dai pulsanti «PDF italiano» / «PDF English» in `/admin/partners/listino/`. È fatto per essere stampato e mostrato ai
 clienti in fiera (proprietà, 12/10/2026).
 
 - **Cosa contiene:** due facciate A4. In cima logo, presentazione,
@@ -120,6 +122,31 @@ clienti in fiera (proprietà, 12/10/2026).
 - **Varianti uguali:** mattina e pomeriggio con gli stessi prezzi stanno
   in una riga sola; «Accademia» e «Uffizi» si scrivono senza ripetere
   l'inizio comune.
+
+## Il QR code della fiera
+
+Lo si trova in **Partners → QR code** (`/admin/partners/qrcode/`).
+
+- **Cosa c'è dentro il QR:** sempre lo stesso indirizzo,
+  `https://prestigerent.com/qr/partners/`.
+- **Dove porta** lo decide la tabella `qr_link` (oggi
+  `https://prestigerent.com/partners/`), e l'admin lo cambia dalla
+  pagina. Così un QR già stampato sulle brochure si può ridirigere
+  **senza ristampare niente**. È la scelta della proprietà del
+  12/10/2026.
+- **Il rimando** lo fa `src/app/qr/[codice]/route.ts`:
+  - è un 302 e non un 301, perché i telefoni ricordano per sempre i
+    rimandi permanenti e il cambio non avrebbe effetto;
+  - un codice che non esiste porta alla home;
+  - `/qr/` è escluso dalle lingue nel proxy.
+- **Il PNG** lo genera `src/lib/qr-logo.ts`:
+  - sfondo trasparente, moduli quasi neri;
+  - correzione d'errore «H», cioè leggibile anche con il 30% coperto;
+  - un tondo vuoto al centro con il logo, che ne copre circa il 6%.
+  - `qr-logo.test.ts` lo **rilegge** con `jsqr`, come un telefono.
+  - **Va stampato su un fondo chiaro**: su un fondo scuro non si legge.
+- **Download:** 512, 1024 o 2048 px (fino a 4096 con
+  `?misura=`), solo per l'admin.
 
 ## Il link a Regiondo dal listino dell'admin
 
@@ -277,7 +304,31 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
 - **Una riga per mezzo**, non schede (proprietà, 12/10/2026):
   l'immagine a sinistra in un riquadro fisso 2:1, accanto nome, posti,
   descrizione e servizi. Sul telefono l'immagine va sopra
-  (`src/components/partners/FlottaVista.tsx`).
+  (`src/components/partners/FlottaRighe.tsx`, client; i dati li prepara
+  `FlottaVista.tsx`).
+- **I testi si modificano dal pannello** (proprietà, 12/10/2026), in
+  `/admin/partners/flotta/`:
+  - selettore Italiano / English in alto;
+  - clic su un testo → sale dal basso una finestra con l'editor; la
+    pagina scorre perché il testo resti visibile sopra, e cambia mentre
+    si scrive;
+  - salvataggio automatico dopo 700 ms senza scrivere, e subito alla
+    chiusura o al cambio di lingua;
+  - «Ripristina il testo originale» torna a quello di `src/lib/flotta.ts`.
+
+  Campi modificabili: tipo, descrizione, nota sui posti, bagagli, «per
+  cosa si usa» (solo l'Atego: per gli altri lo dice la regola dei posti).
+  Tipo e descrizione non possono restare vuoti; gli altri, svuotati,
+  spariscono dalla pagina. Nome, posti, foto e numero di mezzi restano
+  nel codice.
+
+  Le modifiche stanno in **`flotta_testi`** (chiave, lingua, campo, testo;
+  migrazione `20261012_flotta_testi.sql`, lettura per tutti, scrittura
+  solo `e_admin()`) e **vincono sul codice** (`testiMezzo`). Azioni in
+  `src/app/admin/partners/flotta/azioni.ts`, con `chiAgisce` in prima
+  riga. Il partner vede la modifica alla prima pagina che apre: le due
+  pagine sono dinamiche, niente cache da svuotare. Se la tabella non si
+  legge, la pagina mostra i testi del codice invece di rompersi.
 - **Foto tutte uguali**: tela 800×400 trasparente, il mezzo dentro un
   riquadro 740×330, centrato, a 24 px dal fondo. Le **4 auto** sono le
   immagini di studio già usate dal sito (`/our-vehicles/`). L'**Isuzu** è
@@ -309,7 +360,9 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
 
 - `npm test` prova:
   - `prezzi-tab.test.ts`: importi, abbinamento, riscrittura;
-  - `listino.test.ts`: sezioni, righe, flotta.
+  - `listino.test.ts`: sezioni, righe, flotta;
+  - `flotta.test.ts`: i testi modificati dall'admin sopra quelli del
+    codice.
 - `npm run prova:pannello` entra come admin e apre tutte le pagine,
   comprese le sei nuove. Con `PROVA_PARTNER_EMAIL` e
   `PROVA_PARTNER_PASSWORD` in `.env.local` entra anche come partner e

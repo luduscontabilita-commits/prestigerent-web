@@ -80,6 +80,7 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       sotto: [
         { href: '/admin/partners/listino/', testo: 'Listino' },
         { href: '/admin/partners/sincronizza/', testo: 'Sincronizza tab PRICES' },
+        { href: '/admin/partners/pdf/', testo: 'PDF brochure' },
       ],
     },
     /* Voce a se' per decisione della proprieta' (12/10/2026): la flotta
@@ -97,6 +98,7 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       sotto: [
         { href: '/admin/partners/', testo: 'Richieste' },
         { href: '/admin/partners/attivi/', testo: 'Partner attivi' },
+        { href: '/admin/partners/qrcode/', testo: 'QR code' },
       ],
     },
     { href: '/admin/utenti/', testo: 'Utenti', icona: 'utenti' },

@@ -351,3 +351,36 @@ export async function nuovaPasswordPartner(idProfilo: string): Promise<EsitoAppr
   });
   return { ok: true, email: p.email, password, inviata };
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LA DESTINAZIONE DEL QR CODE
+   ═══════════════════════════════════════════════════════════════════
+
+   Il QR stampato contiene prestigerent.com/qr/partners/, sempre lo
+   stesso; qui si cambia dove porta (tabella `qr_link`, rimando in
+   src/app/qr/[codice]/route.ts). Scrive con la sessione dell'admin: la
+   policy `qr_link_admin` (e_admin()) e' la rete sotto il controllo. */
+export async function salvaDestinazioneQr(codice: string, destinazione: string): Promise<Esito> {
+  const agente = await chiAgisce(RUOLI_GESTIONE);
+  if (!agente.io) return { ok: false, errore: agente.errore ?? undefined };
+
+  let url: URL;
+  try {
+    url = new URL(String(destinazione ?? '').trim());
+  } catch {
+    return { ok: false, errore: 'Scrivi un indirizzo completo, per esempio https://prestigerent.com/partners/' };
+  }
+  /* Solo https: un QR che porta a un indirizzo non cifrato fa comparire
+     sul telefono l'avviso «sito non sicuro», proprio davanti al cliente. */
+  if (url.protocol !== 'https:') return { ok: false, errore: 'L’indirizzo deve cominciare con https://' };
+
+  const sb = await supabaseServer();
+  const { data, error } = await sb
+    .from('qr_link')
+    .update({ destinazione: url.toString(), aggiornato_il: new Date().toISOString(), aggiornato_da: agente.io.id })
+    .eq('codice', String(codice))
+    .select('codice');
+  if (error) return { ok: false, errore: error.message };
+  if (!data?.length) return { ok: false, errore: 'QR code non trovato.' };
+  return { ok: true };
+}

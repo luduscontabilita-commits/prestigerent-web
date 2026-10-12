@@ -35,6 +35,10 @@ export default function proxy(req: NextRequest) {
        e senza questa riga /partners diventerebbe /en/partners e un 404.
        Vedi LISTINO_AGENT.md. */
     pathname.startsWith('/partners') ||
+    /* L'indirizzo fisso dei QR code stampati (src/app/qr/[codice]/):
+       senza questa riga diventerebbe /en/qr/... e un 404 sotto il
+       telefono di chi l'ha appena scansionato in fiera. */
+    pathname.startsWith('/qr/') ||
     /* LE LANDING E LA PAGINA DI CONFERMA NON SONO PAGINE DI QUESTO SITO.
      *
      * `/lp/...` sono le quattro landing su cui atterrano tutte le campagne

@@ -1,9 +1,17 @@
 /* LA FLOTTA, COME LA VEDE CHI HA ACCESSO ALL'AREA PARTNER (/partners/fleet/).
  *
  * Dati scritti qui e non nel database: sono sei mezzi, cambiano una volta
- * l'anno, e una tabella con il suo pannello costerebbe piu' di quanto
- * risparmia. Modulo SENZA direttiva: lo leggono sia la pagina (server)
- * sia la scheda (client).
+ * l'anno. Modulo SENZA direttiva: lo leggono sia la pagina (server)
+ * sia le righe e l'editor (client).
+ *
+ * ── I TESTI SI CAMBIANO DAL PANNELLO (dal 12/10/2026) ────────────────
+ * Tipo, descrizione, nota sui posti, bagagli e «per cosa si usa», in
+ * inglese e in italiano, si modificano in /admin/partners/flotta/ (clic
+ * sul testo). Le modifiche stanno nella tabella `flotta_testi` e vincono
+ * su quelle scritte qui (`testiMezzo`); «Ripristina» cancella la riga e
+ * torna il testo di questo file. Quindi: chi cambia un testo QUI non lo
+ * vede in pagina se l'admin l'aveva gia' modificato. Nome, posti, foto e
+ * numero di mezzi restano solo qui.
  *
  * ── DA DOVE VENGONO I NUMERI ─────────────────────────────────────────
  *  - Auto: capienze e bagagli come in /our-vehicles/ (src/app/[locale]/
@@ -73,11 +81,44 @@ export type Mezzo = {
   it: { tipo: string; notaPosti: string | null; bagagli: string | null; descrizione: string; suRichiesta: string | null };
 };
 
-/** I testi di un mezzo nella lingua dell'area partner. */
-export function testiMezzo(m: Mezzo, lingua: 'en' | 'it') {
-  return lingua === 'it'
-    ? m.it
+export type TestiMezzo = Mezzo['it'];
+export type CampoTesto = keyof TestiMezzo;
+
+/** I testi che l'admin puo' cambiare da /admin/partners/flotta/, in
+ *  quest'ordine nella finestra. Il nome del modello, i posti e le foto
+ *  restano nel codice: sono fatti, non testi. */
+export const CAMPI_TESTO: { campo: CampoTesto; nome: string; obbligatorio: boolean }[] = [
+  { campo: 'tipo', nome: 'Tipo di mezzo', obbligatorio: true },
+  { campo: 'descrizione', nome: 'Descrizione', obbligatorio: true },
+  { campo: 'notaPosti', nome: 'Nota sui posti', obbligatorio: false },
+  { campo: 'bagagli', nome: 'Bagagli', obbligatorio: false },
+  { campo: 'suRichiesta', nome: 'Per cosa si usa', obbligatorio: false },
+];
+
+/** Un testo cambiato dall'admin (tabella `flotta_testi`, migrazione
+ *  20261012_flotta_testi.sql). Vince su quello scritto qui sotto. */
+export type ModificaTesto = { chiave: string; lingua: 'en' | 'it'; campo: CampoTesto; testo: string };
+
+export const MAX_TESTO = 1000;
+
+/** I testi di un mezzo nella lingua dell'area partner, con sopra le
+ *  modifiche dell'admin. Un campo facoltativo svuotato dall'admin
+ *  sparisce (null); uno obbligatorio vuoto non arriva mai qui, lo
+ *  rifiuta l'azione, ma se capitasse resta l'originale. */
+export function testiMezzo(m: Mezzo, lingua: 'en' | 'it', modifiche: ModificaTesto[] = []): TestiMezzo {
+  const base: TestiMezzo = lingua === 'it'
+    ? { ...m.it }
     : { tipo: m.tipo, notaPosti: m.notaPosti, bagagli: m.bagagli, descrizione: m.descrizione, suRichiesta: m.suRichiesta };
+  const campi = base as Record<CampoTesto, string | null>;
+  for (const x of modifiche) {
+    if (x.chiave !== m.chiave || x.lingua !== lingua) continue;
+    const def = CAMPI_TESTO.find((c) => c.campo === x.campo);
+    if (!def) continue;
+    const t = x.testo.trim();
+    if (t) campi[x.campo] = t;
+    else if (!def.obbligatorio) campi[x.campo] = null;
+  }
+  return base;
 }
 
 export const FLOTTA: Mezzo[] = [

@@ -100,6 +100,8 @@ const PAGINE = [
   '/admin/partners/listino/',
   '/admin/partners/sincronizza/',
   '/admin/partners/flotta/',
+  '/admin/partners/qrcode/',
+  '/admin/partners/pdf/',
   /* l'area dei partner vista dall'admin: deve aprirsi anche a lui */
   '/partners/price-list/',
   '/partners/fleet/',

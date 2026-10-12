@@ -106,9 +106,16 @@ export function Guscio({
      «Partners» (/admin/partners/) e «Listino prezzi»
      (/admin/partners/listino/). */
   const combacia = (href: string) => percorso.startsWith(href.replace(/\/$/, ''));
+  /* Una voce combacia anche con le sue SOTTOVOCI: «Sincronizza tab
+     PRICES» e «PDF brochure» stanno sotto «Listino prezzi» ma i loro
+     indirizzi (/admin/partners/sincronizza/, /admin/partners/pdf/) non
+     cominciano con il suo (/admin/partners/listino/). Senza, aprendole
+     si accendeva «Partners» e le sottovoci del listino sparivano. */
+  const quantoCombacia = (v: VoceMenu) =>
+    Math.max(...[v.href, ...(v.sotto ?? []).map((s) => s.href)].map((h) => (combacia(h) ? h.length : -1)));
   const migliore = voci
-    .filter((v) => v.href !== '/admin/' && combacia(v.href))
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    .filter((v) => v.href !== '/admin/' && quantoCombacia(v) > 0)
+    .sort((a, b) => quantoCombacia(b) - quantoCombacia(a))[0]?.href;
 
   return (
     <AppShell
