@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
 import { raggruppa, righeDelServizio, type Servizio, type Variante } from './listino';
 import { testiDi, type Lingua } from './partners-testi';
+import { scomponi, tipoCommissione, type Commissioni } from './commissioni';
 
 /* IL LISTINO IN PDF, DA STAMPARE COME BROCHURE (richiesta della
  * proprieta' del 12/10/2026: «da mostrare ai clienti a una fiera»).
@@ -26,7 +27,14 @@ import { testiDi, type Lingua } from './partners-testi';
  * Helvetica dei font standard del PDF: nessun file da incorporare, e il
  * PDF pesa pochi KB. Copre l'euro e le lettere accentate italiane, non
  * simboli come le stelle: `pulito()` li toglie, altrimenti pdf-lib
- * fermerebbe la generazione con un errore. */
+ * fermerebbe la generazione con un errore.
+ *
+ * ── LA VERSIONE PER I PARTNER (dal 12/10/2026) ───────────────────────
+ * Con `commissioni` il PDF diventa il listino da dare alle agenzie: sotto
+ * ogni prezzo Retail, nella stessa colonna, il Net e la commissione
+ * (src/lib/commissioni.ts). Tre righe per servizio non stanno in due
+ * facciate, e non serve: non e' una brochure da fiera. Si impagina a una
+ * misura fissa e prende le pagine che servono. */
 
 export type DatiAzienda = {
   anno_fondazione?: number | null;
@@ -81,6 +89,11 @@ const TESTI_PDF = {
         .filter(Boolean)
         .join('  ·  '),
     titoloListino: (data: string) => `Price list ${data}`,
+    titoloPartner: (data: string) => `Partner price list ${data}`,
+    notaPartner: (p: string, g: string) =>
+      `Prices in euro. Under each Retail price (the public one): Net, what you pay us, and Comm., your commission: ${p} on private services, ${g} on group tours. Net is rounded to the euro.`,
+    net: 'Net',
+    comm: 'Comm.',
     nota: 'Prices in euro for the whole vehicle and party, unless marked "per person". Columns: number of people in the party.',
     persone: 'People',
     perPersona: 'per person',
@@ -99,6 +112,11 @@ const TESTI_PDF = {
         .filter(Boolean)
         .join('  ·  '),
     titoloListino: (data: string) => `Listino prezzi ${data}`,
+    titoloPartner: (data: string) => `Listino partner ${data}`,
+    notaPartner: (p: string, g: string) =>
+      `Prezzi in euro. Sotto ogni prezzo Retail (quello al pubblico): il Net, quello che paghi a noi, e la Comm., la tua commissione: ${p} sui servizi privati, ${g} sui tour di gruppo. Il Net è arrotondato all’euro.`,
+    net: 'Net',
+    comm: 'Comm.',
     nota: 'Prezzi in euro per l’intero veicolo e gruppo, salvo dove è indicato «a persona». Colonne: numero di persone del gruppo.',
     persone: 'Persone',
     perPersona: 'a persona',
@@ -110,7 +128,15 @@ const TESTI_PDF = {
 type Riga =
   | { tipo: 'sezione'; testo: string }
   | { tipo: 'gruppo'; testo: string }
-  | { tipo: 'servizio'; nome: string; rientro: boolean; prezzi: (number | null)[] | null; testoPrezzi: string | null };
+  | {
+      tipo: 'servizio';
+      nome: string;
+      rientro: boolean;
+      prezzi: (number | null)[] | null;
+      testoPrezzi: string | null;
+      /** solo nel PDF dei partner: la commissione del servizio */
+      percentuale?: number | null;
+    };
 
 /** Due titoli di varianti uniti senza ripetere l'inizio comune:
  *  «Driver + Guide in Florence + Accademia tickets» e «… + Uffizi
@@ -139,7 +165,7 @@ function variantiUniche(varianti: Variante[]): { titolo: string; v: Variante }[]
   return fuori;
 }
 
-function righeDelPdf(servizi: Servizio[], lingua: Lingua): Riga[] {
+function righeDelPdf(servizi: Servizio[], lingua: Lingua, commissioni?: Commissioni): Riga[] {
   const T = testiDi(lingua);
   const P = TESTI_PDF[lingua];
   const righe: Riga[] = [];
@@ -158,21 +184,31 @@ function righeDelPdf(servizi: Servizio[], lingua: Lingua): Riga[] {
         const { perPersone } = righeDelServizio(uniche.map((u) => u.v));
         const prezziPersone = (v: Variante) =>
           Array.from({ length: 8 }, (_, i) => v.opzioni.find((o) => Number(o.nome.trim().match(/^\d+/)?.[0]) === i + 1)?.prezzo ?? null);
-        const testoOpzioni = (v: Variante) => v.opzioni.map((o) => `${o.nome.trim()} ${cifra(o.prezzo, lingua)}`).join('  ·  ');
+        const percentuale = commissioni ? commissioni[tipoCommissione(s)] : null;
+        /* Le opzioni a persona (Adult/Youth) stanno nella riga: nel PDF
+           dei partner ognuna e' «Retail / Net / Comm.». */
+        const testoOpzioni = (v: Variante) =>
+          v.opzioni
+            .map((o) => {
+              if (percentuale == null) return `${o.nome.trim()} ${cifra(o.prezzo, lingua)}`;
+              const x = scomponi(o.prezzo, percentuale);
+              return `${o.nome.trim()} ${cifra(x.retail, lingua)} / ${P.net} ${cifra(x.net, lingua)} / ${P.comm} ${cifra(x.commissione, lingua)}`;
+            })
+            .join('  ·  ');
         const nome = s.unita === 'per person' ? `${s.nome} (${P.perPersona})` : s.nome;
         if (uniche.length === 1) {
           righe.push(
             perPersone
-              ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null }
-              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v) }
+              ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null, percentuale }
+              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v), percentuale }
           );
         } else {
           righe.push({ tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: null });
           for (const u of uniche) {
             righe.push(
               perPersone
-                ? { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: prezziPersone(u.v), testoPrezzi: null }
-                : { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: null, testoPrezzi: testoOpzioni(u.v) }
+                ? { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: prezziPersone(u.v), testoPrezzi: null, percentuale }
+                : { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: null, testoPrezzi: testoOpzioni(u.v), percentuale }
             );
           }
         }
@@ -211,6 +247,8 @@ type DatiPdf = {
   lingua: Lingua;
   azienda: DatiAzienda;
   logoPng: Uint8Array | null;
+  /** solo per il PDF dei partner: Net e commissione sotto ogni prezzo */
+  commissioni?: Commissioni;
   /** l'anno del listino, gia' scritto («2026»): solo l'anno, senza giorno
    *  e mese, per decisione della proprieta' (12/10/2026) -- la brochure
    *  si stampa per una fiera e deve valere tutto l'anno */
@@ -222,6 +260,8 @@ type DatiPdf = {
  *  stima dell'altezza sbagliava di due righe (l'introduzione inglese e'
  *  piu' lunga di quella italiana): contare le pagine vere non sbaglia. */
 export async function creaPdfListino(dati: DatiPdf): Promise<Uint8Array> {
+  /* il PDF dei partner non deve stare in due facciate: misura fissa */
+  if (dati.commissioni) return (await componi(dati, 7.4)).file;
   let ultimo: Uint8Array | null = null;
   for (let misura = 8; misura >= 5.8; misura -= 0.2) {
     const { file, pagine } = await componi(dati, misura);
@@ -235,12 +275,14 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
   const { lingua, azienda } = dati;
   const P = TESTI_PDF[lingua];
   const pdf = await PDFDocument.create();
-  pdf.setTitle(pulito(`Prestige Rent - ${P.titoloListino(dati.data)}`));
+  const titolo = dati.commissioni ? P.titoloPartner(dati.data) : P.titoloListino(dati.data);
+  pdf.setTitle(pulito(`Prestige Rent - ${titolo}`));
   pdf.setAuthor('Prestige Rent');
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const grassetto = await pdf.embedFont(StandardFonts.HelveticaBold);
   const logo = dati.logoPng ? await pdf.embedPng(dati.logoPng).catch(() => null) : null;
-  const righe = righeDelPdf(dati.servizi, lingua);
+  const righe = righeDelPdf(dati.servizi, lingua, dati.commissioni);
+  const percento = (n: number) => `${lingua === 'it' ? String(n).replace('.', ',') : n}%`;
 
   const L = A4[0] - 2 * MARGINE; // larghezza utile
   const COLONNE = 8;
@@ -284,7 +326,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
 
   /* ── la tabella ── */
   const intestazione = (p: PDFPage) => {
-    testo(p, P.titoloListino(dati.data), MARGINE, y, misura * 1.5, grassetto);
+    testo(p, titolo, MARGINE, y, misura * 1.5, grassetto);
     y -= passo * 1.3;
     p.drawRectangle({ x: MARGINE, y: y - 3, width: L, height: passo + 2, color: INCHIOSTRO });
     testo(p, P.persone.toUpperCase(), MARGINE + 4, y, misura * 0.92, grassetto, rgb(1, 1, 1));
@@ -293,13 +335,23 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     }
     y -= passo * 1.4;
   };
-  testo(pagina, taglia(P.nota, font, misura, L), MARGINE, y + 4 - 0, misura, font, GRIGIO);
+  if (dati.commissioni) {
+    /* la legenda dei partner va a capo: e' la chiave per leggere tutto */
+    const nota = aCapo(P.notaPartner(percento(dati.commissioni.privato), percento(dati.commissioni.gruppo)), font, misura, L);
+    nota.forEach((r, i) => testo(pagina, r, MARGINE, y + 4 - i * passo, misura, font, GRIGIO));
+    y -= passo * (nota.length - 1);
+  } else {
+    testo(pagina, taglia(P.nota, font, misura, L), MARGINE, y + 4 - 0, misura, font, GRIGIO);
+  }
   y -= passo * 1.6;
   intestazione(pagina);
 
   let pari = false;
   for (const r of righe) {
-    const h = r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : passo;
+    /* nel PDF dei partner una riga coi prezzi in colonna ne occupa tre:
+       Retail, Net, Comm. */
+    const tre = r.tipo === 'servizio' && r.prezzi != null && r.percentuale != null;
+    const h = r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : tre ? passo * 2.9 : passo;
     if (y - h < MARGINE + piede) {
       pagina = pdf.addPage(A4);
       pagine.push(pagina);
@@ -321,15 +373,28 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
       pari = false;
       continue;
     }
-    if (pari) pagina.drawRectangle({ x: MARGINE, y: y - passo * 0.3, width: L, height: passo, color: RIGA });
+    if (pari) pagina.drawRectangle({ x: MARGINE, y: y - passo * 0.3 - (h - passo), width: L, height: h, color: RIGA });
     pari = !pari;
     const rientro = r.rientro ? 10 : 2;
     const fNome = r.rientro ? font : grassetto;
     if (r.prezzi) {
       testo(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome);
+      const sotto = passo * 0.95;
+      if (tre) {
+        aDestra(pagina, P.net, MARGINE + larghezzaNome - 6, y - sotto, misura * 0.9, font, GRIGIO);
+        aDestra(pagina, P.comm, MARGINE + larghezzaNome - 6, y - 2 * sotto, misura * 0.9, font, GRIGIO);
+      }
       r.prezzi.forEach((p, i) => {
         if (p == null) return;
-        aDestra(pagina, cifra(p, lingua), MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4, y, misura);
+        const x = MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4;
+        if (!tre) {
+          aDestra(pagina, cifra(p, lingua), x, y, misura);
+          return;
+        }
+        const s = scomponi(p, r.percentuale!);
+        aDestra(pagina, cifra(s.retail, lingua), x, y, misura, grassetto);
+        aDestra(pagina, cifra(s.net, lingua), x, y - sotto, misura * 0.95);
+        aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.9, font, GRIGIO);
       });
     } else if (r.testoPrezzi) {
       const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);
@@ -338,7 +403,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     } else {
       testo(pagina, taglia(r.nome, fNome, misura, L - rientro), MARGINE + rientro, y, misura, fNome);
     }
-    y -= passo;
+    y -= h;
   }
 
   /* ── il piede, su ogni pagina ── */

@@ -69,6 +69,18 @@ const en = {
   prezzo: 'Price',
   nonDisponibile: 'Prices are not available right now. Please try again in a few minutes.',
   suTop: 'Back to top',
+  // commissioni
+  retail: 'Retail',
+  net: 'Net',
+  commissione: 'Commission',
+  commBreve: 'Comm.',
+  percento: (n: number) => `${String(n)}%`,
+  commissioneDi: (n: number) => `${String(n)}% commission`,
+  legendaTitolo: 'How to read the prices',
+  legendaRetail: 'the public price, the same your client pays on prestigerent.com.',
+  legendaNet: 'what you pay Prestige Rent: the Retail price minus your commission.',
+  legendaCommissione: (privato: number, gruppo: number) =>
+    `your earnings on each booking: ${String(privato)}% on private services (private tours, cruise port tours, transfers), ${String(gruppo)}% on group tours (small group). Net is rounded to the euro.`,
   sezioni: {
     cruise: 'Cruise Port Tours',
     transfers: 'Transfers',
@@ -159,6 +171,18 @@ const it: Testi = {
   prezzo: 'Prezzo',
   nonDisponibile: 'Prezzi non disponibili in questo momento. Riprova fra qualche minuto.',
   suTop: 'Torna in cima',
+  // commissioni
+  retail: 'Retail',
+  net: 'Net',
+  commissione: 'Commissione',
+  commBreve: 'Comm.',
+  percento: (n: number) => `${String(n).replace('.', ',')}%`,
+  commissioneDi: (n: number) => `commissione ${String(n).replace('.', ',')}%`,
+  legendaTitolo: 'Come leggere i prezzi',
+  legendaRetail: 'il prezzo al pubblico, lo stesso che il cliente paga su prestigerent.com.',
+  legendaNet: 'quello che paghi a Prestige Rent: il prezzo Retail meno la tua commissione.',
+  legendaCommissione: (privato: number, gruppo: number) =>
+    `il tuo guadagno su ogni prenotazione: ${String(privato).replace('.', ',')}% sui servizi privati (tour privati, escursioni dai porti, transfer), ${String(gruppo).replace('.', ',')}% sui tour di gruppo (small group). Il Net è arrotondato all’euro.`,
   sezioni: {
     cruise: 'Escursioni dai porti',
     transfers: 'Transfer',

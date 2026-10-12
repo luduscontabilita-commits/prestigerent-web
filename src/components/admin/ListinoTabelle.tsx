@@ -29,6 +29,7 @@ import {
   IconPencil,
 } from '@tabler/icons-react';
 import { raggruppa, righeDelServizio, type ChiaveSezione, type Servizio } from '@/lib/listino';
+import { scomponi, tipoCommissione, type Commissioni } from '@/lib/commissioni';
 import { testiDi, type Lingua, type Testi } from '@/lib/partners-testi';
 import css from './ListinoTabelle.module.css';
 
@@ -57,7 +58,19 @@ import css from './ListinoTabelle.module.css';
  * Bottoni di navigazione alti 36px (sotto si sbaglia col dito), titoli di
  * sezione che non finiscono sotto la barra in alto (`scrollMarginTop`), e
  * un pulsante per tornare su: il listino intero, a una colonna, e' lungo
- * decine di schermate. */
+ * decine di schermate.
+ *
+ * ── RETAIL, NET E COMMISSIONE (dal 12/10/2026) ──────────────────────
+ * Con `commissioni` ogni prezzo diventa tre: Retail (Regiondo), Net e
+ * commissione (src/lib/commissioni.ts). Due impaginazioni, per richiesta
+ * della proprieta':
+ *  - DESKTOP: tabella orizzontale, una colonna per opzione (persone,
+ *    Adult/Youth...), una riga per variante; nella cella il Retail e
+ *    sotto, nella stessa colonna, Net e commissione;
+ *  - TELEFONO: una riga per opzione, con tre colonne di prezzi.
+ * Sono disegnate tutte e due e il CSS ne mostra una (soglia 48em): con
+ * un hook che misura lo schermo, il server non sa la larghezza e al primo
+ * disegno si vedrebbe quella sbagliata. */
 
 export type StatoTab = 'uguale' | 'diverso' | 'non_abbinabile';
 
@@ -87,6 +100,7 @@ export function ListinoTabelle({
   servizi,
   lingua,
   statiTab,
+  commissioni,
 }: {
   servizi: Servizio[];
   /** la lingua dei testi: l'admin in italiano, il partner quella scelta
@@ -94,6 +108,8 @@ export function ListinoTabelle({
   lingua: Lingua;
   /** solo per l'admin: lo stato della tab PRICES di ogni pagina */
   statiTab?: Record<string, StatoTab>;
+  /** le percentuali: ogni prezzo diventa Retail, Net e commissione */
+  commissioni?: Commissioni;
 }) {
   const [cerca, setCerca] = useState('');
   const [scroll, scrollTo] = useWindowScroll();
@@ -111,6 +127,7 @@ export function ListinoTabelle({
   return (
     <Stack gap={40}>
       <Stack gap="sm">
+        {commissioni && <Legenda T={T} commissioni={commissioni} />}
         <TextInput
           id="cerca-listino"
           placeholder={T.cerca}
@@ -191,7 +208,7 @@ export function ListinoTabelle({
                   }}
                 >
                   {g.servizi.map((x) => (
-                    <Scheda key={x.slug} s={x} T={T} admin={admin} stato={statiTab?.[x.slug]} colore={colore} lingua={lingua} />
+                    <Scheda key={x.slug} s={x} T={T} admin={admin} stato={statiTab?.[x.slug]} colore={colore} lingua={lingua} commissioni={commissioni} />
                   ))}
                 </Box>
               </Stack>
@@ -240,8 +257,27 @@ function tinta(colore: string): React.CSSProperties {
   return v as React.CSSProperties;
 }
 
-function Scheda({ s, T, admin, stato, colore, lingua }: { s: Servizio; T: Testi; admin: boolean; stato?: StatoTab; colore: string; lingua: Lingua }) {
-  const largo = (s.varianti?.length ?? 0) > 1;
+function Scheda({
+  s,
+  T,
+  admin,
+  stato,
+  colore,
+  lingua,
+  commissioni,
+}: {
+  s: Servizio;
+  T: Testi;
+  admin: boolean;
+  stato?: StatoTab;
+  colore: string;
+  lingua: Lingua;
+  commissioni?: Commissioni;
+}) {
+  /* Con le commissioni la tabella e' orizzontale: ogni scheda prende
+     tutta la riga, o le colonne delle persone non ci starebbero. */
+  const largo = !!commissioni || (s.varianti?.length ?? 0) > 1;
+  const percentuale = commissioni ? commissioni[tipoCommissione(s)] : null;
   return (
     <div className={`${css.scheda} ${largo ? css.larga : ''}`} style={tinta(colore)}>
       {/* La fascia della scheda: nella tinta della sezione, con il nome
@@ -256,6 +292,11 @@ function Scheda({ s, T, admin, stato, colore, lingua }: { s: Servizio; T: Testi;
             <Badge variant="default" radius="sm" tt="none" fw={600}>
               {s.unita === 'per person' ? T.perPersona : T.perGruppo}
             </Badge>
+            {percentuale != null && (
+              <Badge variant="light" color="gray" radius="sm" tt="none" fw={600}>
+                {T.commissioneDi(percentuale)}
+              </Badge>
+            )}
             {stato && (
               <Badge
                 variant="light"
@@ -293,7 +334,11 @@ function Scheda({ s, T, admin, stato, colore, lingua }: { s: Servizio; T: Testi;
 
       <div>
         {s.varianti?.length ? (
-          <Prezzi s={s} T={T} lingua={lingua} />
+          percentuale != null ? (
+            <PrezziConCommissione s={s} T={T} lingua={lingua} percentuale={percentuale} />
+          ) : (
+            <Prezzi s={s} T={T} lingua={lingua} />
+          )
         ) : (
           <Text size="sm" c="dimmed" p="xs">
             {admin ? 'Regiondo non ha risposto per questo prodotto: riprova fra poco.' : T.nonDisponibile}
@@ -344,5 +389,123 @@ function Prezzi({ s, T, lingua }: { s: Servizio; T: Testi; lingua: Lingua }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** La legenda sopra il listino: cosa vogliono dire Retail, Net e
+ *  commissione, con le percentuali di oggi. */
+function Legenda({ T, commissioni }: { T: Testi; commissioni: Commissioni }) {
+  return (
+    <div className={css.legenda}>
+      <Text fw={700} size="sm" mb={4}>
+        {T.legendaTitolo}
+      </Text>
+      <Text size="sm">
+        <b>{T.retail}</b> — {T.legendaRetail}
+      </Text>
+      <Text size="sm">
+        <b>{T.net}</b> — {T.legendaNet}
+      </Text>
+      <Text size="sm">
+        <b>{T.commissione}</b> — {T.legendaCommissione(commissioni.privato, commissioni.gruppo)}
+      </Text>
+    </div>
+  );
+}
+
+/** Tre cifre impilate nella stessa colonna: Retail, Net, commissione. */
+function Tre({ p, percentuale, lingua }: { p: number; percentuale: number; lingua: Lingua }) {
+  const x = scomponi(p, percentuale);
+  return (
+    <>
+      <span className={css.r}>{euro(x.retail, lingua)}</span>
+      <span className={css.n}>{euro(x.net, lingua)}</span>
+      <span className={css.c}>{euro(x.commissione, lingua)}</span>
+    </>
+  );
+}
+
+function PrezziConCommissione({ s, T, lingua, percentuale }: { s: Servizio; T: Testi; lingua: Lingua; percentuale: number }) {
+  const varianti = s.varianti!;
+  const { perPersone, righe } = righeDelServizio(varianti);
+  const una = varianti.length === 1;
+  return (
+    <>
+      {/* DESKTOP: una colonna per opzione, una riga per variante. */}
+      <div className={`${css.scorre} ${css.soloDesktop}`}>
+        <table className={css.tabella} style={{ minWidth: 150 + righe.length * 96 }}>
+          <thead className={css.testa}>
+            <tr>
+              <th>{perPersone ? T.persone : T.opzione}</th>
+              {righe.map((r) => (
+                <th key={r.etichetta} className={css.destra}>
+                  {r.etichetta}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {varianti.map((v, i) => (
+              <tr key={v.id}>
+                <th scope="row" className={css.etichette}>
+                  {!una && <span className={css.titoloRiga} title={v.titolo}>{v.titolo}</span>}
+                  <span className={css.r}>{T.retail}</span>
+                  <span className={css.n}>{T.net}</span>
+                  <span className={css.c}>{T.commissione}</span>
+                </th>
+                {righe.map((r) => {
+                  const p = r.prezzi[i];
+                  return p == null ? (
+                    <td key={r.etichetta} className={css.vuoto}>—</td>
+                  ) : (
+                    <td key={r.etichetta} className={css.cella}>
+                      {/* una riga vuota all'altezza del titolo della
+                          variante, perche' le cifre restino allineate alle
+                          loro etichette */}
+                      {!una && <span className={css.titoloRiga} aria-hidden="true">&nbsp;</span>}
+                      <Tre p={p} percentuale={percentuale} lingua={lingua} />
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* TELEFONO: per ogni variante, una riga per opzione e tre colonne. */}
+      <div className={css.soloMobile}>
+        {varianti.map((v, i) => (
+          <div key={v.id}>
+            {!una && <div className={css.variantePiccola}>{v.titolo}</div>}
+            <table className={css.tabella}>
+              <thead className={css.testa}>
+                <tr>
+                  <th>{perPersone ? T.persone : T.opzione}</th>
+                  <th className={css.destra}>{T.retail}</th>
+                  <th className={css.destra}>{T.net}</th>
+                  <th className={css.destra}>{T.commBreve}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {righe
+                  .filter((r) => r.prezzi[i] != null)
+                  .map((r) => {
+                    const x = scomponi(r.prezzi[i]!, percentuale);
+                    return (
+                      <tr key={r.etichetta}>
+                        <th scope="row">{r.etichetta}</th>
+                        <td className={css.prezzo}>{euro(x.retail, lingua)}</td>
+                        <td className={css.netto}>{euro(x.net, lingua)}</td>
+                        <td className={css.comm}>{euro(x.commissione, lingua)}</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

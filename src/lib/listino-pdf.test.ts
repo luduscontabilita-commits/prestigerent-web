@@ -37,5 +37,19 @@ describe('creaPdfListino', () => {
       const [l, a] = [pdf.getPage(0).getWidth(), pdf.getPage(0).getHeight()];
       expect([Math.round(l), Math.round(a)]).toEqual([595, 842]);
     });
+
+    it(`${lingua}: il PDF dei partner (Retail, Net, commissione) si genera, anche oltre due pagine`, async () => {
+      const file = await creaPdfListino({
+        servizi: catalogo(95),
+        lingua,
+        azienda: { anno_fondazione: 2000 },
+        logoPng: null,
+        data: '2026',
+        commissioni: { privato: 10, gruppo: 20 },
+      });
+      const pdf = await PDFDocument.load(file);
+      expect(pdf.getPageCount()).toBeGreaterThan(2);
+      expect(pdf.getTitle()).toMatch(/Partner price list 2026|Listino partner 2026/);
+    });
   }
 });

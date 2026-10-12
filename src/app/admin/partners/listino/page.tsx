@@ -7,6 +7,7 @@ import { ListinoTabelle, type StatoTab } from '@/components/admin/ListinoTabelle
 import { vociPerRuolo } from '@/lib/menu-admin';
 import { listino } from '@/lib/regiondo-listino';
 import { confronta } from '@/lib/prezzi-tab';
+import { leggiCommissioni } from '@/lib/commissioni-db';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -33,7 +34,7 @@ export default async function Listino({
   /* «Rileggi adesso» salta la cache di cinque minuti. */
   const fresco = (await searchParams).fresco === '1';
 
-  const { servizi, tour, letto } = await listino(fresco);
+  const [{ servizi, tour, letto }, { privato, gruppo }] = await Promise.all([listino(fresco), leggiCommissioni()]);
 
   const statiTab: Record<string, StatoTab> = {};
   let daAggiornare = 0;
@@ -66,6 +67,12 @@ export default async function Listino({
           <Button component="a" href="/admin/partners/listino/pdf/?lingua=en" variant="filled" size="sm">
             PDF English
           </Button>
+          {/* `component="a"` e non `{Link}`: un componente passato come
+              proprieta' da un Server Component e' il guasto n. 2 di
+              CLAUDE.md. */}
+          <Button component="a" href="/admin/partners/commissioni/" variant="default" size="sm">
+            Commissioni ({privato}% / {gruppo}%)
+          </Button>
           <Button component="a" href="/admin/partners/listino/?fresco=1" variant="default" size="sm">
             Rileggi adesso da Regiondo
           </Button>
@@ -84,7 +91,7 @@ export default async function Listino({
           {`Regiondo non ha risposto per ${mancanti} ${mancanti === 1 ? 'prodotto' : 'prodotti'}: riprova fra poco.`}
         </Alert>
       )}
-      <ListinoTabelle servizi={servizi} lingua="it" statiTab={statiTab} />
+      <ListinoTabelle servizi={servizi} lingua="it" statiTab={statiTab} commissioni={{ privato, gruppo }} />
     </Guscio>
   );
 }

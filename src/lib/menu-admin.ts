@@ -79,6 +79,7 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
       icona: 'listino',
       sotto: [
         { href: '/admin/partners/listino/', testo: 'Listino' },
+        { href: '/admin/partners/commissioni/', testo: 'Commissioni' },
         { href: '/admin/partners/sincronizza/', testo: 'Sincronizza tab PRICES' },
         { href: '/admin/partners/pdf/', testo: 'PDF brochure' },
       ],

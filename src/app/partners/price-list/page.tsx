@@ -5,6 +5,7 @@ import { Guscio } from '@/components/admin/Guscio';
 import { ListinoTabelle } from '@/components/admin/ListinoTabelle';
 import { vociPartner } from '@/lib/menu-admin';
 import { listino } from '@/lib/regiondo-listino';
+import { leggiCommissioni } from '@/lib/commissioni-db';
 import { linguaPartner } from '@/lib/partners-lingua';
 import { testiDi } from '@/lib/partners-testi';
 
@@ -25,7 +26,7 @@ export default async function ListinoPartner() {
   const io = await soloPartner();
   const lingua = await linguaPartner();
   const T = testiDi(lingua);
-  const { servizi } = await listino(false);
+  const [{ servizi }, { privato, gruppo }] = await Promise.all([listino(false), leggiCommissioni()]);
   const mancanti = servizi.filter((s) => !s.varianti).length;
 
   return (
@@ -44,7 +45,7 @@ export default async function ListinoPartner() {
           {T.listinoMancanti}
         </Alert>
       )}
-      <ListinoTabelle servizi={servizi.map((s) => ({ ...s, sku: '' }))} lingua={lingua} />
+      <ListinoTabelle servizi={servizi.map((s) => ({ ...s, sku: '' }))} lingua={lingua} commissioni={{ privato, gruppo }} />
       <Text size="sm" c="dimmed" mt="xl">
         {T.listinoPiede}
       </Text>
