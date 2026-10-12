@@ -136,21 +136,25 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
 | Mercedes Classe S | 4 | gli stessi servizi, su richiesta |
 | Mercedes Classe V | 6 | da 4 a 6 persone |
 | Mercedes Sprinter | 8 | da 7 a 8 persone |
-| Isuzu (6 in flotta) | 25 | i 3 small group |
+| Isuzu minibus (6 in flotta) | 25 | i 3 small group |
 | Mercedes Atego (4 in flotta) | 36 | gruppi da 9 in su, eventi e matrimoni, su richiesta; uno ha il bagno e 28 posti |
 
 - **Abbinamento mezzo → tour:** confermato dalla proprietà. L'elenco dei
   tour sotto ogni mezzo si calcola dal catalogo (`impiegoDi`): i servizi
   «per party» vanno alle auto, quelli «per person» al minibus.
-- 🔴 **I 25 posti dell'Isuzu non li ha detti nessuno.** Sono quelli che il
-  sito promette per i small group. Da confermare.
+- I 25 posti dell'Isuzu sono stati confermati dalla proprietà.
 - 🔴 **Le foto non sono dei nostri mezzi.** Vengono da Wikimedia Commons
-  (CC BY-SA 4.0 e CC BY 2.0). La pagina lo dice e cita autore, licenza e
-  fonte di ognuna. Le due dei bus portano la livrea di altre compagnie
-  («KIWI», «Acorn Travel»): su Commons non c'è una foto libera senza.
-  Vanno sostituite con foto vere appena ci sono: i file sono in
-  `public/listino/flotta/`, si scontornano con `rembg` (modello
-  `isnet-general-use`).
+  (CC BY-SA). La pagina lo dice e cita autore, licenza e fonte di
+  ognuna.
+- 🔴 **Niente marchi di altre aziende** (proprietà, 12/10/2026). Restano
+  solo quelli del costruttore. Le prime foto dei bus portavano la livrea
+  di altre compagnie e sono state sostituite: l'Isuzu ora è un Turquoise
+  senza scritte, e sull'Atego è stato cancellato il blocco col nome del
+  proprietario. Targhe sfocate.
+- **Per cambiare una foto:**
+  - i file sono in `public/listino/flotta/`;
+  - si scontornano con `rembg` (modello `isnet-general-use`);
+  - va rifatto il controllo su marchi e targhe.
 
 ## Come si prova
 

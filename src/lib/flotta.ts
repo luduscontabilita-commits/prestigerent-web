@@ -10,10 +10,8 @@
  *    our-vehicles/page.tsx), che e' gia' online e gia' rivista.
  *  - Bus: dalla proprieta', 12/10/2026: «6 minibus Isuzu e 4 bus Atego
  *    (36 posti, di cui 1 solo da 28 perche' ha il bagno)».
- *  - 🔴 I 25 POSTI DELL'ISUZU NON LI HA DETTI NESSUNO: sono quelli che il
- *    sito promette per i small group («never more than 25 guests»,
- *    src/lib/categorie.ts) e che /about-us/ chiama «25-seat minibuses».
- *    Da confermare con la proprieta'.
+ *  - I 25 posti dell'Isuzu: confermati dalla proprieta' il 12/10/2026
+ *    (sono anche quelli che il sito promette per i small group).
  *
  * ── QUALE MEZZO PER QUALE TOUR ───────────────────────────────────────
  * Confermato dalla proprieta' il 12/10/2026, partendo da quello che dicono
@@ -27,10 +25,16 @@
  * ── LE FOTO ──────────────────────────────────────────────────────────
  * Da Wikimedia Commons, con licenza libera, scontornate. NON sono i
  * nostri mezzi: sono il modello. La pagina lo dice, e cita autore e
- * licenza di ognuna come le licenze CC BY / CC BY-SA chiedono. Le due dei
- * bus portano la livrea di altre compagnie (non esiste su Commons una foto
- * libera senza): vanno sostituite con foto vere dei nostri mezzi appena ci
- * sono. File in public/listino/flotta/.
+ * licenza di ognuna come le licenze CC BY-SA chiedono.
+ *
+ * 🔴 NIENTE MARCHI DI ALTRE AZIENDE (proprieta', 12/10/2026). Restano
+ * solo quelli del costruttore (Mercedes, Isuzu, il nome del modello). Le
+ * prime foto dei bus portavano la livrea di altre compagnie («KIWI»,
+ * «Acorn Travel») e sono state sostituite: l'Isuzu e' ora un Turquoise
+ * senza scritte, l'Atego un bus bianco a cui e' stato cancellato il
+ * blocco con i dati del proprietario sulla fiancata. Targhe sfocate su
+ * entrambi. Chi cambia una foto deve rifare lo stesso controllo.
+ * File in public/listino/flotta/.
  */
 
 import type { Servizio } from './listino';
@@ -160,10 +164,10 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: null,
     foto: '/listino/flotta/isuzu.webp',
     credito: {
-      autore: 'Milhouse35',
-      licenza: 'CC BY-SA 4.0',
-      licenzaUrl: BY_SA_4,
-      fonte: 'https://commons.wikimedia.org/wiki/File:Isuzu_Novo.jpg',
+      autore: 'Anatoliy-024',
+      licenza: 'CC BY-SA 3.0',
+      licenzaUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      fonte: 'https://commons.wikimedia.org/wiki/File:Isuzu_Turquoise.jpg',
     },
   },
   {
@@ -181,10 +185,10 @@ export const FLOTTA: Mezzo[] = [
     suRichiesta: 'Groups of 9 or more, events and weddings, on request.',
     foto: '/listino/flotta/atego.webp',
     credito: {
-      autore: 'km30192002',
-      licenza: 'CC BY 2.0',
-      licenzaUrl: 'https://creativecommons.org/licenses/by/2.0/',
-      fonte: 'https://commons.wikimedia.org/wiki/File:DEZ6135_Acorn_Travel_Mercedes_Atego_with_Sitcar_bodywork_(36940907474).jpg',
+      autore: 'Bob Adams',
+      licenza: 'CC BY-SA 2.0',
+      licenzaUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
+      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes_Benz_Atego_bus_(16456228222).jpg',
     },
   },
 ];
