@@ -51,7 +51,6 @@ const en = {
   entraConPassword: 'Sign in with email and password',
   esci: 'Sign out',
   ruolo: 'partner',
-  piede: 'Prices are read live from our booking system, in euro.',
   menuListino: 'Price list',
   menuFlotta: 'Our fleet',
   // listino
@@ -145,7 +144,6 @@ const it: Testi = {
   entraConPassword: 'Accedi con email e password',
   esci: 'Esci',
   ruolo: 'partner',
-  piede: 'Prezzi letti in tempo reale dal nostro sistema di prenotazione, in euro.',
   menuListino: 'Listino prezzi',
   menuFlotta: 'La flotta',
   listinoTitolo: 'Listino prezzi',

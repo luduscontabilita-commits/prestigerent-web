@@ -229,13 +229,15 @@ export function Guscio({
           })}
         </AppShell.Section>
 
-        <AppShell.Section>
-          <Text size="xs" c="dimmed" px="xs" py="sm">
-            {partner
-              ? T.piede
-              : 'Il pannello non è raggiungibile dal sito: l’indirizzo si scrive a mano.'}
-          </Text>
-        </AppShell.Section>
+        {/* Al partner niente nota in fondo al menu: «Prezzi letti in tempo
+            reale...» tolta su richiesta della proprieta' (12/10/2026). */}
+        {!partner && (
+          <AppShell.Section>
+            <Text size="xs" c="dimmed" px="xs" py="sm">
+              Il pannello non è raggiungibile dal sito: l’indirizzo si scrive a mano.
+            </Text>
+          </AppShell.Section>
+        )}
       </AppShell.Navbar>
 
       <AppShell.Main>
