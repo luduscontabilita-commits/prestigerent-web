@@ -62,8 +62,9 @@ export type Mezzo = {
   chiave: string;
   nome: string;
   tipo: string;
-  /** quanti ne abbiamo, quando la proprieta' l'ha detto */
-  quanti: number | null;
+  /* Niente «quanti ne abbiamo»: il numero esatto dei mezzi per tipo NON
+     si dice ai partner (proprieta', 13/10/2026). Per chi lavora sul
+     codice: 6 minibus Isuzu e 4 pullman Atego, vedi la testata. */
   postiMax: number;
   /** la riga sotto la descrizione: capienza, quando il numero da solo
    *  non basta, e bagagli. Un testo solo, si modifica per intero. */
@@ -130,7 +131,6 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'classe-e',
     nome: 'Mercedes E-Class',
     tipo: 'Sedan',
-    quanti: null,
     postiMax: 4,
     dettagli: 'Most comfortable with up to 3 adults, or 3 adults and a child. Luggage: 2 suitcases + 2 carry-on bags.',
     descrizione:
@@ -152,7 +152,6 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'classe-s',
     nome: 'Mercedes S-Class',
     tipo: 'Executive sedan',
-    quanti: null,
     postiMax: 4,
     dettagli: 'Most comfortable with up to 3 adults, or 3 adults and a child. Luggage: 2 suitcases + 2 carry-on bags.',
     descrizione:
@@ -174,7 +173,6 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'classe-v',
     nome: 'Mercedes V-Class',
     tipo: 'MPV',
-    quanti: null,
     postiMax: 6,
     dettagli: 'Luggage: 6 suitcases + 6 carry-on bags.',
     descrizione:
@@ -196,7 +194,6 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'sprinter',
     nome: 'Mercedes Sprinter',
     tipo: 'Minivan',
-    quanti: null,
     postiMax: 8,
     dettagli: 'Luggage: 8 suitcases + 8 carry-on bags.',
     descrizione:
@@ -218,7 +215,6 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'isuzu',
     nome: 'Isuzu minibus',
     tipo: 'Minibus',
-    quanti: 6,
     postiMax: 25,
     dettagli: null,
     descrizione:
@@ -240,9 +236,8 @@ export const FLOTTA: Mezzo[] = [
     chiave: 'atego',
     nome: 'Mercedes Atego coach',
     tipo: 'Coach',
-    quanti: 4,
     postiMax: 36,
-    dettagli: 'One of the four has an on-board toilet and 28 seats.',
+    dettagli: 'One of our coaches has an on-board toilet and 28 seats.',
     descrizione:
       'Our largest vehicles, for groups that do not fit a minibus, weddings and events.',
     persone: null,
@@ -257,7 +252,7 @@ export const FLOTTA: Mezzo[] = [
     },
     it: {
       tipo: 'Pullman',
-      dettagli: 'Uno dei quattro ha il bagno a bordo e 28 posti.',
+      dettagli: 'Uno dei nostri pullman ha il bagno a bordo e 28 posti.',
       descrizione:
         'I nostri mezzi più grandi, per i gruppi che non entrano in un minibus, matrimoni ed eventi.',
       suRichiesta: 'Gruppi da 9 persone in su, eventi e matrimoni, su richiesta.',

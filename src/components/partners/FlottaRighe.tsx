@@ -120,9 +120,10 @@ export function FlottaRighe({
               <Group justify="space-between" align="baseline" wrap="wrap" gap="xs">
                 <div style={{ minWidth: 0 }}>
                   <Title order={2} size="h3">{testo('nome', tm.nome)}</Title>
+                  {/* senza «6 nella nostra flotta»: il numero dei mezzi non si
+                      dice (proprieta', 13/10/2026) */}
                   <Text size="sm" c="dimmed">
                     {testo('tipo', tm.tipo)}
-                    {m.quanti ? ` · ${T.inFlotta(m.quanti)}` : ''}
                   </Text>
                 </div>
                 <Badge size="lg" variant="light" radius="sm" style={{ textTransform: 'none' }}>
