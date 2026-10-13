@@ -3,6 +3,7 @@ import { listino } from '@/lib/regiondo-listino';
 import { creaPdfListino, type DatiAzienda } from '@/lib/listino-pdf';
 import { supabase } from '@/lib/supabase';
 import { leggiCommissioni } from '@/lib/commissioni-db';
+import { riprova } from '@/lib/riprova';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,13 +32,15 @@ export async function GET(req: Request) {
   const q = new URL(req.url).searchParams;
   const lingua = q.get('lingua') === 'en' ? 'en' : 'it';
   const partner = q.get('partner') === '1';
-  const [{ servizi, letto }, { data: azienda }, logo, c] = await Promise.all([
+  const [{ servizi, letto }, { data: azienda }, logo, c, rp] = await Promise.all([
     listino(false),
     supabase.from('azienda').select('*').eq('id', 1).maybeSingle(),
     fetch(LOGO, { next: { revalidate: 86400 } })
       .then(async (r) => (r.ok ? new Uint8Array(await r.arrayBuffer()) : null))
       .catch(() => null),
     partner ? leggiCommissioni() : Promise.resolve(null),
+    /* i numeri della testata: gli stessi della home, dalla stessa fonte */
+    riprova(),
   ]);
 
   const quando = new Date(letto);
@@ -52,6 +55,15 @@ export async function GET(req: Request) {
     logoPng: logo,
     data,
     commissioni: c ? { privato: c.privato, gruppo: c.gruppo } : undefined,
+    numeri: {
+      voto: rp.voto,
+      clienti: rp.azienda?.clienti_serviti ?? null,
+      tour: rp.azienda?.tour_effettuati ?? null,
+      posizione: rp.azienda?.classifica_posizione ?? null,
+      categoria: rp.azienda?.classifica_categoria ?? null,
+      anni: rp.anni,
+      recensioni: rp.totale || null,
+    },
   });
 
   const giorno = quando.toISOString().slice(0, 10);

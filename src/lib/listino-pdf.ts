@@ -2,6 +2,7 @@ import { PDFDocument, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage,
 import { raggruppa, righeDelServizio, type Servizio, type Variante } from './listino';
 import { testiDi, type Lingua } from './partners-testi';
 import { scomponi, tipoCommissione, type Commissioni } from './commissioni';
+import { testoBreve } from './cifre';
 
 /* IL LISTINO IN PDF, DA STAMPARE COME BROCHURE (richiesta della
  * proprieta' del 12/10/2026: «da mostrare ai clienti a una fiera»).
@@ -46,6 +47,26 @@ export type DatiAzienda = {
   tour_effettuati?: number | null;
 };
 
+/** I numeri della testata: GLI STESSI DELLA HOME (proprieta', 13/10/2026),
+ *  letti dalla stessa fonte -- `riprova()` in src/lib/riprova.ts, cioe' le
+ *  tabelle `azienda` e `fonti_recensioni`. Niente cifre scritte qui. */
+export type NumeriPdf = {
+  voto: number | null;
+  clienti: number | null;
+  tour: number | null;
+  posizione: number | null;
+  categoria: string | null;
+  anni: number | null;
+  /** recensioni sommate sulle piattaforme (12.081 -> «12,000+») */
+  recensioni: number | null;
+};
+
+/** «12,000+» / «12.000»: le recensioni arrotondate in difetto al migliaio. */
+function migliaia(n: number, lingua: Lingua): string {
+  const m = Math.floor(n / 1000) * 1000;
+  return String(m).replace(/B(?=(d{3})+(?!d))/g, lingua === 'it' ? '.' : ',');
+}
+
 const A4: [number, number] = [595.28, 841.89];
 const MARGINE = 30;
 const INCHIOSTRO = rgb(0.141, 0.2, 0.247); // #24333F, l'inchiostro del sito
@@ -84,16 +105,35 @@ const TESTI_PDF = {
       'We own and maintain our fleet of Mercedes cars, vans, minibuses and coaches, driven by our own employed drivers, ' +
       'and we run every tour ourselves: private days in Chianti, Siena and the Val d’Orcia, small group tours, wine experiences, ' +
       'shore excursions from the cruise ports and transfers between cities, ports and airports.',
-    fatti: (anno: number, voto: number | null, tour: number | null) =>
-      [`Since ${anno}`, 'Based in Florence', 'Our own fleet and drivers', voto ? `Rated ${voto}/5 by our guests` : null, tour ? `${tour.toLocaleString('en-GB')}+ tours` : null]
+    /* come la fascia dei numeri della home: «4.9 average rating · 1.1M+
+       guests driven · 270k+ tours and transfers · #1 tour operator in
+       Florence · 26 years on the road» */
+    fatti: (n: NumeriPdf) =>
+      [
+        n.voto ? `${n.voto} average rating` : null,
+        n.clienti ? `${testoBreve(n.clienti)} guests driven` : null,
+        n.tour ? `${testoBreve(n.tour)} tours and transfers` : null,
+        n.posizione && n.categoria ? `#${n.posizione} ${n.categoria}` : null,
+        n.anni ? `${n.anni} years on the road` : null,
+      ]
+        .filter(Boolean)
+        .join('  ·  '),
+    /* i premi della home (Premi.tsx): li' sono immagini, qui testo */
+    premi: (n: NumeriPdf) =>
+      [
+        'Viator Experience Award Winner 2025 & 2023',
+        n.voto && n.recensioni ? `${n.voto} based on ${migliaia(n.recensioni, 'en')}+ reviews on Viator & Tripadvisor` : null,
+        'Tripadvisor Travellers’ Choice Awards 2025',
+      ]
         .filter(Boolean)
         .join('  ·  '),
     titoloListino: (data: string) => `Price list ${data}`,
     titoloPartner: (data: string) => `Partner price list ${data}`,
     notaPartner: (p: string, g: string) =>
-      `Prices in euro. Under each Retail price (the public one): Net, what you pay us, and Comm., your commission: ${p} on private services, ${g} on group tours. Net is rounded to the euro.`,
+      `Prices in euro. For every service: Retail, the public price; Net, what you pay us; Your commission: ${p} on private services, ${g} on group tours. Net is rounded to the euro.`,
+    retail: 'Retail',
     net: 'Net',
-    comm: 'Comm.',
+    comm: 'Your commission',
     nota: 'Prices in euro for the whole vehicle and party, unless marked "per person". Columns: number of people in the party.',
     persone: 'People',
     perPersona: 'per person',
@@ -107,16 +147,31 @@ const TESTI_PDF = {
       'La flotta è nostra – auto, van, minibus e pullman Mercedes e Isuzu – e la guidano i nostri autisti, ' +
       'e ogni tour lo facciamo noi: giornate private nel Chianti, a Siena e in Val d’Orcia, tour in piccolo gruppo, esperienze di vino, ' +
       'escursioni dai porti delle navi da crociera e transfer fra città, porti e aeroporti.',
-    fatti: (anno: number, voto: number | null, tour: number | null) =>
-      [`Dal ${anno}`, 'Sede a Firenze', 'Flotta e autisti nostri', voto ? `Voto ${String(voto).replace('.', ',')}/5 dai nostri ospiti` : null, tour ? `Oltre ${tour.toLocaleString('it-IT')} tour` : null]
+    fatti: (n: NumeriPdf) =>
+      [
+        n.voto ? `${String(n.voto).replace('.', ',')} voto medio` : null,
+        n.clienti ? `${testoBreve(n.clienti).replace('.', ',')} ospiti accompagnati` : null,
+        n.tour ? `${testoBreve(n.tour).replace('.', ',')} tour e transfer` : null,
+        n.posizione && n.categoria ? `#${n.posizione} ${n.categoria.replace(/ in Florence$/i, ' a Firenze')}` : null,
+        n.anni ? `${n.anni} anni di attività` : null,
+      ]
+        .filter(Boolean)
+        .join('  ·  '),
+    premi: (n: NumeriPdf) =>
+      [
+        'Viator Experience Award 2025 e 2023',
+        n.voto && n.recensioni ? `${String(n.voto).replace('.', ',')} su oltre ${migliaia(n.recensioni, 'it')} recensioni su Viator e Tripadvisor` : null,
+        'Tripadvisor Travellers’ Choice Awards 2025',
+      ]
         .filter(Boolean)
         .join('  ·  '),
     titoloListino: (data: string) => `Listino prezzi ${data}`,
     titoloPartner: (data: string) => `Listino partner ${data}`,
     notaPartner: (p: string, g: string) =>
-      `Prezzi in euro. Sotto ogni prezzo Retail (quello al pubblico): il Net, quello che paghi a noi, e la Comm., la tua commissione: ${p} sui servizi privati, ${g} sui tour di gruppo. Il Net è arrotondato all’euro.`,
+      `Prezzi in euro. Per ogni servizio: Retail, il prezzo al pubblico; Net, quello che paghi a noi; La tua commissione: ${p} sui servizi privati, ${g} sui tour di gruppo. Il Net è arrotondato all’euro.`,
+    retail: 'Retail',
     net: 'Net',
-    comm: 'Comm.',
+    comm: 'La tua commissione',
     nota: 'Prezzi in euro per l’intero veicolo e gruppo, salvo dove è indicato «a persona». Colonne: numero di persone del gruppo.',
     persone: 'Persone',
     perPersona: 'a persona',
@@ -136,6 +191,9 @@ type Riga =
       testoPrezzi: string | null;
       /** solo nel PDF dei partner: la commissione del servizio */
       percentuale?: number | null;
+      /** solo nel PDF dei partner, per le opzioni a persona (Adult/Youth):
+       *  le tre righe Retail, Net, commissione */
+      treTesti?: [string, string, string] | null;
       /** la pagina del tour sul sito: il nome diventa un link */
       url?: string;
     };
@@ -187,23 +245,23 @@ function righeDelPdf(servizi: Servizio[], lingua: Lingua, commissioni?: Commissi
         const prezziPersone = (v: Variante) =>
           Array.from({ length: 8 }, (_, i) => v.opzioni.find((o) => Number(o.nome.trim().match(/^\d+/)?.[0]) === i + 1)?.prezzo ?? null);
         const percentuale = commissioni ? commissioni[tipoCommissione(s)] : null;
-        /* Le opzioni a persona (Adult/Youth) stanno nella riga: nel PDF
-           dei partner ognuna e' «Retail / Net / Comm.». */
-        const testoOpzioni = (v: Variante) =>
-          v.opzioni
-            .map((o) => {
-              if (percentuale == null) return `${o.nome.trim()} ${cifra(o.prezzo, lingua)}`;
-              const x = scomponi(o.prezzo, percentuale);
-              return `${o.nome.trim()} ${cifra(x.retail, lingua)} / ${P.net} ${cifra(x.net, lingua)} / ${P.comm} ${cifra(x.commissione, lingua)}`;
-            })
-            .join('  ·  ');
+        /* Le opzioni a persona (Adult/Youth) stanno nella riga. Nel PDF
+           dei partner diventano tre righe, come i prezzi in colonna:
+           «Adult 149 · Youth 119», poi i Net, poi le commissioni. */
+        const testoOpzioni = (v: Variante) => v.opzioni.map((o) => `${o.nome.trim()} ${cifra(o.prezzo, lingua)}`).join('  ·  ');
+        const treOpzioni = (v: Variante): [string, string, string] | null => {
+          if (percentuale == null) return null;
+          const riga = (k: 'retail' | 'net' | 'commissione') =>
+            v.opzioni.map((o) => `${o.nome.trim()} ${cifra(scomponi(o.prezzo, percentuale)[k], lingua)}`).join('  ·  ');
+          return [riga('retail'), riga('net'), riga('commissione')];
+        };
         const nome = s.unita === 'per person' ? `${s.nome} (${P.perPersona})` : s.nome;
         const url = `https://prestigerent.com/tour/${s.slug}/`;
         if (uniche.length === 1) {
           righe.push(
             perPersone
               ? { tipo: 'servizio', nome, rientro: false, prezzi: prezziPersone(uniche[0].v), testoPrezzi: null, percentuale, url }
-              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v), percentuale, url }
+              : { tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: testoOpzioni(uniche[0].v), treTesti: treOpzioni(uniche[0].v), percentuale, url }
           );
         } else {
           righe.push({ tipo: 'servizio', nome, rientro: false, prezzi: null, testoPrezzi: null, url });
@@ -211,7 +269,7 @@ function righeDelPdf(servizi: Servizio[], lingua: Lingua, commissioni?: Commissi
             righe.push(
               perPersone
                 ? { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: prezziPersone(u.v), testoPrezzi: null, percentuale }
-                : { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: null, testoPrezzi: testoOpzioni(u.v), percentuale }
+                : { tipo: 'servizio', nome: u.titolo, rientro: true, prezzi: null, testoPrezzi: testoOpzioni(u.v), treTesti: treOpzioni(u.v), percentuale }
             );
           }
         }
@@ -252,6 +310,8 @@ type DatiPdf = {
   logoPng: Uint8Array | null;
   /** solo per il PDF dei partner: Net e commissione sotto ogni prezzo */
   commissioni?: Commissioni;
+  /** i numeri della home; senza, la riga dei numeri e dei premi si accorcia */
+  numeri?: NumeriPdf;
   /** l'anno del listino, gia' scritto («2026»): solo l'anno, senza giorno
    *  e mese, per decisione della proprieta' (12/10/2026) -- la brochure
    *  si stampa per una fiera e deve valere tutto l'anno */
@@ -343,7 +403,18 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     testo(pagina, r, MARGINE, y, 8.6);
   }
   y -= 14;
-  testo(pagina, P.fatti(anno, azienda.voto_medio ?? null, azienda.tour_effettuati ?? null), MARGINE, y, 8.2, grassetto);
+  const numeri: NumeriPdf = dati.numeri ?? {
+    voto: azienda.voto_medio ?? null,
+    clienti: null,
+    tour: azienda.tour_effettuati ?? null,
+    posizione: null,
+    categoria: null,
+    anni: azienda.anno_fondazione ? new Date().getFullYear() - azienda.anno_fondazione : null,
+    recensioni: null,
+  };
+  testo(pagina, taglia(P.fatti(numeri), grassetto, 8.2, L), MARGINE, y, 8.2, grassetto);
+  y -= 12;
+  testo(pagina, taglia(P.premi(numeri), font, 8, L), MARGINE, y, 8, font, GRIGIO);
   y -= 20;
 
   /* ── la tabella ── */
@@ -372,7 +443,7 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
   for (const r of righe) {
     /* nel PDF dei partner una riga coi prezzi in colonna ne occupa tre:
        Retail, Net, Comm. */
-    const tre = r.tipo === 'servizio' && r.prezzi != null && r.percentuale != null;
+    const tre = r.tipo === 'servizio' && r.percentuale != null && (r.prezzi != null || !!r.treTesti);
     const h = r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : tre ? passo * 2.9 : passo;
     if (y - h < MARGINE + piede) {
       pagina = pdf.addPage(A4);
@@ -399,13 +470,22 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
     pari = !pari;
     const rientro = r.rientro ? 10 : 2;
     const fNome = r.rientro ? font : grassetto;
+    const sotto = passo * 0.95;
+    if (tre) {
+      /* PDF DEI PARTNER: le etichette Retail / Net / Your commission a
+         destra del nome, sulle tre righe (proprieta', 13/10/2026), e il
+         nome che va a capo prima di arrivarci invece di finirci sotto. */
+      const mEt = misura * 0.9;
+      const etichette = [P.retail, P.net, P.comm];
+      const lEt = Math.max(...etichette.map((e) => font.widthOfTextAtSize(e, mEt)));
+      etichette.forEach((e, k) => aDestra(pagina, e, MARGINE + larghezzaNome - 6, y - k * sotto, mEt, font, GRIGIO));
+      const spazio = larghezzaNome - rientro - lEt - 14;
+      let righeNome = aCapo(r.nome, fNome, misura, spazio);
+      if (righeNome.length > 3) righeNome = [righeNome[0], righeNome[1], taglia(righeNome.slice(2).join(' '), fNome, misura, spazio)];
+      righeNome.forEach((t, k) => nomeConLink(pagina, t, MARGINE + rientro, y - k * sotto, misura, fNome, r.url));
+    }
     if (r.prezzi) {
-      nomeConLink(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome, r.url);
-      const sotto = passo * 0.95;
-      if (tre) {
-        aDestra(pagina, P.net, MARGINE + larghezzaNome - 6, y - sotto, misura * 0.9, font, GRIGIO);
-        aDestra(pagina, P.comm, MARGINE + larghezzaNome - 6, y - 2 * sotto, misura * 0.9, font, GRIGIO);
-      }
+      if (!tre) nomeConLink(pagina, taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6), MARGINE + rientro, y, misura, fNome, r.url);
       r.prezzi.forEach((p, i) => {
         if (p == null) return;
         const x = MARGINE + larghezzaNome + (i + 1) * larghezzaPrezzo - 4;
@@ -419,6 +499,12 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
         /* commissione come il Net: stessa misura, stesso colore (proprieta') */
         aDestra(pagina, cifra(s.commissione, lingua), x, y - 2 * sotto, misura * 0.95);
       });
+    } else if (tre && r.treTesti) {
+      /* le opzioni a persona: tre righe come i prezzi in colonna, stesso
+         peso -- Retail in grassetto, Net e commissione uguali */
+      r.treTesti.forEach((t, k) =>
+        testo(pagina, taglia(t, k === 0 ? grassetto : font, misura, COLONNE * larghezzaPrezzo - 4), MARGINE + larghezzaNome + 4, y - k * sotto, k === 0 ? misura : misura * 0.95, k === 0 ? grassetto : font)
+      );
     } else if (r.testoPrezzi) {
       const nome = taglia(r.nome, fNome, misura, larghezzaNome - rientro - 6);
       nomeConLink(pagina, nome, MARGINE + rientro, y, misura, fNome, r.url);
