@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { testiBenvenuto, whatsappLeggibile, type ContattiAzienda } from '@/lib/partners-benvenuto';
-import type { Lingua } from '@/lib/partners-testi';
+import { testiDi, type Lingua } from '@/lib/partners-testi';
 import css from './Benvenuto.module.css';
 
 /* LA PRESENTAZIONE DELL'AZIENDA (pagina iniziale dell'area partner), uguale
@@ -101,6 +102,16 @@ export function Benvenuto({ lingua, c }: { lingua: Lingua; c: ContattiAzienda })
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className={css.logo} src={LOGO} alt="Prestige Rent" width={150} height={150} loading="lazy" />
       </footer>
+
+      {/* Sul telefono il menu sta dietro il panino: in fondo alla pagina
+          due pulsanti portano avanti, al listino e alla flotta
+          (proprieta', 13/10/2026). Sul computer c'e' gia' la barra. */}
+      <nav className={css.avanti} aria-label={T.menu}>
+        <Link href="/partners/price-list/" className={css.pieno}>
+          {testiDi(lingua).menuListino}
+        </Link>
+        <Link href="/partners/fleet/">{testiDi(lingua).menuFlotta}</Link>
+      </nav>
     </article>
   );
 }

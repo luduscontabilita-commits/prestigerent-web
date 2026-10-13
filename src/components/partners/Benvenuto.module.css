@@ -191,3 +191,37 @@
     align-items: flex-start;
   }
 }
+
+/* ── i due pulsanti in fondo, solo sul telefono ── */
+.avanti {
+  display: none;
+}
+
+@media (max-width: 48em) {
+  .avanti {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 24px 0 8px;
+  }
+
+  .avanti a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1px solid var(--rosso);
+    border-radius: 8px;
+    color: var(--rosso);
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .avanti a.pieno {
+    background: var(--rosso);
+    color: #fff;
+  }
+}
