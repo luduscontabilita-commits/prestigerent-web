@@ -117,7 +117,8 @@ describe('flotta', () => {
       expect(m.credito.licenzaUrl).toMatch(/^https:\/\/creativecommons\.org\//);
       expect(m.credito.fonte).toMatch(/^https:\/\/commons\.wikimedia\.org\//);
     }
-    expect(FLOTTA.filter((m) => m.credito).map((m) => m.chiave)).toEqual(['atego']);
+    /* dal 13/10/2026 anche il pullman e' una foto nostra: nessun credito */
+    expect(FLOTTA.filter((m) => m.credito).map((m) => m.chiave)).toEqual([]);
   });
 
   it('tutte le foto stanno in public/listino/flotta/, con la versione', () => {
