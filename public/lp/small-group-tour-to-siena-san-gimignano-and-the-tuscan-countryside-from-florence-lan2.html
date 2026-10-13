@@ -49,7 +49,7 @@
      Sostituisce Cookiebot: l'account di prova e' scaduto il 21/08/2026 e
      da allora il suo script rispondeva solo un errore, lasciando l'Europa
      a consenso negato per sempre. -->
-<script defer src="/lp/js/consenso.js?v=20260901c"></script>
+<script defer src="/lp/js/consenso.js?v=20261013"></script>
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -3190,6 +3190,8 @@ The exact return time depends on traffic. In case you need to book other activit
          stanno dentro GTM e ascoltano questo nome. */
       window.dataLayer=window.dataLayer||[];
       window.dataLayer.push({event:'richiesta_inviata', lingua:'en'});
+      /* il pixel di OpenAI, fuori da GTM: vedi lp/js/consenso.js */
+      if(window.prMisuraRichiesta){ window.prMisuraRichiesta(); }
       if(j.riferimento && rif){
         rif.innerHTML='Your reference: <code>'+String(j.riferimento).replace(/[^A-Za-z0-9-]/g,'')+'</code>';
         rif.hidden=false;

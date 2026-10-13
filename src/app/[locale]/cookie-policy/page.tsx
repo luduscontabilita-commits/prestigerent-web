@@ -31,7 +31,7 @@ import '@/styles/legale.css';
  * posto del segnaposto in fondo.
  */
 
-const AGGIORNATA = '27 August 2026';
+const AGGIORNATA = '13 October 2026';
 
 export async function generateMetadata({
   params,
@@ -114,6 +114,19 @@ export default async function CookiePolicy({
           <strong>Regiondo GmbH</strong> inside the booking calendar embedded on our tour
           pages. These let us know that an advertisement led to a booking, and let us show
           our tours again to someone who looked at them. Set only with your consent.
+        </p>
+        {/* IL PIXEL DI OPENAI HA I NOMI DEI COOKIE, GLI ALTRI NO.
+            Per Google e Meta l'elenco nominale lo da' il pannello del
+            consenso. Questo pixel non passa da GTM -- lo carica il sito,
+            vedi src/components/Consenso.tsx -- e i suoi due cookie sono
+            fissi e documentati da OpenAI: scriverli qui non invecchia. */}
+        <p>
+          The <strong>OpenAI measurement pixel</strong> (OpenAI, provider of ChatGPT), which
+          tells us when an advertisement shown in ChatGPT led to a request or a contact. It
+          sets two cookies: <code>__oppref</code>, which stores the advertising reference from
+          the link you arrived on (30 days), and <code>__obref</code>, a random identifier for
+          your browser on this site (365 days). Set only with your consent, and deleted as
+          soon as you withdraw it.
         </p>
 
         <h2>If you refuse</h2>

@@ -73,6 +73,11 @@ const REGIONE_UE = [
    quando passa al sito. */
 const COOKIE = 'pr_consenso';
 
+/* Il pixel di OpenAI (annunci su ChatGPT). Non e' un segreto: sta scritto
+   nel sorgente di ogni pagina, come l'identificativo di GTM. Gli eventi
+   li manda src/lib/openaiPixel.ts. */
+const PIXEL_OPENAI = '9wgDKTAaYNna9Ug2EUeN7R';
+
 const CODICE = `
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -80,6 +85,30 @@ gtag('consent','default',{ad_storage:'granted',ad_user_data:'granted',ad_persona
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted',wait_for_update:500,region:${JSON.stringify(REGIONE_UE)}});
 gtag('set','ads_data_redaction',true);
 gtag('set','url_passthrough',true);
+
+/* IL PIXEL DI OPENAI, CHIUSO FINCHE' NON SI SA.
+ *
+ * Sta qui, e non in Tracciamento.tsx, per l'ordine: il pixel parte col
+ * consenso CONCESSO se nessuno gli dice niente, quindi il 'false' deve
+ * arrivare prima dell'init, nello stesso script. Poi lo riapre 'applica'
+ * (marketing si'), o 'decidi' quando Google dice che il visitatore e'
+ * fuori dalla zona che chiede il consenso -- la stessa regola del pixel
+ * di Meta, per lo stesso motivo: senza, si perde tutto il traffico
+ * americano. Mai su un semplice caricamento di pagina.
+ *
+ * La guardia del dominio e' la stessa di GTM: sulle anteprime di Vercel
+ * gli eventi di prova finirebbero nei dati veri delle campagne. */
+(function(w,d,s,u){
+  if(!/(^|\\.)prestigerent\\.com$/i.test(location.hostname) &&
+     new URLSearchParams(location.search).get('prova')!=='1') return;
+  if(w.oaiq) return;
+  var q=function(){q.q.push(arguments);};
+  q.q=[]; w.oaiq=q;
+  var js=d.createElement(s); js.async=true; js.src=u;
+  var f=d.getElementsByTagName(s)[0]; f.parentNode.insertBefore(js,f);
+  w.oaiq('consent',false);
+  w.oaiq('init',{pixelId:'${PIXEL_OPENAI}'});
+})(window,document,'script','https://bzrcdn.openai.com/sdk/oaiq.min.js');
 
 (function(){
   var NOME='${COOKIE}', MESI=6, ATTESA=3000, PASSO=100;
@@ -122,9 +151,21 @@ gtag('set','url_passthrough',true);
     }catch(e){}
   }
 
+  /* OpenAI, come Meta, non legge il Consent Mode: va avvisato a parte.
+     Qui non serve riprovare come con 'fbq': 'oaiq' lo crea lo snippet
+     qui sopra, nello stesso script, quindi esiste gia' (o non esistera'
+     mai, fuori produzione). Il 'false' cancella anche '__oppref' e
+     '__obref': lo fa il pixel stesso. */
+  function avvisaOpenAI(marketing){
+    try{
+      if(typeof window.oaiq==='function'){ window.oaiq('consent', !!marketing); }
+    }catch(e){}
+  }
+
   function applica(s){
     var mk=s.mk?'granted':'denied';
     avvisaMeta(!!s.mk);
+    avvisaOpenAI(!!s.mk);
     gtag('consent','update',{
       ad_storage:mk, ad_user_data:mk, ad_personalization:mk,
       analytics_storage:s.an?'granted':'denied',
@@ -263,7 +304,7 @@ gtag('set','url_passthrough',true);
    * cose in ordine -- si richiude Google, si avvisa Meta, si spazza via
    * quello che era stato scritto -- e solo dopo si torna a chiedere. */
   function spazza(){
-    var da=['_ga','_gcl_au','_gcl_aw','_gcl_gb','_fbp','_fbc','_clck','_clsk'];
+    var da=['_ga','_gcl_au','_gcl_aw','_gcl_gb','_fbp','_fbc','_clck','_clsk','__oppref','__obref'];
     var host=location.hostname.replace(/^www\./,'');
     var domini=['', '.'+host, host];
     try{
@@ -292,6 +333,7 @@ gtag('set','url_passthrough',true);
       });
     }catch(e){}
     avvisaMeta(false);
+    avvisaOpenAI(false);
     spazza();
     document.cookie=NOME+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.prestigerent.com';
     stato(null);
@@ -314,6 +356,7 @@ gtag('set','url_passthrough',true);
          ('lp/js/consenso.js', ramo 'r===false'); riscrivendo il consenso
          per il sito nuovo era andata persa. */
       avvisaMeta(true);
+      avvisaOpenAI(true);
       return;
     }
     if(passato>=ATTESA){ if(ripiego()) mostra(); return; }

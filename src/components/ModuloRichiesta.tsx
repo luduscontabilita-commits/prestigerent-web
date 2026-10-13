@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { testiModulo, type CodiceErrore } from '@/lib/testi';
 import { DEFAULT_LOCALE } from '@/lib/locales';
 import { identificativoClic } from '@/lib/clic';
+import { misuraRichiesta } from '@/lib/openaiPixel';
 
 /* IL MODULO DI RICHIESTA RAPIDA.
  *
@@ -189,6 +190,9 @@ export function ModuloRichiesta({ locale, tour, maxPersone = 60 }: Props) {
       } catch {
         /* se il tracciamento non c'e', non e' un problema del modulo */
       }
+      /* ...e il pixel di OpenAI, che non passa da GTM. Stesso punto e
+         stessa condizione: solo dopo il si' del server. */
+      misuraRichiesta();
 
       setStato('fatto');
     } catch {

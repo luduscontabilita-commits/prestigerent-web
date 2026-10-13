@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { EVENTI, dichiara } from '@/lib/eventi';
+import { misuraContatto } from '@/lib/openaiPixel';
 
 /* IL TRACCIAMENTO. UN MESTIERE SOLO.
  *
@@ -226,12 +227,19 @@ export function Tracciamento() {
       const href = el.getAttribute('href') ?? '';
       const posizione = zona(el);
 
+      /* Ogni gesto va due volte, a due destinatari diversi: il dataLayer
+         per GTM e il pixel di OpenAI, che GTM non governa (vedi
+         src/lib/openaiPixel.ts). Non e' un doppione: sono due pannelli
+         che non si leggono a vicenda. */
       if (/wa\.me|whatsapp/i.test(href)) {
         dichiara(EVENTI.contattoWhatsapp, { posizione, canale: 'whatsapp' });
+        misuraContatto('whatsapp_clicked');
       } else if (href.startsWith('tel:')) {
         dichiara(EVENTI.contattoTelefono, { posizione, canale: 'telefono' });
+        misuraContatto('phone_clicked');
       } else if (href.startsWith('mailto:')) {
         dichiara(EVENTI.contattoEmail, { posizione, canale: 'email' });
+        misuraContatto('email_clicked');
       } else if (href === '#bookform' || href.endsWith('#bookform')) {
         /* Intenzione, non acquisto: chiedere di vedere il calendario non
            e' prenotare. Va tenuto distinto, altrimenti Google impara a

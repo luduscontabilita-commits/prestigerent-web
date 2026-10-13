@@ -63,6 +63,74 @@
   var PASSO = 100;
 
   /* ---------------------------------------------------------------- */
+  /* Il pixel di OpenAI (annunci su ChatGPT)                          */
+  /* ---------------------------------------------------------------- */
+  /* Stesso pixel e stessa regola del sito (src/components/Consenso.tsx):
+     parte CHIUSO -- il suo default sarebbe concesso, quindi il `false`
+     va dato prima dell'init -- e lo riapre solo `apriGliAltri`, cioe' un
+     si' al marketing o un visitatore fuori dalla zona del consenso.
+     Sta in questo file e non in pagina perche' qui vive gia' chi decide
+     il consenso: una regola in due posti diventa due regole.
+
+     Questo file e' `defer`: un clic fatto prima che finisca di caricarsi
+     non viene misurato. E' mezzo secondo, e non vale uno snippet in piu'
+     in ognuna delle sette landing. */
+  var PIXEL_OPENAI = '9wgDKTAaYNna9Ug2EUeN7R';
+
+  (function (w, d, s, u) {
+    /* Solo sul dominio vero, come GTM sul sito: le anteprime di Vercel
+       non devono finire nei dati delle campagne. */
+    if (!/(^|\.)prestigerent\.com$/i.test(location.hostname) &&
+        new URLSearchParams(location.search).get('prova') !== '1') { return; }
+    if (w.oaiq) { return; }
+    var q = function () { q.q.push(arguments); };
+    q.q = []; w.oaiq = q;
+    var js = d.createElement(s); js.async = true; js.src = u;
+    var f = d.getElementsByTagName(s)[0]; f.parentNode.insertBefore(js, f);
+    w.oaiq('consent', false);
+    w.oaiq('init', { pixelId: PIXEL_OPENAI });
+  })(window, document, 'script', 'https://bzrcdn.openai.com/sdk/oaiq.min.js');
+
+  function avvisaOpenAI(marketing) {
+    try {
+      if (typeof window.oaiq === 'function') { window.oaiq('consent', !!marketing); }
+    } catch (e) {}
+  }
+
+  /* Chi aveva gia' scelto: `avvia()` esce subito se trova il cookie, e lo
+     snippet in pagina parla solo con Google. Senza questa riga chi torna
+     dopo aver accettato resterebbe chiuso per sempre. */
+  (function () {
+    try {
+      var m = document.cookie.match(/(?:^|;\s*)pr_consenso=([^;]*)/);
+      if (m && JSON.parse(decodeURIComponent(m[1])).mk) { avvisaOpenAI(true); }
+    } catch (e) {}
+  })();
+
+  /* Gli eventi. Il pixel e' fuori da GTM, quindi i clic glieli dice la
+     pagina; col consenso a `false` li trattiene lui e non li spedisce.
+     `prMisuraRichiesta` la chiama il modulo, solo dopo il si' del
+     server -- e' lo stesso punto in cui parte `richiesta_inviata`. */
+  function misuraOpenAI(nome) {
+    try {
+      if (typeof window.oaiq !== 'function') { return; }
+      if (nome === 'lead_created') {
+        window.oaiq('measure', 'lead_created', { type: 'customer_action' });
+      } else {
+        window.oaiq('measure', 'custom', { type: 'custom' }, { custom_event_name: nome });
+      }
+    } catch (e) {}
+  }
+  window.prMisuraRichiesta = function () { misuraOpenAI('lead_created'); };
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    var h = a ? (a.getAttribute('href') || '') : '';
+    if (/wa\.me|whatsapp/i.test(h)) { misuraOpenAI('whatsapp_clicked'); }
+    else if (h.indexOf('tel:') === 0) { misuraOpenAI('phone_clicked'); }
+    else if (h.indexOf('mailto:') === 0) { misuraOpenAI('email_clicked'); }
+  }, true);
+
+  /* ---------------------------------------------------------------- */
   /* Cosa ha deciso Google                                            */
   /* ---------------------------------------------------------------- */
   /* Restituisce true (chiedere), false (non chiedere), null (non lo sa
@@ -132,6 +200,7 @@
      finche' non si sa"); qui si concede. Gli eventi che Meta ha messo in
      coda partono subito dopo il grant, quindi il PageView non si perde. */
   function apriGliAltri(marketing, statistiche) {
+    avvisaOpenAI(marketing);
     /* 🔴 SI ASPETTA CHE IL PIXEL CI SIA.
        Fino al 01/09/2026 il pixel era scritto dentro la pagina, quindi
        quando si arrivava qui `fbq` esisteva di sicuro e bastava un `if`.
@@ -358,6 +427,9 @@
         e.preventDefault();
         document.cookie = COOKIE + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT' +
           ';path=/;domain=.prestigerent.com';
+        /* Ritirare vuol dire ritirare: il pixel di OpenAI si richiude
+           (e cancella da se' `__oppref` e `__obref`) prima di richiedere. */
+        avvisaOpenAI(false);
         mostra();
       });
     }

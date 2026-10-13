@@ -32,7 +32,7 @@ import '@/styles/legale.css';
  * online finche' ne resta anche uno solo.
  */
 
-const AGGIORNATA = '27 August 2026';
+const AGGIORNATA = '13 October 2026';
 
 export async function generateMetadata({
   params,
@@ -168,6 +168,10 @@ export default async function PrivacyPolicy({
           <li>
             <strong>Google Ireland Ltd.</strong> and{' '}
             <strong>Meta Platforms Ireland Ltd.</strong> &mdash; measurement and advertising,
+            and only if you accept the relevant cookies.
+          </li>
+          <li>
+            <strong>OpenAI</strong> &mdash; measurement of advertisements shown in ChatGPT,
             and only if you accept the relevant cookies.
           </li>
           <li>
