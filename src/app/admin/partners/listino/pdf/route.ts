@@ -62,7 +62,14 @@ export async function GET(req: Request) {
       posizione: rp.azienda?.classifica_posizione ?? null,
       categoria: rp.azienda?.classifica_categoria ?? null,
       anni: rp.anni,
-      recensioni: rp.totale || null,
+      /* 🔴 Il numero del MEDAGLIONE della home, non il totale del
+         database. La home non scrive il totale come testo: lo mostra
+         solo il badge «based on 12,000+ reviews on Viator & Tripadvisor»
+         (src/components/Premi.tsx, un'immagine). Il 13/10/2026 il totale
+         di `riprova()` dava gia' 14.000+: scriverlo qui avrebbe messo nel
+         PDF un numero diverso da quello che il cliente vede sul sito.
+         Quando il badge viene rifatto, si cambia anche questa riga. */
+      recensioni: 12000,
     },
   });
 
