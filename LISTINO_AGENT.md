@@ -90,7 +90,16 @@ ricava dall'unità del prezzo, quindi un tour nuovo si classifica da solo
 - **PDF per i partner**: `/admin/partners/listino/pdf/?lingua=it|en&partner=1`,
   dalla pagina PDF brochure. Ha Net e commissione sotto ogni prezzo e non
   è legato alle due facciate (oggi sono 5 pagine). La brochure da fiera
-  resta solo Retail.
+  resta solo Retail. Accanto alle tre righe di ogni prezzo le etichette
+  «Retail», «Net», «Your commission» («La tua commissione»); i nomi
+  lunghi vanno a capo prima delle etichette. Nei due PDF il nome di ogni
+  tour è un link alla sua pagina, e un titolo non resta solo in fondo
+  alla pagina.
+- **I numeri della testata dei PDF** sono quelli della home, dalla stessa
+  fonte (`riprova()`): voto, ospiti, tour, classifica, anni. Unica
+  eccezione: le recensioni sono «12,000+» scritte nella rotta, perché la
+  home le mostra solo nel badge di `Premi.tsx` (un'immagine) e il totale
+  del database dà già di più. Quando si rifà il badge, si cambia anche lì.
 
 ## Le due lingue dell'area partner
 
