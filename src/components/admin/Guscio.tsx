@@ -288,9 +288,12 @@ export function Guscio({
  *  telefono e WhatsApp aprono l'app giusta. */
 function ContattiMenu({ c, lingua }: { c: ContattiAzienda; lingua: Lingua }) {
   const T = testiBenvenuto(lingua);
+  /* Piu' grandi sul telefono (proprieta', 13/10/2026): li' il menu a
+     panino occupa tutto lo schermo e a 12px si leggevano a fatica. Sopra
+     la soglia `sm` la barra e' larga 260px e restano piccoli. */
   const riga = (etichetta: string, valore: React.ReactNode) => (
-    <Text size="xs" lh={1.5}>
-      <Text span fw={700} size="xs">{etichetta}:</Text> {valore}
+    <Text fz={{ base: 'md', sm: 'xs' }} lh={1.6}>
+      <Text span fw={700} inherit>{etichetta}:</Text> {valore}
     </Text>
   );
   const link = (href: string, testo: string, fuori = false) => (
