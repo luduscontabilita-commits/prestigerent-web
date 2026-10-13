@@ -12,6 +12,15 @@ import type { Lingua } from './partners-testi';
  * L'anno di fondazione e i contatti NON sono qui: arrivano dalla tabella
  * `azienda`, come in tutto il sito. */
 
+/** Anno di fondazione e contatti, dalla tabella `azienda`
+ *  (src/lib/contatti-azienda.ts). Solo dati: passa dal server al menu. */
+export type ContattiAzienda = {
+  anno: number;
+  telefono: string;
+  email: string;
+  whatsapp: string;
+};
+
 export type TestiBenvenuto = {
   menu: string;
   sopratitolo: (anno: number) => string;

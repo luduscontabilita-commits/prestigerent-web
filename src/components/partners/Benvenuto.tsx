@@ -1,4 +1,4 @@
-import { testiBenvenuto, whatsappLeggibile } from '@/lib/partners-benvenuto';
+import { testiBenvenuto, whatsappLeggibile, type ContattiAzienda } from '@/lib/partners-benvenuto';
 import type { Lingua } from '@/lib/partners-testi';
 import css from './Benvenuto.module.css';
 
@@ -11,13 +11,6 @@ import css from './Benvenuto.module.css';
  * Mantine, quindi nessun problema di confine (CLAUDE.md). */
 
 const LOGO = 'https://oeipsfnbpaqkmwrxtcrn.supabase.co/storage/v1/object/public/media/lp/img/logo-prestige.png';
-
-export type ContattiAzienda = {
-  anno: number;
-  telefono: string;
-  email: string;
-  whatsapp: string;
-};
 
 export function Benvenuto({ lingua, c }: { lingua: Lingua; c: ContattiAzienda }) {
   const T = testiBenvenuto(lingua);

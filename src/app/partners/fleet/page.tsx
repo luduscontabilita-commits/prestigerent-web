@@ -4,6 +4,7 @@ import { Guscio } from '@/components/admin/Guscio';
 import { FlottaVista } from '@/components/partners/FlottaVista';
 import { vociPartner } from '@/lib/menu-admin';
 import { linguaPartner } from '@/lib/partners-lingua';
+import { contattiAzienda } from '@/lib/contatti-azienda';
 import { testiDi } from '@/lib/partners-testi';
 
 export const dynamic = 'force-dynamic';
@@ -17,8 +18,10 @@ export default async function FlottaPartner() {
   const io = await soloPartner();
   const lingua = await linguaPartner();
   const T = testiDi(lingua);
+  const contatti = await contattiAzienda();
   return (
     <Guscio
+      contatti={contatti}
       chi={comeSiChiama(io)}
       ruolo="listino"
       lingua={lingua}

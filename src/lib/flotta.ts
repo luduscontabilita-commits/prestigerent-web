@@ -50,7 +50,8 @@
  *    dall'originale; la scritta «Webasto» del climatizzatore (marchio di
  *    un'altra azienda) e' stata tolta. E' bianco, e sul fondo chiaro
  *    della scheda il retro spariva (proprieta'): ha un contorno grigio
- *    sottile lungo la sagoma e un'ombra morbida a terra. Prima c'era una foto di Wikimedia
+ *    sottile lungo la sagoma (l'ombra a terra e' stata tolta: «non
+ *    realistica»). Prima c'era una foto di Wikimedia
  *    Commons di un modello vecchio («troppo vecchio», proprieta'): con
  *    lei sono spariti i crediti in fondo alla pagina. Oggi nessuna foto
  *    chiede crediti, ma `credito` resta per quando servira'.
@@ -252,7 +253,7 @@ export const FLOTTA: Mezzo[] = [
     persone: null,
     gruppi: false,
     suRichiesta: 'Groups of 9 or more, events and weddings, on request.',
-    foto: '/listino/flotta/atego.webp?v=4',
+    foto: '/listino/flotta/atego.webp?v=5',
     credito: null,
     it: {
       tipo: 'Pullman',

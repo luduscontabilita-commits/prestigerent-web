@@ -31,6 +31,7 @@ import { esciEVai } from '@/app/admin/entra/azioni';
 import { esciPartner } from '@/app/partners/azioni';
 import type { VoceMenu } from '@/lib/menu-admin';
 import { testiDi, type Lingua } from '@/lib/partners-testi';
+import { testiBenvenuto, whatsappLeggibile, type ContattiAzienda } from '@/lib/partners-benvenuto';
 import { SelettoreLingua } from '@/components/partners/SelettoreLingua';
 
 /* IL GUSCIO DEL PANNELLO: barra laterale, intestazione, uscita.
@@ -83,6 +84,7 @@ export function Guscio({
   sottotitolo,
   azioni,
   lingua,
+  contatti,
   children,
 }: {
   chi: string;
@@ -95,6 +97,8 @@ export function Guscio({
   azioni?: React.ReactNode;
   /** solo per l'area partner: la lingua scelta col selettore EN/IT */
   lingua?: Lingua;
+  /** solo per l'area partner: i contatti in fondo al menu */
+  contatti?: ContattiAzienda;
   children: React.ReactNode;
 }) {
   const [aperta, { toggle, close }] = useDisclosure();
@@ -240,7 +244,15 @@ export function Guscio({
         </AppShell.Section>
 
         {/* Al partner niente nota in fondo al menu: «Prezzi letti in tempo
-            reale...» tolta su richiesta della proprieta' (12/10/2026). */}
+            reale...» tolta su richiesta della proprieta' (12/10/2026). Ci
+            vanno invece i contatti, come in fondo alla brochure B2B
+            (proprieta', 13/10/2026): sotto le voci, sul computer e nel
+            menu a panino del telefono -- e' la stessa barra. */}
+        {partner && contatti && (
+          <AppShell.Section>
+            <ContattiMenu c={contatti} lingua={lingua ?? 'en'} />
+          </AppShell.Section>
+        )}
         {!partner && (
           <AppShell.Section>
             <Text size="xs" c="dimmed" px="xs" py="sm">
@@ -268,5 +280,31 @@ export function Guscio({
         {children}
       </AppShell.Main>
     </AppShell>
+  );
+}
+
+/** I contatti in fondo al menu dei partner, come nella brochure B2B:
+ *  sede, sito, email, telefono, WhatsApp. Si toccano col dito: email,
+ *  telefono e WhatsApp aprono l'app giusta. */
+function ContattiMenu({ c, lingua }: { c: ContattiAzienda; lingua: Lingua }) {
+  const T = testiBenvenuto(lingua);
+  const riga = (etichetta: string, valore: React.ReactNode) => (
+    <Text size="xs" lh={1.5}>
+      <Text span fw={700} size="xs">{etichetta}:</Text> {valore}
+    </Text>
+  );
+  const link = (href: string, testo: string, fuori = false) => (
+    <a href={href} {...(fuori ? { target: '_blank', rel: 'noopener' } : {})} style={{ color: 'inherit', textDecoration: 'none' }}>
+      {testo}
+    </a>
+  );
+  return (
+    <Box px="xs" py="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+      {riga(T.sede, T.sedeValore)}
+      {riga(T.web, link('https://prestigerent.com/', 'www.prestigerent.com', true))}
+      {riga(T.email, link(`mailto:${c.email}`, c.email))}
+      {riga(T.telefono, link(`tel:${c.telefono.replace(/\s/g, '')}`, c.telefono))}
+      {riga(T.whatsapp, link(`https://wa.me/${c.whatsapp.replace(/\D/g, '')}`, whatsappLeggibile(c.whatsapp), true))}
+    </Box>
   );
 }

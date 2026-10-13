@@ -7,6 +7,7 @@ import { vociPartner } from '@/lib/menu-admin';
 import { listino } from '@/lib/regiondo-listino';
 import { leggiCommissioni } from '@/lib/commissioni-db';
 import { linguaPartner } from '@/lib/partners-lingua';
+import { contattiAzienda } from '@/lib/contatti-azienda';
 import { testiDi } from '@/lib/partners-testi';
 
 export const dynamic = 'force-dynamic';
@@ -26,13 +27,14 @@ export default async function ListinoPartner() {
   const io = await soloPartner();
   const lingua = await linguaPartner();
   const T = testiDi(lingua);
-  const [{ servizi }, { privato, gruppo }] = await Promise.all([listino(false), leggiCommissioni()]);
+  const [{ servizi }, { privato, gruppo }, contatti] = await Promise.all([listino(false), leggiCommissioni(), contattiAzienda()]);
   const mancanti = servizi.filter((s) => !s.varianti).length;
 
   return (
     <Guscio
       chi={comeSiChiama(io)}
       ruolo="listino"
+      contatti={contatti}
       lingua={lingua}
       voci={vociPartner(lingua)}
       titolo={T.listinoTitolo}
