@@ -211,6 +211,18 @@ console.log(`\n${SITO} — senza sessione\n`);
     console.log(`   ${p.padEnd(42)} ${chiusa ? `${r.status} -> ${dove}` : `🔴 HTTP ${r.status}: SI VEDE SENZA ACCESSO`}`);
   }
 }
+/* Il PDF del listino dei partner (Retail/Net/commissione): senza sessione
+   NON si scarica, con la sessione si'. */
+{
+  const senza = await fetch(SITO + '/partners/price-list/pdf/?lingua=en', { redirect: 'manual' });
+  const chiuso = senza.status === 403;
+  if (!chiuso) rotte++;
+  console.log(`   ${'/partners/price-list/pdf/'.padEnd(42)} ${chiuso ? '403  senza accesso, giusto' : `🔴 HTTP ${senza.status}: IL PDF SI SCARICA SENZA ACCESSO`}`);
+  const con = await fetch(SITO + '/partners/price-list/pdf/?lingua=en', { headers: { cookie }, redirect: 'manual' });
+  const pdf = con.status === 200 && (con.headers.get('content-type') ?? '').includes('pdf');
+  if (!pdf) rotte++;
+  console.log(`   ${'/partners/price-list/pdf/ (admin)'.padEnd(42)} ${pdf ? `200  PDF, ${(await con.arrayBuffer()).byteLength} byte` : `🔴 HTTP ${con.status}`}`);
+}
 for (const [vecchio, nuovo] of SPOSTATE) {
   const res = await fetch(SITO + vecchio, { headers: { cookie }, redirect: 'manual' });
   const dove = res.headers.get('location') ?? '';
