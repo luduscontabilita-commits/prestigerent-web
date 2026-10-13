@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { testiBenvenuto, whatsappLeggibile, type ContattiAzienda } from '@/lib/partners-benvenuto';
 import { testiDi, type Lingua } from '@/lib/partners-testi';
 import css from './Benvenuto.module.css';
+import p from './Pulsanti.module.css';
 
 /* LA PRESENTAZIONE DELL'AZIENDA (pagina iniziale dell'area partner), uguale
  * alle due brochure B2B in PDF di docs/pdf_partner/: lo stesso ordine, gli
@@ -107,10 +108,12 @@ export function Benvenuto({ lingua, c }: { lingua: Lingua; c: ContattiAzienda })
           due pulsanti portano avanti, al listino e alla flotta
           (proprieta', 13/10/2026). Sul computer c'e' gia' la barra. */}
       <nav className={css.avanti} aria-label={T.menu}>
-        <Link href="/partners/price-list/" className={css.pieno}>
+        <Link href="/partners/price-list/" className={`${p.pulsante} ${p.pieno}`}>
           {testiDi(lingua).menuListino}
         </Link>
-        <Link href="/partners/fleet/">{testiDi(lingua).menuFlotta}</Link>
+        <Link href="/partners/fleet/" className={p.pulsante}>
+          {testiDi(lingua).menuFlotta}
+        </Link>
       </nav>
     </article>
   );

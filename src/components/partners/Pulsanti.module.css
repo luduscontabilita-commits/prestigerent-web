@@ -1,0 +1,48 @@
+/* I PULSANTI ROSSI DELL'AREA PARTNER, uno pieno e uno vuoto, sempre in
+ * coppia sulla stessa riga (proprieta', 13/10/2026): in fondo a «About
+ * us» sul telefono (listino, flotta) e in cima al listino (i due PDF).
+ * Il rosso e' quello del logo, lo stesso della presentazione. */
+
+.coppia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 520px;
+}
+
+.pulsante {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #e2231a;
+  border-radius: 8px;
+  background: #fff;
+  color: #e2231a;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pulsante:hover {
+  background: #fdecea;
+}
+
+.pieno {
+  background: #e2231a;
+  color: #fff;
+}
+
+.pieno:hover {
+  background: #c41d15;
+}
+
+@media (max-width: 30em) {
+  .pulsante {
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+}

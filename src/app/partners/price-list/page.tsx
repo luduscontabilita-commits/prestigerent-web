@@ -1,4 +1,5 @@
-import { Alert, Button, Text } from '@mantine/core';
+import { Alert, Text } from '@mantine/core';
+import p from '@/components/partners/Pulsanti.module.css';
 import { comeSiChiama } from '@/lib/accesso';
 import { soloPartner } from '@/lib/auth';
 import { Guscio } from '@/components/admin/Guscio';
@@ -41,28 +42,24 @@ export default async function ListinoPartner() {
       /* Generico, senza ora di lettura ne' sistema di prenotazione: al
          partner non interessano (proprieta', 12/10/2026). */
       sottotitolo={T.listinoSotto}
-      /* Il listino in PDF con Retail, Net e commissione (proprieta',
-         13/10/2026), nelle due lingue: /partners/price-list/pdf/. Link
-         normali e non azioni: e' un file da scaricare. `component="a"`
-         e non `{Link}`: questo e' un Server Component (CLAUDE.md). La
-         lingua scelta col selettore va per prima. */
-      azioni={
-        <>
-          {(lingua === 'it' ? (['it', 'en'] as const) : (['en', 'it'] as const)).map((l, i) => (
-            <Button
-              key={l}
-              component="a"
-              href={`/partners/price-list/pdf/?lingua=${l}`}
-              variant={i === 0 ? 'filled' : 'default'}
-              size="sm"
-              title={T.scaricaPdfNota}
-            >
-              {T.scaricaPdf(l === 'it' ? 'Italiano' : 'English')}
-            </Button>
-          ))}
-        </>
-      }
     >
+      {/* Il listino in PDF con Retail, Net e commissione (proprieta',
+          13/10/2026), nelle due lingue: /partners/price-list/pdf/. Come i
+          pulsanti di «About us»: uno pieno (la lingua scelta col
+          selettore) e uno vuoto, sulla stessa riga. Link semplici: e' un
+          file da scaricare, non una pagina. */}
+      <div className={p.coppia} style={{ marginBottom: 24 }}>
+        {(lingua === 'it' ? (['it', 'en'] as const) : (['en', 'it'] as const)).map((l, i) => (
+          <a
+            key={l}
+            href={`/partners/price-list/pdf/?lingua=${l}`}
+            className={i === 0 ? `${p.pulsante} ${p.pieno}` : p.pulsante}
+            title={T.scaricaPdfNota}
+          >
+            {T.scaricaPdf(l === 'it' ? 'Italiano' : 'English')}
+          </a>
+        ))}
+      </div>
       {mancanti > 0 && (
         <Alert color="gray" variant="light" mb="lg">
           {T.listinoMancanti}
