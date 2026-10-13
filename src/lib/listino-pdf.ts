@@ -64,7 +64,7 @@ export type NumeriPdf = {
 /** «12,000+» / «12.000»: le recensioni arrotondate in difetto al migliaio. */
 function migliaia(n: number, lingua: Lingua): string {
   const m = Math.floor(n / 1000) * 1000;
-  return String(m).replace(/B(?=(d{3})+(?!d))/g, lingua === 'it' ? '.' : ',');
+  return String(m).replace(/\B(?=(\d{3})+(?!\d))/g, lingua === 'it' ? '.' : ',');
 }
 
 const A4: [number, number] = [595.28, 841.89];
