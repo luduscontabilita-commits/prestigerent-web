@@ -36,6 +36,29 @@ partite.
 Il **partner** è un utente con ruolo `listino`: un'agenzia, un hotel,
 un tour operator. Vede **solo** listino e flotta.
 
+## La pagina iniziale dei partner: la presentazione (13/10/2026)
+
+Dopo l'accesso il partner arriva su **`/partners/welcome/`** («About us» /
+«Chi siamo», prima voce del menu), non più sul listino. È la stessa
+presentazione delle due brochure B2B in PDF di `docs/pdf_partner/`:
+foto con il nome, introduzione, i quattro punti (Zero Middlemen, 100%
+Owned Fleet, Employed Chauffeurs, Peace of Mind), i quattro servizi, la
+foto della flotta, i contatti col logo.
+
+- **Testi:** `src/lib/partners-benvenuto.ts`. L'inglese è quello delle
+  brochure, parola per parola; l'italiano è la traduzione. Se cambia la
+  brochure, va cambiato anche lì.
+- **Foto:** prese dalle brochure senza le scritte sopra (estratte dai
+  livelli del PDF), in `public/partners/benvenuto-*.webp`, a 1000 e 2000
+  px.
+- **Anno e contatti** dalla tabella `azienda`, come nel resto del sito.
+- Pagina: `src/app/partners/welcome/page.tsx` + `Benvenuto.tsx`, HTML
+  semplice con un modulo CSS (niente Mantine: nessun rischio di confine).
+- Le pagine d'arrivo dopo l'accesso sono quattro e vanno cambiate
+  insieme: `/partners/` (già dentro), `/admin/` col ruolo `listino`,
+  `IngressoPartner.tsx` (email e password), `EntraDalLink.tsx` (link
+  dell'email).
+
 ## Le decisioni della proprietà (12/10/2026)
 
 - I prezzi sono **quelli al pubblico** di Regiondo. Niente netti, niente

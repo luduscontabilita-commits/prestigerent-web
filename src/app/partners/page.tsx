@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * partner. */
 export default async function Partners() {
   const io = await chiSono();
-  if (io && haRuolo(io, RUOLI_LISTINO)) redirect('/partners/price-list/');
+  if (io && haRuolo(io, RUOLI_LISTINO)) redirect('/partners/welcome/');
   /* Inglese o italiano: cookie del selettore, se no la lingua del
      browser (src/lib/partners-lingua.ts). */
   return <IngressoPartner lingua={await linguaPartner()} />;

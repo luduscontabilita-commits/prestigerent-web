@@ -1,0 +1,193 @@
+/* LA PRESENTAZIONE DELL'AZIENDA NELL'AREA PARTNER, come le due brochure
+ * B2B in PDF (docs/pdf_partner/): foto con il nome in alto, filetto
+ * rosso, introduzione, quattro punti con la barra rossa a sinistra,
+ * servizi coi titoli rossi, foto della flotta, contatti col logo.
+ * Il rosso e' quello del logo. */
+
+.pagina {
+  --rosso: #e2231a;
+  max-width: 980px;
+  color: #1f1f1f;
+}
+
+/* ── la foto in testa, col nome sopra come nella brochure ── */
+.testa {
+  position: relative;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  background: #e9d2b5;
+}
+
+.testa img {
+  display: block;
+  width: 100%;
+  height: clamp(260px, 46vw, 500px);
+  object-fit: cover;
+  object-position: center 70%;
+}
+
+.nome {
+  position: absolute;
+  inset: 0 0 auto 0;
+  padding: clamp(14px, 3vw, 28px) 16px 0;
+  text-align: center;
+  color: #111;
+  /* un alone chiaro: il cielo al tramonto cambia da arancio a rosa */
+  text-shadow: 0 0 18px rgba(255, 238, 220, 0.85);
+}
+
+.nome h1 {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  font-size: clamp(30px, 6vw, 60px);
+  letter-spacing: 0.01em;
+  line-height: 1.05;
+}
+
+.nome p {
+  margin: 6px 0 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(12px, 2.1vw, 21px);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.filetto {
+  height: 5px;
+  background: var(--rosso);
+}
+
+/* ── introduzione e i quattro punti ── */
+.corpo {
+  padding: clamp(20px, 4vw, 40px) clamp(4px, 2vw, 32px);
+}
+
+.corpo h2 {
+  margin: 0 0 14px;
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.intro {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.punti {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 36px) clamp(20px, 4vw, 44px);
+  margin-top: clamp(24px, 4vw, 44px);
+}
+
+@media (max-width: 40em) {
+  .punti {
+    grid-template-columns: 1fr;
+  }
+}
+
+.punto {
+  border-left: 5px solid var(--rosso);
+  padding: 6px 0 6px 18px;
+}
+
+.punto h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.punto p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* ── i servizi ── */
+.servizi {
+  padding: clamp(8px, 2vw, 16px) clamp(4px, 2vw, 32px) clamp(20px, 4vw, 36px);
+}
+
+.servizi > h2 {
+  margin: 0;
+  padding-bottom: 14px;
+  border-bottom: 5px solid var(--rosso);
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 800;
+}
+
+.servizio h3 {
+  margin: clamp(18px, 3vw, 26px) 0 6px;
+  color: var(--rosso);
+  font-size: clamp(18px, 2.4vw, 22px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.servizio p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* ── la flotta ── */
+.flotta img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2480 / 822;
+  object-fit: cover;
+}
+
+/* ── chiusura e contatti ── */
+.fondo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(20px, 4vw, 36px) clamp(4px, 2vw, 32px) 8px;
+}
+
+.fondo h2 {
+  margin: 0 0 18px;
+  color: var(--rosso);
+  font-size: clamp(19px, 2.6vw, 24px);
+  font-weight: 800;
+}
+
+.contatti {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.contatti b {
+  font-weight: 800;
+}
+
+.contatti a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.contatti a:hover {
+  text-decoration: underline;
+}
+
+.logo {
+  flex-shrink: 0;
+  width: clamp(96px, 16vw, 150px);
+  height: auto;
+}
+
+@media (max-width: 30em) {
+  .fondo {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+}

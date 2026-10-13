@@ -22,6 +22,7 @@
  */
 
 import { testiDi, type Lingua } from './partners-testi';
+import { testiBenvenuto } from './partners-benvenuto';
 
 export type VoceMenu = {
   href: string;
@@ -29,7 +30,7 @@ export type VoceMenu = {
   /** il nome dell'icona, non l'icona: una funzione non attraversa il
    *  confine fra server e client. La traduzione in componente avviene
    *  dentro il guscio, che e' gia' nel browser. */
-  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta' | 'accessi';
+  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta' | 'accessi' | 'benvenuto';
   /** Le pagine dentro questa sezione, mostrate quando la sezione e'
    *  aperta. SOLO I TITOLI: la spiegazione di ognuna sta gia' sulla
    *  pagina della sezione, e ripeterla in una barra laterale larga 260px
@@ -106,10 +107,13 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
   ];
 }
 
-/** Le due voci dell'area partner, nella lingua scelta col selettore. */
+/** Le voci dell'area partner, nella lingua scelta col selettore. Prima la
+ *  presentazione dell'azienda, che e' anche la pagina d'arrivo
+ *  (proprieta', 13/10/2026). */
 export function vociPartner(lingua: Lingua): VoceMenu[] {
   const T = testiDi(lingua);
   return [
+    { href: '/partners/welcome/', testo: testiBenvenuto(lingua).menu, icona: 'benvenuto' },
     { href: '/partners/price-list/', testo: T.menuListino, icona: 'listino' },
     { href: '/partners/fleet/', testo: T.menuFlotta, icona: 'flotta' },
   ];

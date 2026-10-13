@@ -104,6 +104,7 @@ const PAGINE = [
   '/admin/partners/qrcode/',
   '/admin/partners/pdf/',
   /* l'area dei partner vista dall'admin: deve aprirsi anche a lui */
+  '/partners/welcome/',
   '/partners/price-list/',
   '/partners/fleet/',
 ];
@@ -176,7 +177,7 @@ if (pEmail && pPass) {
     rotte++;
   } else {
     console.log(`\n${SITO} — entrato come partner del listino (${pEmail})\n`);
-    for (const p of ['/partners/price-list/', '/partners/fleet/']) {
+    for (const p of ['/partners/welcome/', '/partners/price-list/', '/partners/fleet/']) {
       const res = await fetch(SITO + p, { headers: { cookie: cp }, redirect: 'manual' });
       const html = await res.text();
       const bene = res.status === 200 && !/This page couldn.t load|Application error/i.test(html) && html.length > 2000;
@@ -203,7 +204,7 @@ console.log(`\n${SITO} — senza sessione\n`);
   const bene = res.status === 200 && /Sign in/.test(html) && /Request access/.test(html);
   if (!bene) rotte++;
   console.log(`   ${'/partners/'.padEnd(42)} ${bene ? '200  Sign in + Request access' : `🔴 HTTP ${res.status}`}`);
-  for (const p of ['/partners/price-list/', '/partners/fleet/']) {
+  for (const p of ['/partners/welcome/', '/partners/price-list/', '/partners/fleet/']) {
     const r = await fetch(SITO + p, { redirect: 'manual' });
     const dove = r.headers.get('location') ?? '';
     const chiusa = r.status >= 300 && r.status < 400 && dove.includes('/partners/');

@@ -32,7 +32,7 @@ export default async function Pannello() {
      il listino. E' anche il posto dove lo rimandano tutte le altre pagine
      del pannello (`soloGestione()` manda qui chi non gestisce), quindi
      questa riga e' quella che lo tiene dentro il suo recinto. */
-  if (io.ruolo === 'listino') redirect('/partners/price-list/');
+  if (io.ruolo === 'listino') redirect('/partners/welcome/');
 
   const gestisce = haRuolo(io, RUOLI_GESTIONE);
 

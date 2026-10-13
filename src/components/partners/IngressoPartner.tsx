@@ -120,7 +120,7 @@ function Accesso({ T, lingua, vaiARichiesta }: { T: Testi; lingua: Lingua; vaiAR
        pagina con la sessione nuova; il router lascerebbe pezzi dello
        stato di prima. */
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = '/partners/price-list/';
+    window.location.href = '/partners/welcome/';
   };
 
   return (

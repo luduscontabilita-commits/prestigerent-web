@@ -19,6 +19,7 @@ import {
   IconBus,
   IconCamera,
   IconChartBar,
+  IconHome,
   IconLogout,
   IconPhoto,
   IconReceiptEuro,
@@ -62,6 +63,7 @@ const ICONE = {
   listino: IconReceiptEuro,
   flotta: IconBus,
   accessi: IconUserShield,
+  benvenuto: IconHome,
 };
 
 /** Come si chiama il ruolo in testata. L'utente del listino e' un
@@ -86,7 +88,8 @@ export function Guscio({
   chi: string;
   ruolo: string;
   voci: VoceMenu[];
-  titolo: string;
+  /** facoltativo: la presentazione dei partner ha il suo titolo nella foto */
+  titolo?: string;
   sottotitolo?: React.ReactNode;
   /** comandi propri della pagina, in alto a destra */
   azioni?: React.ReactNode;
@@ -248,17 +251,19 @@ export function Guscio({
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Group justify="space-between" align="flex-start" wrap="wrap" mb="lg" gap="sm">
-          <div style={{ minWidth: 0 }}>
-            <Title order={1} size="h2">{titolo}</Title>
-            {sottotitolo && (
-              <Text c="dimmed" size="sm" mt={4} maw={720}>
-                {sottotitolo}
-              </Text>
-            )}
-          </div>
-          {azioni && <Group gap="xs">{azioni}</Group>}
-        </Group>
+        {(titolo || azioni) && (
+          <Group justify="space-between" align="flex-start" wrap="wrap" mb="lg" gap="sm">
+            <div style={{ minWidth: 0 }}>
+              {titolo && <Title order={1} size="h2">{titolo}</Title>}
+              {sottotitolo && (
+                <Text c="dimmed" size="sm" mt={4} maw={720}>
+                  {sottotitolo}
+                </Text>
+              )}
+            </div>
+            {azioni && <Group gap="xs">{azioni}</Group>}
+          </Group>
+        )}
 
         {children}
       </AppShell.Main>

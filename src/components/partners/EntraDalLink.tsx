@@ -29,7 +29,7 @@ export function EntraDalLink({ t, lingua }: { t: string; lingua: Lingua }) {
       if (!vivo) return;
       if (r.ok) {
         // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-        window.location.href = '/partners/price-list/';
+        window.location.href = '/partners/welcome/';
         return;
       }
       setErrore({ testo: r.errore ?? T.errLinkNonValido, email: r.email });
