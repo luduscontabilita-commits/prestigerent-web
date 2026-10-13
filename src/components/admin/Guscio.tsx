@@ -303,6 +303,11 @@ function ContattiMenu({ c, lingua }: { c: ContattiAzienda; lingua: Lingua }) {
   );
   return (
     <Box px="xs" py="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+      {/* il nome dell'azienda sopra i contatti, solo sul telefono
+          (proprieta', 13/10/2026): li' la testata mostra solo il logo */}
+      <Text hiddenFrom="sm" fw={800} fz="lg" mb={6} style={{ letterSpacing: '.04em' }}>
+        PRESTIGE RENT
+      </Text>
       {riga(T.sede, T.sedeValore)}
       {riga(T.web, link('https://prestigerent.com/', 'www.prestigerent.com', true))}
       {riga(T.email, link(`mailto:${c.email}`, c.email))}
