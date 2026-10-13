@@ -439,13 +439,23 @@ async function componi(dati: DatiPdf, misura: number): Promise<{ file: Uint8Arra
   y -= passo * 1.6;
   intestazione(pagina);
 
+  /* nel PDF dei partner una riga coi prezzi in colonna ne occupa tre:
+     Retail, Net, Comm. */
+  const aTre = (r: Riga | undefined) => r?.tipo === 'servizio' && r.percentuale != null && (r.prezzi != null || !!r.treTesti);
+  const altezza = (r: Riga | undefined) =>
+    !r ? 0 : r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : aTre(r) ? passo * 2.9 : passo;
+  /* Sezioni, porti e titoli di un servizio a piu' varianti non restano
+     soli in fondo alla pagina: vanno a capo insieme alla riga dopo
+     (trovato il 13/10/2026: «Private Tour to Florence & Pisa from La
+     Spezia Port» in fondo a pagina 1, le varianti a pagina 2). */
+  const testata = (r: Riga) => r.tipo !== 'servizio' || (!r.prezzi && !r.testoPrezzi && !r.treTesti);
+
   let pari = false;
-  for (const r of righe) {
-    /* nel PDF dei partner una riga coi prezzi in colonna ne occupa tre:
-       Retail, Net, Comm. */
-    const tre = r.tipo === 'servizio' && r.percentuale != null && (r.prezzi != null || !!r.treTesti);
-    const h = r.tipo === 'sezione' ? passo * 1.9 : r.tipo === 'gruppo' ? passo * 1.25 : tre ? passo * 2.9 : passo;
-    if (y - h < MARGINE + piede) {
+  for (const [i, r] of righe.entries()) {
+    const tre = aTre(r);
+    const h = altezza(r);
+    const serve = testata(r) ? h + altezza(righe[i + 1]) : h;
+    if (y - serve < MARGINE + piede) {
       pagina = pdf.addPage(A4);
       pagine.push(pagina);
       y = A4[1] - MARGINE - 4;
