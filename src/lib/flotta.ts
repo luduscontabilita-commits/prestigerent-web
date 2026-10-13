@@ -41,10 +41,17 @@
  *    (/our-vehicles/, media/wp/2021/09/Mercedes-Benz-*-black.png);
  *  - l'ISUZU e' un nostro minibus vero, con la livrea «Wine Experience»
  *    (media/wp/2021/04/Wine-bus-at-a-Tuscan-winery-1.jpg), scontornato;
- *  - l'ATEGO resta la foto di Wikimedia Commons, senza marchi di altre
- *    aziende e con la targa sfocata: sul sito l'unica foto del nostro
- *    (media/lp/img/Piazzale-Montelungo-minibuses-2022.webp) e' troppo
- *    piccola. E' l'unica che chiede i crediti (`credito`).
+ *  - il PULLMAN (chiave `atego`) dal 13/10/2026 e' il nostro, nuovo,
+ *    con la nostra livrea: foto della proprieta' scattata in garage
+ *    (carrozzeria «Tourer 1224 HD Top Class»), scontornata con rembg
+ *    (isnet-general-use) e GIRATA col muso a destra come gli altri.
+ *    Girandola le scritte venivano a specchio: logo tondo, scritta sulla
+ *    porta e targhetta del modello sono state rimesse dritte copiandole
+ *    dall'originale; la scritta «Webasto» del climatizzatore (marchio di
+ *    un'altra azienda) e' stata tolta. Prima c'era una foto di Wikimedia
+ *    Commons di un modello vecchio («troppo vecchio», proprieta'): con
+ *    lei sono spariti i crediti in fondo alla pagina. Oggi nessuna foto
+ *    chiede crediti, ma `credito` resta per quando servira'.
  *
  * TUTTE SULLA STESSA TELA: 800x400, trasparente, il mezzo ridotto a
  * stare in un riquadro di 740x330, centrato e appoggiato a 24px dal
@@ -243,13 +250,8 @@ export const FLOTTA: Mezzo[] = [
     persone: null,
     gruppi: false,
     suRichiesta: 'Groups of 9 or more, events and weddings, on request.',
-    foto: '/listino/flotta/atego.webp?v=2',
-    credito: {
-      autore: 'Bob Adams',
-      licenza: 'CC BY-SA 2.0',
-      licenzaUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
-      fonte: 'https://commons.wikimedia.org/wiki/File:Mercedes_Benz_Atego_bus_(16456228222).jpg',
-    },
+    foto: '/listino/flotta/atego.webp?v=3',
+    credito: null,
     it: {
       tipo: 'Pullman',
       dettagli: 'Uno dei nostri pullman ha il bagno a bordo e 28 posti.',

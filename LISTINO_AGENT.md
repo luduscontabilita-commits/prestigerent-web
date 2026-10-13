@@ -386,19 +386,23 @@ I dati stanno in `src/lib/flotta.ts`. I mezzi sono sei:
   riquadro 740×330, centrato, a 24 px dal fondo. Le **4 auto** sono le
   immagini di studio già usate dal sito (`/our-vehicles/`). L'**Isuzu** è
   un nostro minibus vero, con la livrea «Wine Experience», scontornato.
-  L'**Atego** resta la foto di Wikimedia Commons: l'unica nostra, a
-  Piazzale Montelungo, è troppo piccola. È l'unica con i crediti, in
-  fondo alla pagina.
+  Il **pullman** (chiave `atego`) dal 13/10/2026 è il nostro, nuovo, con
+  la nostra livrea: foto della proprietà, scontornata e girata col muso a
+  destra come gli altri, con le scritte rimesse dritte e senza il marchio
+  «Webasto» del climatizzatore. Ha sostituito la foto di Wikimedia
+  Commons di un modello vecchio, e con lei i crediti in fondo alla pagina.
+- **Numero dei mezzi:** non si mostra (proprietà, 13/10/2026). Niente «6
+  nella nostra flotta», e la nota del pullman col bagno dice «uno dei
+  nostri pullman», non «uno dei quattro».
 - **Abbinamento mezzo → tour:** confermato dalla proprietà. Per le auto la
   pagina dice solo per quante persone sono: l'elenco «Show the 83
   services» è stato tolto su richiesta della proprietà. Per il minibus
   elenca i 3 small group, calcolati dal catalogo (`impiegoDi`).
 - I 25 posti dell'Isuzu sono stati confermati dalla proprietà.
-- 🔴 **Le foto non sono dei nostri mezzi.** Vengono da Wikimedia Commons
-  (CC BY-SA). I crediti (autore, licenza, fonte) stanno in **una riga in
-  fondo alla pagina**. Dalle schede li ha fatti togliere la proprietà, ma
-  del tutto non si possono togliere: la licenza obbliga a citare
-  l'autore.
+- **Crediti delle foto:** oggi nessuna. Se un giorno si usa di nuovo una
+  foto con licenza CC, il campo `credito` in `src/lib/flotta.ts` rimette
+  la riga in fondo alla pagina, e lì deve restare: la licenza obbliga a
+  citare l'autore.
 - 🔴 **Niente marchi di altre aziende** (proprietà, 12/10/2026). Restano
   solo quelli del costruttore. Le prime foto dei bus portavano la livrea
   di altre compagnie e sono state sostituite: l'Isuzu ora è un Turquoise
