@@ -254,7 +254,23 @@ export default async function LocaleLayout({
             prestigerent-web.vercel.app resta spento apposta, per non
             sporcare i dati delle campagne. Non e' un bug da "sistemare". */}
         <Tracciamento />
+        {/* 🔴 SALTA AL CONTENUTO: WCAG 2.4.1, livello A -- quello
+            obbligatorio. Chi naviga col Tab o con un lettore di schermo
+            attraversa tutto il megamenu prima di arrivare al testo, su
+            ogni pagina. Il link sta SEMPRE nel codice (nasconderlo con
+            display:none lo toglierebbe anche alla tastiera) e compare
+            quando riceve il fuoco. */}
+        <a className="salta-al-contenuto" href="#contenuto">
+          {locale === 'it' ? 'Vai al contenuto'
+            : locale === 'de' ? 'Zum Inhalt springen'
+              : 'Skip to main content'}
+        </a>
         <Header locale={locale} voti={voti} foto={foto} />
+        {/* il bersaglio del salto. 🔴 tabindex="-1" serve: senza, molti
+            browser spostano la pagina ma non il FUOCO, e il Tab dopo
+            riparte dal menu -- cioe' il link non fa niente, e lo si
+            scopre solo provandolo con la tastiera. */}
+        <div id="contenuto" tabIndex={-1} />
         {children}
         <Footer locale={locale} />
         {/* La bolla WhatsApp, fissa in basso a destra su ogni pagina.

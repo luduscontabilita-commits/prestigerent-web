@@ -117,3 +117,27 @@ html[data-theme="dark"] #bookform iframe{
 .th-btn .th-sun{ display:none; }
 html[data-theme="dark"] .th-btn .th-sun{ display:block; }
 html[data-theme="dark"] .th-btn .th-moon{ display:none; }
+
+/* ── SALTA AL CONTENUTO ───────────────────────────────────────────────
+   Fuori dallo schermo finche' non riceve il fuoco: deve restare
+   raggiungibile dalla tastiera, quindi niente display:none e niente
+   visibility:hidden -- quelli lo toglierebbero anche a chi lo cerca. */
+.salta-al-contenuto {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10000;
+  padding: 12px 18px;
+  background: #111;
+  color: #fff;
+  font: 600 15px/1.2 system-ui, sans-serif;
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+}
+.salta-al-contenuto:focus {
+  left: 0;
+  outline: 3px solid #ffd54f;
+  outline-offset: 2px;
+}
+/* il bersaglio non deve disegnare niente ne' prendersi spazio */
+#contenuto { outline: none; }
