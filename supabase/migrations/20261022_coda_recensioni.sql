@@ -38,10 +38,10 @@ create table if not exists public.coda_recensioni (
   /* il portale su cui si pubblica: per viator e tripadvisor e' lo stesso */
   portale text not null check (portale in ('viator', 'getyourguide')),
 
-  prodotto text,
-  titolo text,
+  prodotto text not null default '',
+  titolo text not null default '',
   voto numeric(2, 1),
-  autore text,
+  autore text not null default '',
   lingua text,
 
   /* il testo della recensione: NULL finche' non si apre il portale */
@@ -76,8 +76,15 @@ create table if not exists public.coda_recensioni (
    giorno in giorno finche' non si risponde: senza questo vincolo, dopo
    una settimana la coda avrebbe sette copie di ogni riga. La coppia
    portale+titolo+prodotto e' quello che si ha SEMPRE (l'id esterno no). */
+/* 🔴 Le tre colonne sono NOT NULL con predefinito vuoto, e non e' un
+   dettaglio: un indice su `coalesce(prodotto,'')` il database lo accetta,
+   ma PostgREST NON puo' usarlo come ON CONFLICT -- manda i nomi delle
+   colonne e cerca un vincolo su quelle, non su un'espressione. Con
+   l'indice su espressione l'inserimento rispondeva 42P10, «there is no
+   unique or exclusion constraint matching the ON CONFLICT
+   specification». */
 create unique index if not exists coda_recensioni_unica
-  on public.coda_recensioni (portale, coalesce(prodotto, ''), coalesce(titolo, ''), coalesce(autore, ''));
+  on public.coda_recensioni (portale, prodotto, titolo, autore);
 
 create index if not exists coda_recensioni_stato on public.coda_recensioni (stato);
 create index if not exists coda_recensioni_quando on public.coda_recensioni (pubblicare_il)

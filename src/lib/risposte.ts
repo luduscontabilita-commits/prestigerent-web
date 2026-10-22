@@ -106,6 +106,43 @@ export type Guaio = {
 };
 
 /* ─────────────────────────────────────────────────────────────────────
+   IL NOME DI CHI HA SCRITTO -- QUANDO C'E'
+
+   🔴 SUI PORTALI SPESSO NON C'E'. Provato sulle dieci recensioni vere
+   del 22/10/2026: cinque autori su dieci sono nomi utente e basta --
+   `lisaaX4327EU`, `732lauraleee`, `Picker2014`, `I7324OL_`,
+   `peterpV19AV`. Il modello, a cui era stato chiesto di chiamare le
+   persone per nome, ha scritto «Dear 732lauraleee» e «Hi Picker2014».
+   Si legge malissimo: sembra un modulo compilato da una macchina, che
+   e' esattamente l'impressione che una risposta deve evitare.
+
+   E gli stessi nomi utente facevano scattare un altro controllo: quello
+   sui numeri inventati vedeva il 4327 di `lisaaX4327EU` e bloccava la
+   risposta. Tre su dieci ferme per un numero che nessuno aveva
+   inventato.
+
+   La regola che risolve tutti e due i casi, ed e' generale: UN NOME
+   UTENTE CON DEI NUMERI DENTRO NON E' UN NOME. Gli altri (`Kristin_D`,
+   `Monica_B`, `lori_c`) lo sono, e basta togliere l'iniziale del
+   cognome. Quando non c'e' un nome usabile non se ne inventa uno: si
+   apre senza.
+   ───────────────────────────────────────────────────────────────────── */
+
+/** Il nome di battesimo utilizzabile, o null se quello che c'e' e' un
+ *  nome utente e non un nome. */
+export function nomeDi(autore: string | null): string | null {
+  const primo = (autore ?? '').trim().split(/[_\s.]/)[0];
+  if (!primo) return null;
+  /* numeri dentro: e' un identificativo, non un nome */
+  if (/\d/.test(primo)) return null;
+  if (primo.length < 3 || primo.length > 20) return null;
+  if (!/^[\p{L}'’-]+$/u.test(primo)) return null;
+  /* TUTTO MAIUSCOLO o tuttominuscolo vanno bene (la gente scrive cosi'),
+     ma si restituisce con l'iniziale grande: «lori» -> «Lori» */
+  return primo[0].toUpperCase() + primo.slice(1).toLowerCase();
+}
+
+/* ─────────────────────────────────────────────────────────────────────
    IN CHE LINGUA E' SCRITTA UNA RISPOSTA
 
    🔴 PERCHE' SERVE: il 22/10/2026, alla prima prova su recensioni vere,
@@ -237,13 +274,20 @@ export function guaiDi(risposta: string, rec: Recensione): Guaio[] {
      il controllo diceva «non la chiama per nome» su una risposta che
      cominciava col suo nome. Qui il confine e' «non una lettera», con la
      bandiera `u`, e vale in tutte le lingue. */
-  const nome = (rec.autore ?? '').split(/[_\s.]/)[0];
-  const nomePulito = nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  if (
-    nome.length >= 3 &&
-    !new RegExp(`(^|[^\\p{L}])${nomePulito}([^\\p{L}]|$)`, 'iu').test(t)
-  ) {
+  const nome = nomeDi(rec.autore);
+  if (nome && !new RegExp(`(^|[^\\p{L}])${nome}([^\\p{L}]|$)`, 'iu').test(t)) {
     g.push({ gravita: 'pesa', perche: `non lo chiama per nome (${nome})` });
+  }
+
+  /* 🔴 E quando il nome NON e' un nome, usarlo e' un guaio a se':
+     «Dear 732lauraleee» e' la firma di una macchina, non di una persona.
+     Qui blocca, perche' si vede da fuori e non si corregge dopo. */
+  const utente = (rec.autore ?? '').trim();
+  if (utente.length >= 4 && !nome && t.includes(utente)) {
+    g.push({
+      gravita: 'blocca',
+      perche: `usa il nome utente della piattaforma (${utente}): non è un nome`,
+    });
   }
 
   /* La cosa concreta: almeno una parola piena della recensione deve
@@ -267,7 +311,14 @@ export function guaiDi(risposta: string, rec: Recensione): Guaio[] {
   /* Cifre che nella recensione non c'erano: e' il modo in cui il modello
      inventa prezzi e orari. Si guardano solo i numeri di due cifre o piu',
      perche' «2 ore» puo' venire dal testo suo. */
-  const sueCifre = new Set(rec.testo.match(/\d{2,}/g) ?? []);
+  /* 🔴 I numeri del NOME UTENTE non sono inventati: `lisaaX4327EU`,
+     `732lauraleee`, `Picker2014`. Il 22/10/2026 questo controllo ha
+     bloccato tre risposte su dieci proprio per quello -- e tre falsi
+     allarmi su dieci bastano a far smettere di guardare gli allarmi. */
+  const sueCifre = new Set([
+    ...(rec.testo.match(/\d{2,}/g) ?? []),
+    ...((rec.autore ?? '').match(/\d{2,}/g) ?? []),
+  ]);
   for (const c of t.match(/\d{2,}/g) ?? []) {
     if (!sueCifre.has(c)) {
       g.push({
@@ -321,7 +372,12 @@ export function compitoDi(rec: Recensione, fatti?: string): string {
     '',
     `Piattaforma: ${rec.fonte}`,
     `Voto: ${rec.voto ?? '?'} su 5`,
-    rec.autore ? `Ha scritto: ${rec.autore}` : null,
+    /* 🔴 Il nome si passa solo se e' un nome. Sui portali meta' degli
+       autori sono nomi utente, e il modello a cui si chiede «chiamalo per
+       nome» scrive «Dear 732lauraleee»: peggio che non salutare. */
+    nomeDi(rec.autore)
+      ? `Si chiama ${nomeDi(rec.autore)}: chiamalo cosi'.`
+      : '⚠️ Di chi ha scritto NON si conosce il nome (sulla piattaforma c\'e\' solo un nome utente). Non usare nessun nome e non inventarne uno: apri senza.',
     rec.tour_slug ? `Servizio: ${rec.tour_slug.replace(/-/g, ' ')}` : null,
     rec.data ? `Data: ${rec.data}` : null,
     '',
