@@ -752,10 +752,22 @@ function Riquadro({
 
           {r.stato === 'approvata' ? (
             <>
+              {/* 🔴 UNA RIGA APPROVATA NON ASPETTA TE. La pubblica il giro
+                  automatico, che controlla la coda e incolla nel portale
+                  quando scatta l'orario. Senza dirlo, il pulsante «L'ho
+                  incollata» sembra un compito da fare -- ed e' successo:
+                  «ho approvato e c'e` L'HO INCOLLATA NEL PORTALE??».
+                  Quindi prima si dice cosa succede da solo, e solo dopo
+                  viene la via manuale, in sottotono. */}
+              <Badge color="blue" variant="light" size="lg" style={{ textTransform: 'none' }}>
+                {r.pubblicare_il
+                  ? `In coda: la pubblico io il ${quando(r.pubblicare_il)}`
+                  : 'In coda per la pubblicazione'}
+              </Badge>
               <Button
                 size="xs"
-                color={confermaFatta ? 'orange' : 'green'}
-                variant={confermaFatta ? 'filled' : 'light'}
+                color={confermaFatta ? 'orange' : 'gray'}
+                variant={confermaFatta ? 'filled' : 'subtle'}
                 leftSection={<IconCheck size={14} />}
                 loading={quale === 'fatta'}
                 disabled={inCorso}
@@ -774,8 +786,8 @@ function Riquadro({
                 }}
               >
                 {confermaFatta
-                  ? 'Confermi? L’hai gia’ incollata nel portale'
-                  : 'L’ho incollata nel portale'}
+                  ? 'Confermi? L’hai gia’ incollata tu'
+                  : 'l’ho incollata io a mano'}
               </Button>
               <Button
                 size="xs"
