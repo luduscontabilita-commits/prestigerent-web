@@ -1,17 +1,22 @@
 /* I CODICI PRODOTTO DI VIATOR, E A COSA SERVONO.
  *
  * ── PERCHE' QUESTO FILE ESISTE ────────────────────────────────────────
- * Una risposta pubblicata sparisce. Il portale, in «Manage reviews»,
- * elenca SOLO le recensioni ancora senza risposta: appena rispondi, la
- * riga non si vede piu' (verificato il 23/10/2026 -- dopo aver risposto
- * a Gail_W il contatore e' passato da 10 a 9 e la sua riga e' uscita
- * dall'elenco). E la pagina pubblica di Viator le risposte del fornitore
- * non le mostra affatto.
+ * Viator NON ha un indirizzo per la singola recensione: non esiste un
+ * link che porti a quella di Gail invece che a un'altra. L'unica cosa
+ * che si puo' aprire e' la scheda del prodotto, e per farlo serve il
+ * codice -- che nell'indirizzo sta nella coda `d519-CODICE`.
  *
- * Risultato: una volta pubblicata, una risposta non si ritrova piu' da
- * nessuna parte. Il pannello e' l'unico posto dove resta -- ma senza un
- * link «dove sta» e' una riga in un elenco, non una cosa che si puo'
- * controllare. Questi codici servono a costruire quel link.
+ * E la scheda pubblica aiuta fino a un certo punto: mostra una decina di
+ * recensioni scelte dall'algoritmo su migliaia, e le risposte del
+ * fornitore non le mostra affatto (verificato il 23/10/2026 su 5292P25:
+ * 8.531 recensioni in pagina, zero risposte visibili).
+ *
+ * 🔴 CORREZIONE DEL 23/10/2026, perche' avevo scritto il contrario: il
+ * portale fornitore NON toglie dall'elenco le recensioni a cui si e'
+ * risposto. Quello che sparisce e' il pulsante «Respond to review»; la
+ * riga resta, con la risposta sotto. Me n'ero convinto guardando il
+ * contatore dei pulsanti scendere da 10 a 9, che e' un'altra cosa.
+ * Quindi per rileggere una risposta si va nel portale, non sul pubblico.
  *
  * ── DA DOVE VENGONO ───────────────────────────────────────────────────
  * Letti il 23/10/2026 dalla tendina dei prodotti del portale fornitore

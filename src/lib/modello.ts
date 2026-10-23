@@ -220,7 +220,16 @@ export async function chiedi(
          essere creativa, deve essere giusta e nel tono. Con la
          temperatura alta inventa dettagli sul tour che non esistono. */
       temperature: 0.4,
-      max_tokens: opzioni.tetto ?? 1200,
+      /* 🔴 ERA 1200 E NON BASTAVA PIU', dal 23/10/2026.
+         Due cose si sono sommate: le risposte alle critiche ora arrivano
+         a 250 parole (prima il criterio diceva «due-quattro frasi»), e i
+         modelli Claude RAGIONANO prima di scrivere -- quel ragionamento
+         consuma lo stesso spazio della risposta. Risultato: la seconda
+         prova e' uscita tagliata a meta'.
+         Il tetto non e' una spesa: si paga quello che si usa davvero,
+         non il tetto. Tenerlo basso non fa risparmiare niente e fa
+         fallire le risposte lunghe. */
+      max_tokens: opzioni.tetto ?? 4000,
       /* 🔴 questo e' il campo che fa tornare il costo vero */
       usage: { include: true },
     }),

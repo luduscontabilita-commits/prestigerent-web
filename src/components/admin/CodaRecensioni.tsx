@@ -503,7 +503,7 @@ function Riquadro({
               rel="noreferrer"
               leftSection={<IconExternalLink size={14} />}
             >
-              Scheda pubblica
+              Scheda del prodotto
             </Button>
           ) : null}
 
@@ -891,10 +891,27 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
             Le risposte gia` pubblicate
           </Title>
           <Text size="xs" c="dimmed" mb="sm">
-            Questo e` l&rsquo;unico posto dove restano. Il portale toglie dall&rsquo;elenco le
-            recensioni a cui si e` risposto, e sulla pagina pubblica di Viator le risposte del
-            fornitore non compaiono: una volta uscite, fuori di qui non si ritrovano piu`.
+            <b>Viator non ha un indirizzo per la singola recensione:</b> nessun link porta
+            esattamente a quella. La <b>scheda del prodotto</b> qui sotto apre la pagina giusta, ma
+            mostra una decina di recensioni scelte dall&rsquo;algoritmo su migliaia, e{' '}
+            <b>le risposte del fornitore sulla pagina pubblica non compaiono affatto</b> (verificato:
+            8.531 recensioni in pagina, zero risposte visibili). Per rileggere una risposta con
+            sotto la sua recensione si va nel <b>portale fornitore</b>: li` la riga resta anche dopo
+            che hai risposto, e la risposta si vede sotto.
           </Text>
+          <Group gap="xs" mb="sm">
+            <Button
+              size="xs"
+              variant="default"
+              component="a"
+              href="https://supplier.viator.com/reviews"
+              target="_blank"
+              rel="noreferrer"
+              leftSection={<IconExternalLink size={14} />}
+            >
+              Portale Viator: tutte le recensioni
+            </Button>
+          </Group>
           <Stack gap={6}>
             {viste.map((p) => {
               const link = linkProdottoViator(p.prodotto);
@@ -918,7 +935,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
                   </Text>
                   {link ? (
                     <Anchor href={link} target="_blank" rel="noreferrer" size="xs">
-                      scheda pubblica ↗
+                      scheda del prodotto ↗
                     </Anchor>
                   ) : null}
                 </Group>
