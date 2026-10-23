@@ -276,8 +276,32 @@ function Riquadro({
       portandosi via il messaggio. */
   avvisa: (testo: string, vai?: Filtro) => void;
 }) {
-  const [testoRec, setTestoRec] = useState(r.testo ?? '');
-  const [risposta, setRisposta] = useState(r.corretto ?? r.risposta ?? '');
+  /* 🔴 `useState` LEGGE LA PROPS UNA VOLTA SOLA, alla nascita del
+     componente. Quando l'azione sul server finisce, la pagina si
+     rinfresca e arriva la risposta nuova -- ma queste due caselle
+     restano con il valore di prima, cioe' VUOTE.
+     E' il guasto che si vedeva il 23/10/2026: «ho premuto, gira a
+     vuoto». La risposta c'era davvero (il riquadro mostrava il modello
+     e il costo), semplicemente non compariva nella casella.
+     Si risolve ricordando l'ultimo valore ARRIVATO e riallineando la
+     casella quando cambia -- senza toccare quello che si sta scrivendo
+     a mano, perche' li' il valore arrivato non e' cambiato. */
+  const servitoTesto = r.testo ?? '';
+  const servitaRisposta = r.corretto ?? r.risposta ?? '';
+  const [testoRec, setTestoRec] = useState(servitoTesto);
+  const [risposta, setRisposta] = useState(servitaRisposta);
+  const [ultimoServito, setUltimoServito] = useState({
+    testo: servitoTesto,
+    risposta: servitaRisposta,
+  });
+  if (
+    ultimoServito.testo !== servitoTesto ||
+    ultimoServito.risposta !== servitaRisposta
+  ) {
+    setUltimoServito({ testo: servitoTesto, risposta: servitaRisposta });
+    setTestoRec(servitoTesto);
+    setRisposta(servitaRisposta);
+  }
   const [messaggio, setMessaggio] = useState<string | null>(null);
   const [copiato, setCopiato] = useState(false);
   const [inCorso, parti] = useTransition();
@@ -357,6 +381,11 @@ function Riquadro({
         setQuale(null);
         return;
       }
+      /* 🔴 SI SPEGNE SEMPRE, anche quando e' andata bene. Prima
+         `setQuale(null)` stava solo nel ramo dell'errore: a buon fine
+         la rotella restava accesa per sempre, e sembrava che il
+         pulsante «girasse a vuoto». */
+      setQuale(null);
       if (cosa) {
         const chi = r.autore || r.titolo || 'la recensione';
         avvisa(`${cosa} — ${chi}`, finisceIn);
@@ -1117,7 +1146,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
         >
           <Group gap="sm" wrap="wrap">
             <Text size="sm">
-              {avviso.testo}. <b>La trovi qui sotto, in cima all&rsquo;elenco.</b>
+              {avviso.testo}. <b>&darr; e&rsquo; la prima qui sotto</b>
             </Text>
             {avviso.vai && avviso.vai !== filtro ? (
               <Button
