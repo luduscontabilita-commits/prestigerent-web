@@ -5,6 +5,7 @@ import { chiAgisce, supabaseServer } from '@/lib/auth';
 import { chiedi, ErroreModello } from '@/lib/modello';
 import { compitoDi, sistemaDi, type Recensione } from '@/lib/risposte';
 import { quandoPubblicare } from '@/lib/attesa';
+import { daRiepilogoViator } from '@/lib/posta-recensioni';
 
 /* LE AZIONI DELLA CODA DELLE RECENSIONI.
  *
@@ -39,6 +40,76 @@ import { quandoPubblicare } from '@/lib/attesa';
  */
 
 export type Esito = { ok: boolean; errore?: string };
+
+/** L'esito dell'importazione: quante righe aveva l'email e quante erano
+ *  nuove. Due numeri e non uno, perche' «trovate 11, nuove 0» non e' un
+ *  guasto -- e' il riepilogo di Viator che ripete le stesse recensioni
+ *  ogni giorno finche' non si risponde, e va detto invece di sembrare
+ *  che l'importazione non abbia funzionato. */
+export type EsitoImporto = Esito & { trovate?: number; nuove?: number };
+
+/**
+ * Legge il riepilogo di Viator incollato a mano e riempie la coda.
+ *
+ * ── 🔴 PERCHE' SI INCOLLA, INVECE DI LEGGERE LA POSTA DA SOLI ─────────
+ * Leggere `usa@prestigerent.com` dal server vorrebbe dire registrare
+ * un'applicazione su Microsoft 365, chiedere il permesso `Mail.Read` e
+ * farlo approvare da un amministratore: mezza giornata di lavoro e un
+ * consenso, per risparmiare un «copia e incolla» al giorno. Si incolla.
+ *
+ * Funziona sia col testo dell'email sia con l'HTML grezzo: il lettore
+ * (src/lib/posta-recensioni.ts) ripulisce stili e caratteri invisibili
+ * prima di cercare.
+ *
+ * ── NON SOVRASCRIVE NIENTE ────────────────────────────────────────────
+ * `ignoreDuplicates`: una riga che c'e' gia' si salta. Se ci fosse sopra
+ * una bozza approvata, reimportare l'email del giorno dopo la
+ * cancellerebbe -- e il riepilogo di Viator ripete le stesse recensioni
+ * per giorni.
+ *
+ * ── IL TESTO DELLA RECENSIONE NON C'E' ───────────────────────────────
+ * Nell'email non c'e' (verificato sulle email vere). Le righe nascono
+ * come `nuova` col testo vuoto, e il pannello lo chiede.
+ */
+export async function importaRiepilogo(html: string): Promise<EsitoImporto> {
+  const chi = await chiAgisce();
+  if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+
+  const voci = daRiepilogoViator(html);
+  if (!voci.length) {
+    return {
+      ok: false,
+      errore:
+        'Nel testo incollato non ho trovato nessuna recensione. Serve il riepilogo di Viator («You have N new reviews»): incolla tutta l’email, anche l’HTML.',
+    };
+  }
+
+  const sb = await supabaseServer();
+  const { data, error } = await sb
+    .from('coda_recensioni')
+    .upsert(
+      voci.map((v) => ({
+        fonte: v.fonte,
+        portale: v.portale,
+        /* le tre colonne dell'indice unico sono NOT NULL con predefinito
+           vuoto: un null qui farebbe fallire l'inserimento, e l'autore
+           nel riepilogo non c'e' affatto */
+        prodotto: v.prodotto ?? '',
+        titolo: v.titolo,
+        autore: '',
+        voto: v.voto,
+        link_risposta: v.link_risposta,
+        id_esterno: v.id_esterno,
+        stato: 'nuova',
+      })),
+      { onConflict: 'portale,prodotto,titolo,autore', ignoreDuplicates: true }
+    )
+    .select('id');
+  if (error) return { ok: false, errore: error.message };
+
+  revalidatePath('/admin/recensioni/');
+  return { ok: true, trovate: voci.length, nuove: (data ?? []).length };
+}
 
 /** Le colonne che servono per far scrivere una risposta. */
 const CAMPI_RECENSIONE =

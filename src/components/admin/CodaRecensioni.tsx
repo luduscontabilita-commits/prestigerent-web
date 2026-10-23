@@ -20,6 +20,7 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconCopy,
+  IconDownload,
   IconExternalLink,
   IconPencil,
   IconSparkles,
@@ -28,6 +29,7 @@ import {
 import { CRITERI, guaiDi, siPuoPubblicare, type Guaio, type Recensione } from '@/lib/risposte';
 import {
   approva,
+  importaRiepilogo,
   riapri,
   salvaCorrezione,
   salvaTestoRecensione,
@@ -421,6 +423,107 @@ function Riquadro({ r }: { r: Riga }) {
   );
 }
 
+/* LA CASELLA DOVE SI INCOLLA IL RIEPILOGO DI VIATOR.
+ *
+ * Il riepilogo arriva una volta al giorno a usa@prestigerent.com verso le
+ * 15:16 italiane, oggetto «You have N new reviews». Si incolla qui e la
+ * coda si riempie.
+ *
+ * 🔴 Perche' non si legge la posta da soli: servirebbe registrare
+ * un'applicazione su Microsoft 365 e far approvare il permesso `Mail.Read`
+ * da un amministratore. Mezza giornata di lavoro e un consenso, per
+ * risparmiare un «copia e incolla» al giorno.
+ *
+ * 🔴 «Trovate 11, nuove 0» NON e' un guasto: Viator ripete le stesse
+ * recensioni ogni giorno finche' non si risponde. Per questo si mostrano
+ * due numeri e non uno -- con un numero solo sembrerebbe che
+ * l'importazione non abbia funzionato, e si riproverebbe a vuoto.
+ */
+function Importatore() {
+  const [testo, setTesto] = useState('');
+  const [aperta, setAperta] = useState(false);
+  const [esito, setEsito] = useState<{ ok: boolean; testo: string } | null>(null);
+  const [inCorso, parti] = useTransition();
+
+  if (!aperta) {
+    return (
+      <Group>
+        <Button
+          size="xs"
+          variant="light"
+          leftSection={<IconDownload size={14} />}
+          onClick={() => setAperta(true)}
+        >
+          Incolla il riepilogo di Viator
+        </Button>
+        {esito ? (
+          <Text size="xs" c={esito.ok ? 'green.7' : 'red.8'}>
+            {esito.testo}
+          </Text>
+        ) : null}
+      </Group>
+    );
+  }
+
+  return (
+    <Card withBorder radius="md" padding="md">
+      <Stack gap="xs">
+        <Text fw={600} size="sm">
+          Il riepilogo giornaliero di Viator
+        </Text>
+        <Text size="xs" c="dimmed">
+          Arriva a <b>usa@prestigerent.com</b> verso le 15:16, oggetto «You have N new reviews».
+          Aprila, seleziona tutto, incolla qui: va bene sia il testo sia l&rsquo;HTML. Dentro ci sono
+          anche le recensioni <b>Tripadvisor</b>. Il testo delle recensioni nell&rsquo;email non c&rsquo;e&rsquo;:
+          quello si prende nel portale, una per una.
+        </Text>
+        <Textarea
+          placeholder="Incolla qui tutta l'email"
+          autosize
+          minRows={4}
+          maxRows={10}
+          value={testo}
+          onChange={(e) => setTesto(e.currentTarget.value)}
+        />
+        {esito ? (
+          <Alert color={esito.ok ? 'green' : 'red'} variant="light" p="xs">
+            <Text size="xs">{esito.testo}</Text>
+          </Alert>
+        ) : null}
+        <Group gap="xs">
+          <Button
+            size="xs"
+            loading={inCorso}
+            disabled={!testo.trim()}
+            onClick={() =>
+              parti(async () => {
+                const r = await importaRiepilogo(testo);
+                if (!r.ok) {
+                  setEsito({ ok: false, testo: r.errore ?? 'Non e` andata.' });
+                  return;
+                }
+                const gia = (r.trovate ?? 0) - (r.nuove ?? 0);
+                setEsito({
+                  ok: true,
+                  testo:
+                    `Trovate ${r.trovate}, nuove ${r.nuove}` +
+                    (gia > 0 ? `, ${gia} c'erano gia' (Viator ripete le stesse finche' non si risponde).` : '.'),
+                });
+                setTesto('');
+              })
+            }
+          >
+            Leggi e metti in coda
+          </Button>
+          <Button size="xs" variant="subtle" color="gray" onClick={() => setAperta(false)}>
+            chiudi
+          </Button>
+        </Group>
+      </Stack>
+    </Card>
+  );
+}
+
 type Filtro = 'da-fare' | 'bozze' | 'approvate' | 'pubblicate' | 'tutte';
 
 export function CodaRecensioni({ righe }: { righe: Riga[] }) {
@@ -473,6 +576,8 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
           quindici nello stesso minuto.
         </Text>
       </Alert>
+
+      <Importatore />
 
       <Group justify="space-between" wrap="wrap" gap="xs">
         <SegmentedControl
