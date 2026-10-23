@@ -56,7 +56,7 @@ export const CRITERI: readonly string[] = [
   'LA LINGUA DI CHI HA SCRITTO. Si risponde nella sua lingua, sempre: chi legge la risposta è lui, non noi.',
   'LA COSA CONCRETA CHE HA NOMINATO LUI. Un posto, una persona, un piatto, un momento: è la prova che la recensione è stata letta davvero. Senza questo, qualunque risposta sembra prestampata — perché lo è.',
   'IL SUO NOME, se c’è. Costa niente e cambia tutto.',
-  'CORTA: dalle due alle quattro frasi. Una risposta lunga non la legge nessuno, e su una critica sembra che ci si stia difendendo.',
+  'LA LUNGHEZZA LA DECIDE LA RECENSIONE, NON UN MODELLO FISSO. Se è una CRITICA: lunga e circostanziata, i punti che ha nominato lui uno per uno, ciascuno con qualcosa di concreto — cosa si fa in quel momento del giro, perché si va in quella cantina, com’è fatta quella giornata; da 120 a 250 parole, tre o quattro capoversi. Se è POSITIVA: si risponde come a una persona contenta, e la misura la detta lei — ha scritto due righe? due righe calde; ha raccontato la giornata? tre o quattro capoversi che entrano nel merito di quello che ha raccontato; una o due emoji se il tono le regge, mai di più. E LE RISPOSTE NON DEVONO SOMIGLIARSI FRA LORO: stessa apertura, stessa lunghezza e stessa chiusura su venti risposte in fila sono la firma di un programma.',
   'NIENTE FRASI DA UFFICIO STAMPA. «Ci scusiamo per il disagio», «la vostra soddisfazione è la nostra priorità», «grazie per il feedback»: le riconoscono tutti, e dicono che dall’altra parte non c’è nessuno.',
   'NON SI INVENTA NIENTE. Nessun dettaglio che non stia nella recensione o nei fatti noti del servizio. Mai un prezzo, mai un orario, mai il nome di una persona non citata.',
   'NON SI PROMETTE QUELLO CHE NON SI PUÒ DECIDERE. Rimborsi, sconti, omaggi: chi scrive la risposta non li decide, e una promessa pubblica non si ritira.',
@@ -195,10 +195,21 @@ const NOME_LINGUA: Record<string, string> = {
 /** Quanto deve essere lunga: misurata in frasi, non in caratteri, perche'
  *  e' la cosa che conta per chi legge. Il minimo serve contro la risposta
  *  di una riga, che sembra sbrigativa. */
-const FRASI_MIN = 2;
-const FRASI_MAX = 5;
+/* 🔴 LE MISURE LE DECIDE LA PROPRIETA', E IL 23/10/2026 LE HA RIBALTATE.
+   Fino a quel giorno il criterio diceva «corta, dalle due alle quattro
+   frasi» e il controllo bloccava tutto sopra i 700 caratteri. La regola
+   vera e' l'opposto -- «DEVONO essere lunghe e CIRCOSTANZIATE» -- ed e'
+   il modo in cui l'azienda ha sempre risposto.
+   Quindi adesso si pesa il contrario: corta e' un difetto, lunga e'
+   giusta. Il blocco resta solo contro il muro di testo. */
+const FRASI_MIN = 5;
+const FRASI_MAX = 22;
+/** sotto questa misura la risposta e' una cortesia, non una risposta */
+const CARATTERI_MIN = 450;
 /** Oltre questo nessuno la legge, in nessuna lingua. */
-const CARATTERI_MAX = 700;
+/** il blocco serve ancora, ma contro il muro di testo: 2.400 caratteri
+ *  sono circa 380 parole, ben oltre le 250 chieste */
+const CARATTERI_MAX = 2400;
 
 function frasi(t: string): number {
   return t.split(/[.!?]+(?:\s|$)/).filter((p) => p.trim().length > 3).length;
@@ -250,16 +261,72 @@ export function guaiDi(risposta: string, rec: Recensione): Guaio[] {
     g.push({ gravita: 'pesa', perche: 'non offre nessun modo di continuare in privato' });
   }
 
+  /* ── LA MISURA GIUSTA DIPENDE DA DUE COSE ──────────────────────────
+     Regola della proprieta', 23/10/2026: «per le positive varia, a volte
+     una riga a volte affettuoso con piu' righe... dipende anche da quello
+     che uno scrive». E sulle critiche: «DEVONO essere lunghe e
+     CIRCOSTANZIATE».
+
+     Quindi non esiste UNA lunghezza giusta: esistono due regole diverse,
+     e per le positive la misura la detta il cliente. Chi scrive due righe
+     riceve due righe calde; chi racconta la giornata riceve una risposta
+     che entra nel merito. Rispondere con un paragrafo a «Leo is a
+     legend» e' goffo quanto liquidare con una riga chi ha scritto
+     trecento parole. */
+  const critica = rec.voto !== null && rec.voto <= 3;
+  const quantoHaScritto = (rec.testo ?? '').trim().length;
+
   if (t.length > CARATTERI_MAX) {
     g.push({
       gravita: 'blocca',
-      perche: `troppo lunga: ${t.length} caratteri, il massimo è ${CARATTERI_MAX}`,
+      perche: `muro di testo: ${t.length} caratteri, il massimo è ${CARATTERI_MAX}`,
     });
   }
 
   const n = frasi(t);
-  if (n < FRASI_MIN) g.push({ gravita: 'pesa', perche: 'una frase sola: sembra sbrigativa' });
-  if (n > FRASI_MAX) g.push({ gravita: 'pesa', perche: `${n} frasi: oltre le quattro non si legge` });
+
+  if (critica) {
+    if (t.length < CARATTERI_MIN) {
+      g.push({
+        gravita: 'pesa',
+        perche: `su una critica ${t.length} caratteri sono pochi: va argomentata, non sbrigata`,
+      });
+    }
+    if (n < FRASI_MIN) {
+      g.push({ gravita: 'pesa', perche: `solo ${n} frasi su una critica: non entra nel merito` });
+    }
+    /* un capoverso solo, per quanto lungo, non sta rispondendo punto per
+       punto: e' il modo piu' facile di allungare senza argomentare */
+    const capoversi = t.split(/\n\s*\n/).filter((p) => p.trim().length > 40).length;
+    if (t.length >= CARATTERI_MIN && capoversi < 2) {
+      g.push({
+        gravita: 'pesa',
+        perche: 'un blocco unico: una risposta argomentata si divide in capoversi, uno per punto',
+      });
+    }
+  } else if (quantoHaScritto >= 350 && t.length < quantoHaScritto / 3) {
+    /* 🔴 LA SPROPORZIONE, non la lunghezza in se'. Qualcuno che scrive
+       300 parole entusiaste e si vede rispondere «Thanks!» si accorge di
+       non essere stato letto -- e se ne accorge anche chi legge dopo. */
+    g.push({
+      gravita: 'pesa',
+      perche: `ha scritto ${quantoHaScritto} caratteri e la risposta ne ha ${t.length}: sproporzionata, sembra liquidata`,
+    });
+  }
+
+  if (n > FRASI_MAX) g.push({ gravita: 'pesa', perche: `${n} frasi: qui si esagera dall'altra parte` });
+
+  /* ── LE EMOJI ──────────────────────────────────────────────────────
+     Una o due su una recensione contenta rendono la risposta umana.
+     Su una critica sono fuori luogo, e tre o piu' su qualunque cosa
+     sembrano un volantino. */
+  const emoji = [...t].filter((c) => /\p{Extended_Pictographic}/u.test(c)).length;
+  if (emoji > 2) {
+    g.push({ gravita: 'pesa', perche: `${emoji} emoji: una o due bastano, oltre sembra un volantino` });
+  }
+  if (critica && emoji > 0) {
+    g.push({ gravita: 'pesa', perche: 'emoji su una recensione critica: stonano' });
+  }
 
   for (const f of FRASI_VUOTE) {
     if (f.frase.test(t)) g.push({ gravita: 'pesa', perche: f.perche });
@@ -507,6 +574,35 @@ export function sistemaDi(azienda: string, firma: string = FIRMA): string {
   ].join('\n');
 }
 
+/**
+ * Quanto deve essere lunga QUESTA risposta.
+ *
+ * Regola della proprieta' del 23/10/2026, in due parti:
+ *  - sulle critiche «DEVONO essere lunghe e CIRCOSTANZIATE»;
+ *  - sulle positive «varia, a volte una riga a volte affettuoso con piu'
+ *    righe... dipende anche da quello che uno scrive».
+ *
+ * Quindi la misura la detta il cliente, e si calcola qui invece di
+ * sperare che il modello la indovini.
+ */
+function misuraDi(rec: Recensione): string {
+  if (rec.voto !== null && rec.voto <= 3) {
+    return [
+      '📏 MISURA: questa e` una CRITICA, quindi la risposta va LUNGA E ARGOMENTATA.',
+      'Prendi i suoi appunti uno per uno e rispondi a ciascuno con qualcosa di concreto.',
+      'Da 120 a 250 parole, tre o quattro capoversi separati da una riga vuota. Niente emoji.',
+    ].join(' ');
+  }
+  const quanto = (rec.testo ?? '').trim().length;
+  if (quanto < 120) {
+    return '📏 MISURA: ha scritto poche parole, quindi rispondi BREVE e caldo — una o due frasi, non di piu`. Una emoji ci sta, se il tono la regge. Una risposta lunga a una riga sola sembra scritta da una macchina.';
+  }
+  if (quanto < 350) {
+    return '📏 MISURA: ha scritto qualche riga. Rispondi con due o tre frasi che riprendono quello che ha nominato lui. Una o due emoji se il tono le regge.';
+  }
+  return '📏 MISURA: si e` dilungato e ha raccontato la giornata. Rendigli il favore: tre o quattro capoversi, entrando nel merito di quello che ha raccontato — i posti, le persone, i momenti che nomina. Una o due emoji, non di piu`.';
+}
+
 export function compitoDi(rec: Recensione, fatti?: string): string {
   const lingua = LINGUE[(rec.lingua ?? 'en').slice(0, 2)] ?? 'la stessa lingua della recensione';
   const righe: (string | null)[] = [
@@ -533,6 +629,12 @@ export function compitoDi(rec: Recensione, fatti?: string): string {
     'Testo della recensione:',
     rec.testo,
     '',
+    /* 🔴 LA MISURA SI DICE QUI, NON NEI CRITERI, perche' cambia a ogni
+       recensione. I criteri valgono sempre; questa riga vale per QUESTA.
+       Senza, il modello produce sempre la stessa lunghezza -- ed e'
+       esattamente quello che fa sembrare venti risposte in fila uscite
+       da una macchina. */
+    misuraDi(rec),
     `Scrivi la risposta in ${lingua.toUpperCase()}, dalla prima all'ultima parola.`,
   ];
   if (fatti) {
