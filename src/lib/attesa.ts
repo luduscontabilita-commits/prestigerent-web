@@ -47,7 +47,10 @@ export type Finestra = {
   oraRipresaMax: number;
   /** l'ora in cui si smette la sera: 24 = mezzanotte */
   oraFine: number;
-  /** quanto almeno fra due risposte */
+  /** 🔴 il minimo ASSOLUTO fra due risposte, in minuti. Non e' la
+   *  distanza tipica: quella si estrae ogni volta con `distanzaACaso()`.
+   *  Regola della proprieta', 23/10/2026: «anche 7 minuti esatti non e'
+   *  normale, a volte un minuto dopo, altre 1,5, altre 10». */
   distanzaMinima: number;
   /** quante al massimo nella stessa ora */
   maxPerOra: number;
@@ -59,11 +62,40 @@ export const FINESTRA: Finestra = {
   oraRipresaMin: 7,
   oraRipresaMax: 9,
   oraFine: 24,
-  distanzaMinima: 7,
+  distanzaMinima: 1,
   maxPerOra: 6,
 };
 
 const MINUTO = 60_000;
+
+/**
+ * Quanto aspettare fra una risposta e la successiva: a caso, ogni volta
+ * diverso, con una distribuzione che somiglia a una persona che risponde
+ * «quando capita». Spesso poco (una, due, tre minuti: e' lecito e
+ * normale rispondere a due recensioni di fila), a volte un quarto d'ora,
+ * ogni tanto mezz'ora.
+ *
+ * `seme` serve a chi deve rifare lo stesso calcolo piu' volte e ottenere
+ * la stessa risposta: il giro che controlla la coda ogni due minuti non
+ * deve ri-estrarre la distanza a ogni controllo, se no «vince» sempre
+ * l'estrazione piu' corta.
+ */
+export function distanzaACaso(caso: () => number = Math.random, seme?: number): number {
+  const r = seme === undefined ? caso() : pseudo(seme);
+  const r2 = seme === undefined ? caso() : pseudo(seme + 7919);
+  if (r < 0.35) return 1 + r2 * 2.5; // 1 - 3,5 minuti
+  if (r < 0.8) return 3.5 + r2 * 9; // 3,5 - 12,5 minuti
+  return 12.5 + r2 * 18; // 12,5 - 30 minuti
+}
+
+/** Un numero fra 0 e 1 che dipende solo dal seme: stesso seme, stesso
+ *  numero. Non e' casuale in senso forte e non deve esserlo. */
+function pseudo(seme: number): number {
+  let x = Math.floor(seme) % 2147483647;
+  if (x <= 0) x += 2147483646;
+  x = (x * 16807) % 2147483647;
+  return (x - 1) / 2147483646;
+}
 
 /** L'ora del giorno a Roma, qualunque sia il fuso di chi esegue.
  *
@@ -175,7 +207,8 @@ export function quandoPubblicare(
      un'ora gia' piena, e si prova piu' avanti. Il passo e' a caso
      anch'esso -- un passo fisso rimetterebbe le risposte in griglia. */
   for (let giri = 0; giri < 300; giri++) {
-    const vicina = gia.some((x) => Math.abs(x.getTime() - t.getTime()) < f.distanzaMinima * MINUTO);
+    const distanza = Math.max(f.distanzaMinima, distanzaACaso(caso));
+    const vicina = gia.some((x) => Math.abs(x.getTime() - t.getTime()) < distanza * MINUTO);
     const nellOra = gia.filter(
       (x) => Math.floor(x.getTime() / 3_600_000) === Math.floor(t.getTime() / 3_600_000)
     ).length;

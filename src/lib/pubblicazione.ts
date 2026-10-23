@@ -42,7 +42,7 @@
 
 /* con l'estensione: questo modulo lo esegue anche Node da solo (il giro
    che pubblica), e Node non risolve le estensioni. Vedi tsconfig. */
-import { FINESTRA, type Finestra } from './attesa.ts';
+import { distanzaACaso, FINESTRA, type Finestra } from './attesa.ts';
 import { graveDi, guaiDi, siPuoPubblicare, type Recensione } from './risposte.ts';
 
 export type RigaCoda = {
@@ -113,9 +113,15 @@ export function cosaEsce(
   /* il ritmo sul pubblicato VERO: l'ultima uscita quanto tempo fa, e
      quante nell'ultima ora */
   const ultima = uscite.length ? Math.max(...uscite) : 0;
-  if (ultima && t0 - ultima < f.distanzaMinima * 60_000) {
-    const fra = Math.ceil((f.distanzaMinima * 60_000 - (t0 - ultima)) / 60_000);
-    return { via: false, perche: `l'ultima e' uscita da poco: si aspetta ancora ${fra} min` };
+  /* la distanza dall'ultima uscita e' A CASO ma FISSA per questo
+     intervallo: il seme e' l'ora dell'ultima uscita, quindi il giro che
+     controlla ogni due minuti ottiene sempre la stessa distanza finche'
+     non esce la prossima. Senza seme, ogni controllo ri-estrarrebbe e
+     passerebbe appena capita un'estrazione corta. */
+  const distanza = Math.max(f.distanzaMinima, distanzaACaso(undefined, ultima / 1000));
+  if (ultima && t0 - ultima < distanza * 60_000) {
+    const fra = Math.ceil((distanza * 60_000 - (t0 - ultima)) / 60_000);
+    return { via: false, perche: `l'ultima e' uscita da poco: questa volta si aspetta ${distanza.toFixed(1)} min, ne mancano ${fra}` };
   }
   const nellUltimaOra = uscite.filter((t) => t0 - t < ORA).length;
   if (nellUltimaOra >= f.maxPerOra) {
