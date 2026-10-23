@@ -372,28 +372,28 @@ const GRAVI_SECCHE: { motivo: string; parole: string[] }[] = [
     parole: [
       'harass', 'harassed', 'harassment', 'molest', 'molested', 'groped', 'grope',
       'sexually', 'sexual', 'inappropriately touched', 'touched my body', 'touched me',
-      'grabbed my', 'molestia', 'molestie', 'molestat', 'palpeggi', 'toccata', 'toccato',
+      'grabbed my', 'molestia', 'molestie', 'molestat*', 'palpeggi*', 'toccata', 'toccato',
     ],
   },
   {
     motivo: 'accusa di aggressione o violenza',
-    parole: ['assault', 'assaulted', 'attacked me', 'punched', 'aggredit', 'aggressione', 'violenza'],
+    parole: ['assault', 'assaulted', 'attacked me', 'punched', 'aggredit*', 'aggressione', 'violenza'],
   },
   {
     motivo: 'accusa di furto',
-    parole: ['stole', 'stolen', 'theft', 'robbed', 'rubato', 'rubata', 'derubat', 'furto'],
+    parole: ['stole', 'stolen', 'theft', 'robbed', 'rubato', 'rubata', 'derubat*', 'furto'],
   },
   {
     motivo: 'accusa di discriminazione',
-    parole: ['racist', 'racism', 'homophobic', 'discriminated', 'discriminatory', 'razzist', 'omofob', 'discriminat'],
+    parole: ['racist', 'racism', 'homophobic', 'discriminated', 'discriminatory', 'razzist*', 'omofob*', 'discriminat*'],
   },
   {
     motivo: 'infortunio o emergenza sanitaria',
-    parole: ['hospital', 'ambulance', 'injured', 'injury', 'ospedale', 'ambulanza', 'ferito', 'ferita', 'infortun', 'ricoverat'],
+    parole: ['hospital', 'ambulance', 'injured', 'injury', 'ospedale', 'ambulanza', 'ferito', 'ferita', 'ferite', 'infortun*', 'ricoverat*'],
   },
   {
     motivo: 'minaccia legale o intervento delle autorita’',
-    parole: ['lawsuit', 'legal action', 'sue you', 'sued', 'police', 'avvocato', 'denuncia', 'denunciat', 'polizia', 'carabinieri'],
+    parole: ['lawsuit', 'legal action', 'sue you', 'sued', 'police', 'avvocato', 'denuncia', 'denunciat*', 'polizia', 'carabinieri'],
   },
 ];
 
@@ -410,10 +410,27 @@ const GRAVI_CON_CONTESTO: { motivo: string; parole: string[]; vicino: string[] }
  *  intera: «the tour guide, Jason, was ... He was very drunk». */
 const VICINANZA = 120;
 
+/**
+ * Dove comincia `parola` dentro `testo`, oppure -1.
+ *
+ * 🔴 I DUE CONFINI SERVONO ENTRAMBI, e averne messo uno solo e' costato
+ * un falso allarme al primo giro vero. Il 23/10/2026, caricando le 60
+ * recensioni del portale, il controllo ha fermato una recensione da
+ * CINQUE STELLE -- «we were welcomed with such hospitality» -- perche'
+ * «hospitality» comincia con «hospital». Il confine iniziale c'era,
+ * quello finale no.
+ *
+ * Alcune voci pero' sono RADICI apposta: «infortun» deve prendere
+ * infortunio e infortunata, «molestat» molestato e molestata. Quelle si
+ * scrivono con un `*` in fondo e non chiedono il confine finale.
+ *
+ * E i confini non sono `\b`: in JavaScript `\b` e' ASCII e non riconosce
+ * «toccò» o «ferì» (stessa trappola di nomeDi).
+ */
 function doveSta(testo: string, parola: string): number {
-  /* confine di parola che regge gli accenti: `\b` in JavaScript e' ASCII
-     e non riconosce «toccò» o «ferità» (vedi nomeDi) */
-  const re = new RegExp(`(^|[^\\p{L}])${parola.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'iu');
+  const radice = parola.endsWith('*');
+  const nuda = (radice ? parola.slice(0, -1) : parola).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|[^\\p{L}])${nuda}${radice ? '' : '([^\\p{L}]|$)'}`, 'iu');
   const m = re.exec(testo);
   return m ? m.index : -1;
 }
