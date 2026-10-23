@@ -27,6 +27,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { CRITERI, guaiDi, siPuoPubblicare, type Guaio, type Recensione } from '@/lib/risposte';
+import { costoStimato, MODELLI, modelloConsigliato, rispostaLunga } from '@/lib/modello';
 import {
   approva,
   importaRiepilogo,
@@ -112,6 +113,13 @@ function quando(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? '—' : oraRoma.format(d);
 }
 
+/** Un prezzo in centesimi di dollaro, con tante cifre quante servono a
+ *  non diventare «0,00 ¢» -- che su un pulsante si legge come «gratis». */
+function prezzo(dollari: number): string {
+  const c = dollari * 100;
+  return `${c.toFixed(c < 0.1 ? 3 : 2).replace('.', ',')} ¢`;
+}
+
 function Numero({ n, che, colore }: { n: number; che: string; colore?: string }) {
   return (
     <Card withBorder radius="md" padding="sm">
@@ -187,6 +195,12 @@ function Riquadro({ r }: { r: Riga }) {
 
   const cambiata = risposta.trim() !== (r.corretto ?? r.risposta ?? '').trim();
   const testoCambiato = testoRec.trim() !== (r.testo ?? '').trim();
+
+  /* quale modello conviene per QUESTA recensione, e se la risposta sara'
+     lunga: la regola sta in src/lib/modello.ts, accanto ai prezzi, perche'
+     e' una decisione di spesa e non di grafica */
+  const lunga = rispostaLunga(r.voto);
+  const idConsigliato = modelloConsigliato(r.voto);
 
   function esegui(azione: () => Promise<Esito>) {
     setMessaggio(null);
@@ -307,18 +321,60 @@ function Riquadro({ r }: { r: Riga }) {
           </Alert>
         ) : null}
 
+        {/* CHI LA SCRIVE: un pulsante per modello, col prezzo sopra.
+            Regola della proprieta': «ogni bottone che consuma api a costo
+            ce lo devi scrivere accanto». Il prezzo e' stimato sui token
+            misurati; dopo la chiamata, sotto la casella, compare quello
+            VERO che torna da OpenRouter. */}
+        <Stack gap={6}>
+          <Group gap={6} wrap="wrap">
+            <Text size="xs" fw={600}>
+              {r.risposta ? 'Riscrivi con:' : 'Chi la scrive:'}
+            </Text>
+            <Text size="xs" c="dimmed">
+              il prezzo e` per QUESTA risposta
+            </Text>
+          </Group>
+          <Group gap="xs" wrap="wrap">
+            {MODELLI.map((m) => {
+              const costo = costoStimato(m.id, lunga ? 'lunga' : 'corta');
+              const consigliato = m.id === idConsigliato;
+              return (
+                <Button
+                  key={m.id}
+                  size="xs"
+                  variant={consigliato ? 'filled' : 'default'}
+                  leftSection={consigliato ? <IconSparkles size={14} /> : undefined}
+                  loading={inCorso}
+                  disabled={!r.testo}
+                  title={`${m.cose}\n\n${m.quando}`}
+                  onClick={() => esegui(() => scriviRisposta(r.id, m.id))}
+                >
+                  {m.nome} · {prezzo(costo)}
+                </Button>
+              );
+            })}
+          </Group>
+          <Text size="xs" c="dimmed">
+            {!r.testo ? (
+              <>Spenti finche` non c&rsquo;e` il testo della recensione.</>
+            ) : lunga ? (
+              <>
+                Questa e` una <b>recensione critica</b> ({r.voto}★): qui serve una risposta lunga e
+                argomentata, e <b>Opus</b> e` l&rsquo;unico che la regge. Mezzo centesimo in piu` su
+                una risposta che la leggeranno tutti i prossimi clienti.
+              </>
+            ) : (
+              <>
+                Recensione positiva: bastano tre righe, e <b>Haiku</b> le scrive bene e costa meno di
+                tutti. Passa a Opus solo se questa risposta ti sta particolarmente a cuore.
+              </>
+            )}
+          </Text>
+        </Stack>
+
         {/* i comandi */}
         <Group gap="xs" wrap="wrap">
-          <Button
-            size="xs"
-            leftSection={<IconSparkles size={14} />}
-            loading={inCorso}
-            disabled={!r.testo}
-            onClick={() => esegui(() => scriviRisposta(r.id))}
-          >
-            {r.risposta ? 'Riscrivi' : 'Scrivi la risposta'}
-          </Button>
-
           <Button
             size="xs"
             variant="default"
@@ -529,6 +585,7 @@ type Filtro = 'da-fare' | 'bozze' | 'approvate' | 'pubblicate' | 'tutte';
 export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   const [filtro, setFiltro] = useState<Filtro>('bozze');
   const [criteriAperti, setCriteriAperti] = useState(false);
+  const [prezziAperti, setPrezziAperti] = useState(false);
 
   const conti = useMemo(() => {
     const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, speso: 0 };
@@ -592,10 +649,71 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
             { label: `Tutte (${righe.length})`, value: 'tutte' },
           ]}
         />
-        <Anchor component="button" type="button" size="xs" onClick={() => setCriteriAperti((x) => !x)}>
-          {criteriAperti ? 'nascondi i criteri' : `i ${CRITERI.length} criteri`}
-        </Anchor>
+        <Group gap="md">
+          <Anchor component="button" type="button" size="xs" onClick={() => setPrezziAperti((x) => !x)}>
+            {prezziAperti ? 'nascondi i prezzi' : 'chi scrive e quanto costa'}
+          </Anchor>
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            onClick={() => setCriteriAperti((x) => !x)}
+          >
+            {criteriAperti ? 'nascondi i criteri' : `i ${CRITERI.length} criteri`}
+          </Anchor>
+        </Group>
       </Group>
+
+      {prezziAperti ? (
+        <Card withBorder radius="md" padding="md">
+          <Title order={5} mb={4}>
+            Chi scrive la risposta, e quanto costa
+          </Title>
+          <Text size="xs" c="dimmed" mb="sm">
+            Accanto a ogni recensione trovi un pulsante per ognuno di questi: scegli di volta in
+            volta. Il prezzo sul pulsante e` <b>stimato</b> sui token misurati sulle risposte vere;
+            quello <b>vero</b> compare sotto la casella appena la risposta e` scritta, perche` lo
+            dice OpenRouter a ogni chiamata. I prezzi qui sotto sono quelli di listino del{' '}
+            <b>23/10/2026</b>.
+          </Text>
+          <Stack gap="sm">
+            {MODELLI.map((m) => (
+              <Card key={m.id} withBorder radius="sm" padding="sm">
+                <Group justify="space-between" wrap="wrap" gap="xs" mb={4}>
+                  <Text fw={700} size="sm">
+                    {m.nome}
+                  </Text>
+                  <Group gap="xs">
+                    <Badge variant="light" color="gray" size="sm">
+                      corta {prezzo(costoStimato(m.id, 'corta'))}
+                    </Badge>
+                    <Badge variant="light" color="gray" size="sm">
+                      lunga {prezzo(costoStimato(m.id, 'lunga'))}
+                    </Badge>
+                    <Badge variant="light" color="blue" size="sm">
+                      400 al mese: {(costoStimato(m.id, 'corta') * 400).toFixed(2).replace('.', ',')} $
+                    </Badge>
+                  </Group>
+                </Group>
+                <Text size="xs" mb={2}>
+                  {m.cose}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {m.quando}
+                </Text>
+              </Card>
+            ))}
+          </Stack>
+          <Text size="xs" c="dimmed" mt="sm">
+            <b>Due cose da sapere.</b> Passano tutti dalla stessa porta (OpenRouter) con la stessa
+            chiave: scegliere Claude invece di Gemini non vuol dire un altro account ne` un altro
+            abbonamento. E la cifra «400 al mese» e` il caso in cui si rispondesse a{' '}
+            <b>tutte</b> le recensioni con quel modello: nella pratica le negative sono una su
+            dieci, quindi la spesa vera e` quella di Haiku piu` un decimo di quella di Opus —{' '}
+            <b>meno di un euro al mese.</b>
+          </Text>
+        </Card>
+      ) : null}
 
       {criteriAperti ? (
         <Card withBorder radius="md" padding="md">

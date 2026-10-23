@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { chiAgisce, supabaseServer } from '@/lib/auth';
-import { chiedi, ErroreModello } from '@/lib/modello';
+import { chiedi, ErroreModello, MODELLO_PREDEFINITO, modelloValido } from '@/lib/modello';
 import { compitoDi, sistemaDi, type Recensione } from '@/lib/risposte';
 import { quandoPubblicare } from '@/lib/attesa';
 import { daRiepilogoViator } from '@/lib/posta-recensioni';
@@ -131,9 +131,16 @@ function testoBuono(r: { risposta: string | null; corretto: string | null }): st
  * previsto: e' il modo di riprovare dopo aver cambiato i criteri. La
  * correzione a mano, invece, non si perde (resta in `corretto`).
  */
-export async function scriviRisposta(id: number): Promise<Esito> {
+export async function scriviRisposta(id: number, modelloId?: string): Promise<Esito> {
   const chi = await chiAgisce();
   if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+
+  /* 🔴 IL MODELLO ARRIVA DAL BROWSER, QUINDI SI CONTROLLA. Senza questa
+     riga basterebbe cambiare una stringa negli strumenti di sviluppo per
+     far chiamare il modello piu' caro del listino -- che costa 150 volte
+     Haiku -- e la spesa la pagherebbe la proprieta'. La lista chiusa sta
+     in src/lib/modello.ts, accanto ai prezzi. */
+  const modello = modelloId && modelloValido(modelloId) ? modelloId : MODELLO_PREDEFINITO;
 
   const sb = await supabaseServer();
   const { data: r, error } = await sb
@@ -183,7 +190,7 @@ export async function scriviRisposta(id: number): Promise<Esito> {
 
   let out;
   try {
-    out = await chiedi(sistemaDi('Prestige Rent'), compitoDi(rec));
+    out = await chiedi(sistemaDi('Prestige Rent'), compitoDi(rec), { modello });
   } catch (e) {
     /* L'errore del modello si mostra per quello che e'. Il caso piu'
        probabile e' la chiave assente fra le variabili del progetto su
