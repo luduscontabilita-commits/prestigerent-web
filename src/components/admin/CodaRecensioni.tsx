@@ -35,6 +35,7 @@ import {
   type Recensione,
 } from '@/lib/risposte';
 import { costoStimato, MODELLI, modelloConsigliato, rispostaLunga } from '@/lib/modello';
+import { linkProdottoViator } from '@/lib/prodotti-viator';
 import {
   approva,
   importaRiepilogo,
@@ -488,6 +489,24 @@ function Riquadro({
             </Button>
           ) : null}
 
+          {/* 🔴 DOVE STA, UNA VOLTA PUBBLICATA. Il portale toglie
+              dall'elenco le recensioni a cui si e' risposto, e la pagina
+              pubblica di Viator le risposte non le mostra: senza questo
+              link una risposta pubblicata non si ritrova piu'. */}
+          {linkProdottoViator(r.prodotto) ? (
+            <Button
+              size="xs"
+              variant="subtle"
+              component="a"
+              href={linkProdottoViator(r.prodotto) as string}
+              target="_blank"
+              rel="noreferrer"
+              leftSection={<IconExternalLink size={14} />}
+            >
+              Scheda pubblica
+            </Button>
+          ) : null}
+
           {r.stato === 'approvata' ? (
             <>
               <Button
@@ -720,7 +739,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
         <Numero n={conti.daFare} che="senza risposta" colore={conti.daFare ? 'orange.8' : undefined} />
         <Numero n={conti.bozze} che="bozze da leggere" />
         <Numero n={conti.approvate} che="approvate, da incollare" colore="blue.8" />
-        <Numero n={conti.pubblicate} che="incollate nel portale" colore="green.8" />
+        <Numero n={conti.pubblicate} che="pubblicate &rarr; scheda «Pubblicate»" colore="green.8" />
         <Card withBorder radius="md" padding="sm">
           <Text fz={28} fw={800} lh={1.1}>
             {(conti.speso * 100).toFixed(2)}
@@ -768,7 +787,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
             { label: `Da fare (${conti.daFare})`, value: 'da-fare' },
             { label: `Bozze (${conti.bozze})`, value: 'bozze' },
             { label: `Approvate (${conti.approvate})`, value: 'approvate' },
-            { label: `Fatte (${conti.pubblicate})`, value: 'pubblicate' },
+            { label: `Pubblicate (${conti.pubblicate})`, value: 'pubblicate' },
             { label: `Tutte (${righe.length})`, value: 'tutte' },
           ]}
         />
@@ -853,6 +872,58 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
                 <b>{i + 1}.</b> {c}
               </Text>
             ))}
+          </Stack>
+        </Card>
+      ) : null}
+
+      {/* 🔴 L'ELENCO DI QUELLO CHE E' GIA' USCITO.
+          Chiesto dalla proprieta' il 23/10/2026 con una domanda che era
+          un difetto: «1 incollate nel portale -- dove sono???». Il
+          contatore diceva quante, e poi bisognava cercarsele. E cercarle
+          non si poteva: il portale toglie dall'elenco le recensioni a cui
+          si e' risposto, e la pagina pubblica di Viator le risposte non
+          le mostra. Fuori di qui, una risposta pubblicata non esiste piu'.
+          Quindi qui si vede tutto in una riga: quando, chi, con cosa e'
+          stata scritta, quanto e' costata, e il link alla scheda. */}
+      {filtro === 'pubblicate' && viste.length > 0 ? (
+        <Card withBorder radius="md" padding="md">
+          <Title order={5} mb={4}>
+            Le risposte gia` pubblicate
+          </Title>
+          <Text size="xs" c="dimmed" mb="sm">
+            Questo e` l&rsquo;unico posto dove restano. Il portale toglie dall&rsquo;elenco le
+            recensioni a cui si e` risposto, e sulla pagina pubblica di Viator le risposte del
+            fornitore non compaiono: una volta uscite, fuori di qui non si ritrovano piu`.
+          </Text>
+          <Stack gap={6}>
+            {viste.map((p) => {
+              const link = linkProdottoViator(p.prodotto);
+              return (
+                <Group key={p.id} gap="xs" wrap="wrap" align="baseline">
+                  <Badge size="sm" variant="light" color={COLORE_FONTE[p.fonte] ?? 'gray'}>
+                    {p.fonte}
+                  </Badge>
+                  <Text size="xs" fw={600}>
+                    {quando(p.pubblicata_il)}
+                  </Text>
+                  <Text size="xs">
+                    {p.autore || 'senza nome'} · {p.voto !== null ? `${p.voto}★` : '—'}
+                  </Text>
+                  <Text size="xs" c="dimmed" style={{ flex: 1, minWidth: 180 }}>
+                    {p.titolo}
+                  </Text>
+                  <Text size="xs" c="dimmed">
+                    {p.modello ?? 'scritta a mano'}
+                    {p.costo ? ` · ${prezzo(Number(p.costo))}` : ''}
+                  </Text>
+                  {link ? (
+                    <Anchor href={link} target="_blank" rel="noreferrer" size="xs">
+                      scheda pubblica ↗
+                    </Anchor>
+                  ) : null}
+                </Group>
+              );
+            })}
           </Stack>
         </Card>
       ) : null}
