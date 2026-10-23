@@ -281,6 +281,12 @@ function Riquadro({
   const [messaggio, setMessaggio] = useState<string | null>(null);
   const [copiato, setCopiato] = useState(false);
   const [inCorso, parti] = useTransition();
+  /* 🔴 QUALE pulsante sta lavorando. Senza, `loading={inCorso}` accende
+     la rotella su TUTTI i pulsanti del riquadro -- i quattro modelli e
+     anche «Approva» -- e chi guarda non capisce cosa ha premuto ne' cosa
+     sta succedendo. Visto in una schermata della proprieta' il
+     23/10/2026: cinque rotelle che girano insieme. */
+  const [quale, setQuale] = useState<string | null>(null);
 
   /* I controlli, ricalcolati a ogni battuta. La recensione che si passa e'
      quella con il testo CORRENTE della casella, non quello salvato: se si
@@ -336,12 +342,19 @@ function Riquadro({
      risposta viene scritta, la riga passa da «Da fare» a «Bozze», esce
      dal filtro che si stava guardando e SPARISCE senza che niente lo
      dica. Chi guarda pensa di aver rotto qualcosa. */
-  function esegui(azione: () => Promise<Esito>, finisceIn?: Filtro, cosa?: string) {
+  function esegui(
+    azione: () => Promise<Esito>,
+    finisceIn?: Filtro,
+    cosa?: string,
+    tasto?: string
+  ) {
     setMessaggio(null);
+    setQuale(tasto ?? null);
     parti(async () => {
       const esito = await azione();
       if (!esito.ok) {
         setMessaggio(esito.errore ?? 'Non e` andata.');
+        setQuale(null);
         return;
       }
       if (cosa) {
@@ -521,14 +534,15 @@ function Riquadro({
                   size="xs"
                   variant={consigliato ? 'filled' : 'default'}
                   leftSection={consigliato ? <IconSparkles size={14} /> : undefined}
-                  loading={inCorso}
-                  disabled={!r.testo || !!grave}
+                  loading={quale === m.id}
+                  disabled={inCorso || !r.testo || !!grave}
                   title={`${m.cose}\n\n${m.quando}\n\n${misurato ? 'Prezzo MISURATO sulle risposte gia’ scritte con questo modello.' : 'Prezzo stimato: questo modello non e’ ancora stato usato.'}`}
                   onClick={() =>
                     esegui(
                       () => scriviRisposta(r.id, m.id),
                       'bozze',
-                      `Risposta scritta con ${m.nome}: ora sta in «Bozze»`
+                      `Risposta scritta con ${m.nome}: ora sta in «Bozze»`,
+                      m.id
                     )
                   }
                 >
@@ -619,9 +633,10 @@ function Riquadro({
                 size="xs"
                 color="green"
                 leftSection={<IconCheck size={14} />}
-                loading={inCorso}
+                loading={quale === 'fatta'}
+                disabled={inCorso}
                 onClick={() =>
-                  esegui(() => segnaPubblicata(r.id), 'pubblicate', 'Segnata come pubblicata')
+                  esegui(() => segnaPubblicata(r.id), 'pubblicate', 'Segnata come pubblicata', 'fatta')
                 }
               >
                 L&rsquo;ho incollata nel portale
@@ -641,8 +656,8 @@ function Riquadro({
               size="xs"
               color="blue"
               leftSection={<IconCheck size={14} />}
-              loading={inCorso}
-              disabled={!risposta.trim()}
+              loading={quale === 'approva'}
+              disabled={inCorso || !risposta.trim()}
               onClick={() =>
                 esegui(async () => {
                   /* se c'e' una correzione non salvata, si salva prima:
@@ -654,7 +669,7 @@ function Riquadro({
                     if (!s.ok) return s;
                   }
                   return approva(r.id);
-                }, 'approvate', 'Approvata: ora sta in «Approvate», pronta da copiare')
+                }, 'approvate', 'Approvata: ora sta in «Approvate», pronta da copiare', 'approva')
               }
             >
               Approva
@@ -787,6 +802,13 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
      Un messaggio scritto li' dentro sparirebbe insieme a lui -- che e'
      esattamente il guasto che questo risolve. */
   const [avviso, setAvviso] = useState<{ testo: string; vai?: Filtro } | null>(null);
+  /* 🔴 LE RIGHE APPENA TOCCATE RESTANO VISIBILI, anche se il loro nuovo
+     stato non appartiene al filtro che si sta guardando.
+     Dire «ora sta in Bozze» non bastava: la proprieta' ha riprovato e la
+     riga spariva lo stesso. Chi preme un pulsante si aspetta di vedere
+     il risultato LI', non di andarlo a cercare in un'altra scheda. Si
+     svuota cambiando filtro: a quel punto si sta guardando altro. */
+  const [appenaToccate, setAppenaToccate] = useState<Set<number>>(new Set());
 
   const conti = useMemo(() => {
     const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, gravi: 0, speso: 0 };
@@ -835,21 +857,35 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   const dove = useMemo(() => posizioniNelPortale(righe), [righe]);
 
   const viste = useMemo(() => {
+    const tieni = (r: Riga, dentro: boolean) => dentro || appenaToccate.has(r.id);
     let lista = righe;
-    if (filtro === 'gravi') lista = righe.filter((r) => !!graveDi(r.testo));
+    if (filtro === 'gravi') lista = righe.filter((r) => tieni(r, !!graveDi(r.testo)));
     else if (filtro === 'da-fare')
-      lista = righe.filter((r) => r.stato === 'nuova' || r.stato === 'letta');
-    else if (filtro === 'bozze') lista = righe.filter((r) => r.stato === 'bozza');
-    else if (filtro === 'approvate') lista = righe.filter((r) => r.stato === 'approvata');
-    else if (filtro === 'pubblicate') lista = righe.filter((r) => r.stato === 'pubblicata');
+      lista = righe.filter((r) => tieni(r, r.stato === 'nuova' || r.stato === 'letta'));
+    else if (filtro === 'bozze') lista = righe.filter((r) => tieni(r, r.stato === 'bozza'));
+    else if (filtro === 'approvate') lista = righe.filter((r) => tieni(r, r.stato === 'approvata'));
+    else if (filtro === 'pubblicate')
+      lista = righe.filter((r) => tieni(r, r.stato === 'pubblicata'));
 
-    /* 🔴 LE GRAVI PRIMA DI TUTTO, dentro qualunque filtro. Quella di
-       John_S e' rimasta pubblica e senza risposta per quattro giorni
-       perche' stava in mezzo ad altre 59: nessuno legge sessanta
-       recensioni in fila. Una cosa che va vista si mette in cima, non si
-       spera che qualcuno ci arrivi scorrendo. */
-    return [...lista].sort((a, b) => Number(!!graveDi(b.testo)) - Number(!!graveDi(a.testo)));
-  }, [righe, filtro]);
+    /* L'ORDINE, E I DUE MOTIVI PER CUI NON E' QUELLO DEL DATABASE.
+
+       1. 🔴 LA RIGA CHE HAI APPENA TOCCATO VA IN CIMA. Riscrivendo una
+          bozza le viene assegnato un NUOVO orario di uscita, e l'elenco
+          e' ordinato per orario: la riga saltava in fondo a dodici
+          bozze. Non spariva -- si spostava, che da chi guarda si vede
+          uguale. «Si toglie e si perde e non si sa dove va», detto dalla
+          proprieta' il 23/10/2026 dopo che il primo rimedio (l'avviso)
+          non era bastato.
+
+       2. LE GRAVI SUBITO DOPO, dentro qualunque filtro. Quella di
+          John_S e' rimasta pubblica e senza risposta per quattro giorni
+          perche' stava in mezzo ad altre 59: nessuno legge sessanta
+          recensioni in fila. Una cosa che va vista si mette in cima, non
+          si spera che qualcuno ci arrivi scorrendo. */
+    const peso = (r: Riga) =>
+      (appenaToccate.has(r.id) ? 0 : 2) + (graveDi(r.testo) ? 0 : 1);
+    return [...lista].sort((a, b) => peso(a) - peso(b));
+  }, [righe, filtro, appenaToccate]);
 
   return (
     <Stack gap="md">
@@ -899,7 +935,11 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
         <SegmentedControl
           size="xs"
           value={filtro}
-          onChange={(v) => setFiltro(v as Filtro)}
+          onChange={(v) => {
+            setFiltro(v as Filtro);
+            setAppenaToccate(new Set());
+            setAvviso(null);
+          }}
           data={[
             ...(conti.gravi ? [{ label: `⚠ A mano (${conti.gravi})`, value: 'gravi' }] : []),
             { label: `Da fare (${conti.daFare})`, value: 'da-fare' },
@@ -1076,13 +1116,16 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
           onClose={() => setAvviso(null)}
         >
           <Group gap="sm" wrap="wrap">
-            <Text size="sm">{avviso.testo}</Text>
+            <Text size="sm">
+              {avviso.testo}. <b>La trovi qui sotto, in cima all&rsquo;elenco.</b>
+            </Text>
             {avviso.vai && avviso.vai !== filtro ? (
               <Button
                 size="compact-xs"
                 variant="white"
                 onClick={() => {
                   setFiltro(avviso.vai as Filtro);
+                  setAppenaToccate(new Set());
                   setAvviso(null);
                 }}
               >
@@ -1108,7 +1151,10 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
               apertureRipetute={apertureRipetute}
               costoReale={costoReale}
               dove={dove.get(r.id)}
-              avvisa={(testo, vai) => setAvviso({ testo, vai })}
+              avvisa={(testo, vai) => {
+                setAvviso({ testo, vai });
+                setAppenaToccate((p) => new Set(p).add(r.id));
+              }}
             />
           ))}
         </Stack>
