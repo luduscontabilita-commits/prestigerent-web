@@ -262,6 +262,7 @@ function Riquadro({
   apertureRipetute,
   costoReale,
   dove,
+  avvisa,
 }: {
   r: Riga;
   apertureRipetute: Set<string>;
