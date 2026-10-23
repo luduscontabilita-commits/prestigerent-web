@@ -26,7 +26,14 @@ import {
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
-import { CRITERI, guaiDi, siPuoPubblicare, type Guaio, type Recensione } from '@/lib/risposte';
+import {
+  CRITERI,
+  graveDi,
+  guaiDi,
+  siPuoPubblicare,
+  type Guaio,
+  type Recensione,
+} from '@/lib/risposte';
 import { costoStimato, MODELLI, modelloConsigliato, rispostaLunga } from '@/lib/modello';
 import {
   approva,
@@ -240,6 +247,11 @@ function Riquadro({
   const lunga = rispostaLunga(r.voto);
   const idConsigliato = modelloConsigliato(r.voto);
 
+  /* 🔴 La recensione che nessun modello deve toccare. Si ricalcola sul
+     testo CORRENTE: se lo incolli adesso, l'avviso compare mentre scrivi,
+     prima che tu possa premere un pulsante. */
+  const grave = useMemo(() => graveDi(testoRec || r.testo), [testoRec, r.testo]);
+
   function esegui(azione: () => Promise<Esito>) {
     setMessaggio(null);
     parti(async () => {
@@ -259,8 +271,27 @@ function Riquadro({
   }
 
   return (
-    <Card withBorder radius="md" padding="md">
+    <Card
+      withBorder
+      radius="md"
+      padding="md"
+      style={grave ? { borderColor: 'var(--mantine-color-red-6)', borderWidth: 2 } : undefined}
+    >
       <Stack gap="xs">
+        {grave ? (
+          <Alert color="red" variant="filled" icon={<IconAlertTriangle size={18} />}>
+            <Text size="sm" fw={700}>
+              Questa non la scrive un programma: {grave.motivo}
+            </Text>
+            <Text size="xs" mt={4}>
+              Il controllo e&rsquo; scattato su «{grave.spia}». La risposta pubblica va scritta a mano,
+              e dopo aver parlato con chi c&rsquo;era: una frase sbagliata qui sotto resta pubblica per
+              sempre sotto il nome dell&rsquo;azienda, e in un caso cosi&rsquo; «ci dispiace che si sia
+              sentito cosi&rsquo;» sposta la colpa su chi l&rsquo;ha subita.
+            </Text>
+          </Alert>
+        ) : null}
+
         {/* chi, dove, quanto */}
         <Group justify="space-between" wrap="wrap" gap="xs">
           <Group gap={8} wrap="wrap">
@@ -390,7 +421,7 @@ function Riquadro({
                   variant={consigliato ? 'filled' : 'default'}
                   leftSection={consigliato ? <IconSparkles size={14} /> : undefined}
                   loading={inCorso}
-                  disabled={!r.testo}
+                  disabled={!r.testo || !!grave}
                   title={`${m.cose}\n\n${m.quando}\n\n${misurato ? 'Prezzo MISURATO sulle risposte gia’ scritte con questo modello.' : 'Prezzo stimato: questo modello non e’ ancora stato usato.'}`}
                   onClick={() => esegui(() => scriviRisposta(r.id, m.id))}
                 >
@@ -400,7 +431,11 @@ function Riquadro({
             })}
           </Group>
           <Text size="xs" c="dimmed">
-            {!r.testo ? (
+            {grave ? (
+              <Text component="span" c="red.8" fw={600}>
+                Spenti apposta. La scrive una persona, e la firma una persona.
+              </Text>
+            ) : !r.testo ? (
               <>Spenti finche` non c&rsquo;e` il testo della recensione.</>
             ) : lunga ? (
               <>
@@ -614,7 +649,7 @@ function Importatore() {
   );
 }
 
-type Filtro = 'da-fare' | 'bozze' | 'approvate' | 'pubblicate' | 'tutte';
+type Filtro = 'gravi' | 'da-fare' | 'bozze' | 'approvate' | 'pubblicate' | 'tutte';
 
 export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   const [filtro, setFiltro] = useState<Filtro>('bozze');
@@ -622,12 +657,13 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   const [prezziAperti, setPrezziAperti] = useState(false);
 
   const conti = useMemo(() => {
-    const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, speso: 0 };
+    const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, gravi: 0, speso: 0 };
     for (const r of righe) {
       if (r.stato === 'nuova' || r.stato === 'letta') c.daFare++;
       if (r.stato === 'bozza') c.bozze++;
       if (r.stato === 'approvata') c.approvate++;
       if (r.stato === 'pubblicata') c.pubblicate++;
+      if (r.stato !== 'pubblicata' && r.stato !== 'saltata' && graveDi(r.testo)) c.gravi++;
       c.speso += Number(r.costo ?? 0);
     }
     return c;
@@ -662,11 +698,20 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   }, [righe]);
 
   const viste = useMemo(() => {
-    if (filtro === 'tutte') return righe;
-    if (filtro === 'da-fare') return righe.filter((r) => r.stato === 'nuova' || r.stato === 'letta');
-    if (filtro === 'bozze') return righe.filter((r) => r.stato === 'bozza');
-    if (filtro === 'approvate') return righe.filter((r) => r.stato === 'approvata');
-    return righe.filter((r) => r.stato === 'pubblicata');
+    let lista = righe;
+    if (filtro === 'gravi') lista = righe.filter((r) => !!graveDi(r.testo));
+    else if (filtro === 'da-fare')
+      lista = righe.filter((r) => r.stato === 'nuova' || r.stato === 'letta');
+    else if (filtro === 'bozze') lista = righe.filter((r) => r.stato === 'bozza');
+    else if (filtro === 'approvate') lista = righe.filter((r) => r.stato === 'approvata');
+    else if (filtro === 'pubblicate') lista = righe.filter((r) => r.stato === 'pubblicata');
+
+    /* 🔴 LE GRAVI PRIMA DI TUTTO, dentro qualunque filtro. Quella di
+       John_S e' rimasta pubblica e senza risposta per quattro giorni
+       perche' stava in mezzo ad altre 59: nessuno legge sessanta
+       recensioni in fila. Una cosa che va vista si mette in cima, non si
+       spera che qualcuno ci arrivi scorrendo. */
+    return [...lista].sort((a, b) => Number(!!graveDi(b.testo)) - Number(!!graveDi(a.testo)));
   }, [righe, filtro]);
 
   return (
@@ -686,6 +731,21 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
         </Card>
       </SimpleGrid>
 
+      {conti.gravi ? (
+        <Alert color="red" variant="filled" p="sm" icon={<IconAlertTriangle size={18} />}>
+          <Text size="sm" fw={700}>
+            {conti.gravi === 1
+              ? 'Una recensione in coda va trattata a mano.'
+              : `${conti.gravi} recensioni in coda vanno trattate a mano.`}
+          </Text>
+          <Text size="xs" mt={4}>
+            Accuse di molestia, aggressione, furto, discriminazione, infortuni, personale ubriaco,
+            minacce legali. Sono in cima all&rsquo;elenco e i pulsanti dei modelli sono spenti: queste
+            non le scrive un programma.
+          </Text>
+        </Alert>
+      ) : null}
+
       <Alert color="gray" variant="light" p="sm">
         <Text size="xs">
           <b>Nessun portale permette di pubblicare da qui.</b> Viator, Tripadvisor e GetYourGuide non
@@ -704,6 +764,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
           value={filtro}
           onChange={(v) => setFiltro(v as Filtro)}
           data={[
+            ...(conti.gravi ? [{ label: `⚠ A mano (${conti.gravi})`, value: 'gravi' }] : []),
             { label: `Da fare (${conti.daFare})`, value: 'da-fare' },
             { label: `Bozze (${conti.bozze})`, value: 'bozze' },
             { label: `Approvate (${conti.approvate})`, value: 'approvate' },

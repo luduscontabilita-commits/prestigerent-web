@@ -338,6 +338,117 @@ export function siPuoPubblicare(guai: readonly Guaio[]): boolean {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
+   🔴 LE RECENSIONI CHE UN MODELLO NON DEVE TOCCARE
+
+   Nata il 23/10/2026, leggendo le 60 recensioni senza risposta del
+   portale. Una di quelle (John_S, 19/10, «Tour Guide Problems») accusa
+   una guida di essere ubriaca e di averlo toccato ripetutamente, e si
+   chiude con «I felt borderline sexually harassed».
+
+   Il rischio non e' teorico: la coda ne mostra sessanta in fila, e il
+   modo naturale di lavorarle e' premere i pulsanti uno dopo l'altro.
+   Su una cosa cosi' il modello scriverebbe la frase che scrive sempre --
+   «ci dispiace che si sia sentito cosi'» -- che in un'accusa di molestia
+   sposta la colpa su chi l'ha subita, e che resta pubblica per sempre
+   sotto il nome dell'azienda.
+
+   Qui non serve una risposta migliore: serve che non la scriva una
+   macchina. Il pannello la segna e si ferma.
+
+   ── PERCHE' ALCUNE PAROLE CHIEDONO UN CONTESTO ───────────────────────
+   `drunk` da solo su un tour di cantine e' falso allarme garantito: meta'
+   dei clienti contenti scrive che si e' ubriacata. Conta solo se e'
+   vicino a chi lavorava -- la guida, l'autista. Un controllo che grida
+   sempre viene spento dopo tre giorni, e allora non protegge piu'.
+   ───────────────────────────────────────────────────────────────────── */
+
+export type Grave = { motivo: string; spia: string };
+
+/** parole che da sole bastano: in una recensione di un tour non
+ *  compaiono per caso */
+const GRAVI_SECCHE: { motivo: string; parole: string[] }[] = [
+  {
+    motivo: 'accusa di molestia o contatto fisico non voluto',
+    parole: [
+      'harass', 'harassed', 'harassment', 'molest', 'molested', 'groped', 'grope',
+      'sexually', 'sexual', 'inappropriately touched', 'touched my body', 'touched me',
+      'grabbed my', 'molestia', 'molestie', 'molestat', 'palpeggi', 'toccata', 'toccato',
+    ],
+  },
+  {
+    motivo: 'accusa di aggressione o violenza',
+    parole: ['assault', 'assaulted', 'attacked me', 'punched', 'aggredit', 'aggressione', 'violenza'],
+  },
+  {
+    motivo: 'accusa di furto',
+    parole: ['stole', 'stolen', 'theft', 'robbed', 'rubato', 'rubata', 'derubat', 'furto'],
+  },
+  {
+    motivo: 'accusa di discriminazione',
+    parole: ['racist', 'racism', 'homophobic', 'discriminated', 'discriminatory', 'razzist', 'omofob', 'discriminat'],
+  },
+  {
+    motivo: 'infortunio o emergenza sanitaria',
+    parole: ['hospital', 'ambulance', 'injured', 'injury', 'ospedale', 'ambulanza', 'ferito', 'ferita', 'infortun', 'ricoverat'],
+  },
+  {
+    motivo: 'minaccia legale o intervento delle autorita’',
+    parole: ['lawsuit', 'legal action', 'sue you', 'sued', 'police', 'avvocato', 'denuncia', 'denunciat', 'polizia', 'carabinieri'],
+  },
+];
+
+/** parole che valgono solo se parlano di CHI LAVORAVA */
+const GRAVI_CON_CONTESTO: { motivo: string; parole: string[]; vicino: string[] }[] = [
+  {
+    motivo: 'personale accusato di essere ubriaco',
+    parole: ['drunk', 'intoxicated', 'ubriaco', 'ubriaca', 'alticcio'],
+    vicino: ['guide', 'driver', 'host', 'staff', 'guida', 'autista', 'accompagnatore'],
+  },
+];
+
+/** La distanza entro cui due parole si considerano «vicine». Una frase
+ *  intera: «the tour guide, Jason, was ... He was very drunk». */
+const VICINANZA = 120;
+
+function doveSta(testo: string, parola: string): number {
+  /* confine di parola che regge gli accenti: `\b` in JavaScript e' ASCII
+     e non riconosce «toccò» o «ferità» (vedi nomeDi) */
+  const re = new RegExp(`(^|[^\\p{L}])${parola.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'iu');
+  const m = re.exec(testo);
+  return m ? m.index : -1;
+}
+
+/**
+ * Se questa recensione e' troppo seria perche' risponda un programma.
+ *
+ * Torna il motivo e la parola che l'ha fatta scattare -- la spia si
+ * mostra in pannello, perche' un allarme che non dice cosa ha visto non
+ * si puo' valutare e finisce ignorato.
+ */
+export function graveDi(testo: string | null): Grave | null {
+  const t = (testo ?? '').toLowerCase();
+  if (!t.trim()) return null;
+
+  for (const g of GRAVI_SECCHE) {
+    for (const p of g.parole) {
+      if (doveSta(t, p) >= 0) return { motivo: g.motivo, spia: p };
+    }
+  }
+
+  for (const g of GRAVI_CON_CONTESTO) {
+    for (const p of g.parole) {
+      const dove = doveSta(t, p);
+      if (dove < 0) continue;
+      const intorno = t.slice(Math.max(0, dove - VICINANZA), dove + VICINANZA);
+      const chi = g.vicino.find((v) => doveSta(intorno, v) >= 0);
+      if (chi) return { motivo: g.motivo, spia: `${p} (vicino a «${chi}»)` };
+    }
+  }
+
+  return null;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
    LE ISTRUZIONI PER IL MODELLO
    ───────────────────────────────────────────────────────────────────── */
 

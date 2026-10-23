@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { chiAgisce, supabaseServer } from '@/lib/auth';
 import { chiedi, ErroreModello, MODELLO_PREDEFINITO, modelloValido } from '@/lib/modello';
-import { compitoDi, sistemaDi, type Recensione } from '@/lib/risposte';
+import { compitoDi, graveDi, sistemaDi, type Recensione } from '@/lib/risposte';
+import { invia } from '@/lib/posta';
 import { quandoPubblicare } from '@/lib/attesa';
 import { daRiepilogoViator } from '@/lib/posta-recensioni';
 
@@ -217,6 +218,22 @@ export async function scriviRisposta(id: number, modelloId?: string): Promise<Es
     };
   }
 
+  /* 🔴 IL CANCELLO. Certe recensioni non le scrive una macchina, e questo
+     e' il punto in cui si impedisce -- non un avviso che si puo'
+     ignorare premendo lo stesso il pulsante.
+     Nata dalla recensione di John_S del 19/10/2026, trovata il 23/10 in
+     mezzo ad altre 59: accusa una guida di essere ubriaca e di averlo
+     toccato ripetutamente. Su sessanta righe in fila il modo naturale di
+     lavorare e' premere i pulsanti uno dopo l'altro, e quella sarebbe
+     passata come le altre. */
+  const grave = graveDi(r.testo as string);
+  if (grave) {
+    return {
+      ok: false,
+      errore: `Questa recensione contiene ${grave.motivo} («${grave.spia}»). Non la scrive un programma: la risposta pubblica va scritta a mano, dopo aver parlato con chi c'era.`,
+    };
+  }
+
   /* Gli orari gia' assegnati alle altre, per rispettare distanza minima e
      tetto per ora SUL GRUPPO e non su questa riga da sola. Si guardano
      solo quelle ancora da pubblicare: una risposta uscita ieri non occupa
@@ -282,7 +299,11 @@ export async function salvaTestoRecensione(id: number, testo: string): Promise<E
   if (!pulito) return { ok: false, errore: 'Il testo e` vuoto.' };
 
   const sb = await supabaseServer();
-  const { data: r } = await sb.from('coda_recensioni').select('stato').eq('id', id).maybeSingle();
+  const { data: r } = await sb
+    .from('coda_recensioni')
+    .select('stato,fonte,voto,autore,titolo,prodotto,link_risposta')
+    .eq('id', id)
+    .maybeSingle();
   const { error } = await sb
     .from('coda_recensioni')
     .update({
@@ -293,6 +314,39 @@ export async function salvaTestoRecensione(id: number, testo: string): Promise<E
     })
     .eq('id', id);
   if (error) return { ok: false, errore: error.message };
+
+  /* 🔴 LA SEGNALAZIONE, SUBITO. Richiesta della proprieta' il 23/10/2026
+     dopo aver visto che una recensione con un'accusa di molestia era
+     rimasta pubblica e senza risposta per QUATTRO GIORNI: nessuno
+     l'aveva letta perche' nessuno legge sessanta recensioni in fila.
+     Il testo arriva qui -- e' l'unico momento in cui il sito lo vede per
+     la prima volta -- quindi e' qui che parte l'email. Non blocca il
+     salvataggio: se la posta non parte, la riga e' comunque salvata e
+     il pannello la segna lo stesso in rosso. */
+  const grave = graveDi(pulito);
+  if (grave && process.env.RICHIESTE_A) {
+    const dove = `${r?.fonte ?? 'portale'} — ${r?.prodotto ?? ''}`;
+    await invia({
+      a: process.env.RICHIESTE_A,
+      oggetto: `⚠ Recensione da trattare a mano: ${grave.motivo}`,
+      testo: [
+        `Una recensione appena entrata in coda contiene ${grave.motivo}.`,
+        `Parola che ha fatto scattare il controllo: ${grave.spia}`,
+        '',
+        `Dove: ${dove}`,
+        `Voto: ${r?.voto ?? '?'} — Autore: ${r?.autore || 'senza nome'}`,
+        `Titolo: ${r?.titolo ?? ''}`,
+        '',
+        'Testo della recensione:',
+        pulito,
+        '',
+        r?.link_risposta ? `Rispondi nel portale: ${r.link_risposta}` : '',
+        'In pannello: https://prestigerent.com/admin/recensioni/',
+        '',
+        'Il pannello NON scrivera` una risposta automatica a questa: la risposta pubblica va scritta a mano, dopo aver parlato con chi c’era.',
+      ].join('\n'),
+    }).catch(() => false);
+  }
 
   revalidatePath('/admin/recensioni/');
   return { ok: true };
