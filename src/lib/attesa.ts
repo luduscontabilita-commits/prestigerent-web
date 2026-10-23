@@ -37,8 +37,15 @@ export type Finestra = {
   /** il ritardo minimo da quando si viene a sapere della recensione */
   minMinuti: number;
   maxMinuti: number;
-  /** la prima e l'ultima ora della giornata in cui si pubblica (Europa/Roma) */
-  oraInizio: number;
+  /** 🔴 LA NOTTE SI SALTA, E LA MATTINA NON RICOMINCIA SEMPRE ALLA
+   *  STESSA ORA. Regola della proprieta', 23/10/2026: «salta gli orari
+   *  notturni italiani dalle 24 alle 7-9 RANDOM, mai al minuto esatto».
+   *  Un'ora di ripresa fissa e' una firma come un'altra: venti risposte
+   *  che negli anni escono sempre alle 8:00 si notano. Quindi la ripresa
+   *  si estrae fra queste due ore, ogni volta. */
+  oraRipresaMin: number;
+  oraRipresaMax: number;
+  /** l'ora in cui si smette la sera: 24 = mezzanotte */
   oraFine: number;
   /** quanto almeno fra due risposte */
   distanzaMinima: number;
@@ -49,8 +56,9 @@ export type Finestra = {
 export const FINESTRA: Finestra = {
   minMinuti: 15,
   maxMinuti: 120,
-  oraInizio: 8,
-  oraFine: 22,
+  oraRipresaMin: 7,
+  oraRipresaMax: 9,
+  oraFine: 24,
   distanzaMinima: 7,
   maxPerOra: 6,
 };
@@ -74,7 +82,52 @@ export function oraARoma(d: Date): number {
 
 function dentroLaGiornata(d: Date, f: Finestra): boolean {
   const o = oraARoma(d);
-  return o >= f.oraInizio && o < f.oraFine;
+  /* la sera si pubblica fino a mezzanotte: e' la notte fonda che non ha
+     senso, non le dieci di sera */
+  return o >= f.oraRipresaMin && o < f.oraFine;
+}
+
+/* 🔴 I BORDI DELLA NOTTE SONO MORBIDI, DI PROPOSITO. Regola della
+   proprieta', 23/10/2026: «deve anche poter pubblicare qualche volta a
+   00:30, qualche volta alle 06:30». Un muro netto alle 24:00 e alle 7:00
+   e' un orario d'ufficio, e un orario d'ufficio e' una firma. Una
+   persona ogni tanto risponde a mezzanotte e mezza, o alle sei e mezza
+   prima di uscire. Quindi: una risposta che cade nella prima ora dopo
+   mezzanotte, o nell'ora prima della ripresa, OGNI TANTO resta li'. Non
+   spesso -- una su otto -- se no la notte non e' piu' saltata. */
+const UNA_SU = 8;
+function bordoMorbido(d: Date, f: Finestra, caso: () => number): boolean {
+  const o = oraARoma(d);
+  const primaOraDopoMezzanotte = o === 0;
+  const oraPrimaDellaRipresa = o === f.oraRipresaMin - 1;
+  return (primaOraDopoMezzanotte || oraPrimaDellaRipresa) && Math.floor(caso() * UNA_SU) === 0;
+}
+
+/* 🔴 ANCHE I SECONDI SONO A CASO. «Al minuto esatto» vale anche per i
+   secondi: un orario sempre a :00 secondi e' un orologio, e nei registri
+   di Viator i secondi ci sono. Si sporca sempre, su ogni orario. */
+function secondiACaso(d: Date, caso: () => number): Date {
+  const t = new Date(d);
+  t.setUTCSeconds(1 + Math.floor(caso() * 58), Math.floor(caso() * 1000));
+  return t;
+}
+
+/** I minuti dentro l'ora, a Roma. Serve a non far uscire niente allo
+ *  scoccare dell'ora: le 9:00 in punto sono un orologio, le 9:17 una
+ *  persona. */
+function minutiARoma(d: Date): number {
+  const p = new Intl.DateTimeFormat('it-IT', {
+    timeZone: 'Europe/Rome',
+    minute: 'numeric',
+  }).formatToParts(d);
+  return Number(p.find((x) => x.type === 'minute')?.value ?? 0);
+}
+
+/** 🔴 MAI AL MINUTO ESATTO. Se il momento calcolato cade a :00 lo si
+ *  sposta di qualche minuto: nessuno risponde alle 9:00:00. */
+function maiInPunto(d: Date, caso: () => number): Date {
+  if (minutiARoma(d) !== 0) return d;
+  return new Date(d.getTime() + (2 + Math.floor(caso() * 27)) * MINUTO);
 }
 
 /** Sposta un momento al prossimo orario utile, con la partenza estratta
@@ -89,9 +142,14 @@ function allaProssimaMattina(d: Date, f: Finestra, caso: () => number): Date {
     t = new Date(t.getTime() + 60 * MINUTO);
     giri++;
   }
-  /* ora si e' dentro la finestra, all'inizio di un'ora qualsiasi: si
-     aggiunge una dispersione fino a 90 minuti */
-  return new Date(t.getTime() + Math.floor(caso() * 90) * MINUTO);
+  /* 🔴 ORA SI E' ALL'ORA DI RIPRESA MINIMA (le 7). La dispersione copre
+     la fascia fino all'ora massima (le 9) piu' una coda: cosi' la
+     mattina non ricomincia mai alla stessa ora, che era il punto.
+     E una volta su otto si parte un'ora PRIMA: le 6 e mezza, «prima di
+     uscire». E' il bordo morbido visto dal lato della mattina. */
+  const fascia = Math.max(1, f.oraRipresaMax - f.oraRipresaMin) * 60;
+  const anticipo = Math.floor(caso() * UNA_SU) === 0 ? -Math.floor(caso() * 60) : 0;
+  return maiInPunto(new Date(t.getTime() + (anticipo + Math.floor(caso() * fascia)) * MINUTO), caso);
 }
 
 /**
@@ -110,7 +168,8 @@ export function quandoPubblicare(
   const ritardo = f.minMinuti + Math.floor(caso() * (f.maxMinuti - f.minMinuti + 1));
   let t = new Date(adesso.getTime() + ritardo * MINUTO);
 
-  if (!dentroLaGiornata(t, f)) t = allaProssimaMattina(t, f, caso);
+  if (!dentroLaGiornata(t, f) && !bordoMorbido(t, f, caso)) t = allaProssimaMattina(t, f, caso);
+  t = maiInPunto(t, caso);
 
   /* ora si cerca un posto libero: troppo vicino a un'altra, oppure in
      un'ora gia' piena, e si prova piu' avanti. Il passo e' a caso
@@ -121,10 +180,10 @@ export function quandoPubblicare(
       (x) => Math.floor(x.getTime() / 3_600_000) === Math.floor(t.getTime() / 3_600_000)
     ).length;
 
-    if (!vicina && nellOra < f.maxPerOra) return t;
+    if (!vicina && nellOra < f.maxPerOra) return secondiACaso(maiInPunto(t, caso), caso);
 
     t = new Date(t.getTime() + (5 + Math.floor(caso() * 16)) * MINUTO);
-    if (!dentroLaGiornata(t, f)) t = allaProssimaMattina(t, f, caso);
+    if (!dentroLaGiornata(t, f) && !bordoMorbido(t, f, caso)) t = allaProssimaMattina(t, f, caso);
   }
   return t;
 }

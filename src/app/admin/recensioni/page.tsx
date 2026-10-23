@@ -58,12 +58,22 @@ export default async function RecensioniPannello() {
   const io = await soloGestione();
 
   const sb = await supabaseServer();
-  const { data, error } = await sb
-    .from('coda_recensioni')
-    .select(
-      'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il,data_recensione'
-    )
-    .order('id', { ascending: false });
+  const [{ data, error }, { data: imp }] = await Promise.all([
+    sb
+      .from('coda_recensioni')
+      .select(
+        'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il,data_recensione,nota'
+      )
+      .order('id', { ascending: false }),
+    /* l'interruttore della pubblicazione automatica: una riga sola, e se
+       per qualunque motivo non si legge si considera SPENTO -- e' il
+       verso sicuro dell'errore */
+    sb.from('impostazioni_recensioni').select('automatico,max_al_giorno').eq('id', true).maybeSingle(),
+  ]);
+  const impostazioni = {
+    automatico: Boolean(imp?.automatico),
+    maxAlGiorno: Number(imp?.max_al_giorno ?? 20),
+  };
 
   const righe: Riga[] = ((data ?? []) as Riga[]).slice().sort((a, b) => {
     const pa = PESO[a.stato] ?? 9;
@@ -100,7 +110,7 @@ export default async function RecensioniPannello() {
         </Alert>
       ) : null}
 
-      <CodaRecensioni righe={righe} />
+      <CodaRecensioni righe={righe} impostazioni={impostazioni} />
     </Guscio>
   );
 }

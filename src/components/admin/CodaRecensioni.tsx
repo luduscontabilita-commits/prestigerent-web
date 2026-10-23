@@ -7,13 +7,17 @@ import {
   Badge,
   Button,
   Card,
+  Checkbox,
   Divider,
   Group,
+  NumberInput,
   SegmentedControl,
   SimpleGrid,
   Stack,
+  Switch,
   Text,
   Textarea,
+  TextInput,
   Title,
 } from '@mantine/core';
 import {
@@ -23,6 +27,7 @@ import {
   IconDownload,
   IconExternalLink,
   IconPencil,
+  IconSend,
   IconStarFilled,
   IconSparkles,
   IconTrash,
@@ -40,7 +45,11 @@ import { costoStimato, MODELLI, modelloConsigliato, rispostaLunga } from '@/lib/
 import { linkProdottoViator } from '@/lib/prodotti-viator';
 import {
   approva,
+  escieAdesso,
+  fissaOrario,
   importaRiepilogo,
+  impostaAutomatico,
+  rimandaADomani,
   riapri,
   salvaCorrezione,
   salvaTestoRecensione,
@@ -95,7 +104,20 @@ export type Riga = {
   /** la data che mostra il portale: e' l'unico modo di ritrovare una
    *  recensione, perche' Viator non ha un indirizzo per la singola */
   data_recensione: string | null;
+  /** perche' una riga e' in `errore`: lo scrive il giro quando si ferma */
+  nota: string | null;
 };
+
+/** Da ISO a quello che vuole un `<input type="datetime-local">`: l'ora
+ *  LOCALE di chi guarda, senza fuso. Il pannello lo usa chi sta in
+ *  Italia, e il browser fa la conversione da solo. */
+function aLocale(iso: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const z = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+}
 
 /** Quanti ne mostra una pagina del portale Viator. Contato a mano. */
 const PER_PAGINA = 10;
@@ -151,6 +173,8 @@ const COLORE_STATO: Record<string, string> = {
   approvata: 'blue',
   pubblicata: 'green',
   saltata: 'dark',
+  /* il giro si e' fermato su questa: il perche' sta in `nota` */
+  errore: 'red',
 };
 
 const oraRoma = new Intl.DateTimeFormat('it-IT', {
@@ -334,6 +358,15 @@ function Riquadro({
      gli altri cambiano solo lo stato qui dentro. Se mente, il pannello
      dice «fatto» su una risposta che nel portale non c'e'. */
   const [confermaFatta, setConfermaFatta] = useState(false);
+  /* l'orario scelto a mano: parte da quello precalcolato, si cambia, si
+     conferma. «Decidere un orario di pubblicazione post per post, con
+     precalcolo e conferma». */
+  const [orarioScelto, setOrarioScelto] = useState(aLocale(r.pubblicare_il));
+  const [ultimoOrario, setUltimoOrario] = useState(r.pubblicare_il);
+  if (ultimoOrario !== r.pubblicare_il) {
+    setUltimoOrario(r.pubblicare_il);
+    setOrarioScelto(aLocale(r.pubblicare_il));
+  }
 
   /* I controlli, ricalcolati a ogni battuta. La recensione che si passa e'
      quella con il testo CORRENTE della casella, non quello salvato: se si
@@ -457,6 +490,19 @@ function Riquadro({
       style={grave ? { borderColor: 'var(--mantine-color-red-6)', borderWidth: 2 } : undefined}
     >
       <Stack gap="xs">
+        {r.stato === 'errore' ? (
+          <Alert color="red" variant="light" icon={<IconAlertTriangle size={18} />}>
+            <Text size="sm" fw={700}>
+              Il giro automatico si e` fermato su questa
+            </Text>
+            <Text size="xs" mt={4}>
+              {r.nota || 'senza spiegazione'}. Finche` c&rsquo;e` una riga in errore il giro non
+              pubblica nient&rsquo;altro: guarda cosa e` successo, sistema, e poi «Rimetti in bozza»
+              o «Non rispondere».
+            </Text>
+          </Alert>
+        ) : null}
+
         {grave ? (
           <Alert color="red" variant="filled" icon={<IconAlertTriangle size={18} />}>
             <Text size="sm" fw={700}>
@@ -761,9 +807,72 @@ function Riquadro({
                   viene la via manuale, in sottotono. */}
               <Badge color="blue" variant="light" size="lg" style={{ textTransform: 'none' }}>
                 {r.pubblicare_il
-                  ? `In coda: la pubblico io il ${quando(r.pubblicare_il)}`
-                  : 'In coda per la pubblicazione'}
+                  ? `In coda: esce il ${quando(r.pubblicare_il)}`
+                  : 'In coda, senza orario'}
               </Badge>
+              {/* 🔴 L'ORARIO SI PUO' SCEGLIERE A MANO, post per post. Il
+                  campo parte dall'orario precalcolato (a caso, mai di
+                  notte, mai in punto) e si conferma con un clic; quello
+                  confermato vale ALLA LETTERA, anche se e' di notte:
+                  chi l'ha scelto lo sa. */}
+              <Group gap={4} wrap="nowrap">
+                <TextInput
+                  size="xs"
+                  type="datetime-local"
+                  value={orarioScelto}
+                  onChange={(e) => setOrarioScelto(e.currentTarget.value)}
+                  title="L'orario di uscita. Quello proposto e` calcolato a caso; se lo cambi vale esattamente quello che scrivi."
+                  w={190}
+                />
+                <Button
+                  size="xs"
+                  variant="default"
+                  loading={quale === 'orario'}
+                  disabled={inCorso || !orarioScelto || orarioScelto === aLocale(r.pubblicare_il)}
+                  onClick={() =>
+                    esegui(
+                      () => fissaOrario(r.id, new Date(orarioScelto).toISOString()),
+                      undefined,
+                      `Orario fissato: esce il ${quando(new Date(orarioScelto).toISOString())}`,
+                      'orario'
+                    )
+                  }
+                >
+                  Conferma orario
+                </Button>
+              </Group>
+              <Button
+                size="xs"
+                variant="light"
+                color="blue"
+                leftSection={<IconSend size={14} />}
+                loading={quale === 'subito'}
+                disabled={inCorso}
+                title="Sposta l'orario di uscita a adesso: la prossima volta che il giro controlla, la pubblica. Salta la regola della notte."
+                onClick={() =>
+                  esegui(
+                    () => escieAdesso([r.id]),
+                    undefined,
+                    'Messa in testa alla fila: esce al primo giro',
+                    'subito'
+                  )
+                }
+              >
+                Esci adesso
+              </Button>
+              <Button
+                size="xs"
+                variant="subtle"
+                color="gray"
+                loading={quale === 'domani'}
+                disabled={inCorso}
+                title="Rimanda l'uscita al giorno dopo, dentro la finestra buona"
+                onClick={() =>
+                  esegui(() => rimandaADomani(r.id), undefined, 'Rimandata a domani', 'domani')
+                }
+              >
+                rimanda
+              </Button>
               <Button
                 size="xs"
                 color={confermaFatta ? 'orange' : 'gray'}
@@ -941,8 +1050,21 @@ function Importatore() {
 
 type Filtro = 'gravi' | 'da-fare' | 'bozze' | 'approvate' | 'pubblicate' | 'tutte';
 
-export function CodaRecensioni({ righe }: { righe: Riga[] }) {
+export type Impostazioni = { automatico: boolean; maxAlGiorno: number };
+
+export function CodaRecensioni({
+  righe,
+  impostazioni,
+}: {
+  righe: Riga[];
+  impostazioni: Impostazioni;
+}) {
   const [filtro, setFiltro] = useState<Filtro>('bozze');
+  /* le righe scelte a mano per uscire subito: «devo poter decidere se e
+     quali pubblicare subito o meno» */
+  const [scelte, setScelte] = useState<Set<number>>(new Set());
+  const [tetto, setTetto] = useState<number>(impostazioni.maxAlGiorno);
+  const [inCorsoInterruttore, partiInterruttore] = useTransition();
   const [criteriAperti, setCriteriAperti] = useState(false);
   const [prezziAperti, setPrezziAperti] = useState(false);
   /* 🔴 L'avviso sta QUI e non nel riquadro: quando un'azione riesce, la
@@ -957,6 +1079,8 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
      il risultato LI', non di andarlo a cercare in un'altra scheda. Si
      svuota cambiando filtro: a quel punto si sta guardando altro. */
   const [appenaToccate, setAppenaToccate] = useState<Set<number>>(new Set());
+  const [tutteSubito, setTutteSubito] = useState(false);
+  const [inCorsoTutte, partiTutte] = useTransition();
 
   const conti = useMemo(() => {
     const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, gravi: 0, speso: 0 };
@@ -1191,6 +1315,133 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
           le mostra. Fuori di qui, una risposta pubblicata non esiste piu'.
           Quindi qui si vede tutto in una riga: quando, chi, con cosa e'
           stata scritta, quanto e' costata, e il link alla scheda. */}
+      {/* 🔴 IL COMANDO DEL GIRO STA QUI, non nella chat con chi lo guida.
+          «Voglio che decidiamo dal pannello che cazzo facciamo»
+          (proprieta`, 23/10/2026). Le approvate escono da sole quando
+          scatta il loro orario; da qui si vede quando, e si puo` dire
+          «tutte adesso» senza chiederlo a nessuno. */}
+      {filtro === 'approvate' && viste.length > 0 ? (
+        <Card withBorder radius="md" padding="md" bg="var(--mantine-color-blue-0)">
+          <Group justify="space-between" align="flex-start" wrap="wrap" mb="sm">
+            <div>
+              <Title order={5} mb={4}>
+                Queste escono da sole — se l&rsquo;interruttore e` acceso
+              </Title>
+              <Text size="xs" c="dimmed">
+                Il giro automatico controlla la coda e le incolla nel portale quando scatta il loro
+                orario. Gli orari sono precalcolati a caso: mai nella notte fonda, si riparte fra le
+                7 e le 9 (ogni tanto un po&rsquo; prima, ogni tanto subito dopo mezzanotte), mai al
+                minuto esatto, mai piu` di sei nella stessa ora. Ogni riga ha il suo orario, che
+                puoi cambiare e confermare. Se una ti serve fuori prima, <b>«Esci adesso»</b> sulla
+                sua riga; oppure spunta quelle che vuoi e usa il pulsante qui sotto.
+              </Text>
+            </div>
+            {/* 🔴 L'INTERRUTTORE. Spento, il giro legge e basta: non incolla
+                niente qualunque cosa ci sia in coda. E` il freno chiesto
+                dalla proprieta`: «non voglio processi che vanno a
+                compromettermi Viator». Nasce spento. */}
+            <Card withBorder radius="sm" padding="sm" bg="white" style={{ minWidth: 260 }}>
+              <Switch
+                label={
+                  impostazioni.automatico
+                    ? 'Pubblicazione automatica: ACCESA'
+                    : 'Pubblicazione automatica: spenta'
+                }
+                color="green"
+                checked={impostazioni.automatico}
+                disabled={inCorsoInterruttore}
+                onChange={(e) => {
+                  const acceso = e.currentTarget.checked;
+                  partiInterruttore(async () => {
+                    const esito = await impostaAutomatico(acceso, tetto);
+                    setAvviso({
+                      testo: esito.ok
+                        ? acceso
+                          ? 'Pubblicazione automatica ACCESA: da adesso il giro incolla nel portale quando scatta un orario'
+                          : 'Pubblicazione automatica spenta: il giro non tocca piu` niente'
+                        : (esito.errore ?? 'Non e` andata.'),
+                    });
+                  });
+                }}
+              />
+              <NumberInput
+                size="xs"
+                mt="xs"
+                label="Tetto: al massimo al giorno"
+                description="Oltre questo numero il giro si ferma da solo, qualunque cosa ci sia in coda"
+                min={1}
+                max={100}
+                value={tetto}
+                onChange={(v) => setTetto(Number(v) || 1)}
+                onBlur={() => {
+                  if (tetto !== impostazioni.maxAlGiorno) {
+                    partiInterruttore(async () => {
+                      await impostaAutomatico(impostazioni.automatico, tetto);
+                    });
+                  }
+                }}
+              />
+            </Card>
+          </Group>
+          <Stack gap={4} mb="sm">
+            {viste.map((p) => (
+              <Group key={p.id} gap="xs" wrap="wrap">
+                <Checkbox
+                  size="xs"
+                  checked={scelte.has(p.id)}
+                  onChange={(e) => {
+                    const n = new Set(scelte);
+                    if (e.currentTarget.checked) n.add(p.id);
+                    else n.delete(p.id);
+                    setScelte(n);
+                  }}
+                  aria-label="scegli questa"
+                />
+                <Text size="xs" fw={600}>
+                  {p.pubblicare_il ? quando(p.pubblicare_il) : 'senza orario'}
+                </Text>
+                <Text size="xs">{p.autore || 'senza nome'}</Text>
+                <Text size="xs" c="dimmed">
+                  {p.titolo}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+          <Button
+            size="xs"
+            color={tutteSubito ? 'orange' : 'blue'}
+            variant={tutteSubito ? 'filled' : 'light'}
+            leftSection={<IconSend size={14} />}
+            loading={inCorsoTutte}
+            onClick={() => {
+              if (!tutteSubito) {
+                setTutteSubito(true);
+                return;
+              }
+              setTutteSubito(false);
+              /* se ne hai spuntate alcune escono quelle; se non ne hai
+                 spuntata nessuna, tutte */
+              const ids = scelte.size ? [...scelte] : viste.map((x) => x.id);
+              partiTutte(async () => {
+                const e = await escieAdesso(ids);
+                setScelte(new Set());
+                setAvviso({
+                  testo: e.ok
+                    ? `${e.quante} risposte messe in testa alla fila: escono al primo giro${impostazioni.automatico ? '' : ' — ma l’interruttore e’ SPENTO: accendilo, o non esce niente'}`
+                    : (e.errore ?? 'Non e` andata.'),
+                });
+              });
+            }}
+          >
+            {tutteSubito
+              ? `Confermi? Escono ${scelte.size || viste.length} appena possibile`
+              : scelte.size
+                ? `Fai uscire adesso le ${scelte.size} scelte`
+                : `Falle uscire tutte adesso (${viste.length})`}
+          </Button>
+        </Card>
+      ) : null}
+
       {filtro === 'pubblicate' && viste.length > 0 ? (
         <Card withBorder radius="md" padding="md">
           <Title order={5} mb={4}>

@@ -411,6 +411,147 @@ export async function approva(id: number): Promise<Esito> {
   return { ok: true };
 }
 
+/**
+ * «Esci adesso»: sposta l'orario di uscita a questo momento.
+ *
+ * 🔴 PERCHE' UN COMANDO E NON UNA RICHIESTA A VOCE. Il giro automatico
+ * pubblica quello che ha l'orario scaduto, e quell'orario lo decide il
+ * calcolo del ritardo (mai di notte, mai piu' di sei all'ora). Va bene
+ * quasi sempre -- ma non sempre: una risposta puo' essere urgente, o
+ * semplicemente la si vuole fuori adesso.
+ * Senza questo pulsante l'unico modo di anticipare era chiederlo a voce
+ * a chi guida il giro, e la decisione finiva fuori dal pannello.
+ * Regola della proprieta', 23/10/2026: «voglio che decidiamo dal
+ * pannello che cazzo facciamo».
+ *
+ * Non pubblica niente da solo: mette la riga in cima alla fila. A
+ * pubblicare e' sempre il giro, con il browser.
+ */
+export async function escieAdesso(ids: number[]): Promise<Esito & { quante?: number }> {
+  const chi = await chiAgisce();
+  if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+  if (!ids.length) return { ok: false, errore: 'Nessuna risposta selezionata.' };
+
+  const sb = await supabaseServer();
+  const { data, error } = await sb
+    .from('coda_recensioni')
+    .update({ pubblicare_il: new Date().toISOString(), chi: chi.io.id })
+    .in('id', ids)
+    .eq('stato', 'approvata')
+    .select('id');
+  if (error) return { ok: false, errore: error.message };
+
+  revalidatePath('/admin/recensioni/');
+  return { ok: true, quante: (data ?? []).length };
+}
+
+/**
+ * L'orario scelto A MANO per una risposta.
+ *
+ * Il calcolo propone, la persona dispone: «decidere un orario di
+ * pubblicazione post per post, con precalcolo e conferma» (proprieta',
+ * 23/10/2026). L'orario che arriva qui e' quello confermato nel pannello,
+ * e si rispetta ALLA LETTERA -- anche se cade di notte, anche se e' in
+ * punto. Chi lo ha scelto lo sa; il calcolo automatico serve a chi non
+ * vuole scegliere, non a correggere chi ha scelto.
+ *
+ * Arriva come ISO dal browser, che l'ha costruito nel fuso di chi guarda:
+ * qui si controlla solo che sia una data vera e non nel passato remoto.
+ */
+export async function fissaOrario(id: number, iso: string): Promise<Esito> {
+  const chi = await chiAgisce();
+  if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return { ok: false, errore: 'Orario non valido.' };
+  if (d.getTime() < Date.now() - 24 * 60 * 60 * 1000) {
+    return { ok: false, errore: 'Quell’orario e` gia` passato da piu` di un giorno.' };
+  }
+
+  const sb = await supabaseServer();
+  const { error } = await sb
+    .from('coda_recensioni')
+    .update({ pubblicare_il: d.toISOString(), chi: chi.io.id })
+    .eq('id', id);
+  if (error) return { ok: false, errore: error.message };
+
+  revalidatePath('/admin/recensioni/');
+  return { ok: true };
+}
+
+/**
+ * L'INTERRUTTORE DELLA PUBBLICAZIONE AUTOMATICA, e il tetto giornaliero.
+ *
+ * 🔴 Nasce SPENTO e si accende solo da qui, con un utente che ha fatto
+ * l'accesso al pannello. Finche' e' spento il giro automatico legge la
+ * coda e non incolla niente, qualunque cosa ci sia dentro: e' il freno
+ * che la proprieta' ha chiesto esplicitamente («non voglio processi che
+ * vanno a compromettermi Viator»). Si registra chi l'ha toccato e
+ * quando: se un giorno la pubblicazione «parte da sola», qui si vede chi
+ * l'ha accesa.
+ */
+export async function impostaAutomatico(
+  acceso: boolean,
+  maxAlGiorno: number
+): Promise<Esito> {
+  const chi = await chiAgisce();
+  if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+  const tetto = Math.round(Number(maxAlGiorno));
+  if (!Number.isFinite(tetto) || tetto < 1 || tetto > 100) {
+    return { ok: false, errore: 'Il tetto giornaliero va da 1 a 100.' };
+  }
+
+  const sb = await supabaseServer();
+  const { error } = await sb
+    .from('impostazioni_recensioni')
+    .update({
+      automatico: acceso,
+      max_al_giorno: tetto,
+      cambiato_il: new Date().toISOString(),
+      cambiato_da: chi.io.id,
+    })
+    .eq('id', true);
+  if (error) return { ok: false, errore: error.message };
+
+  revalidatePath('/admin/recensioni/');
+  return { ok: true };
+}
+
+/**
+ * «Rimanda a domani»: ributta l'orario dentro la finestra buona del
+ * giorno dopo, rispettando distanza minima e tetto orario come fa il
+ * calcolo normale.
+ */
+export async function rimandaADomani(id: number): Promise<Esito> {
+  const chi = await chiAgisce();
+  if (!chi.io) return { ok: false, errore: chi.errore ?? 'Non autorizzato.' };
+
+  const sb = await supabaseServer();
+  const { data: altre } = await sb
+    .from('coda_recensioni')
+    .select('pubblicare_il')
+    .in('stato', ['bozza', 'approvata'])
+    .not('pubblicare_il', 'is', null)
+    .neq('id', id);
+  const gia = (altre ?? [])
+    .map((x) => new Date(x.pubblicare_il as string))
+    .filter((d) => !Number.isNaN(d.getTime()));
+
+  /* si riparte da domani mattina: il calcolo sposta da solo dentro la
+     finestra e trova un posto libero */
+  const domani = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const quando = quandoPubblicare(domani, gia);
+
+  const { error } = await sb
+    .from('coda_recensioni')
+    .update({ pubblicare_il: quando.toISOString(), chi: chi.io.id })
+    .eq('id', id);
+  if (error) return { ok: false, errore: error.message };
+
+  revalidatePath('/admin/recensioni/');
+  return { ok: true };
+}
+
 /** Rimette una riga approvata fra le bozze, per cambiarla ancora. */
 export async function riapri(id: number): Promise<Esito> {
   const chi = await chiAgisce();
