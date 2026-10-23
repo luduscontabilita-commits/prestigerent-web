@@ -316,6 +316,34 @@ export function guaiDi(risposta: string, rec: Recensione): Guaio[] {
 
   if (n > FRASI_MAX) g.push({ gravita: 'pesa', perche: `${n} frasi: qui si esagera dall'altra parte` });
 
+  /* ── 🔴 CHI HA SCRITTO E` IL CLIENTE, NON UN DIPENDENTE ────────────
+     Trovato il 23/10/2026 su una recensione di Maurice_W: la risposta
+     diceva «Maurice will be thrilled to read this». E` la formula che
+     si usa per girare un complimento alla guida -- applicata a chi quel
+     complimento l'ha fatto. Nasce da un'istruzione giusta («chiamalo per
+     nome») presa alla lettera nel modo sbagliato: il nome finisce come
+     SOGGETTO di una frase in terza persona invece che come vocativo.
+     Letta dal cliente e` goffa, e dice a chiunque legga che la risposta
+     non l'ha riletta nessuno. Si blocca: il nome di chi scrive serve per
+     rivolgersi a lui, mai per parlarne. */
+  const suoNome = nomeDi(rec.autore);
+  if (suoNome) {
+    const terzaPersona = new RegExp(
+      /* 🔴 `\\s` e `\\p` dentro un template literal: in JavaScript una
+         sequenza di escape sconosciuta in una stringa viene MANGIATA
+         (`\s` diventa `s`), e la regola non trovava piu' niente. Nel
+         sorgente della regex ci vuole il doppio. */
+      `(^|[^\\p{L}])${suoNome}\\s+(will|would|is|was|has|had|must|sar[aà]|[eè]|era|ha|aveva)([^\\p{L}]|$)`,
+      'iu'
+    );
+    if (terzaPersona.test(t)) {
+      g.push({
+        gravita: 'blocca',
+        perche: `parla di ${suoNome} in terza persona, ma ${suoNome} è IL CLIENTE: ci si rivolge a lui, non si parla di lui`,
+      });
+    }
+  }
+
   /* ── LE EMOJI ──────────────────────────────────────────────────────
      Una o due su una recensione contenta rendono la risposta umana.
      Su una critica sono fuori luogo, e tre o piu' su qualunque cosa
@@ -620,7 +648,7 @@ export function compitoDi(rec: Recensione, fatti?: string): string {
        autori sono nomi utente, e il modello a cui si chiede «chiamalo per
        nome» scrive «Dear 732lauraleee»: peggio che non salutare. */
     nomeDi(rec.autore)
-      ? `Si chiama ${nomeDi(rec.autore)}: chiamalo cosi'.`
+      ? `Si chiama ${nomeDi(rec.autore)}, ed e' IL CLIENTE. Il suo nome serve per RIVOLGERTI a lui («${nomeDi(rec.autore)}, grazie...»), MAI per parlare di lui in terza persona: «${nomeDi(rec.autore)} will be thrilled» e' sbagliato, perche' e' la frase che si usa per girare un complimento a un dipendente.`
       : '⚠️ Di chi ha scritto NON si conosce il nome (sulla piattaforma c\'e\' solo un nome utente). Non usare nessun nome e non inventarne uno: apri senza.',
     rec.tour_slug ? `Servizio: ${rec.tour_slug.replace(/-/g, ' ')}` : null,
     rec.data ? `Data: ${rec.data}` : null,

@@ -31,6 +31,7 @@ import {
   CRITERI,
   graveDi,
   guaiDi,
+  nomeDi,
   siPuoPubblicare,
   type Guaio,
   type Recensione,
@@ -311,6 +312,14 @@ function Riquadro({
      sta succedendo. Visto in una schermata della proprieta' il
      23/10/2026: cinque rotelle che girano insieme. */
   const [quale, setQuale] = useState<string | null>(null);
+  /* 🔴 «L'ho incollata nel portale» CHIEDE CONFERMA, e c'e' un motivo
+     preciso. Il 23/10/2026 e' stata segnata per sbaglio una risposta mai
+     incollata: premuto «Approva», la riga e' saltata in cima, i pulsanti
+     sono cambiati sotto il cursore e il clic dopo e' finito su questo.
+     E' l'unico pulsante che afferma qualcosa sul MONDO FUORI -- tutti
+     gli altri cambiano solo lo stato qui dentro. Se mente, il pannello
+     dice «fatto» su una risposta che nel portale non c'e'. */
+  const [confermaFatta, setConfermaFatta] = useState(false);
 
   /* I controlli, ricalcolati a ogni battuta. La recensione che si passa e'
      quella con il testo CORRENTE della casella, non quello salvato: se si
@@ -431,13 +440,35 @@ function Riquadro({
             <Badge color={COLORE_FONTE[r.fonte] ?? 'gray'} variant="light">
               {r.fonte}
             </Badge>
-            <Badge color={COLORE_STATO[r.stato] ?? 'gray'} variant="filled">
-              {r.stato}
+            <Badge
+              color={COLORE_STATO[r.stato] ?? 'gray'}
+              variant="filled"
+              title={
+                r.stato === 'pubblicata'
+                  ? 'Segnata a mano da chi ha incollato la risposta nel portale. Il pannello NON pubblica: non esiste nessuna API per farlo.'
+                  : undefined
+              }
+            >
+              {r.stato === 'pubblicata' ? 'incollata a mano' : r.stato}
             </Badge>
             <Stelle voto={r.voto} />
-            <Text size="sm" c="dimmed">
+            <Text size="sm" fw={600}>
               {r.autore || 'senza nome'}
             </Text>
+            {/* 🔴 QUALE nome usera' il motore, scritto accanto. Meta' degli
+                autori sui portali sono nomi utente (`lisaaX4327EU`), e su
+                quelli la risposta si apre SENZA nome: scritto qui, si
+                capisce subito perche' una risposta non saluta per nome,
+                invece di sembrare una dimenticanza. */}
+            {nomeDi(r.autore) ? (
+              <Badge size="xs" variant="dot" color="teal" title="Il motore si rivolgera` al cliente con questo nome">
+                {nomeDi(r.autore)}
+              </Badge>
+            ) : (
+              <Badge size="xs" variant="dot" color="gray" title="E` un nome utente, non un nome: la risposta non salutera` per nome, e non se ne inventera` uno">
+                senza nome usabile
+              </Badge>
+            )}
             {r.lingua ? (
               <Badge size="xs" variant="outline" color="gray">
                 {r.lingua}
@@ -660,15 +691,28 @@ function Riquadro({
             <>
               <Button
                 size="xs"
-                color="green"
+                color={confermaFatta ? 'orange' : 'green'}
+                variant={confermaFatta ? 'filled' : 'light'}
                 leftSection={<IconCheck size={14} />}
                 loading={quale === 'fatta'}
                 disabled={inCorso}
-                onClick={() =>
-                  esegui(() => segnaPubblicata(r.id), 'pubblicate', 'Segnata come pubblicata', 'fatta')
-                }
+                onClick={() => {
+                  if (!confermaFatta) {
+                    setConfermaFatta(true);
+                    return;
+                  }
+                  setConfermaFatta(false);
+                  esegui(
+                    () => segnaPubblicata(r.id),
+                    'pubblicate',
+                    'Segnata come incollata nel portale',
+                    'fatta'
+                  );
+                }}
               >
-                L&rsquo;ho incollata nel portale
+                {confermaFatta
+                  ? 'Confermi? L’hai gia’ incollata nel portale'
+                  : 'L’ho incollata nel portale'}
               </Button>
               <Button
                 size="xs"
