@@ -23,6 +23,7 @@ import {
   IconDownload,
   IconExternalLink,
   IconPencil,
+  IconStarFilled,
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
@@ -158,6 +159,44 @@ function prezzo(dollari: number): string {
   return `${c.toFixed(c < 0.1 ? 3 : 2).replace('.', ',')} ¢`;
 }
 
+/** Le stelle come si vedono sul portale: piene colorate, vuote grigie,
+ *  e il numero accanto. Un «5★» scritto a testo si legge peggio e non si
+ *  distingue al volo da un 3★ scorrendo sessanta righe -- che e' proprio
+ *  quello che si fa in questa pagina. Sotto le quattro stelle il numero
+ *  diventa rosso: li' cambia il modo di rispondere. */
+function Stelle({ voto }: { voto: number | null }) {
+  if (voto === null) {
+    return (
+      <Text size="xs" c="dimmed">
+        voto non letto
+      </Text>
+    );
+  }
+  const piene = Math.round(voto);
+  const critica = voto <= 3;
+  return (
+    <Group gap={2} wrap="nowrap" align="center">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <IconStarFilled
+          key={i}
+          size={13}
+          style={{
+            color:
+              i <= piene
+                ? critica
+                  ? 'var(--mantine-color-red-6)'
+                  : 'var(--mantine-color-yellow-6)'
+                : 'var(--mantine-color-gray-3)',
+          }}
+        />
+      ))}
+      <Text size="sm" fw={700} ml={4} c={critica ? 'red.8' : undefined}>
+        {Number(voto) % 1 === 0 ? Number(voto).toFixed(0) : voto}
+      </Text>
+    </Group>
+  );
+}
+
 function Numero({ n, che, colore }: { n: number; che: string; colore?: string }) {
   return (
     <Card withBorder radius="md" padding="sm">
@@ -230,6 +269,11 @@ function Riquadro({
   costoReale: Map<string, number>;
   /** dove sta nell'elenco del portale: e' l'unico «indirizzo» che esiste */
   dove?: { pagina: number; riga: number };
+  /** 🔴 Da dire al piano di sopra quando questa riga CAMBIA SCHEDA.
+      Serve perche' l'avviso non puo' stare dentro il riquadro: appena
+      l'azione riesce, la riga esce dal filtro e il riquadro sparisce --
+      portandosi via il messaggio. */
+  avvisa: (testo: string, vai?: Filtro) => void;
 }) {
   const [testoRec, setTestoRec] = useState(r.testo ?? '');
   const [risposta, setRisposta] = useState(r.corretto ?? r.risposta ?? '');
@@ -286,11 +330,23 @@ function Riquadro({
      prima che tu possa premere un pulsante. */
   const grave = useMemo(() => graveDi(testoRec || r.testo), [testoRec, r.testo]);
 
-  function esegui(azione: () => Promise<Esito>) {
+  /* `dove` e `cosa` dicono dove finisce la riga dopo l'azione. Senza,
+     succede quello che e' successo il 23/10/2026 premendo «Haiku»: la
+     risposta viene scritta, la riga passa da «Da fare» a «Bozze», esce
+     dal filtro che si stava guardando e SPARISCE senza che niente lo
+     dica. Chi guarda pensa di aver rotto qualcosa. */
+  function esegui(azione: () => Promise<Esito>, finisceIn?: Filtro, cosa?: string) {
     setMessaggio(null);
     parti(async () => {
       const esito = await azione();
-      if (!esito.ok) setMessaggio(esito.errore ?? 'Non e` andata.');
+      if (!esito.ok) {
+        setMessaggio(esito.errore ?? 'Non e` andata.');
+        return;
+      }
+      if (cosa) {
+        const chi = r.autore || r.titolo || 'la recensione';
+        avvisa(`${cosa} — ${chi}`, finisceIn);
+      }
     });
   }
 
@@ -335,9 +391,7 @@ function Riquadro({
             <Badge color={COLORE_STATO[r.stato] ?? 'gray'} variant="filled">
               {r.stato}
             </Badge>
-            <Text fw={700} size="sm">
-              {r.voto !== null ? `${r.voto}★` : '—'}
-            </Text>
+            <Stelle voto={r.voto} />
             <Text size="sm" c="dimmed">
               {r.autore || 'senza nome'}
             </Text>
@@ -469,7 +523,13 @@ function Riquadro({
                   loading={inCorso}
                   disabled={!r.testo || !!grave}
                   title={`${m.cose}\n\n${m.quando}\n\n${misurato ? 'Prezzo MISURATO sulle risposte gia’ scritte con questo modello.' : 'Prezzo stimato: questo modello non e’ ancora stato usato.'}`}
-                  onClick={() => esegui(() => scriviRisposta(r.id, m.id))}
+                  onClick={() =>
+                    esegui(
+                      () => scriviRisposta(r.id, m.id),
+                      'bozze',
+                      `Risposta scritta con ${m.nome}: ora sta in «Bozze»`
+                    )
+                  }
                 >
                   {m.nome} · {prezzo(costo)}
                 </Button>
@@ -559,7 +619,9 @@ function Riquadro({
                 color="green"
                 leftSection={<IconCheck size={14} />}
                 loading={inCorso}
-                onClick={() => esegui(() => segnaPubblicata(r.id))}
+                onClick={() =>
+                  esegui(() => segnaPubblicata(r.id), 'pubblicate', 'Segnata come pubblicata')
+                }
               >
                 L&rsquo;ho incollata nel portale
               </Button>
@@ -568,7 +630,7 @@ function Riquadro({
                 variant="subtle"
                 color="gray"
                 disabled={inCorso}
-                onClick={() => esegui(() => riapri(r.id))}
+                onClick={() => esegui(() => riapri(r.id), 'bozze', 'Rimessa fra le bozze')}
               >
                 Rimetti in bozza
               </Button>
@@ -591,7 +653,7 @@ function Riquadro({
                     if (!s.ok) return s;
                   }
                   return approva(r.id);
-                })
+                }, 'approvate', 'Approvata: ora sta in «Approvate», pronta da copiare')
               }
             >
               Approva
@@ -605,7 +667,7 @@ function Riquadro({
               color="red"
               leftSection={<IconTrash size={14} />}
               disabled={inCorso}
-              onClick={() => esegui(() => scarta(r.id))}
+              onClick={() => esegui(() => scarta(r.id), 'tutte', 'Scartata: non le si rispondera`')}
             >
               Non rispondere
             </Button>
@@ -719,6 +781,11 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
   const [filtro, setFiltro] = useState<Filtro>('bozze');
   const [criteriAperti, setCriteriAperti] = useState(false);
   const [prezziAperti, setPrezziAperti] = useState(false);
+  /* 🔴 L'avviso sta QUI e non nel riquadro: quando un'azione riesce, la
+     riga cambia stato, esce dal filtro e il suo riquadro viene smontato.
+     Un messaggio scritto li' dentro sparirebbe insieme a lui -- che e'
+     esattamente il guasto che questo risolve. */
+  const [avviso, setAvviso] = useState<{ testo: string; vai?: Filtro } | null>(null);
 
   const conti = useMemo(() => {
     const c = { daFare: 0, bozze: 0, approvate: 0, pubblicate: 0, gravi: 0, speso: 0 };
@@ -978,9 +1045,8 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
                       portale p.{dove.get(p.id)!.pagina} · {dove.get(p.id)!.riga}ª
                     </Badge>
                   ) : null}
-                  <Text size="xs">
-                    {p.autore || 'senza nome'} · {p.voto !== null ? `${p.voto}★` : '—'}
-                  </Text>
+                  <Text size="xs">{p.autore || 'senza nome'}</Text>
+                  <Stelle voto={p.voto} />
                   <Text size="xs" c="dimmed" style={{ flex: 1, minWidth: 180 }}>
                     {p.titolo}
                   </Text>
@@ -1000,6 +1066,32 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
         </Card>
       ) : null}
 
+      {avviso ? (
+        <Alert
+          color="teal"
+          variant="light"
+          icon={<IconCheck size={18} />}
+          withCloseButton
+          onClose={() => setAvviso(null)}
+        >
+          <Group gap="sm" wrap="wrap">
+            <Text size="sm">{avviso.testo}</Text>
+            {avviso.vai && avviso.vai !== filtro ? (
+              <Button
+                size="compact-xs"
+                variant="white"
+                onClick={() => {
+                  setFiltro(avviso.vai as Filtro);
+                  setAvviso(null);
+                }}
+              >
+                portami li’
+              </Button>
+            ) : null}
+          </Group>
+        </Alert>
+      ) : null}
+
       {viste.length === 0 ? (
         <Card withBorder radius="md" padding="lg">
           <Text size="sm" c="dimmed">
@@ -1015,6 +1107,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
               apertureRipetute={apertureRipetute}
               costoReale={costoReale}
               dove={dove.get(r.id)}
+              avvisa={(testo, vai) => setAvviso({ testo, vai })}
             />
           ))}
         </Stack>
