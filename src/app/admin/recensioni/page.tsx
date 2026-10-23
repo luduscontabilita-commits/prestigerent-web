@@ -4,6 +4,7 @@ import { soloGestione, supabaseServer } from '@/lib/auth';
 import { Guscio } from '@/components/admin/Guscio';
 import { vociPerRuolo } from '@/lib/menu-admin';
 import { CodaRecensioni, type Riga } from '@/components/admin/CodaRecensioni';
+import { meteoGiorni } from '@/lib/meteo';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -58,18 +59,25 @@ export default async function RecensioniPannello() {
   const io = await soloGestione();
 
   const sb = await supabaseServer();
-  const [{ data, error }, { data: imp }] = await Promise.all([
+  const [{ data, error }, { data: imp }, meteo] = await Promise.all([
     sb
       .from('coda_recensioni')
       .select(
-        'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il,data_recensione,nota'
+        'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il,data_recensione,data_servizio,nota'
       )
       .order('id', { ascending: false }),
     /* l'interruttore della pubblicazione automatica: una riga sola, e se
        per qualunque motivo non si legge si considera SPENTO -- e' il
        verso sicuro dell'errore */
     sb.from('impostazioni_recensioni').select('automatico,max_al_giorno').eq('id', true).maybeSingle(),
+    /* il tempo a Firenze, 92 giorni indietro e 7 avanti: per il calendario
+       e per le righe che conoscono la data del servizio. Se non risponde,
+       mappa vuota e il pannello si disegna lo stesso. */
+    meteoGiorni(92, 7),
   ]);
+  /* una Map non attraversa il confine server/client: si passa come
+     oggetto semplice */
+  const meteoPerGiorno = Object.fromEntries(meteo);
   const impostazioni = {
     automatico: Boolean(imp?.automatico),
     maxAlGiorno: Number(imp?.max_al_giorno ?? 20),
@@ -110,7 +118,7 @@ export default async function RecensioniPannello() {
         </Alert>
       ) : null}
 
-      <CodaRecensioni righe={righe} impostazioni={impostazioni} />
+      <CodaRecensioni righe={righe} impostazioni={impostazioni} meteo={meteoPerGiorno} />
     </Guscio>
   );
 }

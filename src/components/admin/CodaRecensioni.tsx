@@ -43,6 +43,8 @@ import {
 } from '@/lib/risposte';
 import { costoStimato, MODELLI, modelloConsigliato, rispostaLunga } from '@/lib/modello';
 import { linkProdottoViator } from '@/lib/prodotti-viator';
+import { descriviMeteo } from '@/lib/meteo';
+import { CalendarioRecensioni } from './CalendarioRecensioni';
 import {
   approva,
   escieAdesso,
@@ -106,7 +108,14 @@ export type Riga = {
   data_recensione: string | null;
   /** perche' una riga e' in `errore`: lo scrive il giro quando si ferma */
   nota: string | null;
+  /** il giorno in cui il cliente ha FATTO il tour: non e' la data della
+   *  recensione, e i portali non la danno. Vuota finche' non si riempie
+   *  da Regiondo o a mano. E' il giorno di cui conta il meteo. */
+  data_servizio: string | null;
 };
+
+/** Il meteo di un giorno, come arriva dal server (vedi src/lib/meteo.ts). */
+export type MeteoGiorno = { giorno: string; codice: number; max: number; min: number; pioggia: number };
 
 /** Da ISO a quello che vuole un `<input type="datetime-local">`: l'ora
  *  LOCALE di chi guarda, senza fuso. Il pannello lo usa chi sta in
@@ -302,8 +311,11 @@ function Riquadro({
   costoReale,
   dove,
   avvisa,
+  meteoDi,
 }: {
   r: Riga;
+  /** il meteo di un giorno «AAAA-MM-GG», se lo abbiamo */
+  meteoDi: (giorno: string) => MeteoGiorno | undefined;
   apertureRipetute: Set<string>;
   /** la spesa MEDIA gia' misurata per ogni modello, da OpenRouter */
   costoReale: Map<string, number>;
@@ -578,6 +590,28 @@ function Riquadro({
               portale: pagina {dove.pagina}, {dove.riga}ª riga circa
             </Badge>
           ) : null}
+          {/* 🔴 IL METEO DEL GIORNO DEL SERVIZIO, non della recensione.
+              Si mostra solo se la data del servizio e' nota: i portali
+              non la danno, e inventarla dal giorno della recensione
+              sarebbe esattamente l'errore che la proprieta' ha chiesto di
+              non fare («importantissimo»). */}
+          {r.data_servizio ? (
+            <Badge
+              size="xs"
+              variant="light"
+              color="cyan"
+              title="Il giorno in cui il cliente ha fatto il tour, e il tempo che faceva a Firenze"
+            >
+              servizio il {r.data_servizio.split('-').reverse().slice(0, 2).join('/')}
+              {meteoDi(r.data_servizio)
+                ? ` · ${descriviMeteo(meteoDi(r.data_servizio)!.codice).simbolo} ${meteoDi(r.data_servizio)!.max}°`
+                : ''}
+            </Badge>
+          ) : (
+            <Badge size="xs" variant="outline" color="gray" title="I portali non dicono quando e' stato fatto il tour: si riempie da Regiondo o a mano. Finche' manca, non si mostra nessun meteo per questa riga.">
+              data del servizio: sconosciuta
+            </Badge>
+          )}
           <Text size="xs" c="dimmed">
             {r.prodotto || 'prodotto non indicato'}
           </Text>
@@ -1055,9 +1089,12 @@ export type Impostazioni = { automatico: boolean; maxAlGiorno: number };
 export function CodaRecensioni({
   righe,
   impostazioni,
+  meteo,
 }: {
   righe: Riga[];
   impostazioni: Impostazioni;
+  /** «AAAA-MM-GG» -> meteo di Firenze quel giorno */
+  meteo: Record<string, MeteoGiorno>;
 }) {
   const [filtro, setFiltro] = useState<Filtro>('bozze');
   /* le righe scelte a mano per uscire subito: «devo poter decidere se e
@@ -1161,6 +1198,10 @@ export function CodaRecensioni({
 
   return (
     <Stack gap="md">
+      {/* IL CALENDARIO, SOPRA A TUTTO: cosa e' arrivato e cosa e' uscito,
+          giorno per giorno, con le stelle e il tempo che faceva. */}
+      <CalendarioRecensioni righe={righe} meteo={meteo} />
+
       <SimpleGrid cols={{ base: 2, sm: 5 }} spacing="sm">
         <Numero n={conti.daFare} che="senza risposta" colore={conti.daFare ? 'orange.8' : undefined} />
         <Numero n={conti.bozze} che="bozze da leggere" />
@@ -1550,6 +1591,7 @@ export function CodaRecensioni({
               apertureRipetute={apertureRipetute}
               costoReale={costoReale}
               dove={dove.get(r.id)}
+              meteoDi={(g) => meteo[g]}
               avvisa={(testo, vai) => {
                 setAvviso({ testo, vai });
                 setAppenaToccate((p) => new Set(p).add(r.id));
