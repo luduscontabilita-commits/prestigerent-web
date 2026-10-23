@@ -6,6 +6,14 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    /* 🔴 SERVE AGLI SCRIPT DI SERVIZIO, non al sito. Node 24 esegue
+       TypeScript da solo togliendo i tipi, ma NON risolve le estensioni:
+       `scripts/giro-recensioni.ts` deve importare `../src/lib/risposte.ts`
+       con l'estensione scritta, o Node non trova il file. Senza questa
+       voce `tsc` rifiuta quell'estensione (TS5097) e `next build` fallisce
+       -- cioe' un file che non entra nel sito ferma la pubblicazione.
+       E' lecita solo perche' qui `noEmit` e` true. */
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

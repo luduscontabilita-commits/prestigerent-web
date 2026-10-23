@@ -22,9 +22,22 @@
  * dollaro in tutto, zero risposte fermate dai controlli.
  */
 import { readFileSync } from 'node:fs';
-import { chiedi } from './src/lib/modello.ts';
-import { compitoDi, guaiDi, sistemaDi, type Recensione } from './src/lib/risposte.ts';
-import { quandoPubblicarle } from './src/lib/attesa.ts';
+/* 🔴 I PERCORSI SONO RELATIVI A QUESTO FILE, non alla radice, e c'e' una
+   storia dietro: questo script e' nato come `giro.ts` nella radice del
+   progetto e li' importava `./src/lib/...`. Spostato in `scripts/`, quei
+   percorsi puntavano a `scripts/src/lib/...`, che non esiste. Node non se
+   n'e' accorto perche' nessuno l'ha piu' lanciato, ma `next build` fa
+   girare `tsc` su TUTTO il repository, e il 22/10/2026 ha fatto fallire
+   il deploy di produzione con cinque TS2307/TS7006 -- su un file che non
+   finisce nemmeno nel sito. Un file di servizio rotto ferma la
+   pubblicazione come un file del sito.
+
+   Si lancia DALLA RADICE (`node scripts/giro-recensioni.ts dati.json`):
+   gli import li risolve Node rispetto al file, `.env.local` e il JSON
+   rispetto alla cartella da cui si lancia. */
+import { chiedi } from '../src/lib/modello.ts';
+import { compitoDi, guaiDi, sistemaDi, type Recensione } from '../src/lib/risposte.ts';
+import { quandoPubblicarle } from '../src/lib/attesa.ts';
 
 const envTxt = readFileSync('.env.local', 'utf8');
 const env = (k: string) =>
