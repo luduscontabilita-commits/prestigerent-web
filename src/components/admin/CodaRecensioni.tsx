@@ -497,41 +497,29 @@ function Riquadro({ r }: { r: Riga }) {
  */
 function Importatore() {
   const [testo, setTesto] = useState('');
-  const [aperta, setAperta] = useState(false);
   const [esito, setEsito] = useState<{ ok: boolean; testo: string } | null>(null);
   const [inCorso, parti] = useTransition();
 
-  if (!aperta) {
-    return (
-      <Group>
-        <Button
-          size="xs"
-          variant="light"
-          leftSection={<IconDownload size={14} />}
-          onClick={() => setAperta(true)}
-        >
-          Incolla il riepilogo di Viator
-        </Button>
-        {esito ? (
-          <Text size="xs" c={esito.ok ? 'green.7' : 'red.8'}>
-            {esito.testo}
-          </Text>
-        ) : null}
-      </Group>
-    );
-  }
-
+  /* 🔴 SEMPRE APERTO, e non e' una scelta estetica. Era un pulsante da
+     premere per far comparire la casella, e il 23/10/2026 la proprieta'
+     ha chiesto «dov'e' incolla riepilogo da viator?» avendolo davanti
+     agli occhi. E' il PRIMO passo di tutto il giro -- senza, la coda
+     resta vuota e il resto della schermata non serve a niente. Un primo
+     passo che si deve cercare e' un primo passo fatto male. */
   return (
-    <Card withBorder radius="md" padding="md">
+    <Card withBorder radius="md" padding="md" bg="var(--mantine-color-orange-0)">
       <Stack gap="xs">
-        <Text fw={600} size="sm">
-          Il riepilogo giornaliero di Viator
-        </Text>
+        <Group gap={8}>
+          <IconDownload size={18} />
+          <Text fw={700}>Far entrare le recensioni, a mano</Text>
+        </Group>
         <Text size="xs" c="dimmed">
-          Arriva a <b>usa@prestigerent.com</b> verso le 15:16, oggetto «You have N new reviews».
-          Aprila, seleziona tutto, incolla qui: va bene sia il testo sia l&rsquo;HTML. Dentro ci sono
-          anche le recensioni <b>Tripadvisor</b>. Il testo delle recensioni nell&rsquo;email non c&rsquo;e&rsquo;:
-          quello si prende nel portale, una per una.
+          <b>Questa casella e` una riserva, non il modo normale di lavorare.</b> Il riepilogo arriva
+          a <b>usa@prestigerent.com</b> verso le 15:16 («You have N new reviews») e il sito deve
+          leggerlo da solo: finche` quel pezzo non e` acceso, si incolla qui. Aprila, seleziona
+          tutto, incolla: va bene sia il testo sia l&rsquo;HTML. Dentro ci sono anche le recensioni{' '}
+          <b>Tripadvisor</b>. Il testo delle recensioni nell&rsquo;email non c&rsquo;e&rsquo;: quello si
+          prende nel portale, una per una.
         </Text>
         <Textarea
           placeholder="Incolla qui tutta l'email"
@@ -571,9 +559,11 @@ function Importatore() {
           >
             Leggi e metti in coda
           </Button>
-          <Button size="xs" variant="subtle" color="gray" onClick={() => setAperta(false)}>
-            chiudi
-          </Button>
+          {testo ? (
+            <Button size="xs" variant="subtle" color="gray" onClick={() => setTesto('')}>
+              svuota
+            </Button>
+          ) : null}
         </Group>
       </Stack>
     </Card>
