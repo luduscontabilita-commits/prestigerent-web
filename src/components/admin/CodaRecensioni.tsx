@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useRef, useState, useTransition } from 'react';
 import {
   Alert,
   Anchor,
@@ -99,6 +99,20 @@ export type Riga = {
 
 /** Quanti ne mostra una pagina del portale Viator. Contato a mano. */
 const PER_PAGINA = 10;
+
+/** Le emoji che servono davvero per rispondere a una recensione di un
+ *  tour: ringraziamento, vino, campagna, calore. Non un pannello di
+ *  trecento faccine -- otto che si premono senza pensarci. */
+const EMOJI: readonly { c: string; che: string }[] = [
+  { c: '\u{1F64F}', che: 'grazie (mani giunte)' },
+  { c: '\u{1F377}', che: 'vino' },
+  { c: '\u{1F942}', che: 'brindisi' },
+  { c: '\u{1F33F}', che: 'campagna, verde' },
+  { c: '\u{1F31E}', che: 'sole, bella giornata' },
+  { c: '\u{1F60A}', che: 'sorriso' },
+  { c: '❤️', che: 'cuore' },
+  { c: '\u{1F44F}', che: 'applauso, bravo' },
+];
 
 /**
  * Dove sta ogni recensione NELL'ELENCO DEL PORTALE.
@@ -402,6 +416,29 @@ function Riquadro({
     });
   }
 
+  /* L'emoji entra DOVE STA IL CURSORE, non in fondo: se stai correggendo
+     la prima riga e il 🙏 ti finisce dopo la firma, il pulsante e' piu'
+     fastidioso che utile. Se la casella non ha il fuoco, va in coda. */
+  const casella = useRef<HTMLTextAreaElement>(null);
+  function metti(emoji: string) {
+    const el = casella.current;
+    if (!el) {
+      setRisposta((t) => t + emoji);
+      return;
+    }
+    const a = el.selectionStart ?? el.value.length;
+    const b = el.selectionEnd ?? a;
+    const nuovo = el.value.slice(0, a) + emoji + el.value.slice(b);
+    setRisposta(nuovo);
+    /* il cursore si rimette subito dopo l'emoji, se no riparte da capo
+       e si continua a scrivere all'inizio del testo */
+    requestAnimationFrame(() => {
+      el.focus();
+      const p = a + emoji.length;
+      el.setSelectionRange(p, p);
+    });
+  }
+
   async function copia() {
     try {
       await navigator.clipboard.writeText(risposta);
@@ -539,6 +576,7 @@ function Riquadro({
 
         {/* la risposta */}
         <Textarea
+          ref={casella}
           label="La risposta"
           description={
             r.modello
@@ -556,6 +594,31 @@ function Riquadro({
           <Text size="xs" c={risposta.length > 700 ? 'red.8' : 'dimmed'}>
             {risposta.length} caratteri
           </Text>
+        </Group>
+
+        {/* 🔴 LE EMOJI SI PREMONO, NON SI CERCANO. Chiesto dalla
+            proprieta' il 23/10/2026. Aprire il pannello delle emoji di
+            Windows per mettere un 🙏 e' una seccatura che si fa una volta
+            e poi non si fa piu': le risposte restano senza, e quella e'
+            una delle cose che le fa sembrare scritte da un programma.
+            Si inseriscono nel punto dove sta il cursore, non in fondo. */}
+        <Group gap={4} wrap="wrap">
+          <Text size="xs" c="dimmed" mr={4}>
+            una o due, non di piu`:
+          </Text>
+          {EMOJI.map((e) => (
+            <Button
+              key={e.c}
+              size="compact-xs"
+              variant="default"
+              px={7}
+              title={e.che}
+              disabled={!!grave}
+              onClick={() => metti(e.c)}
+            >
+              <span style={{ fontSize: 15, lineHeight: 1 }}>{e.c}</span>
+            </Button>
+          ))}
         </Group>
 
         {messaggio ? (

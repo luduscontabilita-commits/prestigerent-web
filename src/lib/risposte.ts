@@ -57,6 +57,7 @@ export const CRITERI: readonly string[] = [
   'LA COSA CONCRETA CHE HA NOMINATO LUI. Un posto, una persona, un piatto, un momento: è la prova che la recensione è stata letta davvero. Senza questo, qualunque risposta sembra prestampata — perché lo è.',
   'IL SUO NOME, se c’è. Costa niente e cambia tutto.',
   'LA LUNGHEZZA LA DECIDE LA RECENSIONE, NON UN MODELLO FISSO. Se è una CRITICA: lunga e circostanziata, i punti che ha nominato lui uno per uno, ciascuno con qualcosa di concreto — cosa si fa in quel momento del giro, perché si va in quella cantina, com’è fatta quella giornata; da 120 a 250 parole, tre o quattro capoversi. Se è POSITIVA: si risponde come a una persona contenta, e la misura la detta lei — ha scritto due righe? due righe calde; ha raccontato la giornata? tre o quattro capoversi che entrano nel merito di quello che ha raccontato; una o due emoji se il tono le regge, mai di più. E LE RISPOSTE NON DEVONO SOMIGLIARSI FRA LORO: stessa apertura, stessa lunghezza e stessa chiusura su venti risposte in fila sono la firma di un programma.',
+  'UMILTA’: NON CI SI LODA MAI DA SOLI. Il complimento l’ha fatto il cliente, e ripeterlo da parte nostra lo svuota. Vietato dire che le nostre guide sono fantastiche, che il servizio è eccellente, che siamo i migliori, che siamo orgogliosi di qualcosa. Si ringrazia, si gira il merito alla persona che c’era quel giorno, e si parla di quello che è SUCCESSO — non di quanto siamo bravi.',
   'NIENTE FRASI DA UFFICIO STAMPA. «Ci scusiamo per il disagio», «la vostra soddisfazione è la nostra priorità», «grazie per il feedback»: le riconoscono tutti, e dicono che dall’altra parte non c’è nessuno.',
   'NON SI INVENTA NIENTE. Nessun dettaglio che non stia nella recensione o nei fatti noti del servizio. Mai un prezzo, mai un orario, mai il nome di una persona non citata.',
   'NON SI PROMETTE QUELLO CHE NON SI PUÒ DECIDERE. Rimborsi, sconti, omaggi: chi scrive la risposta non li decide, e una promessa pubblica non si ritira.',
@@ -87,6 +88,35 @@ const FRASI_VUOTE: readonly { frase: RegExp; perche: string }[] = [
   { frase: /\bil team di\b|\bthe .{0,20}team\b/i, perche: 'firma impersonale: si firma col nome dell’azienda' },
   { frase: /non vediamo l'ora di (ri)?accoglier/i, perche: 'frase fatta' },
   { frase: /we look forward to welcoming you/i, perche: 'frase fatta' },
+];
+
+/* 🔴 L'AUTOELOGIO, vietato dalla proprieta' il 23/10/2026: «evita
+   assolutamente di autolodarsi, umilta'».
+   Non e' una questione di buon gusto, e' di efficacia: il complimento
+   l'ha gia' fatto il cliente, e ripeterlo da parte dell'azienda lo
+   svuota. «Our guides are fantastic» scritto da noi sotto una recensione
+   che dice «the guide was fantastic» toglie valore proprio a quella
+   frase. E chi legge dopo lo sente subito.
+   Si pesa, non si blocca: una frase puo' sembrare autoelogio e non
+   esserlo, e chi approva deve poter decidere. */
+const AUTOELOGIO: readonly { frase: RegExp; perche: string }[] = [
+  {
+    frase: /\bour\s+(?:\w+\s+){0,2}(amazing|wonderful|fantastic|excellent|exceptional|outstanding|incredible|best|passionate|expert|professional|dedicated)\b/i,
+    perche: 'autoelogio: parla delle nostre cose con un aggettivo di lode',
+  },
+  {
+    frase: /\b(we|our team)\s+(are|is)\s+(the\s+)?(best|proud|passionate|committed|dedicated)\b/i,
+    perche: 'autoelogio: dice quanto siamo bravi',
+  },
+  { frase: /\bwe (take |)pride\b/i, perche: 'autoelogio: «we take pride»' },
+  { frase: /\bcommitment to (excellence|quality)\b/i, perche: 'autoelogio da brochure' },
+  { frase: /\bwe always (strive|aim|try) to\b/i, perche: 'autoelogio: promessa generica su noi stessi' },
+  { frase: /\bsiamo (orgogliosi|fieri|i migliori)\b/i, perche: 'autoelogio: dice quanto siamo bravi' },
+  {
+    frase: /\bl[ae] nostr[ae]\s+(?:\w+\s+){0,2}(fantastic|eccellent|eccezional|migliori|straordinari)/i,
+    perche: 'autoelogio: parla delle nostre cose con un aggettivo di lode',
+  },
+  { frase: /\bil nostro (impegno|obiettivo)\b/i, perche: 'autoelogio da brochure' },
 ];
 
 /* Le promesse che chi scrive la risposta non puo' prendere. Qui non si
@@ -357,6 +387,10 @@ export function guaiDi(risposta: string, rec: Recensione): Guaio[] {
   }
 
   for (const f of FRASI_VUOTE) {
+    if (f.frase.test(t)) g.push({ gravita: 'pesa', perche: f.perche });
+  }
+
+  for (const f of AUTOELOGIO) {
     if (f.frase.test(t)) g.push({ gravita: 'pesa', perche: f.perche });
   }
 
