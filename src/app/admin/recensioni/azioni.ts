@@ -85,30 +85,85 @@ export async function importaRiepilogo(html: string): Promise<EsitoImporto> {
   }
 
   const sb = await supabaseServer();
-  const { data, error } = await sb
+
+  /* 🔴 NON SI PUO' USARE L'INDICE UNICO PER RICONOSCERE I DOPPIONI, e
+     costa caro scoprirlo tardi. L'indice e'
+     `(portale, prodotto, titolo, autore)`, ma NELL'EMAIL L'AUTORE NON
+     C'E': le righe che arrivano di qui hanno `autore = ''`, quelle lette
+     dal portale hanno `Kristin_D`. Per il database sono due recensioni
+     diverse, quindi `upsert` le inseriva ENTRAMBE.
+     Misurato il 23/10/2026 usando il pannello dal browser: importando il
+     riepilogo del giorno, 3 recensioni su 4 sono finite in coda due
+     volte -- una con la bozza gia' scritta e una vuota. Ogni giorno
+     avrebbe raddoppiato la coda, e la seconda copia sarebbe sembrata
+     lavoro ancora da fare.
+
+     Quindi il confronto si fa QUI, su `portale + prodotto + titolo`, che
+     e' tutto quello che l'email garantisce. Se la riga c'e' gia' non si
+     tocca il suo contenuto -- si aggiunge solo il link per rispondere,
+     che e' l'unica cosa che l'email sa e il portale no. */
+  const { data: gia, error: errLettura } = await sb
     .from('coda_recensioni')
-    .upsert(
-      voci.map((v) => ({
-        fonte: v.fonte,
-        portale: v.portale,
-        /* le tre colonne dell'indice unico sono NOT NULL con predefinito
-           vuoto: un null qui farebbe fallire l'inserimento, e l'autore
-           nel riepilogo non c'e' affatto */
-        prodotto: v.prodotto ?? '',
-        titolo: v.titolo,
-        autore: '',
-        voto: v.voto,
-        link_risposta: v.link_risposta,
-        id_esterno: v.id_esterno,
-        stato: 'nuova',
-      })),
-      { onConflict: 'portale,prodotto,titolo,autore', ignoreDuplicates: true }
-    )
-    .select('id');
-  if (error) return { ok: false, errore: error.message };
+    .select('id,portale,prodotto,titolo,link_risposta')
+    .in(
+      'titolo',
+      voci.map((v) => v.titolo)
+    );
+  if (errLettura) return { ok: false, errore: errLettura.message };
+
+  const chiave = (p: string, pr: string | null, t: string) => `${p}\u0000${pr ?? ''}\u0000${t}`;
+  const mappa = new Map(
+    (gia ?? []).map((r) => [
+      chiave(r.portale as string, r.prodotto as string, r.titolo as string),
+      r,
+    ])
+  );
+
+  const daInserire = [];
+  const daCompletare: { id: number; link: string }[] = [];
+  for (const v of voci) {
+    const trovata = mappa.get(chiave(v.portale, v.prodotto, v.titolo));
+    if (trovata) {
+      /* c'era gia': si aggiunge il link solo se manca, e nient'altro */
+      if (!trovata.link_risposta && v.link_risposta) {
+        daCompletare.push({ id: trovata.id as number, link: v.link_risposta });
+      }
+      continue;
+    }
+    daInserire.push({
+      fonte: v.fonte,
+      portale: v.portale,
+      /* le tre colonne dell'indice unico sono NOT NULL con predefinito
+         vuoto: un null qui farebbe fallire l'inserimento */
+      prodotto: v.prodotto ?? '',
+      titolo: v.titolo,
+      autore: '',
+      voto: v.voto,
+      link_risposta: v.link_risposta,
+      id_esterno: v.id_esterno,
+      stato: 'nuova',
+    });
+  }
+
+  let nuove = 0;
+  if (daInserire.length) {
+    const { data, error } = await sb
+      .from('coda_recensioni')
+      .upsert(daInserire, {
+        onConflict: 'portale,prodotto,titolo,autore',
+        ignoreDuplicates: true,
+      })
+      .select('id');
+    if (error) return { ok: false, errore: error.message };
+    nuove = (data ?? []).length;
+  }
+
+  for (const c of daCompletare) {
+    await sb.from('coda_recensioni').update({ link_risposta: c.link }).eq('id', c.id);
+  }
 
   revalidatePath('/admin/recensioni/');
-  return { ok: true, trovate: voci.length, nuove: (data ?? []).length };
+  return { ok: true, trovate: voci.length, nuove };
 }
 
 /** Le colonne che servono per far scrivere una risposta. */
