@@ -90,7 +90,37 @@ export type Riga = {
   link_risposta: string | null;
   pubblicare_il: string | null;
   pubblicata_il: string | null;
+  /** la data che mostra il portale: e' l'unico modo di ritrovare una
+   *  recensione, perche' Viator non ha un indirizzo per la singola */
+  data_recensione: string | null;
 };
+
+/** Quanti ne mostra una pagina del portale Viator. Contato a mano. */
+const PER_PAGINA = 10;
+
+/**
+ * Dove sta ogni recensione NELL'ELENCO DEL PORTALE.
+ *
+ * 🔴 Serve perche' Viator non ha un indirizzo per la singola recensione:
+ * per ritrovarne una bisogna scorrere cinque pagine da dieci. Ma
+ * quell'elenco e' ordinato per data, dalla piu' recente — quindi la
+ * posizione in quell'ordine E' l'indirizzo. «Pagina 3, nona riga» si
+ * trova in dieci secondi.
+ *
+ * A parita' di data l'ordine del portale non e' garantito, quindi la
+ * riga puo' ballare di una o due posizioni: si dice «circa», non si
+ * finge una precisione che non c'e'.
+ */
+function posizioniNelPortale(righe: Riga[]): Map<number, { pagina: number; riga: number }> {
+  const ordinate = righe
+    .filter((r) => r.data_recensione)
+    .sort((a, b) => (b.data_recensione ?? '').localeCompare(a.data_recensione ?? ''));
+  const m = new Map<number, { pagina: number; riga: number }>();
+  ordinate.forEach((r, i) => {
+    m.set(r.id, { pagina: Math.floor(i / PER_PAGINA) + 1, riga: (i % PER_PAGINA) + 1 });
+  });
+  return m;
+}
 
 const COLORE_FONTE: Record<string, string> = {
   viator: 'teal',
@@ -192,11 +222,14 @@ function Riquadro({
   r,
   apertureRipetute,
   costoReale,
+  dove,
 }: {
   r: Riga;
   apertureRipetute: Set<string>;
   /** la spesa MEDIA gia' misurata per ogni modello, da OpenRouter */
   costoReale: Map<string, number>;
+  /** dove sta nell'elenco del portale: e' l'unico «indirizzo» che esiste */
+  dove?: { pagina: number; riga: number };
 }) {
   const [testoRec, setTestoRec] = useState(r.testo ?? '');
   const [risposta, setRisposta] = useState(r.corretto ?? r.risposta ?? '');
@@ -323,9 +356,21 @@ function Riquadro({
           </Text>
         </Group>
 
-        <Text size="xs" c="dimmed">
-          {r.prodotto || 'prodotto non indicato'}
-        </Text>
+        <Group gap={8} wrap="wrap">
+          {r.data_recensione ? (
+            <Badge size="xs" variant="outline" color="gray">
+              {r.data_recensione.split('-').reverse().slice(0, 2).join('/')}
+            </Badge>
+          ) : null}
+          {dove ? (
+            <Badge size="xs" variant="light" color="indigo" title="Viator non ha un indirizzo per la singola recensione: l'elenco e' ordinato per data, quindi la posizione e' l'unico modo di dire dove sta. A parita' di data puo' ballare di una riga.">
+              portale: pagina {dove.pagina}, {dove.riga}ª riga circa
+            </Badge>
+          ) : null}
+          <Text size="xs" c="dimmed">
+            {r.prodotto || 'prodotto non indicato'}
+          </Text>
+        </Group>
         {r.titolo ? <Text fw={600}>«{r.titolo}»</Text> : null}
 
         {/* il testo della recensione: se manca, si incolla */}
@@ -716,6 +761,11 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
     return new Map([...somme].map(([id, s]) => [id, s.tot / s.n]));
   }, [righe]);
 
+  /* dove sta ognuna nell'elenco del portale: calcolato su TUTTE le righe,
+     non su quelle filtrate, perche' il portale non conosce i nostri
+     filtri */
+  const dove = useMemo(() => posizioniNelPortale(righe), [righe]);
+
   const viste = useMemo(() => {
     let lista = righe;
     if (filtro === 'gravi') lista = righe.filter((r) => !!graveDi(r.testo));
@@ -923,6 +973,11 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
                   <Text size="xs" fw={600}>
                     {quando(p.pubblicata_il)}
                   </Text>
+                  {dove.get(p.id) ? (
+                    <Badge size="xs" variant="light" color="indigo">
+                      portale p.{dove.get(p.id)!.pagina} · {dove.get(p.id)!.riga}ª
+                    </Badge>
+                  ) : null}
                   <Text size="xs">
                     {p.autore || 'senza nome'} · {p.voto !== null ? `${p.voto}★` : '—'}
                   </Text>
@@ -959,6 +1014,7 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
               r={r}
               apertureRipetute={apertureRipetute}
               costoReale={costoReale}
+              dove={dove.get(r.id)}
             />
           ))}
         </Stack>

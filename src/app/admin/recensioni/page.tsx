@@ -61,7 +61,7 @@ export default async function RecensioniPannello() {
   const { data, error } = await sb
     .from('coda_recensioni')
     .select(
-      'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il'
+      'id,fonte,portale,prodotto,titolo,autore,voto,lingua,testo,risposta,corretto,stato,modello,costo,link_risposta,pubblicare_il,pubblicata_il,data_recensione'
     )
     .order('id', { ascending: false });
 
