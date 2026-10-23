@@ -24,6 +24,7 @@ import {
   IconPhoto,
   IconReceiptEuro,
   IconSearch,
+  IconStar,
   IconUserShield,
   IconUsers,
 } from '@tabler/icons-react';
@@ -60,6 +61,7 @@ const ICONE = {
   foto: IconPhoto,
   seo: IconSearch,
   numeri: IconChartBar,
+  recensioni: IconStar,
   utenti: IconUsers,
   listino: IconReceiptEuro,
   flotta: IconBus,

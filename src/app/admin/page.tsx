@@ -8,6 +8,7 @@ import {
   IconPhoto,
   IconReceiptEuro,
   IconSearch,
+  IconStar,
   IconUserShield,
   IconUsers,
 } from '@tabler/icons-react';
@@ -68,6 +69,14 @@ export default async function Pannello() {
             'Recensioni, prenotazioni e disponibilità. Si riaggiornano con un pulsante e dicono quanti anni hanno.',
           icona: IconChartBar,
           colore: 'teal',
+        },
+        {
+          href: '/admin/recensioni/',
+          titolo: 'Recensioni dai portali',
+          testo:
+            'Le recensioni di Viator e Tripadvisor con la bozza di risposta e i controlli. Si approva qui, si pubblica incollando nel portale: nessuno dei due ha un’API per scrivere.',
+          icona: IconStar,
+          colore: 'red',
         },
         {
           href: '/admin/partners/listino/',

@@ -30,7 +30,17 @@ export type VoceMenu = {
   /** il nome dell'icona, non l'icona: una funzione non attraversa il
    *  confine fra server e client. La traduzione in componente avviene
    *  dentro il guscio, che e' gia' nel browser. */
-  icona: 'gallery' | 'foto' | 'seo' | 'numeri' | 'utenti' | 'listino' | 'flotta' | 'accessi' | 'benvenuto';
+  icona:
+    | 'gallery'
+    | 'foto'
+    | 'seo'
+    | 'numeri'
+    | 'recensioni'
+    | 'utenti'
+    | 'listino'
+    | 'flotta'
+    | 'accessi'
+    | 'benvenuto';
   /** Le pagine dentro questa sezione, mostrate quando la sezione e'
    *  aperta. SOLO I TITOLI: la spiegazione di ognuna sta gia' sulla
    *  pagina della sezione, e ripeterla in una barra laterale larga 260px
@@ -74,6 +84,11 @@ export function vociPerRuolo(ruolo: string): VoceMenu[] {
     { href: '/admin/foto/', testo: 'Foto dei tour', icona: 'foto' },
     { href: '/admin/seo/', testo: 'Title e description', icona: 'seo' },
     { href: '/admin/numeri/', testo: 'Numeri da Regiondo', icona: 'numeri' },
+    /* Le recensioni dei PORTALI (Viator, Tripadvisor), non quelle che il
+       sito mostra: quelle stanno in `recensioni` e arrivano da Regiondo.
+       Qui si risponde, e si pubblica incollando nel portale -- nessuno
+       dei portali ha un'API di scrittura. */
+    { href: '/admin/recensioni/', testo: 'Recensioni dai portali', icona: 'recensioni' },
     {
       href: '/admin/partners/listino/',
       testo: 'Listino prezzi',
