@@ -105,7 +105,7 @@ export async function importaRiepilogo(html: string): Promise<EsitoImporto> {
      che e' l'unica cosa che l'email sa e il portale no. */
   const { data: gia, error: errLettura } = await sb
     .from('coda_recensioni')
-    .select('id,portale,prodotto,titolo,link_risposta')
+    .select('id,portale,prodotto,titolo,link_risposta,voto')
     .in(
       'titolo',
       voci.map((v) => v.titolo)
@@ -121,14 +121,22 @@ export async function importaRiepilogo(html: string): Promise<EsitoImporto> {
   );
 
   const daInserire = [];
-  const daCompletare: { id: number; link: string }[] = [];
+  const daCompletare: { id: number; campi: Record<string, unknown> }[] = [];
   for (const v of voci) {
     const trovata = mappa.get(chiave(v.portale, v.prodotto, v.titolo));
     if (trovata) {
-      /* c'era gia': si aggiunge il link solo se manca, e nient'altro */
-      if (!trovata.link_risposta && v.link_risposta) {
-        daCompletare.push({ id: trovata.id as number, link: v.link_risposta });
-      }
+      /* 🔴 SI COMPLETA, NON SI SALTA. La prima versione saltava e basta,
+         e il 23/10/2026 e' costato una riga rimasta vuota in pannello:
+         la recensione era entrata dall'email (che il testo non ce
+         l'ha), e quando e' arrivata la stessa riga dal portale -- col
+         testo -- e' stata scartata come doppione. Risultato: tenuta
+         quella vuota, buttata quella piena.
+         Regola: di una riga che c'e' gia' non si tocca NIENTE di quello
+         che ha, ma si riempie quello che le MANCA. */
+      const campi: Record<string, unknown> = {};
+      if (!trovata.link_risposta && v.link_risposta) campi.link_risposta = v.link_risposta;
+      if (trovata.voto === null && v.voto !== null) campi.voto = v.voto;
+      if (Object.keys(campi).length) daCompletare.push({ id: trovata.id as number, campi });
       continue;
     }
     daInserire.push({
@@ -160,7 +168,7 @@ export async function importaRiepilogo(html: string): Promise<EsitoImporto> {
   }
 
   for (const c of daCompletare) {
-    await sb.from('coda_recensioni').update({ link_risposta: c.link }).eq('id', c.id);
+    await sb.from('coda_recensioni').update(c.campi).eq('id', c.id);
   }
 
   revalidatePath('/admin/recensioni/');
