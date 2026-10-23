@@ -347,13 +347,33 @@ const LINGUE: Record<string, string> = {
   pl: 'polacco', sv: 'svedese', da: 'danese', no: 'norvegese', fi: 'finlandese',
 };
 
-export function sistemaDi(azienda: string): string {
+/* 🔴 COME SI FIRMA, DECISO DALLA PROPRIETA' IL 23/10/2026.
+ *
+ * Firma col nome di una persona, non con quello dell'azienda: chi legge
+ * vede qualcuno che risponde invece di un ufficio. Il nome e' quello del
+ * titolare, e la scelta e' sua -- non si cambia da qui.
+ *
+ * ⚠️ Su Viator la firma NON basta: il portale mette sopra la risposta il
+ * nome dell'ACCOUNT (oggi `PR_Guest_Relations`) e il ruolo scelto nel
+ * modulo. Finche' quel nome resta cosi', sulla stessa risposta si leggono
+ * due nomi diversi. Va cambiato nelle impostazioni Viator. */
+export const FIRMA = 'Saverio';
+
+export function sistemaDi(azienda: string, firma: string = FIRMA): string {
   return [
     `Scrivi le risposte pubbliche alle recensioni di ${azienda}, operatore di tour ed escursioni in Toscana.`,
     'Scrivi come il titolare che ha accompagnato quelle persone, non come un ufficio.',
     '',
     'I criteri, tutti obbligatori:',
     ...CRITERI.map((c, i) => `${i + 1}. ${c}`),
+    '',
+    `Chiudi SEMPRE con la firma su una riga a se': ${firma}. Non firmare col nome dell'azienda.`,
+    /* 🔴 L'APERTURA E' LA COSA CHE SI RIPETE DI PIU'. Misurato il
+       22/10/2026: «I'm so glad» apriva 7 risposte su 10, e il 23/10 anche
+       Haiku ha fatto lo stesso. Una pagina di prodotto le mostra in fila:
+       venti risposte che cominciano uguale dicono a chiunque guardi che
+       dall'altra parte c'e' un programma. */
+    'VIETATO aprire con «I’m so glad», «We’re so glad», «Thank you for your kind words» o qualunque altra formula che potrebbe aprire una risposta qualsiasi. Comincia da QUELLO CHE HA SCRITTO LUI: un nome, un luogo, un dettaglio.',
     '',
     'Rispondi SOLO col testo della risposta: niente virgolette intorno, niente spiegazioni, niente titolo, niente oggetto.',
   ].join('\n');

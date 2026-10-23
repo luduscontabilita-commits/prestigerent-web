@@ -166,7 +166,30 @@ function Avvisi({ guai }: { guai: Guaio[] }) {
   );
 }
 
-function Riquadro({ r }: { r: Riga }) {
+/** Le prime parole di una risposta, normalizzate: e' con queste che si
+ *  riconosce la formula ripetuta. Sei parole bastano -- «I'm so glad you
+ *  enjoyed the small group» e «I'm so glad you enjoyed the wine» sono la
+ *  stessa apertura per chi legge. */
+function aperturaDi(testo: string): string {
+  return (testo || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\s']/gu, ' ')
+    .split(/\s+/)
+    .slice(0, 6)
+    .join(' ');
+}
+
+function Riquadro({
+  r,
+  apertureRipetute,
+  costoReale,
+}: {
+  r: Riga;
+  apertureRipetute: Set<string>;
+  /** la spesa MEDIA gia' misurata per ogni modello, da OpenRouter */
+  costoReale: Map<string, number>;
+}) {
   const [testoRec, setTestoRec] = useState(r.testo ?? '');
   const [risposta, setRisposta] = useState(r.corretto ?? r.risposta ?? '');
   const [messaggio, setMessaggio] = useState<string | null>(null);
@@ -190,8 +213,23 @@ function Riquadro({ r }: { r: Riga }) {
       tour_slug: r.prodotto,
       data: null,
     };
-    return guaiDi(risposta, rec);
-  }, [risposta, testoRec, r]);
+    const trovati = guaiDi(risposta, rec);
+    /* 🔴 IL CONTROLLO CHE `guaiDi` NON PUO' FARE, e che serviva piu' di
+       tutti: guarda le ALTRE risposte. `guaiDi` vede una risposta alla
+       volta, quindi non si accorge che venti cominciano uguale -- e
+       l'apertura e' la cosa che si ripete di piu' (7 su 10 il 22/10,
+       e anche Haiku il 23/10). Qui il browser ha tutta la coda in mano,
+       quindi il confronto si fa qui, dove e' l'unico posto in cui si
+       puo' fare. */
+    const ap = aperturaDi(risposta);
+    if (ap && apertureRipetute.has(ap)) {
+      trovati.push({
+        gravita: 'pesa',
+        perche: `altre risposte in coda cominciano uguale («${ap}…»): in fila sulla pagina del prodotto si vede`,
+      });
+    }
+    return trovati;
+  }, [risposta, testoRec, r, apertureRipetute]);
 
   const cambiata = risposta.trim() !== (r.corretto ?? r.risposta ?? '').trim();
   const testoCambiato = testoRec.trim() !== (r.testo ?? '').trim();
@@ -337,7 +375,13 @@ function Riquadro({ r }: { r: Riga }) {
           </Group>
           <Group gap="xs" wrap="wrap">
             {MODELLI.map((m) => {
-              const costo = costoStimato(m.id, lunga ? 'lunga' : 'corta');
+              /* 🔴 IL PREZZO MISURATO BATTE QUELLO STIMATO. La stima dai
+                 token diceva 0,021 ¢ per Haiku; la prima chiamata vera ne
+                 e' costati 0,034 -- il 60% in piu'. La stima serve solo
+                 finche' un modello non e' mai stato usato: appena c'e'
+                 una spesa vera in coda, si mostra quella. */
+              const misurato = costoReale.get(m.id);
+              const costo = misurato ?? costoStimato(m.id, lunga ? 'lunga' : 'corta');
               const consigliato = m.id === idConsigliato;
               return (
                 <Button
@@ -347,7 +391,7 @@ function Riquadro({ r }: { r: Riga }) {
                   leftSection={consigliato ? <IconSparkles size={14} /> : undefined}
                   loading={inCorso}
                   disabled={!r.testo}
-                  title={`${m.cose}\n\n${m.quando}`}
+                  title={`${m.cose}\n\n${m.quando}\n\n${misurato ? 'Prezzo MISURATO sulle risposte gia’ scritte con questo modello.' : 'Prezzo stimato: questo modello non e’ ancora stato usato.'}`}
                   onClick={() => esegui(() => scriviRisposta(r.id, m.id))}
                 >
                   {m.nome} · {prezzo(costo)}
@@ -589,6 +633,34 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
     return c;
   }, [righe]);
 
+  /* Le aperture che compaiono in piu' di una risposta. Si calcolano qui
+     perche' qui c'e' tutta la coda: il singolo riquadro vede solo se
+     stesso, ed e' il motivo per cui «I'm so glad» su 7 risposte su 10 non
+     l'aveva segnalato nessun controllo. */
+  const apertureRipetute = useMemo(() => {
+    const conta = new Map<string, number>();
+    for (const r of righe) {
+      const a = aperturaDi(r.corretto ?? r.risposta ?? '');
+      if (a) conta.set(a, (conta.get(a) ?? 0) + 1);
+    }
+    return new Set([...conta].filter(([, n]) => n > 1).map(([a]) => a));
+  }, [righe]);
+
+  /** La spesa media gia' sostenuta per ogni modello, dai dati veri di
+   *  OpenRouter salvati in coda. Batte qualunque stima. */
+  const costoReale = useMemo(() => {
+    const somme = new Map<string, { tot: number; n: number }>();
+    for (const r of righe) {
+      const c = Number(r.costo ?? 0);
+      if (!r.modello || !c) continue;
+      const s = somme.get(r.modello) ?? { tot: 0, n: 0 };
+      s.tot += c;
+      s.n += 1;
+      somme.set(r.modello, s);
+    }
+    return new Map([...somme].map(([id, s]) => [id, s.tot / s.n]));
+  }, [righe]);
+
   const viste = useMemo(() => {
     if (filtro === 'tutte') return righe;
     if (filtro === 'da-fare') return righe.filter((r) => r.stato === 'nuova' || r.stato === 'letta');
@@ -733,7 +805,12 @@ export function CodaRecensioni({ righe }: { righe: Riga[] }) {
       ) : (
         <Stack gap="md">
           {viste.map((r) => (
-            <Riquadro key={r.id} r={r} />
+            <Riquadro
+              key={r.id}
+              r={r}
+              apertureRipetute={apertureRipetute}
+              costoReale={costoReale}
+            />
           ))}
         </Stack>
       )}
