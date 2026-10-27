@@ -22,6 +22,21 @@
 export type Opzione = { id: string; nome: string; prezzo: number };
 export type Variante = { id: string; titolo: string; opzioni: Opzione[] };
 
+/** Il prezzo come lo scrive l'API ufficiale di Regiondo, in numero.
+ *
+ *  🔴 L'API scrive le migliaia con la VIRGOLA: «1,040.00». Con un
+ *  `Number()` nudo diventa NaN, e il 27/10/2026 il listino ha perso tutte
+ *  le opzioni da mille euro in su -- le colonne 6, 7, 8 persone e intere
+ *  varianti «Driver + Guide» -- e la sincronizzazione segnava «tab PRICES
+ *  non abbinabile» su 69 servizi. Il punto e' sempre il separatore dei
+ *  decimali (formato inglese), la virgola sempre quello delle migliaia. */
+export function prezzoRegiondo(v: unknown): number {
+  if (typeof v === 'number') return v;
+  if (typeof v !== 'string') return NaN;
+  const pulito = v.trim().replace(/[\s,]/g, '');
+  return pulito ? Number(pulito) : NaN;
+}
+
 export type ChiaveSezione = 'cruise' | 'transfers' | 'small' | 'wine' | 'private' | 'other';
 
 export type Servizio = {

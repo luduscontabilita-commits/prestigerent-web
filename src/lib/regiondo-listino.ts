@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { testo } from './prosa';
 import { unitaDi } from './prezzi';
-import { sezioneDi, type Servizio, type Variante } from './listino';
+import { prezzoRegiondo, sezioneDi, type Servizio, type Variante } from './listino';
 import { unstable_cache } from 'next/cache';
 import { chiama, regiondoConfigurato } from './regiondo-api';
 
@@ -126,7 +126,7 @@ async function opzioniUfficiali(sku: string, fresco: boolean): Promise<Variante[
       const o = await chiama<{ data?: Record<string, OpzioneUfficiale> }>(`products/availoptions/${x.id}`, {}, memoria);
       const opzioni = Object.values(o?.data ?? {})
         .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
-        .map((op) => ({ id: String(op.option_id ?? ''), nome: testo(op.name ?? ''), prezzo: Number(op.original_price) }))
+        .map((op) => ({ id: String(op.option_id ?? ''), nome: testo(op.name ?? ''), prezzo: prezzoRegiondo(op.original_price) }))
         .filter((op) => op.nome && Number.isFinite(op.prezzo) && op.prezzo > 0);
       return { id: String(x.id), titolo: testo(x.name ?? ''), opzioni };
     })
@@ -156,7 +156,9 @@ const opzioniInMemoria = unstable_cache(
     if (!r) throw new Error(`Regiondo: nessuna opzione per ${sku}`);
     return r;
   },
-  ['regiondo-opzioni-v1'],
+  /* v2: la v1 aveva in memoria i listini senza le opzioni da mille euro
+     in su (vedi `prezzoRegiondo`); cambiando chiave si buttano subito */
+  ['regiondo-opzioni-v2'],
   { revalidate: DURATA, tags: ['regiondo-listino'] }
 );
 
@@ -176,7 +178,7 @@ async function opzioniDalWidget(sku: string, fresco: boolean): Promise<Variante[
       id: String(v.variation_id ?? ''),
       titolo: testo(v.title ?? ''),
       opzioni: (v.options ?? [])
-        .map((o) => ({ id: String(o.option_id ?? ''), nome: testo(o.name ?? ''), prezzo: Number(o.original_price) }))
+        .map((o) => ({ id: String(o.option_id ?? ''), nome: testo(o.name ?? ''), prezzo: prezzoRegiondo(o.original_price) }))
         .filter((o) => o.nome && Number.isFinite(o.prezzo) && o.prezzo > 0),
     }));
   } catch {

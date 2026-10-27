@@ -1,11 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import { raggruppa, righeDelServizio, sezioneDi, type Servizio, type Variante } from './listino';
+import { prezzoRegiondo, raggruppa, righeDelServizio, sezioneDi, type Servizio, type Variante } from './listino';
 import { FLOTTA, impiegoDi } from './flotta';
 
 /* Come si ordina il listino e quale mezzo fa quale servizio. Un errore qui
  * non rompe niente di visibile subito: mette un tour nella sezione
  * sbagliata, o fa dire alla pagina della flotta che il minibus fa i
  * transfer privati. */
+
+describe('prezzoRegiondo', () => {
+  it("legge le migliaia con la virgola come le scrive l'API ufficiale", () => {
+    expect(prezzoRegiondo('1,040.00')).toBe(1040);
+    expect(prezzoRegiondo('2,300.00')).toBe(2300);
+    expect(prezzoRegiondo('89.00')).toBe(89);
+    expect(prezzoRegiondo(' 950.00 ')).toBe(950);
+    expect(prezzoRegiondo(120)).toBe(120);
+  });
+  it("quello che non e' un prezzo resta NaN, e il listino lo scarta", () => {
+    expect(prezzoRegiondo('')).toBeNaN();
+    expect(prezzoRegiondo(null)).toBeNaN();
+    expect(prezzoRegiondo('su richiesta')).toBeNaN();
+  });
+});
 
 describe('sezioneDi', () => {
   it('un tour dal porto va sotto il suo porto, anche se e’ anche un privato', () => {
