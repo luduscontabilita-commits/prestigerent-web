@@ -16,7 +16,12 @@
 
 import { primaSezione, testo as inChiaro } from './prosa';
 
-export type Prezzo = { valore: number; fonte: 'regiondo' | 'wordpress' };
+export type Prezzo = {
+  valore: number;
+  fonte: 'regiondo' | 'wordpress';
+  /** true = e' IL prezzo (l'Adult), non un «a partire da»: niente «from» */
+  esatto?: boolean;
+};
 
 const IMPORTO = /(?:Euro|EUR|€)\s*([0-9][0-9.,]*)/gi;
 
@@ -94,6 +99,28 @@ export function unitaDaSchedaPrezzi(tabs?: Record<string, string>): Unita | null
  *  moltiplica la cifra invece di dividerla. */
 export function unitaDi(tabs: Record<string, string> | undefined, kind: string): Unita {
   return unitaDaSchedaPrezzi(tabs) ?? (kind === 'small_group' ? 'per person' : 'per party');
+}
+
+/* ── IL PREZZO ADULT DEI TOUR A PERSONA (proprieta', 27/10/2026) ──────────
+ *
+ * Sui tre small group (Wine Experience, Wine & Food, Siena e San
+ * Gimignano) il «from €» era il prezzo PIU' BASSO fra le opzioni, cioe'
+ * quello dei ragazzi: «from €79» per un tour che un adulto paga 89. La
+ * proprieta' vuole il prezzo Adult, scritto come prezzo e non come «da».
+ *
+ * La regola non nomina i tour: vale per ogni prodotto che su Regiondo ha
+ * opzioni che si chiamano «Adult». Se ce ne sono piu' d'una (la Wine
+ * Experience ha l'Adult a 89 nel gruppo e a 129 nel semi privato) vale la
+ * piu' bassa: e' il prezzo del tour base. Senza opzioni «Adult» torna
+ * null e la pagina resta col «from» di sempre. */
+export function prezzoAdulti(
+  varianti: { opzioni: { nome: string; prezzo: number }[] }[] | null | undefined
+): number | null {
+  const adulti = (varianti ?? [])
+    .flatMap((v) => v.opzioni)
+    .filter((o) => /^\s*adults?\b/i.test(o.nome) && Number.isFinite(o.prezzo) && o.prezzo > 0)
+    .map((o) => o.prezzo);
+  return adulti.length ? Math.min(...adulti) : null;
 }
 
 export function prezzoDi(

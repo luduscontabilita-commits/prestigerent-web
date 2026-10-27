@@ -26,7 +26,8 @@ import { fotoVere, fotoAttinente, provaDi } from '@/lib/galleria';
 import { badgeIncluso } from '@/lib/inclusi';
 import { breadcrumb, grafo, hreflangDi, organization, product as prodottoJsonLd, touristTrip, SITE as SITE_URL } from '@/lib/schema';
 import { ogDiPagina } from '@/lib/og';
-import { prezzoDi, unitaDi } from '@/lib/prezzi';
+import { prezzoAdulti, prezzoDi, unitaDi, type Prezzo } from '@/lib/prezzi';
+import { opzioniDi } from '@/lib/regiondo-listino';
 import { metaDi } from '@/lib/seo';
 import { prenotazioniDi, disponibilitaDi, riprova } from '@/lib/riprova';
 import { Urgenza } from '@/components/Urgenza';
@@ -195,7 +196,7 @@ export default async function TourPage({
   /* Regiondo e le recensioni si leggono INSIEME, non una dopo l'altra:
      sono due richieste indipendenti e in fila costerebbero il doppio del
      tempo su ogni pagina. */
-  const [product, fiducia, leRecensioni] = await Promise.all([
+  const [product, fiducia, leRecensioni, opzioni] = await Promise.all([
     tour.regiondo_sku
       ? fetchProduct(tour.regiondo_sku, regiondoLocale(locale))
       : Promise.resolve(null),
@@ -212,6 +213,11 @@ export default async function TourPage({
        e nulla garantirebbe che i due risultati coincidano. */
     riprova(),
     recensioniDi(slug),
+    /* Le opzioni dall'API ufficiale di Regiondo, solo per i tour a persona:
+       servono al prezzo Adult (vedi `prezzoAdulti` in src/lib/prezzi.ts).
+       Gli altri tour hanno opzioni «1 person … 8 people» e restano col
+       «from»: chiederle anche per loro sarebbero chiamate inutili. */
+    tour.regiondo_sku && tour.kind === 'small_group' ? opzioniDi(tour.regiondo_sku) : Promise.resolve(null),
   ]);
   /* Dipende dalle fonti d'azienda, quindi non puo' stare nel Promise.all
      sopra. Le prende da `fiducia`: nessuna query in piu'. */
@@ -305,7 +311,9 @@ export default async function TourPage({
     usp.push({ icona: '👥', testo: 'Never more than 25 guests' });
   }
 
-  const prezzo = prezzoDi(product?.price, schede);
+  const adulti = prezzoAdulti(opzioni);
+  const prezzo: Prezzo | null =
+    adulti != null ? { valore: adulti, fonte: 'regiondo', esatto: true } : prezzoDi(product?.price, schede);
 
   /* I fatti si calcolano una volta sola: servono alla barra qui sotto e
      alla riga del prezzo, che da sola non diceva DA DOVE si parte. */
@@ -546,7 +554,9 @@ export default async function TourPage({
 
         {prezzo != null && (
           <p className="hero-dep">
-            <b>from &euro;{prezzo.valore.toFixed(0)}</b>
+            {/* «from» solo quando e' davvero un «a partire da»: sui tour a
+                persona e' il prezzo Adult, e si scrive e basta. */}
+            <b>{prezzo.esatto ? '' : 'from '}&euro;{prezzo.valore.toFixed(0)}</b>
             {/* Dollari e sterline accanto, con il "circa": si incassa in
                 euro e la conversione vera la fa la carta del cliente. */}
             {affiancato(prezzo.valore, cambio) && (
@@ -950,6 +960,7 @@ export default async function TourPage({
         prezzo={prezzo?.valore ?? null}
         unita={unitaDi(tutteLeSchede, tour.kind)}
         cambio={cambio}
+        da={!prezzo?.esatto}
       />
       </div>{/* /.pg-cols */}
     </main>

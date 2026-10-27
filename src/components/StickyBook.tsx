@@ -20,11 +20,14 @@ export function StickyBook({
   prezzo,
   unita,
   cambio,
+  da = true,
 }: {
   titolo: string;
   prezzo: number | null;
   unita: string;
   cambio?: Cambi | null;
+  /** false = il prezzo e' quello Adult, non un «a partire da»: niente «from» */
+  da?: boolean;
 }) {
   const [mostra, setMostra] = useState(false);
 
@@ -95,7 +98,8 @@ export function StickyBook({
         <div className="pr-sticky-title">{titolo}</div>
         {prezzo != null && (
           <div className="pr-sticky-price">
-            <span className="from">from</span> <b>&euro;{prezzo.toFixed(0)}</b>{' '}
+            {da && <span className="from">from </span>}
+            <b>&euro;{prezzo.toFixed(0)}</b>{' '}
             <span className="per">{unita}</span>
             {/* Qui la riga e' strettissima e sta sopra il pulsante: solo
                 le due cifre, senza la fonte. Chi vuole il dettaglio ce
