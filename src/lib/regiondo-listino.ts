@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import { testo } from './prosa';
 import { unitaDi } from './prezzi';
 import { sezioneDi, type Servizio, type Variante } from './listino';
+import { chiama, regiondoConfigurato } from './regiondo-api';
 
 /* I PREZZI DEL LISTINO, LETTI DA REGIONDO OGNI VOLTA.
  *
@@ -40,10 +41,91 @@ const DURATA = 300;
 type OpzioneGrezza = { option_id?: string | number; name?: string; original_price?: number | string };
 type VarianteGrezza = { variation_id?: string | number; title?: string; options?: OpzioneGrezza[] };
 
+/* ── 🔴 DAL 27/10/2026 SI LEGGE DALL'API UFFICIALE ─────────────────────
+ * Regiondo ha messo il negozio (prestigerent.regiondo.com) dietro la
+ * protezione anti-bot di Cloudflare: `ticketVariations` risponde 403
+ * «Attention Required!» a qualunque richiesta da un server, Vercel
+ * compreso. Il listino mostrava «Regiondo non ha risposto per 86
+ * prodotti». Non e' un guasto nostro e non si aggira: la protezione e'
+ * voluta.
+ *
+ * L'API ufficiale firmata (api.regiondo.com, le nostre chiavi) non e'
+ * dietro quella protezione e da' gli stessi dati, senza data:
+ *  - `products`: lo SKU del sito -> il numero interno del prodotto
+ *    (T-PR193-210790 -> 195819; NON e' la cifra dentro lo SKU);
+ *  - `products/variations/{prodotto}`: varianti, col nome;
+ *  - `products/availoptions/{variante}`: opzioni con `original_price`.
+ * Verificato sulla Wine Experience: 89/79 e 129, gli stessi del widget.
+ * Il widget resta come riserva, se un giorno Regiondo togliesse il
+ * blocco. */
+
+type ProdottoUfficiale = { product_id: string; sku: string };
+
+/** SKU -> numero del prodotto sull'API ufficiale. Cambia solo quando si
+ *  aggiunge un prodotto su Regiondo: un'ora di memoria basta. Dentro lo
+ *  stesso minuto la lista si chiede una volta sola, anche con «Rileggi
+ *  adesso»: senza, gli 86 prodotti la richiederebbero 86 volte. */
+let mappaRecente: { quando: number; mappa: Promise<Map<string, string>> } | null = null;
+
+function prodottiUfficiali(fresco: boolean): Promise<Map<string, string>> {
+  if (mappaRecente && Date.now() - mappaRecente.quando < 60_000) return mappaRecente.mappa;
+  const mappa = leggiProdottiUfficiali(fresco).then((m) => {
+    if (!m.size) mappaRecente = null; // una lista vuota non si tiene a memoria
+    return m;
+  });
+  mappaRecente = { quando: Date.now(), mappa };
+  return mappa;
+}
+
+async function leggiProdottiUfficiali(fresco: boolean): Promise<Map<string, string>> {
+  const mappa = new Map<string, string>();
+  for (let offset = 0; offset < 1000; offset += 100) {
+    const d = await chiama<{ data?: ProdottoUfficiale[] }>('products', { active_only: 1, limit: 100, offset }, fresco ? 0 : 3600);
+    const lista = d?.data ?? [];
+    for (const p of lista) if (p.sku && p.product_id) mappa.set(p.sku, String(p.product_id));
+    if (lista.length < 100) break;
+  }
+  return mappa;
+}
+
+type OpzioneUfficiale = { option_id?: string; name?: string; original_price?: string; sort_order?: string };
+
+/** Le varianti di un prodotto dall'API ufficiale; null se non risponde. */
+async function opzioniUfficiali(sku: string, fresco: boolean): Promise<Variante[] | null> {
+  if (!regiondoConfigurato()) return null;
+  const memoria = fresco ? 0 : DURATA;
+  const prodotto = (await prodottiUfficiali(fresco)).get(sku);
+  if (!prodotto) return null;
+  const v = await chiama<{ data?: { id: string; name: string }[] }>(`products/variations/${prodotto}`, {}, memoria);
+  if (!v?.data?.length) return null;
+  const varianti = await Promise.all(
+    v.data.map(async (x) => {
+      const o = await chiama<{ data?: Record<string, OpzioneUfficiale> }>(`products/availoptions/${x.id}`, {}, memoria);
+      const opzioni = Object.values(o?.data ?? {})
+        .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+        .map((op) => ({ id: String(op.option_id ?? ''), nome: testo(op.name ?? ''), prezzo: Number(op.original_price) }))
+        .filter((op) => op.nome && Number.isFinite(op.prezzo) && op.prezzo > 0);
+      return { id: String(x.id), titolo: testo(x.name ?? ''), opzioni };
+    })
+  );
+  return varianti.some((x) => x.opzioni.length) ? varianti : null;
+}
+
 /** Le varianti di un prodotto con le opzioni e i prezzi. null se Regiondo
  *  non risponde: un prodotto irraggiungibile non deve far fallire gli
- *  altri 85, come in `calendario()` di src/lib/regiondo-api.ts. */
+ *  altri 85, come in `calendario()` di src/lib/regiondo-api.ts.
+ *  Prima l'API ufficiale, poi il widget come riserva (vedi sopra). */
 export async function opzioniDi(sku: string, fresco = false): Promise<Variante[] | null> {
+  try {
+    const ufficiali = await opzioniUfficiali(sku, fresco);
+    if (ufficiali) return ufficiali;
+  } catch {
+    /* si prova il widget */
+  }
+  return opzioniDalWidget(sku, fresco);
+}
+
+async function opzioniDalWidget(sku: string, fresco: boolean): Promise<Variante[] | null> {
   const url =
     `${SHOP}/widgets/booking/product/ticketVariations?locale=en_US` +
     `&provider=${encodeURIComponent(PROVIDER)}&product=${encodeURIComponent(sku)}`;
