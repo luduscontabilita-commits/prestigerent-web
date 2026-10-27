@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import { testo } from './prosa';
 import { unitaDi } from './prezzi';
 import { sezioneDi, type Servizio, type Variante } from './listino';
+import { unstable_cache } from 'next/cache';
 import { chiama, regiondoConfigurato } from './regiondo-api';
 
 /* I PREZZI DEL LISTINO, LETTI DA REGIONDO OGNI VOLTA.
@@ -78,15 +79,37 @@ function prodottiUfficiali(fresco: boolean): Promise<Map<string, string>> {
 }
 
 async function leggiProdottiUfficiali(fresco: boolean): Promise<Map<string, string>> {
-  const mappa = new Map<string, string>();
+  return new Map(fresco ? await coppieProdotti() : await coppieInMemoria());
+}
+
+async function coppieProdotti(): Promise<[string, string][]> {
+  const coppie: [string, string][] = [];
   for (let offset = 0; offset < 1000; offset += 100) {
-    const d = await chiama<{ data?: ProdottoUfficiale[] }>('products', { active_only: 1, limit: 100, offset }, fresco ? 0 : 3600);
+    const d = await chiama<{ data?: ProdottoUfficiale[] }>('products', { active_only: 1, limit: 100, offset }, 0);
     const lista = d?.data ?? [];
-    for (const p of lista) if (p.sku && p.product_id) mappa.set(p.sku, String(p.product_id));
+    for (const p of lista) if (p.sku && p.product_id) coppie.push([p.sku, String(p.product_id)]);
     if (lista.length < 100) break;
   }
-  return mappa;
+  return coppie;
 }
+
+/* 🔴 LA MEMORIA VA TENUTA QUI, NON NELLA `fetch`. Ogni chiamata firmata
+   porta l'ora al secondo negli header (X-API-TIME, X-API-HASH), e la
+   memoria delle `fetch` di Next distingue le richieste anche per gli
+   header: non ne ritrovava mai una uguale, e le pagine del listino
+   rifacevano ~200 chiamate a ogni visita (10 secondi, misurato il
+   27/10/2026). `unstable_cache` tiene il RISULTATO, per chiave.
+   Se la lettura fallisce si lancia un errore: cosi' un fallimento non
+   resta in memoria per cinque minuti. */
+const coppieInMemoria = unstable_cache(
+  async () => {
+    const c = await coppieProdotti();
+    if (!c.length) throw new Error('Regiondo: elenco prodotti vuoto');
+    return c;
+  },
+  ['regiondo-prodotti-v1'],
+  { revalidate: 3600, tags: ['regiondo-listino'] }
+);
 
 type OpzioneUfficiale = { option_id?: string; name?: string; original_price?: string; sort_order?: string };
 
@@ -117,13 +140,25 @@ async function opzioniUfficiali(sku: string, fresco: boolean): Promise<Variante[
  *  Prima l'API ufficiale, poi il widget come riserva (vedi sopra). */
 export async function opzioniDi(sku: string, fresco = false): Promise<Variante[] | null> {
   try {
-    const ufficiali = await opzioniUfficiali(sku, fresco);
+    const ufficiali = fresco ? await opzioniUfficiali(sku, true) : await opzioniInMemoria(sku);
     if (ufficiali) return ufficiali;
   } catch {
     /* si prova il widget */
   }
   return opzioniDalWidget(sku, fresco);
 }
+
+/** Le opzioni di un prodotto tenute in memoria cinque minuti, per SKU
+ *  (vedi `coppieInMemoria` sul perche' non basta la memoria delle fetch). */
+const opzioniInMemoria = unstable_cache(
+  async (sku: string) => {
+    const r = await opzioniUfficiali(sku, false);
+    if (!r) throw new Error(`Regiondo: nessuna opzione per ${sku}`);
+    return r;
+  },
+  ['regiondo-opzioni-v1'],
+  { revalidate: DURATA, tags: ['regiondo-listino'] }
+);
 
 async function opzioniDalWidget(sku: string, fresco: boolean): Promise<Variante[] | null> {
   const url =
