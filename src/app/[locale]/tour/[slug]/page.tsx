@@ -317,7 +317,14 @@ export default async function TourPage({
 
   /* I fatti si calcolano una volta sola: servono alla barra qui sotto e
      alla riga del prezzo, che da sola non diceva DA DOVE si parte. */
-  const fatti = fattiDi({ kind: tour.kind, durata: product?.durationLabel, schede });
+  const fatti = fattiDi({
+    kind: tour.kind,
+    durata: product?.durationLabel,
+    schede,
+    /* «(or 8 semiprivate)» solo se Regiondo ha davvero la variante semi
+       privata (proprieta', 29/10/2026: toglierlo dove non c'e'). */
+    semiprivato: (opzioni ?? []).some((v) => /semi.?private/i.test(v.titolo)),
+  });
   const partenza = fatti.find((f) => f.etichetta === 'Location')?.valore ?? null;
 
   /* 🔴 IL VOTO PER `aggregateRating`, E DA DOVE PUO' VENIRE.

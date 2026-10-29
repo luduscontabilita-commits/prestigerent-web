@@ -136,7 +136,11 @@ const TIPO: Record<string, string> = {
 /** Quante persone al massimo. Sono i numeri che il testo dei tour
  *  dichiara gia' ("max 25 people", "max 8"), non una stima. */
 const GRUPPO: Record<string, string> = {
-  small_group: 'Max 25 (or 8 semiprivate)',
+  /* «(or 8 semiprivate)» NON sta qui (proprieta', 29/10/2026): era scritto
+     per tutti e tre i small group, ma la variante semi privata (max 8)
+     esiste solo sulla Wine Experience. Lo aggiunge `fattiDi` quando il
+     tour ce l'ha davvero su Regiondo (`semiprivato`). */
+  small_group: 'Max 25',
   private: 'Your party only',
   cruise: 'Your party only',
   transfer: 'Your party only',
@@ -146,8 +150,10 @@ export function fattiDi(opzioni: {
   kind: string | null | undefined;
   durata: string | null | undefined;
   schede: Record<string, string> | undefined;
+  /** il tour ha su Regiondo una variante semi privata (oggi: la Wine Experience) */
+  semiprivato?: boolean;
 }): Fatto[] {
-  const { kind, durata, schede } = opzioni;
+  const { kind, durata, schede, semiprivato } = opzioni;
   const tempoLuogo = schede?.['TIME / LOCATION'];
   const fuori: Fatto[] = [];
 
@@ -167,7 +173,10 @@ export function fattiDi(opzioni: {
   fuori.push({ icona: 'lingua', etichetta: 'Language', valore: 'English' });
 
   if (kind && TIPO[kind]) fuori.push({ icona: 'tipo', etichetta: 'Tour type', valore: TIPO[kind] });
-  if (kind && GRUPPO[kind]) fuori.push({ icona: 'gruppo', etichetta: 'Group', valore: GRUPPO[kind] });
+  if (kind && GRUPPO[kind]) {
+    const valore = kind === 'small_group' && semiprivato ? `${GRUPPO[kind]} (or 8 semiprivate)` : GRUPPO[kind];
+    fuori.push({ icona: 'gruppo', etichetta: 'Group', valore });
+  }
 
   /* Le ventiquattro ore valgono su tutto il catalogo: e' la condizione
      che l'azienda applica, scritta in ogni scheda e ripetuta nel
